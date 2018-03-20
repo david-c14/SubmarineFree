@@ -25,3 +25,13 @@ RACK_DIR ?= ../..
 
 # Include the VCV Rack plugin Makefile framework
 include $(RACK_DIR)/plugin.mk
+
+# Make resources
+
+RESOURCES += $(wildcard res/*.svg)
+
+res: $(RESOURCES)
+	
+res/%.svg: res/src/%.svg
+	inkscape -z -T -l=$@ $<
+
