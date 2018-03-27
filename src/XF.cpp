@@ -2,6 +2,8 @@
 
 struct XF : Module {
 	enum ParamIds {
+		CV_PARAM_1,
+		MODE_PARAM_1,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -34,11 +36,14 @@ struct XF101 : ModuleWidget {
 	XF101(XF *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-104.svg")));
 
-		addInput(Port::create<PJ301MPort>(Vec(27.5,18), Port::INPUT, module, XF::INPUT_A_1));
-		addInput(Port::create<PJ301MPort>(Vec(127.5,18), Port::INPUT, module, XF::INPUT_B_1));
-		addInput(Port::create<PJ301MPort>(Vec(27.5,74), Port::INPUT, module, XF::INPUT_CV_1));
+		addInput(Port::create<sub_port>(Vec(27.5,18), Port::INPUT, module, XF::INPUT_A_1));
+		addInput(Port::create<sub_port>(Vec(127.5,18), Port::INPUT, module, XF::INPUT_B_1));
+		addInput(Port::create<sub_port>(Vec(27.5,74), Port::INPUT, module, XF::INPUT_CV_1));
 
-		addOutput(Port::create<PJ301MPort>(Vec(127.5,74), Port::OUTPUT, module, XF::OUTPUT_1));
+		addOutput(Port::create<sub_port>(Vec(127.5,74), Port::OUTPUT, module, XF::OUTPUT_1));
+
+		addParam(ParamWidget::create<sub_sw_2>(Vec(41, 46), module, XF::CV_PARAM_1, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_3>(Vec(125, 43.5), module, XF::MODE_PARAM_1, 0.0f, 2.0f, 0.0f));
 	}
 };
 
