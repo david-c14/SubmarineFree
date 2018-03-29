@@ -7,19 +7,27 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    id="svg4226">
-  <defs>
-    <radialGradient id="blueGradient" cx="0.5" cy="0.5" r="0.7">
-      <stop offset="0%" stop-color="#ccddff"/>
-      <stop offset="50%" stop-color="#6699ff"/>
-      <stop offset="100%" stop-color="3333cc"/>
-    </radialGradient>
-  </defs>
   <g
      inkscape:label="Background"
      inkscape:groupmode="layer"
      id="background">
+    <circle
+       cx="27"
+       cy="27"
+       r="27"
+       fill="#000000"
+       stroke="none"/>
     <rect x="25" y="4" width="4" height="12"
-      fill="url(#blueGradient)"
-      stroke="none"/>
+       fill="#003399"
+       stroke="none"/> 
+    <path d="M 27 5 l 2 5 l -2 5 l -2 -5 z"
+       fill="#0099cc"
+       stroke="none"/>
+    <circle
+       cx="27"
+       cy="10"
+       r="2"
+       fill="#00ccff"
+       stroke="none"/>
   </g>
 </svg>
