@@ -4,6 +4,8 @@ struct XF : Module {
 	enum ParamIds {
 		CV_PARAM_1,
 		MODE_PARAM_1,
+		LINK_PARAM_1,
+		FADE_PARAM_1,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -19,6 +21,7 @@ struct XF : Module {
 	enum LightIds {
 		NUM_LIGHTS
 	};
+	LightKnob *fader1;
 
 	XF() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -30,6 +33,7 @@ struct XF : Module {
 };
 
 void XF::step() {
+	fader1->setEnabled(inputs[INPUT_CV_1].active);
 }
 
 struct XF101 : ModuleWidget {
@@ -44,6 +48,9 @@ struct XF101 : ModuleWidget {
 
 		addParam(ParamWidget::create<sub_sw_2>(Vec(41, 46), module, XF::CV_PARAM_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_3>(Vec(125, 43.5), module, XF::MODE_PARAM_1, 0.0f, 2.0f, 0.0f));
+		addParam(ParamWidget::create<sub_btn>(Vec(90, 94.5), module, XF::LINK_PARAM_1, 0.0f, 1.0f, 0.0f));
+		module->fader1 = ParamWidget::create<sub_knob_large>(Vec(63, 31), module, XF::FADE_PARAM_1, -5.0f, 5.0f, 0.0f);
+		addParam(module->fader1);
 	}
 };
 
