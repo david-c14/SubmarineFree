@@ -44,5 +44,30 @@
        x="3"
        y="377"
        id="text4662">submarine</text>
+    <text x="45" y="12" text-anchor="middle">XF-102</text>
+  </g>
+  <g
+     inkscape:label="Group"
+     inkscape:groupmode="layer"
+     id="group1"
+     font-family="DejaVu Sans"
+     font-size="8"
+     stroke="#ffffff"
+     stroke-width="1"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     fill="none">
+    <line x1="3" y1="190.5" x2="87" y2="190.5" stroke="#719fcf"/>
+  </g>
+  <g
+     inkscape:label="Cutout"
+     inkscape:groupmode="layer"
+     id="cutout"
+     fill="#000000|">
+    <circle cx="45" cy="58" r="27"/>
+    <circle cx="20" cy="90" r="12.5"/>
+    <rect x="20" y="120" width="14" height="25" rx="7" ry="7"/>
+    <rect x="20" y="160" width="14" height="30" rx="7" ry="7"/>
+    <rect x="20" y="200" width="16" height="16" rx="3" ry="3"/>
   </g>
 </svg>
