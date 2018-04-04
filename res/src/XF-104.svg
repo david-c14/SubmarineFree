@@ -131,40 +131,4 @@
       <text x="141" y="334" >AUTO</text>
     </g>
   </g>
-  <g
-     inkscape:label="Cutout"
-     inkscape:groupmode="layer"
-     id="cutout"
-     fill="#000000">
-    <circle cx="90" cy="58" r="27" />
-    <circle cx="40" cy="30.5" r="12.5" />
-    <circle cx="40" cy="86.5" r="12.5" />
-    <circle cx="140" cy="30.5" r="12.5" />
-    <circle cx="140" cy="86.5" r="12.5" />
-    <rect x="41" y="46" width="14" height="25" rx="7" ry="7"/>
-    <rect x="125" y="43.5" width="14" height="30" rx="7" ry="7"/>
-    <rect x="90" y="94.5" width="16" height="16" rx="3" ry="3" />
-    <circle cx="90" cy="146" r="27" />
-    <circle cx="40" cy="118.5" r="12.5" />
-    <circle cx="40" cy="174.5" r="12.5" />
-    <circle cx="140" cy="118.5" r="12.5" />
-    <circle cx="140" cy="174.5" r="12.5" />
-    <rect x="41" y="134" width="14" height="25" rx="7" ry="7"/>
-    <rect x="125" y="131.5" width="14" height="30" rx="7" ry="7"/>
-    <circle cx="90" cy="234" r="27" />
-    <circle cx="40" cy="206.5" r="12.5" />
-    <circle cx="40" cy="262.5" r="12.5" />
-    <circle cx="140" cy="206.5" r="12.5" />
-    <circle cx="140" cy="262.5" r="12.5" />
-    <rect x="41" y="222" width="14" height="25" rx="7" ry="7"/>
-    <rect x="125" y="219.5" width="14" height="30" rx="7" ry="7"/>
-    <rect x="90" y="270.5" width="16" height="16" rx="3" ry="3" />
-    <circle cx="90" cy="322" r="27" />
-    <circle cx="40" cy="294.5" r="12.5" />
-    <circle cx="40" cy="350.5" r="12.5" />
-    <circle cx="140" cy="294.5" r="12.5" />
-    <circle cx="140" cy="350.5" r="12.5" />
-    <rect x="41" y="310" width="14" height="25" rx="7" ry="7"/>
-    <rect x="125" y="307.5" width="14" height="30" rx="7" ry="7"/>
-  </g>
 </svg>
