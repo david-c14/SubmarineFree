@@ -91,9 +91,9 @@
       <text x="27" y="92" text-anchor="end" font-size="16">CV</text>
       <text x="155" y="36" font-size="16">B</text>
       <text x="155" y="92" font-size="18" fill="#294f77">&#x21a6;</text>
-      <text x="141" y="52" >LIN</text>
-      <text x="141" y="61" >LOG</text>
-      <text x="141" y="70" >AUTO</text>
+      <text x="146" y="52" >LIN</text>
+      <text x="146" y="61" >LOG</text>
+      <text x="146" y="70" >AUTO</text>
       <text x="88" y="105" text-anchor="end" fill="#719fcf">LINK</text>
       <text x="58" y="175" font-size="10">A</text>
       <text x="116" y="175" font-size="10">B</text>
@@ -103,9 +103,9 @@
       <text x="27" y="180" text-anchor="end" font-size="16">CV</text>
       <text x="155" y="124" font-size="16">B</text>
       <text x="155" y="180" font-size="18" fill="#294f77">&#x21a6;</text>
-      <text x="141" y="140" >LIN</text>
-      <text x="141" y="149" >LOG</text>
-      <text x="141" y="158" >AUTO</text>
+      <text x="146" y="140" >LIN</text>
+      <text x="146" y="149" >LOG</text>
+      <text x="146" y="158" >AUTO</text>
       <text x="58" y="263" font-size="10">A</text>
       <text x="116" y="263" font-size="10">B</text>
       <text x="39" y="231" text-anchor="end">BI</text>
@@ -114,9 +114,9 @@
       <text x="27" y="268" text-anchor="end" font-size="16">CV</text>
       <text x="155" y="212" font-size="16">B</text>
       <text x="155" y="268" font-size="18" fill="#294f77">&#x21a6;</text>
-      <text x="141" y="228" >LIN</text>
-      <text x="141" y="237" >LOG</text>
-      <text x="141" y="246" >AUTO</text>
+      <text x="146" y="228" >LIN</text>
+      <text x="146" y="237" >LOG</text>
+      <text x="146" y="246" >AUTO</text>
       <text x="88" y="281" text-anchor="end" fill="#719fcf">LINK</text>
       <text x="58" y="351" font-size="10">A</text>
       <text x="116" y="351" font-size="10">B</text>
@@ -126,9 +126,9 @@
       <text x="27" y="356" text-anchor="end" font-size="16">CV</text>
       <text x="155" y="300" font-size="16">B</text>
       <text x="155" y="356" font-size="18" fill="#294f77">&#x21a6;</text>
-      <text x="141" y="316" >LIN</text>
-      <text x="141" y="325" >LOG</text>
-      <text x="141" y="334" >AUTO</text>
+      <text x="146" y="316" >LIN</text>
+      <text x="146" y="325" >LOG</text>
+      <text x="146" y="334" >AUTO</text>
     </g>
   </g>
 </svg>

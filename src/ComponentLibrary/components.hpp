@@ -50,6 +50,7 @@ struct sub_knob_large : LightKnob {
 	sub_knob_large() {
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
+		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large_a.svg")));
 	}
