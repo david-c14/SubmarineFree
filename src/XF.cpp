@@ -1,5 +1,64 @@
 #include "SubmarineFree.hpp"
 
+const int frameSize = 1024;
+
+struct XF_Correlator {
+	float samples_a[frameSize];
+	float samples_b[frameSize];
+	int n = 0;
+	int sp = 0;
+	float covariance = 0;
+	float sigma_a = 0;
+	float sigma_b = 0;
+	float sigma_a2 = 0;
+	float sigma_b2 = 0;
+	int schmitt = 0;
+	float correlation = 0;
+
+	int correlate(float, float);
+	XF_Correlator() {};
+};
+
+int XF_Correlator::correlate(float a, float b) {
+	//Remove old samples
+	if (n == frameSize) {
+		covariance -= (samples_a[sp] * samples_b[sp]);
+		sigma_a -= samples_a[sp];
+		sigma_b -= samples_b[sp];
+		sigma_a2 -= (samples_a[sp] * samples_a[sp]);
+		sigma_b2 -= (samples_b[sp] * samples_b[sp]);
+	}
+	else {
+		n++;
+	}
+
+	//Add new samples
+	covariance += (a * b);
+	sigma_a += samples_a[sp] = a;
+	sigma_b += samples_b[sp] = b;
+	sigma_a2 += (a * a);
+	sigma_b2 += (b * b);
+	sp++;
+	if (sp > frameSize - 1) {
+		sp -= frameSize;
+	}
+	float stdev_a = powf(sigma_a2 - (sigma_a * sigma_a / n), 0.5f);
+	float stdev_b = powf(sigma_b2 - (sigma_b * sigma_b / n), 0.5f);
+	if (stdev_a * stdev_b == 0.0f)
+		correlation = (stdev_a == stdev_b);
+	else
+		correlation = covariance / (stdev_a * stdev_b);
+	if (schmitt) {
+		if (fabs(correlation) < 0.4)
+			schmitt = 0;
+	}
+	else {
+		if (fabs(correlation) > 0.6)
+			schmitt = 1;
+	}
+	return schmitt;
+}
+
 struct XF : Module {
 	XF(int p, int i, int o, int l) : Module(p, i, o, l) {}
 	void crossFadeMono(
@@ -10,6 +69,9 @@ struct XF : Module {
 		int polar, 
 		int mode,
 		int light1,
+		int light2,
+		int light3,
+		XF_Correlator *correlator,
 		int out
 	); 
 };
@@ -22,16 +84,37 @@ void XF::crossFadeMono(
 	int polar, 
 	int mode,
 	int light1,
+	int light2,
+	int light3,
+	XF_Correlator *correlator,
 	int out
 ) {
 	float fade = clamp((inputs[cv].active?params[polar].value + inputs[cv].value:params[fader].value)/10.0f, 0.0f, 1.0f);
-	if (params[mode].value > 0.5f) {
+	if (params[mode].value > 1.5f) {
+		if (correlator->correlate(inputs[a].value, inputs[b].value)) {
+			outputs[out].value = inputs[a].value * (1.0f - fade) + inputs[b].value * fade;
+			lights[light1].value = 1.0f;
+			lights[light2].value = 0.0f;
+			lights[light3].value = 1.0f;
+		}
+		else {
+			outputs[out].value = inputs[a].value * powf(1.0f - fade, 0.5f) + inputs[b].value * powf(fade, 0.5f);
+			lights[light1].value = 0.0f;
+			lights[light2].value = 1.0f;
+			lights[light3].value = 1.0f;
+		}
+	}
+	else if (params[mode].value > 0.5f) {
 		outputs[out].value = inputs[a].value * powf(1.0f - fade, 0.5f) + inputs[b].value * powf(fade, 0.5f);
 		lights[light1].value = 0.0f;
+		lights[light2].value = 1.0f;
+		lights[light3].value = 0.0f;
 	}
 	else {
 		outputs[out].value = inputs[a].value * (1.0f - fade) + inputs[b].value * fade;
 		lights[light1].value = 1.0f;
+		lights[light2].value = 0.0f;
+		lights[light3].value = 0.0f;
 	}
 }
 
@@ -55,9 +138,12 @@ struct XF_101 : XF {
 	};
 	enum LightIds {
 		LIGHT_LIN_1,
+		LIGHT_LOG_1,
+		LIGHT_AUTO_1,
 		NUM_LIGHTS
 	};
 	LightKnob *fader1;
+	XF_Correlator correlators[1];
 
 	XF_101() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -78,6 +164,9 @@ void XF_101::step() {
 		PARAM_CV_1, 
 		PARAM_MODE_1,
 		LIGHT_LIN_1,
+		LIGHT_LOG_1,
+		LIGHT_AUTO_1,
+		&correlators[0],
 		OUTPUT_1
 	);
 }
@@ -100,6 +189,8 @@ struct XF101 : ModuleWidget {
 		module->fader1->setEnabled(1);
 
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 47), module, XF_101::LIGHT_LIN_1));
+		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 57), module, XF_101::LIGHT_LOG_1));
+		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 67), module, XF_101::LIGHT_AUTO_1));
 	}
 };
 
