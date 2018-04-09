@@ -27,6 +27,39 @@ struct sub_sw_3 : SVGSwitch, ToggleSwitch {
 	}
 };
 
+struct sub_sw_4 : SVGSwitch, ToggleSwitch {
+	sub_sw_4() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4a.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4b.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4c.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4d.svg")));
+	}
+};
+
+struct sub_sw_2h : SVGSwitch, ToggleSwitch {
+	sub_sw_2h() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_2ha.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_2hb.svg")));
+	}
+};
+
+struct sub_sw_3h : SVGSwitch, ToggleSwitch {
+	sub_sw_3h() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_3ha.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_3hb.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_3hc.svg")));
+	}
+};
+
+struct sub_sw_4h : SVGSwitch, ToggleSwitch {
+	sub_sw_4h() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4ha.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4hb.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4hc.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_sw_4hd.svg")));
+	}
+};
+
 struct sub_btn : SVGSwitch, ToggleSwitch {
 	sub_btn() {
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_btn.svg")));
