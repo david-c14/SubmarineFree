@@ -66,6 +66,7 @@
     <rect x="128" y="18.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="127.5" y="74" width="49.5" height="25" rx="12.5" ry="12.5" fill="#ffffff" stroke="none" />
     <path d="M 65 171.5 l 4 -4 A 30 30 0 1 1 111 167.5 l 4 4"/>
+    <line x1="146" y1="54" x2="150" y2="54"/>
     <rect x="3.5" y="106.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="3.5" y="162.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="128" y="106.5" width="48.5" height="24" rx="12" ry="12"/>
@@ -91,9 +92,9 @@
       <text x="27" y="92" text-anchor="end" font-size="16">CV</text>
       <text x="155" y="36" font-size="16">B</text>
       <text x="155" y="92" font-size="18" fill="#294f77">&#x21a6;</text>
-      <text x="146" y="52" >LIN</text>
-      <text x="146" y="61" >LOG</text>
-      <text x="146" y="70" >AUTO</text>
+      <text x="146" y="51" >LIN</text>
+      <text x="146" y="63" >LOG</text>
+      <text x="146" y="72" >AUTO</text>
       <text x="88" y="105" text-anchor="end" fill="#719fcf">LINK</text>
       <text x="58" y="175" font-size="10">A</text>
       <text x="116" y="175" font-size="10">B</text>
