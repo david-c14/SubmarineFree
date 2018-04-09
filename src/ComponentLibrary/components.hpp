@@ -34,9 +34,9 @@ struct sub_btn : SVGSwitch, ToggleSwitch {
 	}
 };
 
-//////////////
+//////////////////
 // Knobs
-//////////////
+//////////////////
 
 struct LightKnob : SVGKnob {
 	char enabled;
@@ -53,5 +53,16 @@ struct sub_knob_large : LightKnob {
 		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large_a.svg")));
+	}
+};
+
+//////////////////
+// Lights
+//////////////////
+
+struct BlueRedLight : GrayModuleLightWidget {
+	BlueRedLight() {
+		addBaseColor(COLOR_BLUE);
+		addBaseColor(COLOR_RED);
 	}
 };

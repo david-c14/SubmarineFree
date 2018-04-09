@@ -90,31 +90,33 @@ void XF::crossFadeMono(
 	int out
 ) {
 	float fade = clamp((inputs[cv].active?params[polar].value + inputs[cv].value:params[fader].value)/10.0f, 0.0f, 1.0f);
+	int mode = 0;
 	if (params[mode].value > 1.5f) {
-		if (correlator->correlate(inputs[a].value, inputs[b].value)) {
-			outputs[out].value = inputs[a].value * (1.0f - fade) + inputs[b].value * fade;
-			lights[light1].value = 1.0f;
-			lights[light2].value = 0.0f;
-			lights[light3].value = 1.0f;
+		mode = correlator->correlate(inputs[a].value, inputs[b].value)
+		if (correlator->correlation < -0.1f) {
+			lights[light3].value = 0.0f;
+			lights[light3 + 1].value = 1.0f;
 		}
 		else {
-			outputs[out].value = inputs[a].value * powf(1.0f - fade, 0.5f) + inputs[b].value * powf(fade, 0.5f);
-			lights[light1].value = 0.0f;
-			lights[light2].value = 1.0f;
 			lights[light3].value = 1.0f;
+			lights[light3 + 1].value = 0.0f;
 		}
 	}
 	else if (params[mode].value > 0.5f) {
+		mode = 0;
+	}
+	else {
+		mode = 1;
+	}
+	if (mode == 1) {
 		outputs[out].value = inputs[a].value * powf(1.0f - fade, 0.5f) + inputs[b].value * powf(fade, 0.5f);
 		lights[light1].value = 0.0f;
 		lights[light2].value = 1.0f;
-		lights[light3].value = 0.0f;
 	}
 	else {
 		outputs[out].value = inputs[a].value * (1.0f - fade) + inputs[b].value * fade;
 		lights[light1].value = 1.0f;
 		lights[light2].value = 0.0f;
-		lights[light3].value = 0.0f;
 	}
 }
 
@@ -140,6 +142,7 @@ struct XF_101 : XF {
 		LIGHT_LIN_1,
 		LIGHT_LOG_1,
 		LIGHT_AUTO_1,
+		LIGHT_INV_1,
 		NUM_LIGHTS
 	};
 	LightKnob *fader1;
@@ -190,7 +193,7 @@ struct XF101 : ModuleWidget {
 
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 47), module, XF_101::LIGHT_LIN_1));
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 57), module, XF_101::LIGHT_LOG_1));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 67), module, XF_101::LIGHT_AUTO_1));
+		addChild(ModuleLightWidget::create<TinyLight<BlueRedLight>>(Vec(141, 67), module, XF_101::LIGHT_AUTO_1));
 	}
 };
 
