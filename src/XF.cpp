@@ -2,23 +2,6 @@
 
 static const int frameSize = 1024;
 
-struct XF_Controls {
-	int a;
-	int ar;
-	int b;
-	int br;
-	int fader;
-	int cv;
-	int out;
-	int outr;
-	int polar;
-	int mode;
-	int light1;
-	int light2;
-	int light3;
-	XF_Correlator *correlator;
-}; 
-
 struct XF_Correlator {
 	float samples_a[frameSize];
 	float samples_b[frameSize];
@@ -35,6 +18,23 @@ struct XF_Correlator {
 	int correlate(float, float);
 	XF_Correlator() {};
 };
+
+struct XF_Controls {
+	int a;
+	int ar;
+	int b;
+	int br;
+	int fader;
+	int cv;
+	int out;
+	int outr;
+	int polar;
+	int mode;
+	int light1;
+	int light2;
+	int light3;
+	XF_Correlator *correlator;
+}; 
 
 int XF_Correlator::correlate(float a, float b) {
 	//Remove old samples
@@ -85,7 +85,7 @@ void XF::crossFadeMono(XF_Controls *controls) {
 	float fade = clamp((inputs[controls->cv].active?params[controls->polar].value + inputs[controls->cv].value:params[controls->fader].value)/10.0f, 0.0f, 1.0f);
 	int mode = 0;
 	if (params[controls->mode].value > 1.5f) {
-		mode = controls->correlator->correlate(inputs[controls->a].value, inputs[controls->b].value)
+		mode = controls->correlator->correlate(inputs[controls->a].value, inputs[controls->b].value);
 		if (controls->correlator->correlation < -0.1f) {
 			lights[controls->light3].value = 0.0f;
 			lights[controls->light3 + 1].value = 1.0f;
@@ -140,7 +140,7 @@ struct XF_101 : XF {
 	};
 	LightKnob *fader1;
 	XF_Correlator correlators[1];
-	XF_Controls controls[] = {
+	XF_Controls controls[1] = {
 		{
 			INPUT_A_1,
 			0,
@@ -169,21 +169,22 @@ struct XF_101 : XF {
 };
 
 void XF_101::step() {
-	fader1->setEnabled(!inputs[INPUT_CV_1].active);
-	crossFadeMono(@controls[0]);
+	if (fader1) 
+		fader1->setEnabled(!inputs[INPUT_CV_1].active);
+	crossFadeMono(&controls[0]);
 }
 
 struct XF101 : ModuleWidget {
 	XF101(XF_101 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-104.svg")));
 
-		addInput(Port::create<sub_port>(Vec(27.5,18), Port::INPUT, module, XF_101::INPUT_A_1));
+		addInput(Port::create<PJ301MPort>(Vec(27.5,18), Port::INPUT, module, XF_101::INPUT_A_1));
 		addInput(Port::create<sub_port>(Vec(127.5,18), Port::INPUT, module, XF_101::INPUT_B_1));
 		addInput(Port::create<sub_port>(Vec(27.5,74), Port::INPUT, module, XF_101::INPUT_CV_1));
 
 		addOutput(Port::create<sub_port>(Vec(127.5,74), Port::OUTPUT, module, XF_101::OUTPUT_1));
 
-		addParam(ParamWidget::create<sub_sw_2>(Vec(41, 46), module, XF_101::PARAM_CV_1, 5.0f, 0.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_2>(Vec(41, 46), module, XF_101::PARAM_CV_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_3>(Vec(125, 43.5), module, XF_101::PARAM_MODE_1, 0.0f, 2.0f, 0.0f));
 		addParam(ParamWidget::create<sub_btn>(Vec(90, 94.5), module, XF_101::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
 		module->fader1 = ParamWidget::create<sub_knob_large>(Vec(63, 31), module, XF_101::PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
