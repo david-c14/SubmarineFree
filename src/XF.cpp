@@ -82,7 +82,7 @@ struct XF : Module {
 };
 
 void XF::crossFadeMono(XF_Controls *controls) {
-	float fade = clamp((inputs[controls->cv].active?params[controls->polar].value + inputs[controls->cv].value:params[controls->fader].value)/10.0f, 0.0f, 1.0f);
+	float fade = clamp((inputs[controls->cv].active?params[controls->polar].value * 5.0f + inputs[controls->cv].value:params[controls->fader].value)/10.0f, 0.0f, 1.0f);
 	int mode = 0;
 	if (params[controls->mode].value > 1.5f) {
 		mode = controls->correlator->correlate(inputs[controls->a].value, inputs[controls->b].value);
@@ -97,9 +97,13 @@ void XF::crossFadeMono(XF_Controls *controls) {
 	}
 	else if (params[controls->mode].value > 0.5f) {
 		mode = 0;
+		lights[controls->light3].value = 0.0f;
+		lights[controls->light3 + 1].value = 0.0f;
 	}
 	else {
 		mode = 1;
+		lights[controls->light3].value = 0.0f;
+		lights[controls->light3 + 1].value = 0.0f;
 	}
 	if (mode == 1) {
 		outputs[controls->out].value = inputs[controls->a].value * powf(1.0f - fade, 0.5f) + inputs[controls->b].value * powf(fade, 0.5f);
