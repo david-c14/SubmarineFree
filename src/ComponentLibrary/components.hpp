@@ -73,19 +73,18 @@ struct sub_btn : SVGSwitch, ToggleSwitch {
 
 struct LightKnob : SVGKnob {
 	char enabled;
+	char *moduleFlag;
 	std::vector<std::shared_ptr<SVG>> frames;
 	LightKnob();
-	void addFrame(std::shared_ptr<SVG> svg);
-	void setEnabled(char val);
+	void setSVG(std::shared_ptr<SVG>, std::shared_ptr<SVG>);
+	void step() override;
 };
 
 struct sub_knob_large : LightKnob {
 	sub_knob_large() {
 		minAngle = -0.75*M_PI;
 		maxAngle = 0.75*M_PI;
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")));
-		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")));
-		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large_a.svg")));
+		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")), SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large_a.svg")));
 	}
 };
 

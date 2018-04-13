@@ -96,12 +96,12 @@ void XF::crossFadeMono(XF_Controls *controls) {
 		}
 	}
 	else if (params[controls->mode].value > 0.5f) {
-		mode = 0;
+		mode = 1;
 		lights[controls->light3].value = 0.0f;
 		lights[controls->light3 + 1].value = 0.0f;
 	}
 	else {
-		mode = 1;
+		mode = 0;
 		lights[controls->light3].value = 0.0f;
 		lights[controls->light3 + 1].value = 0.0f;
 	}
@@ -142,7 +142,7 @@ struct XF_101 : XF {
 		LIGHT_INV_1,
 		NUM_LIGHTS
 	};
-	LightKnob *fader1;
+	char faderKnob_enabled_1;
 	XF_Correlator correlators[1];
 	XF_Controls controls[1] = {
 		{
@@ -173,13 +173,13 @@ struct XF_101 : XF {
 };
 
 void XF_101::step() {
-	if (fader1) 
-		fader1->setEnabled(!inputs[INPUT_CV_1].active);
+	faderKnob_enabled_1 = !inputs[INPUT_CV_1].active;
 	crossFadeMono(&controls[0]);
 }
 
 struct XF101 : ModuleWidget {
 	XF101(XF_101 *module) : ModuleWidget(module) {
+		LightKnob *fader1;
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-104.svg")));
 
 		addInput(Port::create<PJ301MPort>(Vec(27.5,18), Port::INPUT, module, XF_101::INPUT_A_1));
@@ -191,9 +191,10 @@ struct XF101 : ModuleWidget {
 		addParam(ParamWidget::create<sub_sw_2>(Vec(41, 46), module, XF_101::PARAM_CV_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_3>(Vec(125, 43.5), module, XF_101::PARAM_MODE_1, 0.0f, 2.0f, 0.0f));
 		addParam(ParamWidget::create<sub_btn>(Vec(90, 94.5), module, XF_101::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
-		module->fader1 = ParamWidget::create<sub_knob_large>(Vec(63, 31), module, XF_101::PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
-		addParam(module->fader1);
-		module->fader1->setEnabled(1);
+		fader1 = ParamWidget::create<sub_knob_large>(Vec(63, 31), module, XF_101::PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
+		fader1->moduleFlag = &module->faderKnob_enabled_1;
+		addParam(fader1);
+//		module->fader1->setEnabled(1);
 
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 47), module, XF_101::LIGHT_LIN_1));
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 57), module, XF_101::LIGHT_LOG_1));
