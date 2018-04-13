@@ -7,5 +7,6 @@ extern Plugin *plugin;
 
 // Forward-declare each Model, defined in each module source file
 extern Model *modelXF101;
+extern Model *modelXF102;
 
 #include "ComponentLibrary/components.hpp"
