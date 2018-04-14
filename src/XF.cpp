@@ -1,8 +1,8 @@
 #include "SubmarineFree.hpp"
 
-static const int frameSize = 1024;
 
 struct XF_Correlator {
+	static const int frameSize = 1024;
 	float samples_a[frameSize];
 	float samples_b[frameSize];
 	int n = 0;
