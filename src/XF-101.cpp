@@ -57,7 +57,7 @@ void XF_101::step() {
 struct XF101 : ModuleWidget {
 	XF101(XF_101 *module) : ModuleWidget(module) {
 		LightKnob *fader;
-		setPanel(SVG::load(assetPlugin(plugin, "res/XF-104.svg")));
+		setPanel(SVG::load(assetPlugin(plugin, "res/XF-101.svg")));
 
 		addInput(Port::create<PJ301MPort>(Vec(27.5,18), Port::INPUT, module, XF_101::INPUT_A_1));
 		addInput(Port::create<sub_port>(Vec(127.5,18), Port::INPUT, module, XF_101::INPUT_B_1));

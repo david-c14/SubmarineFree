@@ -83,7 +83,7 @@ void XF_102::step() {
 struct XF102 : ModuleWidget {
 	XF102(XF_102 *module) : ModuleWidget(module) {
 		LightKnob *fader;
-		setPanel(SVG::load(assetPlugin(plugin, "res/XF-104.svg")));
+		setPanel(SVG::load(assetPlugin(plugin, "res/XF-102.svg")));
 		for (int i = 0; i < XF_102::deviceCount; i++) {
 			int offset = 88 * i;
 			addInput(Port::create<PJ301MPort>(Vec(27.5,18 + offset), Port::INPUT, module, XF_102::INPUT_A_1 + i));
