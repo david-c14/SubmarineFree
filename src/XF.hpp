@@ -35,6 +35,12 @@ struct XF_Controls {
 	XF_Correlator *correlator;
 }; 
 
+struct XF_LightKnob : sub_knob_large {
+	int cv;
+	int link;
+	void step() override;
+};
+
 struct XF : Module {
 	XF(int p, int i, int o, int l) : Module(p, i, o, l) {}
 	void crossFade(XF_Controls *controls);

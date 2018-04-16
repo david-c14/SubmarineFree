@@ -79,3 +79,13 @@ void XF::crossFade(XF_Controls *controls) {
 		lights[controls->light2].value = 0.0f;
 	}
 }
+
+void XF_LightKnob::step() {
+	if (link) {
+		setEnabled(!module->inputs[cv].active && (module->params[link].value < 0.5f));
+	}
+	else {
+		setEnabled(!module->inputs[cv].active);
+	}
+	SVGKnob::step();
+}

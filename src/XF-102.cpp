@@ -25,7 +25,6 @@ struct XF_102 : XF {
 		LIGHT_AUTO_1, LIGHT_INV_1, LIGHT_AUTO_2, LIGHT_INV_2,
 		NUM_LIGHTS
 	};
-	char faderKnob_enabled[deviceCount];
 	XF_Correlator correlators[deviceCount];
 	XF_Controls controls[(int)(deviceCount * 1.5f)];
 
@@ -68,13 +67,10 @@ struct XF_102 : XF {
 };
 
 void XF_102::step() {
-	faderKnob_enabled[0] = !inputs[INPUT_CV_1].active;
 	if (params[PARAM_LINK_1].value > 0.5f) {
 		crossFade(&controls[2]);
-		faderKnob_enabled[1] = 0;
 	}
 	else {
-		faderKnob_enabled[1] = !inputs[INPUT_CV_2].active;
 		crossFade(&controls[0]);
 		crossFade(&controls[1]);
 	}
@@ -82,7 +78,7 @@ void XF_102::step() {
 
 struct XF102 : ModuleWidget {
 	XF102(XF_102 *module) : ModuleWidget(module) {
-		LightKnob *fader;
+		XF_LightKnob *fader;
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-102.svg")));
 		for (int i = 0; i < XF_102::deviceCount; i++) {
 			int offset = 88 * i;
@@ -94,8 +90,9 @@ struct XF102 : ModuleWidget {
 
 			addParam(ParamWidget::create<sub_sw_2>(Vec(41, 46 + offset), module, XF_102::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
 			addParam(ParamWidget::create<sub_sw_3>(Vec(125, 43.5 + offset), module, XF_102::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
-			fader = ParamWidget::create<sub_knob_large>(Vec(63, 31 + offset), module, XF_102::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
-			fader->moduleFlag = &module->faderKnob_enabled[i];
+			fader = ParamWidget::create<XF_LightKnob>(Vec(63, 31 + offset), module, XF_102::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
+			fader->cv = XF_102::INPUT_CV_1 + i;
+			fader->link = i?XF_102::PARAM_LINK_1:0;
 			addParam(fader);
 
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 47 + offset), module, XF_102::LIGHT_LIN_1 + i));

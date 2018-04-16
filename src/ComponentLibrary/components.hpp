@@ -73,11 +73,10 @@ struct sub_btn : SVGSwitch, ToggleSwitch {
 
 struct LightKnob : SVGKnob {
 	char enabled;
-	char *moduleFlag;
 	std::vector<std::shared_ptr<SVG>> frames;
 	LightKnob();
 	void setSVG(std::shared_ptr<SVG>, std::shared_ptr<SVG>);
-	void step() override;
+	void setEnabled(int val);
 };
 
 struct sub_knob_large : LightKnob {
