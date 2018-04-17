@@ -14,7 +14,7 @@ CXXFLAGS +=
 LDFLAGS +=
 
 # Add .cpp and .c files to the build
-SOURCES += $(wildcard src/*.cpp)
+SOURCES += $(wildcard src/*.cpp) $(wildcard src/ComponentLibrary/*.cpp)
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin is automatically added.
@@ -28,10 +28,10 @@ include $(RACK_DIR)/plugin.mk
 
 # Make resources
 
-RESOURCES += $(wildcard res/*.svg)
+RESOURCES += $(wildcard res/??-???.svg)
 
 res: $(RESOURCES)
 	
-res/%.svg: res/src/%.svg
+%.svg: src/%.svg
 	inkscape -z -T -l=$@ $<
 
