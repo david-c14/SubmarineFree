@@ -56,20 +56,44 @@
      fill="none">
     <line x1="3" y1="190.5" x2="117" y2="190.5" stroke="#719fcf"/>
     <path d="M 35 103.5 l 4 -4 a 30 30 0 1 1 42 0 l 4 4 "/>
-    <rect x="3.5" y="18.5" width="48.5" height="24" rx="12" ry="12"/>
-    <rect x="3.5" y="18.5" width="24" height="51" rx="12" ry="12"/>
-    <rect x="68" y="18.5" width="48.5" height="24" rx="12" ry="12"/>
-    <rect x="92.5" y="18.5" width="24" height="51" rx="12" ry="12"/>
+    <path d="M 15.5 18.5 l 24.5 0 a 12 12 0 1 1 0 24 l -7.5 0 a 5 5 0 0 0 -5 5 l 0 10 a 12 12 0 1 1 -24 0 l 0 -27 a 12 12 0 0 1 12 -12 z"/>
+    <path d="M 80 18.5 l 24.5 0 a 12 12 0 0 1 12 12 l 0 27 a 12 12 0 1 1 -24 0l 0 -10 a 5 5 0 0 0 -5 -5 l -7.5 0 a 12 12 0 1 1 0 -24 z"/>
     <rect x="3.5" y="120.5" width="48.5" height="24" rx="12" ry="12"/>
-    <rect x="68" y="120.5" width="48.5" height="24" rx="12" ry="12"/>
-    <rect x="92.5" y="93.5" width="24" height="51" rx="12" ry="12"/>
-    <rect x="18.5" y="155" width="14" height="24" rx="7" ry="7"/>
-    <rect x="65.5" y="152" width="14" height="30" rx="7" ry="7"/>
+    <path fill="#ffffff" d="M 80 120.5 l 7.5 0 a 5 5 0 0 0 5 -5 l 0 -10 a 12 12 0 1 1 24 0 l 0 27 a 12 12 0 0 1 -12 12 l -24.5 0 a 12 12 0 1 1 0 -24 z"/>
     <g
        fill="#ffffff"
        stroke="none">
       <text x="34" y="113" font-size="10">A</text>
       <text x="80" y="113" font-size="10">B</text>
+      <text x="26" y="164" text-anchor="end">UNI</text>
+      <text x="26" y="176" text-anchor="end">BI</text>
+      <text x="30" y="36" font-size="16">A</text>
+      <text x="90" y="36" text-anchor="end" font-size="16">B</text>
+      <text x="26" y="138" font-size="16">CV</text>
+      <text x="90" y="138" text-anchor="end" font-size="18" fill="#294f77">&#x21a6;</text>
+      <text x="86" y="161" >LIN</text>
+      <text x="86" y="170" >LOG</text>
+      <text x="86" y="179" >AUTO</text>
+    </g>
+    <path d="M 35 279.5 l 4 -4 a 30 30 0 1 1 42 0 l 4 4 "/>
+    <path d="M 15.5 194.5 l 24.5 0 a 12 12 0 1 1 0 24 l -7.5 0 a 5 5 0 0 0 -5 5 l 0 10 a 12 12 0 1 1 -24 0 l 0 -27 a 12 12 0 0 1 12 -12 z"/>
+    <path d="M 80 194.5 l 24.5 0 a 12 12 0 0 1 12 12 l 0 27 a 12 12 0 1 1 -24 0l 0 -10 a 5 5 0 0 0 -5 -5 l -7.5 0 a 12 12 0 1 1 0 -24 z"/>
+    <rect x="3.5" y="296.5" width="48.5" height="24" rx="12" ry="12"/>
+    <path fill="#ffffff" d="M 80 296.5 l 7.5 0 a 5 5 0 0 0 5 -5 l 0 -10 a 12 12 0 1 1 24 0 l 0 27 a 12 12 0 0 1 -12 12 l -24.5 0 a 12 12 0 1 1 0 -24 z"/>
+    <g
+       fill="#ffffff"
+       stroke="none">
+      <text x="34" y="289" font-size="10">A</text>
+      <text x="80" y="289" font-size="10">B</text>
+      <text x="26" y="340" text-anchor="end">UNI</text>
+      <text x="26" y="352" text-anchor="end">BI</text>
+      <text x="30" y="212" font-size="16">A</text>
+      <text x="90" y="212" text-anchor="end" font-size="16">B</text>
+      <text x="26" y="314" font-size="16">CV</text>
+      <text x="90" y="314" text-anchor="end" font-size="18" fill="#294f77">&#x21a6;</text>
+      <text x="86" y="337" >LIN</text>
+      <text x="86" y="346" >LOG</text>
+      <text x="86" y="355" >AUTO</text>
     </g>
   </g>
 </svg>
