@@ -9,6 +9,7 @@ extern Plugin *plugin;
 extern Model *modelXF101;
 extern Model *modelXF102;
 extern Model *modelXF104;
+extern Model *modelXF201;
 extern Model *modelXF202;
 
 #include "ComponentLibrary/components.hpp"

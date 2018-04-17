@@ -13,6 +13,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelXF101);
 	p->addModel(modelXF102);
 	p->addModel(modelXF104);
+	p->addModel(modelXF201);
 	p->addModel(modelXF202);
 
 	// Any other plugin initialization may go here.
