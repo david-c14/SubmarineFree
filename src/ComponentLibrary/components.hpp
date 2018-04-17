@@ -8,6 +8,12 @@ struct sub_port : SVGPort {
 	}
 };
 
+struct sub_port_red : SVGPort {
+	sub_port_red() {
+		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port_red.svg")));
+	}
+};
+
 //////////////////
 // Switches
 //////////////////
