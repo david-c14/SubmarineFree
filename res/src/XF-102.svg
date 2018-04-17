@@ -57,12 +57,12 @@
      fill="none">
     <line x1="3" y1="102.5" x2="67" y2="102.5" stroke="#719fcf"/>
     <line x1="109" y1="102.5" x2="177" y2="102.5" stroke="#719fcf"/>
-    <path d="M 65 83.5 l 4 -4 A 30 30 0 1 1 111 79.5 l 4 4"/>
+    <path d="M 65 83.5 l 4 -4 a 30 30 0 1 1 42 0 l 4 4"/>
     <rect x="3.5" y="18.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="3.5" y="74.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="128" y="18.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="127.5" y="74" width="49.5" height="25" rx="12.5" ry="12.5" fill="#ffffff" stroke="none" />
-    <path d="M 65 171.5 l 4 -4 A 30 30 0 1 1 111 167.5 l 4 4"/>
+    <path d="M 65 171.5 l 4 -4 a 30 30 0 1 1 42 0 l 4 4"/>
     <rect x="3.5" y="106.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="3.5" y="162.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="128" y="106.5" width="48.5" height="24" rx="12" ry="12"/>

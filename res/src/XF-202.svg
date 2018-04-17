@@ -55,7 +55,7 @@
      stroke-linejoin="round"
      fill="none">
     <line x1="3" y1="190.5" x2="117" y2="190.5" stroke="#719fcf"/>
-    <path d="M 35 103.5 l 4 -4 A 30 30 0 1 1 81 99.5 l 4 4 "/>
+    <path d="M 35 103.5 l 4 -4 a 30 30 0 1 1 42 0 l 4 4 "/>
     <rect x="3.5" y="18.5" width="48.5" height="24" rx="12" ry="12"/>
     <rect x="3.5" y="18.5" width="24" height="51" rx="12" ry="12"/>
     <rect x="68" y="18.5" width="48.5" height="24" rx="12" ry="12"/>
