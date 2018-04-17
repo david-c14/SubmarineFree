@@ -10,7 +10,18 @@ void init(rack::Plugin *p) {
 	p->version = TOSTRING(VERSION);
 
 	// Add all Models defined throughout the plugin
-	p->addModel(modelXF101);
+	p->addModel(modelBP101);
+	p->addModel(modelBP102);
+	p->addModel(modelBP104);
+	p->addModel(modelBP108);
+	p->addModel(modelBP110);
+	p->addModel(modelBP112);
+	p->addModel(modelBP116);
+	p->addModel(modelBP120);
+	p->addModel(modelBP124);
+	p->addModel(modelBP132);
+
+  p->addModel(modelXF101);
 	p->addModel(modelXF102);
 	p->addModel(modelXF104);
 	p->addModel(modelXF201);
