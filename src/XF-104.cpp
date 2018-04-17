@@ -89,7 +89,7 @@ struct XF104 : ModuleWidget {
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-104.svg")));
 		for (int i = 0; i < XF_104::deviceCount; i++) {
 			int offset = 88 * i;
-			addInput(Port::create<PJ301MPort>(Vec(27.5,18 + offset), Port::INPUT, module, XF_104::INPUT_A_1 + i));
+			addInput(Port::create<sub_port>(Vec(27.5,18 + offset), Port::INPUT, module, XF_104::INPUT_A_1 + i));
 			addInput(Port::create<sub_port>(Vec(127.5,18 + offset), Port::INPUT, module, XF_104::INPUT_B_1 + i));
 			addInput(Port::create<sub_port>(Vec(27.5,74 + offset), Port::INPUT, module, XF_104::INPUT_CV_1 + i));
 
