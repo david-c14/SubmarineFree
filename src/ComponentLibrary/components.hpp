@@ -14,6 +14,12 @@ struct sub_port_red : SVGPort {
 	}
 };
 
+struct sub_port_blue : SVGPort {
+	sub_port_blue() {
+		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port_blue.svg")));
+	}
+};
+
 //////////////////
 // Switches
 //////////////////
@@ -83,6 +89,14 @@ struct LightKnob : SVGKnob {
 	LightKnob();
 	void setSVG(std::shared_ptr<SVG>, std::shared_ptr<SVG>);
 	void setEnabled(int val);
+};
+
+struct sub_knob_small : LightKnob {
+	sub_knob_small() {
+		minAngle = -0.75*M_PI;
+		maxAngle = 0.75*M_PI;
+		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_small.svg")), SVG::load(assetPlugin(plugin, "res/Components/sub_knob_small_a.svg")));
+	}
 };
 
 struct sub_knob_large : LightKnob {
