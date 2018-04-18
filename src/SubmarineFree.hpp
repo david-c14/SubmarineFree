@@ -23,4 +23,6 @@ extern Model *modelBP120;
 extern Model *modelBP124;
 extern Model *modelBP132;
 
+extern Model *modelLD106;
+
 #include "ComponentLibrary/components.hpp"

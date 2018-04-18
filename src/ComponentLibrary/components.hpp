@@ -107,6 +107,22 @@ struct sub_knob_large : LightKnob {
 	}
 };
 
+struct sub_knob_small_on : SVGKnob {
+	sub_knob_small_on() {
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
+		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_small_a.svg")));
+	}
+};
+
+struct sub_knob_large_on : SVGKnob {
+	sub_knob_large_on() {
+		minAngle = -0.83*M_PI;
+		maxAngle = 0.83*M_PI;
+		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large_a.svg")));
+	}
+};
+
 //////////////////
 // Lights
 //////////////////
