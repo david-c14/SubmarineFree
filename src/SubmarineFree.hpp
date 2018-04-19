@@ -6,6 +6,8 @@ using namespace rack;
 extern Plugin *plugin;
 
 // Forward-declare each Model, defined in each module source file
+extern Model *modelAG106;
+
 extern Model *modelXF101;
 extern Model *modelXF102;
 extern Model *modelXF104;
