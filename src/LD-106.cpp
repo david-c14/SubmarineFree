@@ -47,16 +47,14 @@ struct LD_106 : Module {
 
 void LD_106::step() {
 	for (int i = 0; i < deviceCount; i++) {
-		if (inputs[INPUT_1 + i].active) {
-			if (schmittState[i]) {
-				if (inputs[INPUT_1 + i].value < (params[PARAM_CUTOFF_1 + i].value - params[PARAM_WIDTH_1 + i].value)) {	
-					schmittState[i] = 0;
-				}
+		if (schmittState[i]) {
+			if (inputs[INPUT_1 + i].value < (params[PARAM_CUTOFF_1 + i].value - params[PARAM_WIDTH_1 + i].value)) {	
+				schmittState[i] = 0;
 			}
-			else {
-				if (inputs[INPUT_1 + i].value > (params[PARAM_CUTOFF_1 + i].value + params[PARAM_WIDTH_1 + i].value)) {
-					schmittState[i] = 5;
-				}
+		}
+		else {
+			if (inputs[INPUT_1 + i].value > (params[PARAM_CUTOFF_1 + i].value + params[PARAM_WIDTH_1 + i].value)) {
+				schmittState[i] = 5;
 			}
 		}
 		outputs[OUTPUT_1 + i].value = schmittState[i];

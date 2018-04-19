@@ -104,35 +104,4 @@
       <text x="62" y="355" text-anchor="end">WIDTH</text>
     </g>
   </g>
-  <g 
-     inkscape:lable="Cutout"
-     inkscape:groupmode="layer"
-     id="cutout"
-     fill="#000000"
-     stroke="none">
-    <circle cx="16" cy="31.5" r="12.5"/>
-    <circle cx="74" cy="31.5" r="12.5"/>
-    <circle cx="16" cy="59" r="12"/>
-    <circle cx="74" cy="59" r="12"/>
-    <circle cx="16" cy="89.5" r="12.5"/>
-    <circle cx="74" cy="89.5" r="12.5"/>
-    <circle cx="16" cy="117" r="12"/>
-    <circle cx="74" cy="117" r="12"/>
-    <circle cx="16" cy="147.5" r="12.5"/>
-    <circle cx="74" cy="147.5" r="12.5"/>
-    <circle cx="16" cy="175" r="12"/>
-    <circle cx="74" cy="175" r="12"/>
-    <circle cx="16" cy="205.5" r="12.5"/>
-    <circle cx="74" cy="205.5" r="12.5"/>
-    <circle cx="16" cy="233" r="12"/>
-    <circle cx="74" cy="233" r="12"/>
-    <circle cx="16" cy="263.5" r="12.5"/>
-    <circle cx="74" cy="263.5" r="12.5"/>
-    <circle cx="16" cy="291" r="12"/>
-    <circle cx="74" cy="291" r="12"/>
-    <circle cx="16" cy="321.5" r="12.5"/>
-    <circle cx="74" cy="321.5" r="12.5"/>
-    <circle cx="16" cy="349" r="12"/>
-    <circle cx="74" cy="349" r="12"/>
-  </g>
 </svg>
