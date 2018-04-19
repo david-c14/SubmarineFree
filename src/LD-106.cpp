@@ -115,4 +115,4 @@ void LD106::appendContextMenu(Menu *menu) {
 	menu->addChild(menuItem);
 }
 
-Model *modelLD106 = Model::create<LD_106, LD106>("SubmarineFree", "LD-106", "LD-106 Hex Schmitt Trigger Line Driver", DIGITAL_TAG, LOGIC_TAG, MULTIPLE_TAG);
+Model *modelLD106 = Model::create<LD_106, LD106>("SubmarineFree", "LD-106", "LD-106 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
