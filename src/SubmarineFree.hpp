@@ -29,4 +29,6 @@ extern Model *modelXF104;
 extern Model *modelXF201;
 extern Model *modelXF202;
 
+extern Model *modelXG106;
+
 #include "ComponentLibrary/components.hpp"
