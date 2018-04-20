@@ -73,9 +73,9 @@ struct LD106 : ModuleWidget {
 
 			addOutput(Port::create<sub_port_blue>(Vec(61.5,19 + offset), Port::OUTPUT, module, LD_106::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = ParamWidget::create<sub_knob_small_on>(Vec(4, 47 + offset), module, LD_106::PARAM_CUTOFF_1 + i, -5.0f, 5.0f, 2.5f);
+			cutoffWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(4, 47 + offset), module, LD_106::PARAM_CUTOFF_1 + i, -5.0f, 5.0f, 2.5f);
 			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = ParamWidget::create<sub_knob_small_on>(Vec(62, 47 + offset), module, LD_106::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 0.0f);
+			widthWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(62, 47 + offset), module, LD_106::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 0.0f);
 			addParam(widthWidgets[i]);
 		}
 	}

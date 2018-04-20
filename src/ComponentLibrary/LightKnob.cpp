@@ -2,6 +2,8 @@
 
 LightKnob::LightKnob() {
 	enabled = 0;
+	minAngle = -0.83*M_PI;
+	maxAngle = 0.83*M_PI;
 }
 
 void LightKnob::setSVG(std::shared_ptr<SVG> svg1, std::shared_ptr<SVG> svg2) {
