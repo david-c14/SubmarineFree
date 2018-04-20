@@ -115,7 +115,7 @@ struct LA_Display : TransparentWidget {
 		for (int i = 0; i < BUFFER_SIZE; i++) {
 			float x, y;
 			x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-			y = offset - clamp(values[i], 0.0f, 1.0f) * 29;
+			y = offset - clamp(values[i], 0.0f, 5.0f) * 5.8f;
 			if (i == 0)
 				nvgMoveTo(vg, x, y);
 			else
