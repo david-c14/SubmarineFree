@@ -43,12 +43,32 @@ struct LA_108 : Module {
 };
 
 void LA_108::step() {
+	for (int i = 0; i < 9; i++)
+		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);
 }
 
 struct LA_Display : TransparentWidget {
 	LA_108 *module;
 
+	void drawIndex(NVGcontext *vg, float value) {
+		Rect b = Rect(Vec(0, 0), box.size);
+		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+		value = value * b.size.x;
+
+		nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
+		{
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, value, 0);
+			nvgLineTo(vg, value, b.size.y);
+			nvgClosePath(vg);
+		}
+		nvgStroke(vg);
+		nvgResetScissor(vg);
+	}
+
 	void draw(NVGcontext *vg) override {
+		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_1].value, 0.0f, 1.0f));
+		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_2].value, 0.0f, 1.0f));
 	}
 };
 
@@ -59,22 +79,22 @@ struct LA108 : ModuleWidget {
 		{
 			LA_Display * display = new LA_Display();
 			display->module = module;
-			display->box.pos = Vec(45, 15);
-			display->box.size = Vec(box.size.x - 47, 304);
+			display->box.pos = Vec(42, 15);
+			display->box.size = Vec(box.size.x - 44, 280);
 			addChild(display);
 		}
 
 		for (int i = 0; i < 8; i++) {
 			addInput(Port::create<sub_port_blue>(Vec(4, 20 + 35 * i), Port::INPUT, module, LA_108::INPUT_1 + i));
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 42 + 38 * i), module, LA_108::LIGHT_1 + i));
+			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 22 + 35 * i), module, LA_108::LIGHT_1 + i));
 		}
 
 		addInput(Port::create<sub_port_blue>(Vec(4, 330), Port::INPUT, module, LA_108::INPUT_EXT));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 351), module, LA_108::LIGHT_EXT));
+		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 332), module, LA_108::LIGHT_EXT));
 
 		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(48, 325), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(88, 325), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(108, 325), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(108, 325), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
 		addParam(ParamWidget::create<sub_knob_med>(Vec(148, 325), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_knob_med>(Vec(188, 325), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
 	}
