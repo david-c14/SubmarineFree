@@ -11,6 +11,7 @@ struct LA_108 : Module {
 		PARAM_INDEX_1,
 		PARAM_INDEX_2,
 		PARAM_RUN,
+		PARAM_RESET,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -175,14 +176,16 @@ struct LA108 : ModuleWidget {
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 22 + 35 * i), module, LA_108::LIGHT_1 + i));
 		}
 
-		addInput(Port::create<sub_port_blue>(Vec(4, 330), Port::INPUT, module, LA_108::INPUT_EXT));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 332), module, LA_108::LIGHT_EXT));
+		addInput(Port::create<sub_port_blue>(Vec(4, 310), Port::INPUT, module, LA_108::INPUT_EXT));
+		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, LA_108::LIGHT_EXT));
 
-		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(48, 325), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
-		addParam(ParamWidget::create<sub_sw_2>(Vec(88, 325), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(108, 325), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(148, 325), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(188, 325), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
+		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(43, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_2>(Vec(90, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_2>(Vec(120, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_btn>(Vec(167, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(191, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
+		addParam(ParamWidget::create<sub_knob_small>(Vec(237, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_small>(Vec(267, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
 	}
 };
 
