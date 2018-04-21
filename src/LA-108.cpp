@@ -47,6 +47,7 @@ struct LA_108 : Module {
 	float frameIndex = 0;
 
 	SchmittTrigger trigger;
+	sub_btn *resetButtonWidget;
 
 	LA_108() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -90,15 +91,28 @@ void LA_108::step() {
 		if (params[PARAM_EDGE].value > 0.5f)
 			gate = 5.0f - gate;
 
-		// Reset if triggered
-		float holdTime = 0.1f;
-		if (trigger.process(gate)) {
-			bufferIndex = 0; frameIndex = 0; return;
-		}
+		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
+			resetButtonWidget->setValue(0.0f);
+			// Reset if triggered
+			float holdTime = 0.1f;
+			if (trigger.process(gate)) {
+				bufferIndex = 0; frameIndex = 0; return;
+			}
 
-		// Reset if we've waited too long
-		if (frameIndex >= engineGetSampleRate() * holdTime) {
-			bufferIndex = 0; frameIndex = 0; return;
+			// Reset if we've waited too long
+			if (frameIndex >= engineGetSampleRate() * holdTime) {
+				bufferIndex = 0; frameIndex = 0; return;
+			}
+		}
+		else {
+			if (params[PARAM_RESET].value > 0.5f) {
+				if (trigger.process(gate)) {
+					bufferIndex = 0; 
+					frameIndex = 0; 
+					resetButtonWidget->setValue(0.0f);
+					return;
+				}
+			}
 		}
 	}
 }
@@ -182,7 +196,8 @@ struct LA108 : ModuleWidget {
 		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(43, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(90, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(120, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_btn>(Vec(167, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f));
+		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(167, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
+		addParam(module->resetButtonWidget);
 		addParam(ParamWidget::create<sub_knob_med>(Vec(191, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
 		addParam(ParamWidget::create<sub_knob_small>(Vec(237, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_knob_small>(Vec(267, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
