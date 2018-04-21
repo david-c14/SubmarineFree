@@ -1,3 +1,4 @@
+#include <string.h>
 #include "SubmarineFree.hpp"
 #include "dsp/digital.hpp"
 
@@ -48,12 +49,16 @@ struct LA_108 : Module {
 
 	SchmittTrigger trigger;
 	sub_btn *resetButtonWidget;
+	char measureText[21];
 
 	LA_108() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 };
 
 void LA_108::step() {
+	// Measure Text
+	strncpy(measureText, "Hello", 20);
+	// Set trigger lights
 	for (int i = 0; i < 9; i++)
 		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);
 	// Compute time
@@ -173,6 +178,23 @@ struct LA_Display : TransparentWidget {
 	}
 };
 
+struct LA_Measure : TransparentWidget {
+	std::shared_ptr<Font> font;
+	LA_108 *module;
+
+	LA_Measure() {
+		font = Font::load(assetGlobal( "res/fonts/DejaVuSans.ttf"));
+	}
+
+	void draw(NVGcontext *vg) override {
+		nvgFontSize(vg, 13);
+		nvgFontFaceId(vg, font->handle);
+		nvgFillColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0xff));
+		nvgText(vg, 2, 10, module->measureText, NULL);
+	}
+};
+
+
 struct LA108 : ModuleWidget {
 	LA108(LA_108 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/LA-108.svg")));
@@ -182,6 +204,13 @@ struct LA108 : ModuleWidget {
 			display->module = module;
 			display->box.pos = Vec(42, 15);
 			display->box.size = Vec(box.size.x - 44, 280);
+			addChild(display);
+		}
+		{
+			LA_Measure * display = new LA_Measure();
+			display->module = module;
+			display->box.pos = Vec(237, 297);
+			display->box.size = Vec(54, 16);
 			addChild(display);
 		}
 
