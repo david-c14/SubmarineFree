@@ -58,8 +58,10 @@
        y="15"
        width="256"
        height="280"
+       rx="2"
+       ry="2"
        id="rect4244" />
-    <rect x="237" y="297" width="54" height="16" />
+    <rect x="237" y="297" width="54" height="16" rx="2" ry="2"/>
   </g>
   <g
      inkscape:label="Grid"

@@ -49,15 +49,12 @@ struct LA_108 : Module {
 
 	SchmittTrigger trigger;
 	sub_btn *resetButtonWidget;
-	char measureText[21];
 
 	LA_108() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 };
 
 void LA_108::step() {
-	// Measure Text
-	strncpy(measureText, "Hello", 20);
 	// Set trigger lights
 	for (int i = 0; i < 9; i++)
 		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);
@@ -181,16 +178,24 @@ struct LA_Display : TransparentWidget {
 struct LA_Measure : TransparentWidget {
 	std::shared_ptr<Font> font;
 	LA_108 *module;
+	char measureText[41];
 
 	LA_Measure() {
 		font = Font::load(assetGlobal( "res/fonts/DejaVuSans.ttf"));
 	}
 
 	void draw(NVGcontext *vg) override {
+		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].value);
+		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate()) * BUFFER_SIZE;
+		float width = frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].value - module->params[LA_108::PARAM_INDEX_2].value) / engineGetSampleRate(); 
+		
+		sprintf(measureText, "%f", width);
+//		strncpy(measureText, "Hello\xc2\xb5", 40);
 		nvgFontSize(vg, 13);
 		nvgFontFaceId(vg, font->handle);
-		nvgFillColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0xff));
-		nvgText(vg, 2, 10, module->measureText, NULL);
+		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
+		nvgTextAlign(vg, NVG_ALIGN_CENTER);
+		nvgText(vg, 27, 12, measureText, NULL);
 	}
 };
 

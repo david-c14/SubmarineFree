@@ -53,11 +53,17 @@
      stroke-linecap="round"
      stroke-linejoin="round"
      fill="none">
-    <line x1="3" y1="74" x2="87" y2="74" stroke="#719fcf"/>
-    <line x1="3" y1="132" x2="87" y2="132" stroke="#719fcf"/>
-    <line x1="3" y1="190" x2="87" y2="190" stroke="#719fcf"/>
-    <line x1="3" y1="248" x2="87" y2="248" stroke="#719fcf"/>
-    <line x1="3" y1="306" x2="87" y2="306" stroke="#719fcf"/>
+    <line x1="3" y1="74" x2="70" y2="74" stroke="#719fcf"/>
+    <line x1="78" y1="74" x2="87" y2="74" stroke="#719fcf"/>
+    <line x1="3" y1="132" x2="70" y2="132" stroke="#719fcf"/>
+    <line x1="78" y1="132" x2="87" y2="132" stroke="#719fcf"/>
+    <line x1="3" y1="190" x2="70" y2="190" stroke="#719fcf"/>
+    <line x1="78" y1="190" x2="87" y2="190" stroke="#719fcf"/>
+    <line x1="3" y1="248" x2="70" y2="248" stroke="#719fcf"/>
+    <line x1="78" y1="248" x2="87" y2="248" stroke="#719fcf"/>
+    <line x1="3" y1="306" x2="70" y2="306" stroke="#719fcf"/>
+    <line x1="78" y1="306" x2="87" y2="306" stroke="#719fcf"/>
+    <line x1="74" y1="45" x2="74" y2="335" stroke="#719fcf"/> 
 
     <path d="M 16 31.5 l 18 0 l 0 11 l 5 0 m -23 16 l 18 0 l 0 -11 l 5 0 m 16 -2.5 l 19 0 m -35 -11.5 l 0 23 l 4.5 0 a 11.5 11.5 0 0 0 0 -23 z" />
     <path d="M 16 89.5 l 18 0 l 0 11 l 5 0 m -23 16 l 18 0 l 0 -11 l 5 0 m 16 -2.5 l 19 0 m -35 -11.5 l 0 23 l 4.5 0 a 11.5 11.5 0 0 0 0 -23 z" />

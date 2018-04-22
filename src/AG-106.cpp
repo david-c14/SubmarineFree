@@ -38,8 +38,27 @@ struct AG_106 : Module {
 };
 
 void AG_106::step() {
+	int connCount = 0;
+	int setCount = 0;
 	for (int i = 0; i < deviceCount; i++) {
-		outputs[OUTPUT_1 + i].value = ((inputs[INPUT_A_1 + i].value > 2.5f) && (inputs[INPUT_B_1 + i].value > 2.5f)) * 5.0f;
+		if (inputs[INPUT_A_1 + i].active) {
+			connCount++;
+			if (inputs[INPUT_A_1 + i].value > 2.0f)
+				setCount++;
+		}
+		if (inputs[INPUT_B_1 + i].active) {
+			connCount++;
+			if (inputs[INPUT_B_1 + i].value > 2.0f)
+				setCount++;
+		}
+		if (outputs[OUTPUT_1 + i].active) {
+			if (connCount)
+				outputs[OUTPUT_1 + i].value = 5.0f * (connCount == setCount);
+			else
+				outputs[OUTPUT_1 + i].value = 0.0f;
+			connCount = 0;
+			setCount = 0;
+		}
 	}
 }
 
