@@ -1,4 +1,4 @@
-# [AG](https://github.com/david-c14/SubmarineFree/blob/master/manual/AG.md)
+# [AG](AG.md)
 Logical AND gates
 
 # [BP](https://github.com/david-c14/SubmarineFree/blob/master/manual/BP.md)
