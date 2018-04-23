@@ -186,12 +186,29 @@ struct LA_Measure : TransparentWidget {
 
 	void draw(NVGcontext *vg) override {
 		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].value);
-		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate()) * BUFFER_SIZE;
-		float width = frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].value - module->params[LA_108::PARAM_INDEX_2].value) / engineGetSampleRate(); 
+		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate()) + 1;
+		frameCount *= BUFFER_SIZE;
+		float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].value - module->params[LA_108::PARAM_INDEX_2].value) / engineGetSampleRate(); 
 		
-		sprintf(measureText, "%f", width);
-//		strncpy(measureText, "Hello\xc2\xb5", 40);
-		nvgFontSize(vg, 13);
+		if (width < 0.00000995f)
+			sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
+		else if (width < 0.0000995f)
+			sprintf(measureText, "%4.2f\xc2\xb5s", width * 1000000.0f);
+		else if (width < 0.000995f)
+			sprintf(measureText, "%4.1f\xc2\xb5s", width * 1000000.0f);
+		else if (width < 0.00995f)
+			sprintf(measureText, "%4.3fms", width * 1000.0f);
+		else if (width < 0.0995f)
+			sprintf(measureText, "%4.2fms", width * 1000.0f);
+		else if (width < 0.995f)
+			sprintf(measureText, "%4.1fms", width * 1000.0f);
+		else if (width < 9.95f)
+			sprintf(measureText, "%4.3fs", width);
+		else if (width < 99.5f)
+			sprintf(measureText, "%4.2fs", width);
+		else
+			sprintf(measureText, "%4.1fs", width);
+		nvgFontSize(vg, 14);
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
