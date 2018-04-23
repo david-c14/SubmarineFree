@@ -55,9 +55,9 @@ struct NG112 : ModuleWidget {
 
 		for (int i = 0; i < NG_112::deviceCount; i++) {
 			int offset = 29 * i;
-			addInput(Port::create<sub_port_blue>(Vec(3.5,19 + offset), Port::INPUT, module, NG_112::INPUT_1 + i));
+			addInput(Port::create<sub_port_blue>(Vec(4,19 + offset), Port::INPUT, module, NG_112::INPUT_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(61.5,19 + offset), Port::OUTPUT, module, NG_112::OUTPUT_1 + i));
+			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, NG_112::OUTPUT_1 + i));
 		}
 	}
 };

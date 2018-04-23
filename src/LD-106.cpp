@@ -69,9 +69,9 @@ struct LD106 : ModuleWidget {
 
 		for (int i = 0; i < LD_106::deviceCount; i++) {
 			int offset = 58 * i;
-			addInput(Port::create<sub_port>(Vec(3.5,19 + offset), Port::INPUT, module, LD_106::INPUT_1 + i));
+			addInput(Port::create<sub_port>(Vec(4,19 + offset), Port::INPUT, module, LD_106::INPUT_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(61.5,19 + offset), Port::OUTPUT, module, LD_106::OUTPUT_1 + i));
+			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, LD_106::OUTPUT_1 + i));
 
 			cutoffWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(4, 47 + offset), module, LD_106::PARAM_CUTOFF_1 + i, -5.0f, 5.0f, 2.5f);
 			addParam(cutoffWidgets[i]);
