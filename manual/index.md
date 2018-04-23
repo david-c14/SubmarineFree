@@ -1,7 +1,7 @@
 # [AG](AG.md)
 Logical AND gates
 
-# [BP](https://github.com/david-c14/SubmarineFree/blob/master/manual/BP.md)
+# [BP](BP.md)
 Blanking plates
 
 # [LA](https://github.com/david-c14/SubmarineFree/blob/master/manual/LA.md)
