@@ -60,9 +60,9 @@ struct XG106 : ModuleWidget {
 		for (int i = 0; i < XG_106::deviceCount; i++) {
 			int offset = 58 * i;
 			addInput(Port::create<sub_port_blue>(Vec(3.5,19 + offset), Port::INPUT, module, XG_106::INPUT_A_1 + i));
-			addInput(Port::create<sub_port_blue>(Vec(3.5,46 + offset), Port::INPUT, module, XG_106::INPUT_B_1 + i));
+			addInput(Port::create<sub_port_blue>(Vec(3.5,47 + offset), Port::INPUT, module, XG_106::INPUT_B_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(61.5,32.5 + offset), Port::OUTPUT, module, XG_106::OUTPUT_1 + i));
+			addOutput(Port::create<sub_port_blue>(Vec(61.5,33 + offset), Port::OUTPUT, module, XG_106::OUTPUT_1 + i));
 		}
 	}
 };
