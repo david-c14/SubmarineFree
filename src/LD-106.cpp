@@ -77,7 +77,7 @@ struct LD106 : ModuleWidget {
 
 			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, LD_106::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(4, 47 + offset), module, LD_106::PARAM_CUTOFF_1 + i, -5.0f, 5.0f, 2.5f);
+			cutoffWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(4, 47 + offset), module, LD_106::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 2.5f);
 			addParam(cutoffWidgets[i]);
 			widthWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(62, 47 + offset), module, LD_106::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 0.0f);
 			addParam(widthWidgets[i]);
@@ -110,6 +110,11 @@ void LD106::appendContextMenu(Menu *menu) {
 	menuItem = MenuItem::create<LDMenuItem>("Bipolar Levels");
 	menuItem->ld106 = ld106;
 	menuItem->cutoff = 0.0f;
+	menuItem->width = 0.0f;
+	menu->addChild(menuItem);
+	menuItem = MenuItem::create<LDMenuItem>("Unipolar Levels");
+	menuItem->ld106 = ld106;
+	menuItem->cutoff = 5.0f;
 	menuItem->width = 0.0f;
 	menu->addChild(menuItem);
 	menuItem = MenuItem::create<LDMenuItem>("TTL Levels");
