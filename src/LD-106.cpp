@@ -1,6 +1,6 @@
-#include "SubmarineFree.hpp"
+#include "DS.hpp"
 
-struct LD_106 : Module {
+struct LD_106 : DS_Module {
 	static const int deviceCount = 6;
 	enum ParamIds {
 		PARAM_CUTOFF_1,
@@ -39,14 +39,17 @@ struct LD_106 : Module {
 		NUM_LIGHTS
 	};
 
-	char schmittState[deviceCount] = { 0, 0, 0, 0, 0, 0 };
+//	char schmittState[deviceCount] = { 0, 0, 0, 0, 0, 0 };
+	DS_Schmitt schmittState[deviceCount];
 
-	LD_106() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	LD_106() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 };
 
 void LD_106::step() {
 	for (int i = 0; i < deviceCount; i++) {
+		outputs[OUTPUT_1 + i].value = output(schmittState[i].state(params[PARAM_CUTOFF_1 + i].value - params[PARAM_WIDTH_1 + i].value, params[PARAM_CUTOFF_1 + i].value + params[PARAM_WIDTH_1 + i].value, inputs[INPUT_1 + i].value));
+/*
 		if (schmittState[i]) {
 			if (inputs[INPUT_1 + i].value < (params[PARAM_CUTOFF_1 + i].value - params[PARAM_WIDTH_1 + i].value)) {	
 				schmittState[i] = 0;
@@ -58,6 +61,7 @@ void LD_106::step() {
 			}
 		}
 		outputs[OUTPUT_1 + i].value = schmittState[i];
+*/
 	}
 }
 
@@ -113,6 +117,7 @@ void LD106::appendContextMenu(Menu *menu) {
 	menuItem->cutoff = 1.4f;
 	menuItem->width = 0.6f;
 	menu->addChild(menuItem);
+	((LD_106 *)module)->appendContextMenu(menu);
 }
 
 Model *modelLD106 = Model::create<LD_106, LD106>("SubmarineFree", "LD-106", "LD-106 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
