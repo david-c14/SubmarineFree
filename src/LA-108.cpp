@@ -1,10 +1,9 @@
 #include <string.h>
-#include "SubmarineFree.hpp"
-#include "dsp/digital.hpp"
+#include "DS.hpp"
 
 #define BUFFER_SIZE 512
 
-struct LA_108 : Module {
+struct LA_108 : DS_Module {
 	enum ParamIds {
 		PARAM_TRIGGER,
 		PARAM_EDGE,
@@ -47,10 +46,10 @@ struct LA_108 : Module {
 	int bufferIndex = 0;
 	float frameIndex = 0;
 
-	SchmittTrigger trigger;
+	DS_Schmitt trigger;
 	sub_btn *resetButtonWidget;
 
-	LA_108() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	LA_108() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 };
 
@@ -73,6 +72,7 @@ void LA_108::step() {
 	}
 
 	int triggerInput = LA_108::INPUT_1 + (int)(clamp(params[PARAM_TRIGGER].value, 0.0f, 8.0f));
+	int edge = (params[PARAM_EDGE].value > 0.5f);
 	
 	// Are we waiting on the next trigger?
 	if (bufferIndex >= BUFFER_SIZE) {
@@ -85,20 +85,28 @@ void LA_108::step() {
 
 		// Reset the Schmitt trigger so we don't trigger immediately if the input is high
 		if (frameIndex == 0) {
-			trigger.reset();
+			if (edge)
+				trigger.set();
+			else
+				trigger.reset();
 		}
 		frameIndex++;
 
 		float gate = inputs[triggerInput].value;
-		if (params[PARAM_EDGE].value > 0.5f)
-			gate = 5.0f - gate;
 
 		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
 			resetButtonWidget->setValue(0.0f);
 			// Reset if triggered
 			float holdTime = 0.1f;
-			if (trigger.process(gate)) {
-				bufferIndex = 0; frameIndex = 0; return;
+			if (edge) {
+				if (trigger.fedge(this, gate)) {
+					bufferIndex = 0; frameIndex = 0; return;
+				}
+			}
+			else {
+				if (trigger.redge(this, gate)) {
+					bufferIndex = 0; frameIndex = 0; return;
+				}
 			}
 
 			// Reset if we've waited too long
@@ -108,11 +116,21 @@ void LA_108::step() {
 		}
 		else {
 			if (params[PARAM_RESET].value > 0.5f) {
-				if (trigger.process(gate)) {
-					bufferIndex = 0; 
-					frameIndex = 0; 
-					resetButtonWidget->setValue(0.0f);
-					return;
+				if (edge) {
+					if (trigger.fedge(this, gate)) {
+						bufferIndex = 0; 
+						frameIndex = 0; 
+						resetButtonWidget->setValue(0.0f);
+						return;
+					}
+				}
+				else {
+					if (trigger.redge(this, gate)) {
+						bufferIndex = 0; 
+						frameIndex = 0; 
+						resetButtonWidget->setValue(0.0f);
+						return;
+					}
 				}
 			}
 		}
@@ -132,7 +150,12 @@ struct LA_Display : TransparentWidget {
 		for (int i = 0; i < BUFFER_SIZE; i++) {
 			float x, y;
 			x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-			y = offset - clamp(values[i], 0.0f, 5.0f) * 5.8f;
+			y = -clamp(values[i], module->voltage0, module->voltage1);
+			y += module->voltage0;
+			debug("%f", y);
+			y /= (module->voltage1 - module->voltage0);
+			y *= 29.0f; 
+			y += offset;
 			if (i == 0)
 				nvgMoveTo(vg, x, y);
 			else
@@ -165,7 +188,7 @@ struct LA_Display : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 1; i++) {
 			if (module->inputs[LA_108::INPUT_1 + i].active) {
 				drawTrace(vg, module->buffer[i], 32.5f + 35 * i); 
 			}
@@ -252,6 +275,9 @@ struct LA108 : ModuleWidget {
 		addParam(ParamWidget::create<sub_knob_med>(Vec(191, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
 		addParam(ParamWidget::create<sub_knob_small>(Vec(237, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_knob_small>(Vec(267, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
+	}
+	void appendContextMenu(Menu *menu) override {
+		((DS_Module *)module)->appendContextMenu(menu);
 	}
 };
 

@@ -12,16 +12,10 @@ struct DS_Module : Module {
 	void appendContextMenu(Menu *);
 };
 
-struct DS_MenuItemH : MenuItem {
+struct DS_MenuItem : MenuItem {
 	DS_Module *module;
-	float v;
-	void onAction(EventAction &e) override;
-	void step() override;
-};
-
-struct DS_MenuItemL : MenuItem {
-	DS_Module *module;
-	float v;
+	float vh;
+	float vl;
 	void onAction(EventAction &e) override;
 	void step() override;
 };

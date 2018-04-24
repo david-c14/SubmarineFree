@@ -31,49 +31,41 @@ float DS_Module::output(int state) {
 
 void DS_Module::appendContextMenu(Menu *menu) {
 	menu->addChild(MenuEntry::create());
-	DS_MenuItemH *mh = MenuItem::create<DS_MenuItemH>("1V");
-	mh->module = this;
-	mh->v = 1.0f;
-	menu->addChild(mh);
-	mh = MenuItem::create<DS_MenuItemH>("5V");
-	mh->module = this;
-	mh->v = 5.0f;
-	menu->addChild(mh);
-	mh = MenuItem::create<DS_MenuItemH>("10V");
-	mh->module = this;
-	mh->v = 10.0f;
-	menu->addChild(mh);
-	menu->addChild(MenuEntry::create());
-	DS_MenuItemL *ml = MenuItem::create<DS_MenuItemL>("0V");
-	ml->module = this;
-	ml->v = 0.0f;
-	menu->addChild(ml);
-	ml = MenuItem::create<DS_MenuItemL>("-5V");
-	ml->module = this;
-	ml->v = -5.0f;
-	menu->addChild(ml);
-	ml = MenuItem::create<DS_MenuItemL>("-10V");
-	ml->module = this;
-	ml->v = -10.0f;
-	menu->addChild(ml);
+	DS_MenuItem *m = MenuItem::create<DS_MenuItem>("Range 0V - 1V");
+	m->module = this;
+	m->vl = 0.0f;
+	m->vh = 1.0f;
+	menu->addChild(m);
+	m = MenuItem::create<DS_MenuItem>("Range 0V - 5V");
+	m->module = this;
+	m->vl = 0.0f;
+	m->vh = 5.0f;
+	menu->addChild(m);
+	m = MenuItem::create<DS_MenuItem>("Range 0V - 10V");
+	m->module = this;
+	m->vl = 0.0f;
+	m->vh = 10.0f;
+	menu->addChild(m);
+	m = MenuItem::create<DS_MenuItem>("Range -5V - 5V");
+	m->module = this;
+	m->vl = -5.0f;
+	m->vh = 5.0f;
+	menu->addChild(m);
+	m = MenuItem::create<DS_MenuItem>("Range -10V - 10V");
+	m->module = this;
+	m->vl = -10.0f;
+	m->vh = 10.0f;
+	menu->addChild(m);
 }
 
-void DS_MenuItemH::onAction(EventAction &e) {
-	module->voltage1 = v;
+void DS_MenuItem::onAction(EventAction &e) {
+	module->voltage0 = vl;
+	module->voltage1 = vh;
 }
 
-void DS_MenuItemH::step() {
-	rightText = CHECKMARK(module->voltage1 == v);
+void DS_MenuItem::step() {
+	rightText = CHECKMARK((module->voltage0 == vl) && (module->voltage1 == vh));
 }
-
-void DS_MenuItemL::onAction(EventAction &e) {
-	module->voltage0 = v;
-}
-
-void DS_MenuItemL::step() {
-	rightText = CHECKMARK(module->voltage0 == v);
-}
-
 
 float DS_Schmitt::high(float v0, float v1) {
 	return (v0 * 0.4f + v1 * 0.6f);

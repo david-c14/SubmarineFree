@@ -1,6 +1,6 @@
-#include "SubmarineFree.hpp"
+#include "DS.hpp"
 
-struct NG_112 : Module {
+struct NG_112 : DS_Module {
 	static const int deviceCount = 12;
 	enum ParamIds {
 		NUM_PARAMS
@@ -39,13 +39,13 @@ struct NG_112 : Module {
 		NUM_LIGHTS
 	};
 
-	NG_112() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	NG_112() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 };
 
 void NG_112::step() {
 	for (int i = 0; i < deviceCount; i++) {
-		outputs[OUTPUT_1 + i].value = (inputs[INPUT_1 + i].value < 2.5f) * 5.0f;
+		outputs[OUTPUT_1 + i].value = (inputs[INPUT_1 + i].value < midpoint())?voltage1:voltage0;
 	}
 }
 
@@ -59,6 +59,9 @@ struct NG112 : ModuleWidget {
 
 			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, NG_112::OUTPUT_1 + i));
 		}
+	}
+	void appendContextMenu(Menu *menu) override {
+		((DS_Module *)module)->appendContextMenu(menu);
 	}
 };
 

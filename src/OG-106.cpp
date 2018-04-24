@@ -1,6 +1,6 @@
-#include "SubmarineFree.hpp"
+#include "DS.hpp"
 
-struct OG_106 : Module {
+struct OG_106 : DS_Module {
 	static const int deviceCount = 6;
 	enum ParamIds {
 		NUM_PARAMS
@@ -33,7 +33,7 @@ struct OG_106 : Module {
 		NUM_LIGHTS
 	};
 
-	OG_106() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	OG_106() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 };
 
@@ -41,13 +41,13 @@ void OG_106::step() {
 	int setCount = 0;
 	for (int i = 0; i < deviceCount; i++) {
 		if (inputs[INPUT_A_1 + i].active)
-			if (inputs[INPUT_A_1 + i].value > 2.0f)
+			if (inputs[INPUT_A_1 + i].value > midpoint())
 				setCount++;
 		if (inputs[INPUT_B_1 + i].active)
-			if (inputs[INPUT_B_1 + i].value > 2.0f)
+			if (inputs[INPUT_B_1 + i].value > midpoint())
 				setCount++;
 		if (outputs[OUTPUT_1 + i].active) {
-			outputs[OUTPUT_1 + i].value = 5.0f * (setCount > 0);
+			outputs[OUTPUT_1 + i].value = (setCount > 0)?voltage1:voltage0;
 			setCount = 0;
 		}
 	}
@@ -64,6 +64,9 @@ struct OG106 : ModuleWidget {
 
 			addOutput(Port::create<sub_port_blue>(Vec(62,33 + offset), Port::OUTPUT, module, OG_106::OUTPUT_1 + i));
 		}
+	}
+	void appendContextMenu(Menu *menu) override {
+		((DS_Module *)module)->appendContextMenu(menu);
 	}
 };
 
