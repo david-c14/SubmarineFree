@@ -64,7 +64,7 @@ void LA_108::step() {
 
 	// Add frame to buffer
 	if (bufferIndex < BUFFER_SIZE) {
-		if (++frameIndex > frameCount) {
+		if (++frameIndex >= frameCount) {
 			frameIndex = 0;
 			for (int i = 0; i < 8; i++)
 				buffer[i][bufferIndex] = inputs[INPUT_1 + i].value;
@@ -186,7 +186,7 @@ struct LA_Measure : TransparentWidget {
 
 	void draw(NVGcontext *vg) override {
 		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].value);
-		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate()) + 1;
+		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
 		frameCount *= BUFFER_SIZE;
 		float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].value - module->params[LA_108::PARAM_INDEX_2].value) / engineGetSampleRate(); 
 		
