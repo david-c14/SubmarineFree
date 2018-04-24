@@ -5,7 +5,7 @@
 
 ## Basic Operation
 
-The logic analyser takes 8 input signals which it will trace out on the scope screen. It is designed to take digital signals with a low of 0V and a high of 5V, but it will happily accept analog signals which will be clamped to this range.
+The logic analyser takes 8 input signals which it will trace out on the scope screen. It is designed to take digital signals, but it will happily accept analog signals which will be clamped to the configured range.
 It has one additional input (EXT.TR) which is not traced, but which can be used as a trigger.
 
 ## Trigger

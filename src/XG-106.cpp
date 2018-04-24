@@ -70,4 +70,4 @@ struct XG106 : ModuleWidget {
 	}
 };
 
-Model *modelXG106 = Model::create<XG_106, XG106>("SubmarineFree", "XG-106", "XG-106 Xor Gates", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelXG106 = Model::create<XG_106, XG106>("SubmarineFree", "XG-106", "XG-106 XOR Gates", LOGIC_TAG, MULTIPLE_TAG);

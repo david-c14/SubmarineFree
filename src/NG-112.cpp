@@ -65,4 +65,4 @@ struct NG112 : ModuleWidget {
 	}
 };
 
-Model *modelNG112 = Model::create<NG_112, NG112>("SubmarineFree", "NG-112", "NG-112 Not Gates", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelNG112 = Model::create<NG_112, NG112>("SubmarineFree", "NG-112", "NG-112 NOT Gates", LOGIC_TAG, MULTIPLE_TAG);

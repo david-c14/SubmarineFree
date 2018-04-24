@@ -79,4 +79,4 @@ struct AG106 : ModuleWidget {
 	}
 };
 
-Model *modelAG106 = Model::create<AG_106, AG106>("SubmarineFree", "AG-106", "AG-106 And Gates", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelAG106 = Model::create<AG_106, AG106>("SubmarineFree", "AG-106", "AG-106 AND Gates", LOGIC_TAG, MULTIPLE_TAG);
