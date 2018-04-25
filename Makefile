@@ -2,7 +2,7 @@
 SLUG = SubmarineFree
 
 # Must follow the format in the Versioning section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-VERSION = 0.6.1
+VERSION = 0.6.2
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
@@ -33,5 +33,9 @@ RESOURCES += $(wildcard res/??-???.svg)
 res: $(RESOURCES)
 	
 %.svg: src/%.svg
+ifeq (${SVG_TOOL},inkscape)
 	inkscape -z -T -l=$@ $<
+else
+	touch $@
+endif
 
