@@ -1,4 +1,5 @@
 # Logical NOT Gates
+### [Part of the Digital Suite](DS.md)
 #### NG-112 NOT Gates
 
 ![View of the NOT Gates](NG.png "NOT Gates")

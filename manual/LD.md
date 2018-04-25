@@ -1,4 +1,5 @@
 # Schmitt Trigger Line Drivers
+### [Part of the Digital Suite](DS.md)
 #### LD-106 Line Drivers
 
 ![View of the Line Drivers](LD.png "Line Drivers")

@@ -4,6 +4,9 @@ Logical AND gates
 # [BP](BP.md)
 Blanking plates
 
+# [DS](DS.md)
+Digital Suite
+
 # [LA](LA.md)
 8-Channel Logic Analyser
 

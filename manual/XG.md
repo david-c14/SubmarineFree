@@ -1,4 +1,5 @@
 # Logical XOR Gates
+### [Part of the Digital Suite](DS.md)
 #### XG-106 XOR Gates
 
 ![View of the XOR Gates](XG.png "XOR Gates")

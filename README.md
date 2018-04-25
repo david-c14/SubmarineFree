@@ -3,10 +3,6 @@ Free plugins for VCV Rack
 
 # [Manual](https://github.com/david-c14/SubmarineFree/blob/master/manual/index.md)
 
-[BP](https://github.com/david-c14/SubmarineFree/blob/master/manual/BP.md) Blanking Plates
-
-[XF](https://github.com/david-c14/SubmarineFree/blob/master/manual/XF.md) Equal Power Cross-Faders
-
 # License
 Source code licensed under BSD-3-Clause by carbon14 (David O'Rourke)
 

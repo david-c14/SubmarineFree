@@ -1,5 +1,7 @@
 # Logical AND Gates
+### [Part of the Digital Suite](DS.md)
 #### AG-106 AND Gates
+
 
 ![View of the AND Gates](AG.png "AND Gates")
 

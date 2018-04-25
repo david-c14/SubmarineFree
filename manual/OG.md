@@ -1,4 +1,5 @@
 # Logical OR Gates
+### [Part of the Digital Suite](DS.md)
 #### OG-106 OR Gates
 
 ![View of the OR Gates](OG.png "OR Gates")
