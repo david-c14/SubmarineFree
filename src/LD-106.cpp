@@ -39,7 +39,6 @@ struct LD_106 : DS_Module {
 		NUM_LIGHTS
 	};
 
-//	char schmittState[deviceCount] = { 0, 0, 0, 0, 0, 0 };
 	DS_Schmitt schmittState[deviceCount];
 
 	LD_106() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
@@ -49,19 +48,6 @@ struct LD_106 : DS_Module {
 void LD_106::step() {
 	for (int i = 0; i < deviceCount; i++) {
 		outputs[OUTPUT_1 + i].value = output(schmittState[i].state(params[PARAM_CUTOFF_1 + i].value - params[PARAM_WIDTH_1 + i].value, params[PARAM_CUTOFF_1 + i].value + params[PARAM_WIDTH_1 + i].value, inputs[INPUT_1 + i].value));
-/*
-		if (schmittState[i]) {
-			if (inputs[INPUT_1 + i].value < (params[PARAM_CUTOFF_1 + i].value - params[PARAM_WIDTH_1 + i].value)) {	
-				schmittState[i] = 0;
-			}
-		}
-		else {
-			if (inputs[INPUT_1 + i].value > (params[PARAM_CUTOFF_1 + i].value + params[PARAM_WIDTH_1 + i].value)) {
-				schmittState[i] = 5;
-			}
-		}
-		outputs[OUTPUT_1 + i].value = schmittState[i];
-*/
 	}
 }
 
@@ -77,9 +63,9 @@ struct LD106 : ModuleWidget {
 
 			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, LD_106::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(4, 47 + offset), module, LD_106::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 2.5f);
+			cutoffWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(4, 47 + offset), module, LD_106::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
 			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(62, 47 + offset), module, LD_106::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 0.0f);
+			widthWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(62, 47 + offset), module, LD_106::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
 			addParam(widthWidgets[i]);
 		}
 	}
@@ -102,20 +88,20 @@ void LD106::appendContextMenu(Menu *menu) {
 	menu->addChild(MenuEntry::create());
 	LD106 *ld106 = dynamic_cast<LD106*>(this);
 	assert(ld106);
-	LDMenuItem *menuItem = MenuItem::create<LDMenuItem>("Standard Levels");
+	LDMenuItem *menuItem = MenuItem::create<LDMenuItem>("Cutoff 5V");
 	menuItem->ld106 = ld106;
-	menuItem->cutoff = 2.5f;
-	menuItem->width = 0.0f;
+	menuItem->cutoff = 5.0f;
+	menuItem->width = 1.0f;
 	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem>("Bipolar Levels");
+	menuItem = MenuItem::create<LDMenuItem>("Cutoff 0V");
 	menuItem->ld106 = ld106;
 	menuItem->cutoff = 0.0f;
 	menuItem->width = 0.0f;
 	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem>("Unipolar Levels");
+	menuItem = MenuItem::create<LDMenuItem>("Cutoff 2.5V");
 	menuItem->ld106 = ld106;
-	menuItem->cutoff = 5.0f;
-	menuItem->width = 0.0f;
+	menuItem->cutoff = 2.5f;
+	menuItem->width = 0.5f;
 	menu->addChild(menuItem);
 	menuItem = MenuItem::create<LDMenuItem>("TTL Levels");
 	menuItem->ld106 = ld106;

@@ -85,28 +85,19 @@ void LA_108::step() {
 
 		// Reset the Schmitt trigger so we don't trigger immediately if the input is high
 		if (frameIndex == 0) {
-			if (edge)
-				trigger.set();
-			else
-				trigger.reset();
+			//trigger.set(edge);
 		}
 		frameIndex++;
 
 		float gate = inputs[triggerInput].value;
+		int triggered = trigger.edge(this, gate, edge);
 
 		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
 			resetButtonWidget->setValue(0.0f);
 			// Reset if triggered
 			float holdTime = 0.1f;
-			if (edge) {
-				if (trigger.fedge(this, gate)) {
-					bufferIndex = 0; frameIndex = 0; return;
-				}
-			}
-			else {
-				if (trigger.redge(this, gate)) {
-					bufferIndex = 0; frameIndex = 0; return;
-				}
+			if (triggered) {
+				bufferIndex = 0; frameIndex = 0; return;
 			}
 
 			// Reset if we've waited too long
@@ -116,21 +107,11 @@ void LA_108::step() {
 		}
 		else {
 			if (params[PARAM_RESET].value > 0.5f) {
-				if (edge) {
-					if (trigger.fedge(this, gate)) {
-						bufferIndex = 0; 
-						frameIndex = 0; 
-						resetButtonWidget->setValue(0.0f);
-						return;
-					}
-				}
-				else {
-					if (trigger.redge(this, gate)) {
-						bufferIndex = 0; 
-						frameIndex = 0; 
-						resetButtonWidget->setValue(0.0f);
-						return;
-					}
+				if (triggered) {
+					bufferIndex = 0; 
+					frameIndex = 0; 
+					resetButtonWidget->setValue(0.0f);
+					return;
 				}
 			}
 		}
@@ -150,11 +131,8 @@ struct LA_Display : TransparentWidget {
 		for (int i = 0; i < BUFFER_SIZE; i++) {
 			float x, y;
 			x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-			y = -clamp(values[i], module->voltage0, module->voltage1);
-			y += module->voltage0;
-			debug("%f", y);
-			y /= (module->voltage1 - module->voltage0);
-			y *= 29.0f; 
+			y = module->voltage0 -clamp(values[i], module->voltage0, module->voltage1);
+			y *= 29.0f / (module->voltage1 - module->voltage0);
 			y += offset;
 			if (i == 0)
 				nvgMoveTo(vg, x, y);
@@ -188,7 +166,7 @@ struct LA_Display : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 8; i++) {
 			if (module->inputs[LA_108::INPUT_1 + i].active) {
 				drawTrace(vg, module->buffer[i], 32.5f + 35 * i); 
 			}

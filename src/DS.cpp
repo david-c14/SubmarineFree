@@ -83,6 +83,10 @@ void DS_Schmitt::set() {
 	_state = 1;
 }
 
+void DS_Schmitt::set(int state) {
+	_state = state;
+}
+
 int DS_Schmitt::state(float vl, float vh, float v) {
 	if (_state) {
 		if (v < vl)
@@ -107,6 +111,14 @@ int DS_Schmitt::edge(float vl, float vh, float v) {
 int DS_Schmitt::edge(DS_Module *module, float v) {
 	int old = _state;
 	return (state(module, v) != old);
+}
+
+int DS_Schmitt::edge(float vl, float vh, float v, int falling) {
+	return falling?fedge(vl, vh, v):redge(vl, vh, v);
+}
+
+int DS_Schmitt::edge(DS_Module *module, float v, int falling) {
+	return falling?fedge(module, v):redge(module, v);
 }
 
 int DS_Schmitt::redge(float vl, float vh, float v) {

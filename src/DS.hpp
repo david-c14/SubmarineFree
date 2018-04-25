@@ -2,7 +2,7 @@
 
 struct DS_Module : Module {
 	float voltage0 = 0.0f;
-	float voltage1 = 5.0f;
+	float voltage1 = 10.0f;
 	float midpoint();
 	float output(int);
 	DS_Module(int p, int i, int o, int l) : Module(p, i, o, l) {}
@@ -26,10 +26,13 @@ struct DS_Schmitt {
 	static float low(float, float);
 	void reset();
 	void set();
+	void set(int);
 	int state(float, float, float);
 	int state(DS_Module *, float);
 	int edge(float, float, float);
 	int edge(DS_Module *, float);
+	int edge(float, float, float, int);
+	int edge(DS_Module *, float, int);
 	int redge(float, float, float);
 	int redge(DS_Module *, float);
 	int fedge(float, float, float);
