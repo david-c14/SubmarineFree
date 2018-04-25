@@ -1,16 +1,16 @@
 # Digital Suite
-#### [AG-106 AND Gates](AG)
-#### [LA-108 8-Channel Logic Analyser](LA)
-#### [LD-106 Line Drivers](LD)
-#### [NG-112 NOT Gates](NG)
-#### [OG-106 OR Gates](OG)
-#### [XG-106 XOR Gates](XG)
+#### [AG-106 AND Gates](AG.md)
+#### [LA-108 8-Channel Logic Analyser](LA.md)
+#### [LD-106 Line Drivers](LD.md)
+#### [NG-112 NOT Gates](NG.md)
+#### [OG-106 OR Gates](OG.md)
+#### [XG-106 XOR Gates](XG.md)
 
 ![View of the DS Suite Menu](DS.png "DS Modules")
 
 ## Basic Operation
 
-The Digital Suite is a set of modules in the designed to handle digital logic. It includes line drivers, logic gates and a logic analyser.
+The Digital Suite is a set of modules designed to handle digital logic. It includes line drivers, logic gates and a logic analyser.
 
 ## Voltage Range
 
