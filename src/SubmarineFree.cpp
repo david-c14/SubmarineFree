@@ -11,6 +11,8 @@ void init(rack::Plugin *p) {
 
 	// Add all Models defined throughout the plugin
 	p->addModel(modelAG106);
+	p->addModel(modelFF110);
+	p->addModel(modelFF120);
 	p->addModel(modelFF212);
 	p->addModel(modelLA108);
 	p->addModel(modelLD106);
