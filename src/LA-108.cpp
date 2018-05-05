@@ -50,6 +50,7 @@ struct LA_108 : DS_Module {
 	float preBuffer[8][32] = {};
 	int preBufferIndex = 0;
 	float preFrameIndex = 0;
+	int preCount = 0;
 
 	DS_Schmitt trigger;
 	sub_btn *resetButtonWidget;
@@ -61,7 +62,7 @@ struct LA_108 : DS_Module {
 
 void LA_108::startFrame() {
 	frameIndex = 0;
-	int preCount = (int)(params[PARAM_PRE].value + 0.5f);
+	preCount = (int)(params[PARAM_PRE].value + 0.5f);
 	if (preCount) {
 		for (int i = 0; i < 8; i++) {
 			for (int s = 0; s < preCount; s++) {
@@ -203,13 +204,6 @@ struct LA_Display : TransparentWidget {
 		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
 		value = value * b.size.x;
 
-		nvgFillColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x40));
-		{
-			nvgBeginPath(vg);
-			nvgRect(vg, 0, 0, value, b.size.y);
-			nvgClosePath(vg);
-		}
-		nvgFill(vg);
 		nvgStrokeColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x80));
 		{
 			nvgBeginPath(vg);
@@ -221,6 +215,23 @@ struct LA_Display : TransparentWidget {
 		nvgResetScissor(vg);
 	}
 
+	void drawMask(NVGcontext *vg, float value) {
+		if (value == 0.0f)
+			return;
+		Rect b = Rect(Vec(0, 0), box.size);
+		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+		value = value * b.size.x;
+
+		nvgFillColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x40));
+		{
+			nvgBeginPath(vg);
+			nvgRect(vg, 0, 0, value, b.size.y);
+			nvgClosePath(vg);
+		}
+		nvgFill(vg);
+		nvgResetScissor(vg);
+	}
+
 	void draw(NVGcontext *vg) override {
 		for (int i = 0; i < 8; i++) {
 			if (module->inputs[LA_108::INPUT_1 + i].active) {
@@ -229,7 +240,8 @@ struct LA_Display : TransparentWidget {
 		}
 		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_1].value, 0.0f, 1.0f));
 		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_2].value, 0.0f, 1.0f));
-		drawPre(vg, clamp(module->params[LA_108::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
+		drawMask(vg, clamp(module->params[LA_108::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
+		drawPre(vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
 };
 
