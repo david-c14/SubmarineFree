@@ -36,3 +36,6 @@ You can use an index to help you compare the edges of signals from different tra
 
 Alternatively using both indices and the time span display will allow you to measure the length of a pulse or event in a trace,  Or by setting the indices to a known time span, you can adjust other devices in your rack until a signal is of the desired duration.
 
+## Pre-trigger Buffer
+
+The PRE. knob controls the display of the content of the pre-trigger buffer. This 32-sample buffer is constantly filled by the scope and is available to display the up to 32 samples prior to the trigger point. By adjusting the PRE. knob you can adjust how much of this buffer is displayed. The trigger point is indicated by a vertical red line on the display.

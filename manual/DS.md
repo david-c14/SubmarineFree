@@ -1,9 +1,13 @@
 # Digital Suite
 #### [AG-106 AND Gates](AG)
+#### [FF-110 Flip-Flops](FF)
+#### [FF-120 Flip-Flops](FF)
+#### [FF-212 Flip-Flops](FF)
 #### [LA-108 8-Channel Logic Analyser](LA)
 #### [LD-106 Line Drivers](LD)
 #### [NG-112 NOT Gates](NG)
 #### [OG-106 OR Gates](OG)
+#### [PG-112 Pulse Generators](PG)
 #### [XG-106 XOR Gates](XG)
 
 ![View of the DS Suite Menu](DS.png "DS Modules")
