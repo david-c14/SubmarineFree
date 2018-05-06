@@ -19,6 +19,10 @@ extern Model *modelBP120;
 extern Model *modelBP124;
 extern Model *modelBP132;
 
+extern Model *modelFF110;
+extern Model *modelFF120;
+extern Model *modelFF212;
+
 extern Model *modelLA108;
 
 extern Model *modelLD106;
@@ -26,6 +30,8 @@ extern Model *modelLD106;
 extern Model *modelNG112;
 
 extern Model *modelOG106;
+
+extern Model *modelPG112;
 
 extern Model *modelXF101;
 extern Model *modelXF102;

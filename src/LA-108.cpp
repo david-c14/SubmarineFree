@@ -12,6 +12,7 @@ struct LA_108 : DS_Module {
 		PARAM_INDEX_2,
 		PARAM_RUN,
 		PARAM_RESET,
+		PARAM_PRE,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -45,13 +46,34 @@ struct LA_108 : DS_Module {
 	float buffer[8][BUFFER_SIZE] = {};
 	int bufferIndex = 0;
 	float frameIndex = 0;
+	
+	float preBuffer[8][32] = {};
+	int preBufferIndex = 0;
+	float preFrameIndex = 0;
+	int preCount = 0;
 
 	DS_Schmitt trigger;
 	sub_btn *resetButtonWidget;
 
 	LA_108() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
+	void startFrame(void);
 };
+
+void LA_108::startFrame() {
+	frameIndex = 0;
+	preCount = (int)(params[PARAM_PRE].value + 0.5f);
+	if (preCount) {
+		for (int i = 0; i < 8; i++) {
+			for (int s = 0; s < preCount; s++) {
+				buffer[i][s] = preBuffer[i][(preBufferIndex + 64 - preCount + s) % 32];
+			}
+		}
+		bufferIndex = preCount;
+		return;
+	}
+	bufferIndex = 0;
+}
 
 void LA_108::step() {
 	// Set trigger lights
@@ -60,6 +82,16 @@ void LA_108::step() {
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
 	int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
+	
+	// Add frame to preBuffer
+	if (++preFrameIndex >= frameCount) {
+		preFrameIndex = 0;
+		for (int i = 0; i < 8; i++)
+			preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].value;
+		preBufferIndex++;
+		if (preBufferIndex >= 32)
+			preBufferIndex = 0;
+	}
 
 	// Add frame to buffer
 	if (bufferIndex < BUFFER_SIZE) {
@@ -78,8 +110,7 @@ void LA_108::step() {
 	if (bufferIndex >= BUFFER_SIZE) {
 		// Trigger immediately if nothing connected to trigger input
 		if (!inputs[triggerInput].active) {
-			bufferIndex = 0;
-			frameIndex = 0;
+			startFrame();
 			return;
 		}
 
@@ -97,19 +128,20 @@ void LA_108::step() {
 			// Reset if triggered
 			float holdTime = 0.1f;
 			if (triggered) {
-				bufferIndex = 0; frameIndex = 0; return;
+				startFrame();
+				return;
 			}
 
 			// Reset if we've waited too long
 			if (frameIndex >= engineGetSampleRate() * holdTime) {
-				bufferIndex = 0; frameIndex = 0; return;
+				startFrame();
+				return;
 			}
 		}
 		else {
 			if (params[PARAM_RESET].value > 0.5f) {
 				if (triggered) {
-					bufferIndex = 0; 
-					frameIndex = 0; 
+					startFrame();
 					resetButtonWidget->setValue(0.0f);
 					return;
 				}
@@ -165,6 +197,41 @@ struct LA_Display : TransparentWidget {
 		nvgResetScissor(vg);
 	}
 
+	void drawPre(NVGcontext *vg, float value) {
+		if (value == 0.0f)
+			return;
+		Rect b = Rect(Vec(0, 0), box.size);
+		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+		value = value * b.size.x;
+
+		nvgStrokeColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x80));
+		{
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, value, 0);
+			nvgLineTo(vg, value, b.size.y);
+			nvgClosePath(vg);
+		}
+		nvgStroke(vg);
+		nvgResetScissor(vg);
+	}
+
+	void drawMask(NVGcontext *vg, float value) {
+		if (value == 0.0f)
+			return;
+		Rect b = Rect(Vec(0, 0), box.size);
+		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+		value = value * b.size.x;
+
+		nvgFillColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x40));
+		{
+			nvgBeginPath(vg);
+			nvgRect(vg, 0, 0, value, b.size.y);
+			nvgClosePath(vg);
+		}
+		nvgFill(vg);
+		nvgResetScissor(vg);
+	}
+
 	void draw(NVGcontext *vg) override {
 		for (int i = 0; i < 8; i++) {
 			if (module->inputs[LA_108::INPUT_1 + i].active) {
@@ -173,6 +240,8 @@ struct LA_Display : TransparentWidget {
 		}
 		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_1].value, 0.0f, 1.0f));
 		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_2].value, 0.0f, 1.0f));
+		drawMask(vg, clamp(module->params[LA_108::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
+		drawPre(vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
 };
 
@@ -232,7 +301,7 @@ struct LA108 : ModuleWidget {
 		{
 			LA_Measure * display = new LA_Measure();
 			display->module = module;
-			display->box.pos = Vec(237, 297);
+			display->box.pos = Vec(213, 297);
 			display->box.size = Vec(54, 16);
 			addChild(display);
 		}
@@ -245,14 +314,15 @@ struct LA108 : ModuleWidget {
 		addInput(Port::create<sub_port_blue>(Vec(4, 310), Port::INPUT, module, LA_108::INPUT_EXT));
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, LA_108::LIGHT_EXT));
 
-		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(43, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
-		addParam(ParamWidget::create<sub_sw_2>(Vec(90, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_sw_2>(Vec(120, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
-		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(167, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
+		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(39, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_2>(Vec(82, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
+		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(151, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
 		addParam(module->resetButtonWidget);
-		addParam(ParamWidget::create<sub_knob_med>(Vec(191, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(237, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(267, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(171, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
+		addParam(ParamWidget::create<sub_knob_small>(Vec(214, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_small>(Vec(242, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
+		addParam(ParamWidget::create<sub_knob_small_snap>(Vec(271, 315), module, LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f));
 	}
 	void appendContextMenu(Menu *menu) override {
 		((DS_Module *)module)->appendContextMenu(menu);

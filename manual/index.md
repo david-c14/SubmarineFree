@@ -7,6 +7,9 @@ Blanking plates
 # [DS](DS.md)
 Digital Suite
 
+# [FF](FF.md)
+Flip-Flops
+
 # [LA](LA.md)
 8-Channel Logic Analyser
 
@@ -18,6 +21,9 @@ Logical NOT gates
 
 # [OG](OG.md)
 Logical OR gates
+
+# [PG](PG.md)
+Pulse Generators
 
 # [XF](XF.md)
 A range of mono and stereo equal power cross-faders with linear and logarithmic gain profiles and an autoselector

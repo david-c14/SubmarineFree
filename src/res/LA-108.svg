@@ -61,7 +61,7 @@
        rx="2"
        ry="2"
        id="rect4244" />
-    <rect x="237" y="297" width="54" height="16" rx="2" ry="2"/>
+    <rect x="213" y="297" width="54" height="16" rx="2" ry="2"/>
   </g>
   <g
      inkscape:label="Grid"
@@ -103,20 +103,21 @@
     <line x1="16.5" y1="242.5" x2="42" y2="242.5" />
     <line x1="16.5" y1="277.5" x2="42" y2="277.5" />
 
-    <path d="M 106.5 316.5 l 3 0 l 0 -6 l 3 0" />
-    <path d="M 106.5 323.5 l 3 0 l 0 6 l 3 0" />
+    <path d="M 98.5 316.5 l 3 0 l 0 -6 l 3 0" />
+    <path d="M 98.5 323.5 l 3 0 l 0 6 l 3 0" />
     <g
        fill="#ffffff"
        stroke="none">
       <text x="16.5" y="350" text-anchor="middle">EXT.TR</text> 
-      <text x="62" y="350" text-anchor="middle">TRIGGER</text> 
-      <text x="101" y="350" text-anchor="middle">EDGE</text>
-      <text x="143" y="350" text-anchor="middle">MODE</text>
-      <text x="137" y="318">CONT</text>
-      <text x="137" y="330">ONCE</text>
-      <text x="175" y="350" text-anchor="middle">RESET</text>
-      <text x="210" y="350" text-anchor="middle">TIME</text>
-      <text x="264" y="350" text-anchor="middle">L INDEX R</text>
+      <text x="58" y="350" text-anchor="middle">TRIGGER</text> 
+      <text x="93" y="350" text-anchor="middle">EDGE</text>
+      <text x="128" y="350" text-anchor="middle">MODE</text>
+      <text x="125" y="318">CONT</text>
+      <text x="125" y="330">ONCE</text>
+      <text x="158" y="350" text-anchor="middle">RESET</text>
+      <text x="190" y="350" text-anchor="middle">TIME</text>
+      <text x="240" y="350" text-anchor="middle">L INDEX R</text>
+      <text x="283" y="350" text-anchor="middle">PRE.</text>
     </g>
   </g>
 </svg>
