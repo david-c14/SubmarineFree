@@ -164,10 +164,24 @@ struct sub_knob_small : sub_knob {
 	}
 };
 
+/*
 struct sub_knob_med : sub_knob {
 	sub_knob_med() {
 		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_med_a.svg")));
 	}
+};
+*/
+
+struct sub_knob_med : Knob {
+	/** Angles in radians */
+	float minAngle = -0.83*M_PI;
+	float maxAngle = 0.83*M_PI;
+	/** Radii in standard units */
+	float radius = 19.0;
+	sub_knob_med() {}
+	void step() override;
+	void draw(NVGcontext *vg) override;
+	void onChange(EventChange &e) override;
 };
 
 struct sub_knob_large : sub_knob {
