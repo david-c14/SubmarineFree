@@ -30,7 +30,7 @@ void LightKnob::draw(NVGcontext *vg) {
 		nvgBeginPath(vg);
 		nvgCircle(vg, radius, radius, radius);
 		nvgTranslate(vg, radius, radius);
-		nvgRotate(vg, M_PI / -4);
+		nvgRotate(vg, M_PI / -15);
 		nvgScale(vg, 40, 1);
 		NVGpaint paint;
 		paint = nvgRadialGradient(vg, 0, 0, 0, radius * 0.2, nvgRGB(0x7a,0x7a,0x7a), nvgRGB(10,10,10));
