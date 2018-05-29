@@ -1,37 +1,39 @@
 #include "../SubmarineFree.hpp"
 #include "util/color.hpp"
 
-LightKnob::LightKnob() {
-	enabled = 0;
-	minAngle = -0.83*M_PI;
-	maxAngle = 0.83*M_PI;
-}
-
-void LightKnob::setSVG(std::shared_ptr<SVG> svg1, std::shared_ptr<SVG> svg2) {
-	frames.push_back(svg1);
-	SVGKnob::setSVG(svg1);
-	frames.push_back(svg2);
-}
-
 void LightKnob::setEnabled(int val) {
-	if (enabled == val)
-		return;
 	enabled = val;
-	assert(frames.size() > 1);
-	sw->setSVG(frames[enabled]);
-	dirty = true;
 }
 
-void sub_knob_med::step() {
-	
+void LightKnob::setRadius(int r) {
+	radius = r;
+	box.size.x = r * 2;
+	box.size.y = r * 2;
 }
 
-void sub_knob_med::draw(NVGcontext *vg) {
+void LightKnob::draw(NVGcontext *vg) {
+	NVGcolor lcol = enabled?nvgRGB(0x29,0xb2,0xef):nvgRGB(0x4a,0x4a,0x4a);
+		
 	// Circle
-	nvgBeginPath(vg);
-	nvgCircle(vg, radius, radius, radius);
-	nvgFillColor(vg, nvgRGB(0,0,0));
-	nvgFill(vg);
+	{
+		float ctm[6];
+		nvgCurrentTransform(vg, ctm);
+		nvgBeginPath(vg);
+		nvgCircle(vg, radius, radius, radius);
+		nvgTranslate(vg, radius, radius);
+		nvgRotate(vg, M_PI / -4);
+		nvgScale(vg, 40, 1);
+		NVGpaint paint;
+		paint = nvgRadialGradient(vg, 0, 0, 0, radius * 0.2, nvgRGB(0x7a,0x7a,0x7a), nvgRGB(10,10,10));
+		nvgFillPaint(vg, paint);
+		nvgFill(vg);	
+		nvgResetTransform(vg);
+		nvgTransform(vg, ctm[0], ctm[1], ctm[2], ctm[3], ctm[4], ctm[5]);
+		nvgBeginPath(vg);
+		nvgCircle(vg, radius, radius, radius * 0.9);
+		nvgFillColor(vg, nvgRGB(10,10,10));
+		nvgFill(vg);
+	}
 
 	float angle;
 	if (isfinite(minValue) && isfinite(maxValue)) {
@@ -47,27 +49,33 @@ void sub_knob_med::draw(NVGcontext *vg) {
 	float oradius = lradius + 15.0;
 	
 	// Light
-	nvgBeginPath(vg);
-	nvgCircle(vg, cx, cy ,lradius);
-	nvgFillColor(vg, nvgRGB(0x29,0xb2,0xef));
-	nvgFill(vg);
-	nvgStrokeWidth(vg, 0.5);
-	nvgStrokeColor(vg, nvgRGBA(0,0,0,0.6));
-	nvgStroke(vg);
+	{
+		float ctm[6];
+		nvgCurrentTransform(vg, ctm);
+		nvgBeginPath(vg);
+		nvgTranslate(vg, radius, radius);
+		nvgRotate(vg, angle);
+		nvgRect(vg, radius * -0.05, radius * -0.9, radius * 0.1, radius * 0.4);
+		NVGpaint paint;
+		NVGcolor ocol = colorMult(lcol, 0.1);
+		paint = nvgRadialGradient(vg, 0, radius * -0.7, radius * 0.05, radius * 0.2, lcol, ocol);
+		nvgFillPaint(vg, paint);
+		nvgFill(vg);
+		nvgResetTransform(vg);
+		nvgTransform(vg, ctm[0], ctm[1], ctm[2], ctm[3], ctm[4], ctm[5]);
+	}
 	
 	// Halo
-	nvgBeginPath(vg);
-	nvgRect(vg, cx - oradius, cy - oradius, 2 * oradius, 2 * oradius);
-	NVGpaint paint;
-	NVGcolor icol = colorMult(nvgRGB(0x29, 0xb2, 0xef), 0.08);
-	NVGcolor ocol = nvgRGB(0, 0, 0);
-	paint = nvgRadialGradient(vg, cx, cy, lradius, oradius, icol, ocol);
-	nvgFillPaint(vg, paint);
-	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-	nvgFill(vg);	
+	{
+		nvgBeginPath(vg);
+		nvgRect(vg, cx - oradius, cy - oradius, 2 * oradius, 2 * oradius);
+		NVGpaint paint;
+		NVGcolor icol = colorMult(lcol, 0.08);
+		NVGcolor ocol = nvgRGB(0, 0, 0);
+		paint = nvgRadialGradient(vg, cx, cy, lradius, oradius, icol, ocol);
+		nvgFillPaint(vg, paint);
+		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+		nvgFill(vg);	
+	}
 	
-}
-
-void sub_knob_med::onChange(EventChange &e) {
-	Knob::onChange(e);
 }

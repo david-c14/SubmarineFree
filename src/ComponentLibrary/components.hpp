@@ -83,110 +83,34 @@ struct sub_btn : SVGSwitch, ToggleSwitch {
 // Knobs
 //////////////////
 
-struct LightKnob : SVGKnob {
-	char enabled;
-	std::vector<std::shared_ptr<SVG>> frames;
-	LightKnob();
-	void setSVG(std::shared_ptr<SVG>, std::shared_ptr<SVG>);
-	void setEnabled(int val);
-};
-
-struct sub_knob_small_light : LightKnob {
-	sub_knob_small_light() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_small.svg")), SVG::load(assetPlugin(plugin, "res/Components/sub_knob_small_a.svg")));
-	}
-};
-
-struct sub_knob_med_light : LightKnob {
-	sub_knob_med_light() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_med.svg")), SVG::load(assetPlugin(plugin, "res/Components/sub_knob_med_a.svg")));
-	}
-};
-
-struct sub_knob_large_light : LightKnob {
-	sub_knob_large_light() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large.svg")), SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large_a.svg")));
-	}
-};
-
-struct sub_knob_small_light_narrow : sub_knob_small_light {
-	sub_knob_small_light_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
-	}
-};
-
-struct sub_knob_med_light_narrow : sub_knob_med_light {
-	sub_knob_med_light_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
-	}
-};
-
-struct sub_knob_large_light_narrow : sub_knob_large_light {
-	sub_knob_large_light_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
-	}
-};
-
-struct sub_knob_small_light_snap : sub_knob_small_light {
-	sub_knob_small_light_snap() {
-		snap = true;
-		smooth = false;
-	}
-};
-
-struct sub_knob_med_light_snap : sub_knob_med_light {
-	sub_knob_med_light_snap() {
-		snap = true;
-		smooth = false;
-	}
-};
-
-struct sub_knob_large_light_snap : sub_knob_large_light {
-	sub_knob_large_light_snap() {
-		snap = true;
-		smooth = false;
-	}
-};
-
-struct sub_knob : SVGKnob {
-	sub_knob() {
-		minAngle = -0.83*M_PI;
-		maxAngle = 0.83*M_PI;
-	}
-};
-
-struct sub_knob_small : sub_knob {
-	sub_knob_small() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_small_a.svg")));
-	}
-};
-
-/*
-struct sub_knob_med : sub_knob {
-	sub_knob_med() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_med_a.svg")));
-	}
-};
-*/
-
-struct sub_knob_med : Knob {
+struct LightKnob : Knob {
 	/** Angles in radians */
 	float minAngle = -0.83*M_PI;
 	float maxAngle = 0.83*M_PI;
 	/** Radii in standard units */
 	float radius = 19.0;
-	sub_knob_med() {}
-	void step() override;
+	int enabled = 1;
+	LightKnob() {}
 	void draw(NVGcontext *vg) override;
-	void onChange(EventChange &e) override;
+	void setEnabled(int val);
+	void setRadius(int r);
 };
 
-struct sub_knob_large : sub_knob {
+struct sub_knob_small : LightKnob {
+	sub_knob_small() {
+		setRadius(12.0);	
+	}
+};
+
+struct sub_knob_med : LightKnob {
+	sub_knob_med() {
+		setRadius(19.0);
+	}
+};
+
+struct sub_knob_large : LightKnob {
 	sub_knob_large() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_knob_large_a.svg")));
+		setRadius(27.0);
 	}
 };
 

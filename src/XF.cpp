@@ -87,5 +87,5 @@ void XF_LightKnob::step() {
 	else {
 		setEnabled(!module->inputs[cv].active);
 	}
-	SVGKnob::step();
+	Knob::step();
 }
