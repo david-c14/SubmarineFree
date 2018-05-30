@@ -81,4 +81,18 @@
     <rect x="47" y="311" width="56" height="17" rx="5" ry="5" />
     <rect x="47" y="332" width="56" height="17" rx="5" ry="5" />
   </g>
+  <g
+     inkscape:label="Text"
+     inkscape:groupmode="layer"
+     stroke="none"
+     fill="#ffffff"
+     font-family="DejaVu Sans"
+     font-size="8">
+    <text x="36" y="25" text-anchor="middle">V/OCT</text>
+    <text x="114" y="25" text-anchor="middle">TORPEDO</text>
+    <text x="16.5" y="61" text-anchor="middle">IN</text>
+    <text x="55.5" y="61" text-anchor="middle">OUT</text>
+    <text x="94.5" y="61" text-anchor="middle">IN</text>
+    <text x="133.5" y="61" text-anchor="middle">OUT</text>
+  </g>
 </svg>

@@ -1,5 +1,6 @@
 #include "SubmarineFree.hpp"
 #include <mutex>
+#include "torpedo.hpp"
 
 struct WK_Tuning {
 	std::string name;
@@ -11,6 +12,14 @@ WK_Tuning tunings[] = {
 	{ "Pythagorean", { 0.0f, 13.7f, 3.9f, -5.9f, -7.8f, -2.0f, 11.7f, 2.0f, -7.8f, 5.9f, 3.9f, 9.8f } },
 	{ "Werckmeister III", { 0.0f, -9.775f, -7.82f, -5.865f, -9.775f, -1.955f, -11.73f, -3.94f, -7.82f, -11.93f, -3.91f, -7.82f } },
 	{ "Young", { 0.0f, -6.1f, -4.2f, -2.2f, -8.3f, -0.1f, -8.1f, -2.1f, -4.2f, -6.2f, -0.2f, -8.2f } }
+};
+
+struct WK_101;
+
+struct WK_InputPort : Torpedo::PatchInputPort {
+	WK_101 *wkModule;
+	WK_InputPort(WK_101 *module, unsigned int portNum):PatchInputPort((Module *)module, portNum) { wkModule = module;};
+	void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
 };
 
 struct WK_101 : Module {
@@ -45,7 +54,10 @@ struct WK_101 : Module {
 	};
 	float tunings[12];
 	int isDirty = 0;
+	int toSend = 0;
 	std::mutex mtx;
+	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
+	WK_InputPort inPort = WK_InputPort(this, INPUT_TOR);
 
 	WK_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -55,18 +67,23 @@ void WK_101::step() {
 	int quantized = floor((12.0f * inputs[INPUT_CV].value) + 0.5f);
 	int note = (120 + quantized) % 12;
 	outputs[OUTPUT_CV].value = (tunings[note] / 1200.0f) + (quantized / 12.0f);	
+	if (toSend && !outPort.isBusy()) {
+		toSend = 0;
+		json_t *rootJ = json_array();
+		for (int i = 0; i < 12; i++)
+			json_array_append_new(rootJ, json_real(tunings[i]));
+		outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
+	}
+	outPort.process();
+	inPort.process();
 }
 
-/*
-json_t *WK_101::toJson(void) {
-	json_t *rootJ = json_array();
-	for (int i = 0; i < 12; i++)
-		json_array_append_new(rootJ, json_real(tunings[i]));
-	return rootJ;
-}
-
-void WK_101::fromJson(json_t *rootJ) {
+void WK_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
+	if (pluginName.compare(TOSTRING(SLUG))) return;
+	if (moduleName.compare("WK")) return;
+	float tunings[12];
 	int size = json_array_size(rootJ);
+	if (!size) return;
 	if (size > 12)
 		size = 12;
 	for (int i = 0; i < 12; i++) {
@@ -74,8 +91,13 @@ void WK_101::fromJson(json_t *rootJ) {
 		if (j1)
 			tunings[i] = json_number_value(j1);
 	}
+	{
+		std::lock_guard<std::mutex> guard(wkModule->mtx);
+		for (int i = 0; i < 12; i++)
+			wkModule->tunings[i] = tunings[i];
+		wkModule->isDirty = true;
+	}
 }
-*/
 
 struct WK_Display : TransparentWidget {
 	std::shared_ptr<Font> font;
@@ -105,6 +127,7 @@ struct WK_MenuItem : MenuItem {
 		for (int i = 0; i < WK_101::deviceCount; i++)
 			module->tunings[i] = tunings[index].offsets[i];
 		module->isDirty = true;
+		module->toSend = true;
 	}
 };
 
@@ -114,6 +137,7 @@ struct WK_Param : sub_knob_med {
 		sub_knob_med::onChange(e);
 		WK_101 *module = dynamic_cast<WK_101 *>(this->module);
 		module->tunings[paramId - WK_101::PARAM_1] = value;
+		module->toSend = true;
 	}
 };
 
@@ -122,10 +146,10 @@ struct WK101 : ModuleWidget {
 	WK101(WK_101 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/WK-101.svg")));
 
-		addInput(Port::create<sub_port>(Vec(4,19), Port::INPUT, module, WK_101::INPUT_CV));
-		addOutput(Port::create<sub_port>(Vec(43,19), Port::OUTPUT, module, WK_101::OUTPUT_CV));
-		addInput(Port::create<sub_port_black>(Vec(82,19), Port::INPUT, module, WK_101::INPUT_TOR));
-		addOutput(Port::create<sub_port_black>(Vec(121,19), Port::OUTPUT, module, WK_101::OUTPUT_TOR));
+		addInput(Port::create<sub_port>(Vec(4,29), Port::INPUT, module, WK_101::INPUT_CV));
+		addOutput(Port::create<sub_port>(Vec(43,29), Port::OUTPUT, module, WK_101::OUTPUT_CV));
+		addInput(Port::create<sub_port_black>(Vec(82,29), Port::INPUT, module, WK_101::INPUT_TOR));
+		addOutput(Port::create<sub_port_black>(Vec(121,29), Port::OUTPUT, module, WK_101::OUTPUT_TOR));
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -180,7 +204,8 @@ void WK101::step() {
 	if (!isDirty)
 		return;
 	for (int i = 0; i < 12; i++) {
-		widgets[i]->setValue(tunings[i]);	
+		if (widgets[i]->value != tunings[i])
+			widgets[i]->setValue(tunings[i]);	
 	}
 }
 
