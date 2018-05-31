@@ -232,7 +232,7 @@ void WK101::loadTunings(const char *path) {
 		json_decref(rootJ);
 	}
 	else {
-		std::string message = stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = stringf("SubmarineFree WK: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		debug(message.c_str());
 	}
 	fclose(file);
