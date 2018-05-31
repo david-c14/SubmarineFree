@@ -76,6 +76,7 @@ void WK_101::step() {
 	}
 	outPort.process();
 	inPort.process();
+
 }
 
 void WK_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
@@ -201,12 +202,14 @@ void WK101::step() {
 			isDirty = 1;
 		}
 	}
-	if (!isDirty)
-		return;
-	for (int i = 0; i < 12; i++) {
-		if (widgets[i]->value != tunings[i])
-			widgets[i]->setValue(tunings[i]);	
+	if (isDirty) {
+		for (int i = 0; i < 12; i++) {
+			if (widgets[i]->value != tunings[i])
+				widgets[i]->setValue(tunings[i]);	
+		}
 	}
+
+	ModuleWidget::step();
 }
 
 Model *modelWK101 = Model::create<WK_101, WK101>("SubmarineFree", "WK-101", "WK-101 Das Wohltemperierte Klavier", QUANTIZER_TAG, TUNER_TAG);
