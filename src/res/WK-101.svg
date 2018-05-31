@@ -89,7 +89,7 @@
      font-family="DejaVu Sans"
      font-size="8">
     <text x="36" y="25" text-anchor="middle">V/OCT</text>
-    <text x="114" y="25" text-anchor="middle">TORPEDO</text>
+    <text x="114" y="25" text-anchor="middle">SYNC</text>
     <text x="16.5" y="61" text-anchor="middle">IN</text>
     <text x="55.5" y="61" text-anchor="middle">OUT</text>
     <text x="94.5" y="61" text-anchor="middle">IN</text>
