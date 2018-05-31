@@ -7,12 +7,9 @@ struct WK_Tuning {
 	float offsets[12];
 };
 
-WK_Tuning tunings[] = {
-	{ "Equal Temperament", { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f } },
-	{ "Pythagorean", { 0.0f, 13.7f, 3.9f, -5.9f, -7.8f, -2.0f, 11.7f, 2.0f, -7.8f, 5.9f, 3.9f, 9.8f } },
-	{ "Werckmeister III", { 0.0f, -9.775f, -7.82f, -5.865f, -9.775f, -1.955f, -11.73f, -3.94f, -7.82f, -11.93f, -3.91f, -7.82f } },
-	{ "Young", { 0.0f, -6.1f, -4.2f, -2.2f, -8.3f, -0.1f, -8.1f, -2.1f, -4.2f, -6.2f, -0.2f, -8.2f } }
-};
+std::vector<WK_Tuning> tunings;
+
+int tuningsLoaded = false;
 
 struct WK_101;
 
@@ -87,7 +84,7 @@ void WK_InputPort::received(std::string pluginName, std::string moduleName, json
 	if (!size) return;
 	if (size > 12)
 		size = 12;
-	for (int i = 0; i < 12; i++) {
+	for (int i = 0; i < size; i++) {
 		json_t *j1 = json_array_get(rootJ, i);
 		if (j1)
 			tunings[i] = json_number_value(j1);
@@ -144,6 +141,7 @@ struct WK_Param : sub_knob_med {
 
 struct WK101 : ModuleWidget {
 	WK_Param *widgets[12];
+	void loadTunings(const char *path);
 	WK101(WK_101 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/WK-101.svg")));
 
@@ -174,6 +172,9 @@ struct WK101 : ModuleWidget {
 			widgets[i] = ParamWidget::create<WK_Param>(Vec(108 - 104 * (i%2),91 + 21 * i), module, WK_101::PARAM_1 + i, -99.0f, 99.0f, 0.0f);
 			addParam(widgets[i]);
 		}
+		loadTunings("res/WK_Standard.tunings");
+		loadTunings("res/WK_Custom.tunings");
+		tuningsLoaded = true;
 	}
 	void appendContextMenu(Menu *menu) override;
 	void step() override;
@@ -182,12 +183,59 @@ struct WK101 : ModuleWidget {
 void WK101::appendContextMenu(Menu *menu) {
 	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
 	menu->addChild(MenuEntry::create());
-	for (int i = 0; i < 4; i++) { 
+	for (unsigned int i = 0; i < tunings.size(); i++) { 
 		WK_MenuItem *m = MenuItem::create<WK_MenuItem>(tunings[i].name.c_str());
 		m->module = module;
 		m->index = i;
 		menu->addChild(m);
 	}
+}
+
+void WK101::loadTunings(const char *path) {
+	if (tuningsLoaded)
+		return;
+	FILE *file = fopen(assetPlugin(plugin, path).c_str(), "r");
+	if (!file) {
+		return;
+	}
+	int defaultSize = tunings.size();
+	
+	json_error_t error;
+	json_t *rootJ = json_loadf(file, 0, &error);
+	if (rootJ) {
+		int size = json_array_size(rootJ);
+		for (int i = 0; i < size; i++) {
+			json_t *j0 = json_array_get(rootJ, i);
+			if (j0) {
+				json_t *jname = json_object_get(j0, "name");
+				if (jname) {
+					json_t *joffsets = json_object_get(j0, "tunings");
+					if (joffsets) {
+						tunings.push_back(WK_Tuning());
+						tunings[i + defaultSize].name.assign(json_string_value(jname));
+						int tsize = json_array_size(joffsets);
+						for (int j = 0; j < 12; j++) {
+							if (j < tsize) {
+								json_t *joffset = json_array_get(joffsets, j);
+								if (joffset) {
+									tunings[i + defaultSize].offsets[j] = json_number_value(joffset);
+								}
+							}
+							else {
+								tunings[i + defaultSize].offsets[j] = 0.0f;
+							}
+						}
+					}	
+				}
+			}
+		}
+		json_decref(rootJ);
+	}
+	else {
+		std::string message = stringf("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		debug(message.c_str());
+	}
+	fclose(file);
 }
 
 void WK101::step() {
