@@ -172,8 +172,8 @@ struct WK101 : ModuleWidget {
 			widgets[i] = ParamWidget::create<WK_Param>(Vec(108 - 104 * (i%2),91 + 21 * i), module, WK_101::PARAM_1 + i, -99.0f, 99.0f, 0.0f);
 			addParam(widgets[i]);
 		}
-		loadTunings("res/WK_Standard.tunings");
-		loadTunings("res/WK_Custom.tunings");
+		loadTunings("WK_Standard.tunings");
+		loadTunings("WK_Custom.tunings");
 		tuningsLoaded = true;
 	}
 	void appendContextMenu(Menu *menu) override;
