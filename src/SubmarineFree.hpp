@@ -8,6 +8,8 @@ extern Plugin *plugin;
 // Forward-declare each Model, defined in each module source file
 extern Model *modelAG106;
 
+extern Model *modelBB120;
+
 extern Model *modelBP101;
 extern Model *modelBP102;
 extern Model *modelBP104;
