@@ -93,6 +93,18 @@ struct WK_101 : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		LIGHT_1,
+		LIGHT_2,
+		LIGHT_3,
+		LIGHT_4,
+		LIGHT_5,
+		LIGHT_6,
+		LIGHT_7,
+		LIGHT_8,
+		LIGHT_9,
+		LIGHT_10,
+		LIGHT_11,
+		LIGHT_12,
 		NUM_LIGHTS
 	};
 	float tunings[12];
@@ -110,6 +122,8 @@ void WK_101::step() {
 	int quantized = floor((12.0f * inputs[INPUT_CV].value) + 0.5f);
 	int note = (120 + quantized) % 12;
 	outputs[OUTPUT_CV].value = (tunings[note] / 1200.0f) + (quantized / 12.0f);	
+	for (int i = 0; i < 12; i++) 
+		lights[LIGHT_1 + i].value = (note == i)?1.0f:0.0f;
 	if (toSend && !outPort.isBusy()) {
 		toSend = 0;
 		json_t *rootJ = json_array();
@@ -155,7 +169,7 @@ struct WK_Display : TransparentWidget {
 
 	void draw(NVGcontext *vg) override {
 		float val = module->tunings[index];
-		sprintf(dspText, "%+5.3f", val);
+		sprintf(dspText, "%+05.2f", val);
 		nvgFontSize(vg, 14);
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
@@ -203,8 +217,9 @@ struct WK101 : ModuleWidget {
 			display->box.pos = Vec(45, 79 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			widgets[i] = ParamWidget::create<WK_Param>(Vec(4 + 104 * (i%2),70 + 21 * i), module, WK_101::PARAM_1 + i, -99.0f, 99.0f, 0.0f);
+			widgets[i] = ParamWidget::create<WK_Param>(Vec(4 + 104 * (i%2),70 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
 			addParam(widgets[i]);
+			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(21.5 + 104 * (i%2), 87.5 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
 		for (int i = 5; i < 12; i++)
 		{
@@ -214,8 +229,9 @@ struct WK101 : ModuleWidget {
 			display->box.pos = Vec(45, 100 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			widgets[i] = ParamWidget::create<WK_Param>(Vec(108 - 104 * (i%2),91 + 21 * i), module, WK_101::PARAM_1 + i, -99.0f, 99.0f, 0.0f);
+			widgets[i] = ParamWidget::create<WK_Param>(Vec(108 - 104 * (i%2),91 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
 			addParam(widgets[i]);
+			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(125.5 - 104 * (i%2), 108.5 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
 		loadTunings("WK_Standard.tunings");
 		loadTunings("WK_Custom.tunings");

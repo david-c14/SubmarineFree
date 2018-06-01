@@ -68,18 +68,18 @@
      inkscape:groupmode="layer"
      stroke="none"
      fill="#000000">
-    <rect x="47" y="80" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="101" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="122" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="143" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="164" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="206" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="227" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="248" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="269" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="290" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="311" width="56" height="17" rx="5" ry="5" />
-    <rect x="47" y="332" width="56" height="17" rx="5" ry="5" />
+    <rect x="50" y="80" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="101" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="122" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="143" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="164" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="206" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="227" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="248" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="269" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="290" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="311" width="50" height="17" rx="4" ry="4" />
+    <rect x="50" y="332" width="50" height="17" rx="4" ry="4" />
   </g>
   <g
      inkscape:label="Text"
