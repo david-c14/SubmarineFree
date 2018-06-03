@@ -1,6 +1,9 @@
 #include "SubmarineFree.hpp"
 #include <mutex>
 #include "torpedo.hpp"
+#include <dirent.h>
+#include <fstream>
+#include <cctype>
 
 struct WK_Tuning {
 	std::string name;
@@ -11,10 +14,22 @@ std::vector<WK_Tuning> tunings;
 
 int tuningsLoaded = false;
 
-void loadTunings(const char *path) {
-	if (tuningsLoaded)
-		return;
-	FILE *file = fopen(assetPlugin(plugin, path).c_str(), "r");
+struct WK_Tunings {
+	static void loadTuningsFromWK(const char *path);
+	static void loadTuningsFromScala(Plugin *plugin);
+	static void loadScalaFile(Plugin *plugin, const char *path);
+	static void loadTunings(Plugin *plugin) {
+		if (tuningsLoaded)
+			return;
+		tuningsLoaded = true;
+		loadTuningsFromWK(assetPlugin(plugin, "WK_Standard.tunings").c_str());
+		loadTuningsFromWK(assetPlugin(plugin, "WK_Custom.tunings").c_str());
+		loadTuningsFromScala(plugin);
+	}
+};
+
+void WK_Tunings::loadTuningsFromWK(const char *path) {
+	FILE *file = fopen(path, "r");
 	if (!file) {
 		return;
 	}
@@ -56,6 +71,60 @@ void loadTunings(const char *path) {
 		debug(message.c_str());
 	}
 	fclose(file);
+}
+
+void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
+	std::string fname {"Scala"};
+	fname.append("/");
+	fname.append(path);
+	std::ifstream fs{assetPlugin(plugin, fname), std::ios_base::in};
+	if (fs) {
+		std::vector<std::string> strings;
+		while (!fs.eof()) {
+			std::string line;
+			getline(fs, line);
+			int iscomment = false;
+			for (unsigned int i = 0; i < line.size(); i++) {
+				if (std::isspace(line[i]))
+					continue;
+				if (line[i] == '!') {
+					iscomment = true;
+					break;
+				}
+			}
+			if (iscomment)
+				continue;
+			debug(" %s", line.c_str());
+			strings.push_back(std::string(line));
+			if (strings.size() >= 14)
+				break;
+		}
+		fs.close();
+	// Create a WK_Tuning 
+	// set name
+	// get and check length
+	// get and check values
+	// if good create a WK_Tuning in the vector and copy data
+	}
+
+}
+
+void WK_Tunings::loadTuningsFromScala(Plugin *plugin) {
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir (assetPlugin(plugin, "Scala").c_str())) != NULL) {
+  		/* print all the files and directories within directory */
+  		while ((ent = readdir (dir)) != NULL) {
+			if (strlen(ent->d_name) > 3)
+				if (!strcmp(ent->d_name + strlen(ent->d_name) - 4, ".scl"))
+					loadScalaFile(plugin, ent->d_name);
+  		}
+  		closedir (dir);
+	} else {
+  		/* could not open directory */
+  		warn("WK: Could not open directory");
+  		return;
+	}
 }
 
 struct WK_101;
@@ -233,9 +302,7 @@ struct WK101 : ModuleWidget {
 			addParam(widgets[i]);
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(125.5 - 104 * (i%2), 108.5 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
-		loadTunings("WK_Standard.tunings");
-		loadTunings("WK_Custom.tunings");
-		tuningsLoaded = true;
+		WK_Tunings::loadTunings(plugin);
 	}
 	void appendContextMenu(Menu *menu) override;
 	void step() override;
@@ -373,9 +440,7 @@ struct WK205 : ModuleWidget {
 			addOutput(Port::create<sub_port>(Vec(2.5,92 + i * 60), Port::OUTPUT, module, WK_205::OUTPUT_CV_1 + i));
 		}
 
-		loadTunings("WK_Standard.tunings");
-		loadTunings("WK_Custom.tunings");
-		tuningsLoaded = true;
+		WK_Tunings::loadTunings(plugin);
 	}
 	void appendContextMenu(Menu *menu) override;
 };
