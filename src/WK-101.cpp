@@ -22,7 +22,6 @@ struct WK_Tunings {
 		if (tuningsLoaded)
 			return;
 		tuningsLoaded = true;
-		loadTuningsFromWK(assetPlugin(plugin, "WK_Standard.tunings").c_str());
 		loadTuningsFromWK(assetPlugin(plugin, "WK_Custom.tunings").c_str());
 		loadTuningsFromScala(plugin);
 	}
