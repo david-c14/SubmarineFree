@@ -1,6 +1,9 @@
 #include "SubmarineFree.hpp"
 #include <mutex>
 #include "torpedo.hpp"
+#include <dirent.h>
+#include <fstream>
+#include <cctype>
 
 struct WK_Tuning {
 	std::string name;
@@ -11,10 +14,22 @@ std::vector<WK_Tuning> tunings;
 
 int tuningsLoaded = false;
 
-void loadTunings(const char *path) {
-	if (tuningsLoaded)
-		return;
-	FILE *file = fopen(assetPlugin(plugin, path).c_str(), "r");
+struct WK_Tunings {
+	static void loadTuningsFromWK(const char *path);
+	static void loadTuningsFromScala(Plugin *plugin);
+	static void loadScalaFile(Plugin *plugin, const char *path);
+	static void loadTunings(Plugin *plugin) {
+		if (tuningsLoaded)
+			return;
+		tuningsLoaded = true;
+		loadTuningsFromWK(assetPlugin(plugin, "WK_Standard.tunings").c_str());
+		loadTuningsFromWK(assetPlugin(plugin, "WK_Custom.tunings").c_str());
+		loadTuningsFromScala(plugin);
+	}
+};
+
+void WK_Tunings::loadTuningsFromWK(const char *path) {
+	FILE *file = fopen(path, "r");
 	if (!file) {
 		return;
 	}
@@ -53,9 +68,148 @@ void loadTunings(const char *path) {
 	}
 	else {
 		std::string message = stringf("SubmarineFree WK: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		debug(message.c_str());
+		warn(message.c_str());
 	}
 	fclose(file);
+}
+
+void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
+	std::string fname {"Scala"};
+	fname.append("/");
+	fname.append(path);
+	std::ifstream fs{assetPlugin(plugin, fname), std::ios_base::in};
+	if (fs) {
+		std::vector<std::string> strings;
+		while (!fs.eof()) {
+			std::string line;
+			getline(fs, line);
+			int iscomment = false;
+			for (unsigned int i = 0; i < line.size(); i++) {
+				if (std::isspace(line[i]))
+					continue;
+				if (line[i] == '!') {
+					iscomment = true;
+					break;
+				}
+			}
+			if (iscomment)
+				continue;
+			strings.push_back(std::string(line));
+			if (strings.size() >= 14)
+				break;
+		}
+		fs.close();
+		if (strings.size() < 2) return;
+		WK_Tuning tuning = { "", { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+		tuning.name.assign(strings[0]);
+		for (unsigned int i = 2; i < strings.size(); i++) {
+			// remove leading whitespace
+			while (strings[i].size() && std::isspace(strings[i][0]))
+				strings[i].erase(0,1);
+			std::string line;
+			int decimal = false;
+			int ratio = false;
+			while (strings[i].size() && !std::isspace(strings[i][0])) {
+				char c = strings[i][0];
+				line.append(1,c);
+				strings[i].erase(0,1);
+				if (!std::isdigit(c) && (c != '/') && (c != '.')) {
+					warn("WK: Scala file format error in %s", path);
+					return;
+				}
+				if (c == '.')
+					decimal = true;
+				if (c == '/' && !ratio)
+					ratio = line.size();
+				if (decimal && ratio) {
+					warn("WK: Scala file format error in %s", path);
+					return;
+				}
+			}
+			if (decimal) {
+				try {
+					float d = std::stof(line, nullptr);
+					d -= (i-1) * 100.0;
+					if ((d < -50.0) || (d > 50.0)) {
+						warn("WK: Scala file format error in %s", path);
+						return;
+					}
+					tuning.offsets[(i-1)%12] = d;
+				}
+				catch (std::exception &err) {
+					warn("WK: Scala file format error in %s", path);
+					return;
+				}
+			}
+			else {
+				if (ratio) {
+					std::string num = line.substr(0,ratio);
+					std::string denom = line.substr(ratio);
+					try {
+						int inum = std::stoi(num,nullptr);
+						int idenom = std::stoi(denom, nullptr);
+						if (!idenom) {
+							warn("WK: Scala file format error in %s", path);
+							return;
+						}
+						float r = (1.0f * inum / idenom);  
+						float d = 1200.0 * log2(r);
+						d -= (i-1) * 100.0;
+						if ((d < -50.0) || (d > 50.0)) {
+							warn("WK: Scala file format error in %s", path);
+							return;
+						}
+						tuning.offsets[(i-1)%12] = d;
+					}
+					catch (std::exception &err) {
+						warn("WK: Scala file format error in %s", path);
+						return;
+					}
+				}
+				else {
+					try {
+						int inum = std::stoi(line, nullptr);
+						float d = 1200.0 * log2(inum);
+						d -= (i-1) * 100.0;
+						if ((d < -50.0) || (d > 50.0)) {
+							warn("WK: Scala file format error in %s", path);
+							return;
+						}
+						tuning.offsets[(i-1)%12] = d;
+					}
+					catch (std::exception &err) {
+						warn("WK: Scala file format error in %s", path);
+						return;
+					}
+				}
+			}
+		}
+		int index = tunings.size();
+		tunings.push_back(WK_Tuning());
+		tunings[index].name = tuning.name;
+		for (int i = 0; i < 12; i++)
+			tunings[index].offsets[i] = tuning.offsets[i];
+		info("WK: Loaded Scala file %s", tuning.name.c_str());
+	}
+
+}
+
+void WK_Tunings::loadTuningsFromScala(Plugin *plugin) {
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir (assetPlugin(plugin, "Scala").c_str())) != NULL) {
+  		/* print all the files and directories within directory */
+  		while ((ent = readdir (dir)) != NULL) {
+			if (strlen(ent->d_name) > 3)
+				if (!strcmp(ent->d_name + strlen(ent->d_name) - 4, ".scl"))
+					loadScalaFile(plugin, ent->d_name);
+  		}
+  		closedir (dir);
+	} else {
+  		/* could not open directory */
+  		warn("WK: Could not open Scala directory");
+  		return;
+	}
 }
 
 struct WK_101;
@@ -233,9 +387,7 @@ struct WK101 : ModuleWidget {
 			addParam(widgets[i]);
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(125.5 - 104 * (i%2), 108.5 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
-		loadTunings("WK_Standard.tunings");
-		loadTunings("WK_Custom.tunings");
-		tuningsLoaded = true;
+		WK_Tunings::loadTunings(plugin);
 	}
 	void appendContextMenu(Menu *menu) override;
 	void step() override;
@@ -373,9 +525,7 @@ struct WK205 : ModuleWidget {
 			addOutput(Port::create<sub_port>(Vec(2.5,92 + i * 60), Port::OUTPUT, module, WK_205::OUTPUT_CV_1 + i));
 		}
 
-		loadTunings("WK_Standard.tunings");
-		loadTunings("WK_Custom.tunings");
-		tuningsLoaded = true;
+		WK_Tunings::loadTunings(plugin);
 	}
 	void appendContextMenu(Menu *menu) override;
 };
