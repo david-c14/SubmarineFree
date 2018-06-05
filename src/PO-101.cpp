@@ -1,6 +1,6 @@
 #include "SubmarineFree.hpp"
 
-struct PO_101 : Module {
+struct PO_Util {
 	static constexpr float deg0   = 0.0f;
 	static constexpr float deg30  =         M_PI / 6.0f;
 	static constexpr float deg45  =         M_PI / 4.0f;
@@ -25,6 +25,40 @@ struct PO_101 : Module {
 	static constexpr float ph300 = 5.0f / 6.0f;
 	static constexpr float ph315 = 0.875f;
 	static constexpr float ph330 = 11.0f / 12.0f;
+
+	float sin(float phase);
+	float tri(float phase);
+	float saw(float phase);
+	float sqr(float phase);
+};
+
+float PO_Util::sin(float phase) {
+	return 5.0f * sinf(phase);
+}
+
+float PO_Util::tri(float phase) {
+	if (phase >= 1.0f)
+		phase -= 1.0f;
+	if (phase < 0.25f)
+		return 20.0f * phase;
+	if (phase < 0.75f)
+		return 20.0f * (0.5f - phase);
+	return 20.0f * (phase - 1.0f);
+}
+
+float PO_Util::saw(float phase) {
+	if (phase >= 1.0f)
+		phase -= 1.0f;
+	if (phase < 0.5f)
+		return 10.0f * phase;
+	return 10.0f * (phase - 1.0f);
+}
+
+float PO_Util::sqr(float phase) {
+	return ((phase < 0.5f) || (phase >= 1.0f))?5.0f:-5.0f;
+}
+
+struct PO_101 : Module, PO_Util {
 	
 	enum ParamIds {
 		PARAM_TUNE,
@@ -69,31 +103,23 @@ struct PO_101 : Module {
 
 	PO_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
-	float sin(float phase);
 	void sin(std::vector<float> *outputs, float phase);
-	float tri(float phase);
 	void tri(std::vector<float> *outputs, float phase);
-	float saw(float phase);
 	void saw(std::vector<float> *outputs, float phase);
-	float sqr(float phase);
 	void sqr(std::vector<float> *outputs, float phase);
 	float phase = 0.0f;
 };
 
-float PO_101::sin(float phase) {
-	return 5.0f * sinf(phase);
-}
-
 void PO_101::sin(std::vector<float> *outputs, float phase) {
 	phase *= (2 * M_PI);
-	outputs->at(0) = sin(phase + deg0);
-	outputs->at(1) = sin(phase + deg30); 
-	outputs->at(2) = sin(phase + deg45); 
-	outputs->at(3) = sin(phase + deg60); 
-	outputs->at(4) = sin(phase + deg90); 
-	outputs->at(5) = sin(phase + deg120); 
-	outputs->at(6) = sin(phase + deg135); 
-	outputs->at(7) = sin(phase + deg150); 
+	outputs->at(0) = PO_Util::sin(phase + deg0);
+	outputs->at(1) = PO_Util::sin(phase + deg30); 
+	outputs->at(2) = PO_Util::sin(phase + deg45); 
+	outputs->at(3) = PO_Util::sin(phase + deg60); 
+	outputs->at(4) = PO_Util::sin(phase + deg90); 
+	outputs->at(5) = PO_Util::sin(phase + deg120); 
+	outputs->at(6) = PO_Util::sin(phase + deg135); 
+	outputs->at(7) = PO_Util::sin(phase + deg150); 
 	outputs->at(8) = -outputs->at(0); 
 	outputs->at(9) = -outputs->at(1); 
 	outputs->at(10) = -outputs->at(2); 
@@ -102,27 +128,17 @@ void PO_101::sin(std::vector<float> *outputs, float phase) {
 	outputs->at(13) = -outputs->at(5); 
 	outputs->at(14) = -outputs->at(6); 
 	outputs->at(15) = -outputs->at(7); 
-}
-
-float PO_101::tri(float phase) {
-	if (phase >= 1.0f)
-		phase -= 1.0f;
-	if (phase < 0.25f)
-		return 20.0f * phase;
-	if (phase < 0.75f)
-		return 20.0f * (0.5f - phase);
-	return 20.0f * (phase - 1.0f);
 }
 
 void PO_101::tri(std::vector<float> *outputs, float phase) {
-	outputs->at(0) = tri(phase + ph0);
-	outputs->at(1) = tri(phase + ph30); 
-	outputs->at(2) = tri(phase + ph45); 
-	outputs->at(3) = tri(phase + ph60); 
-	outputs->at(4) = tri(phase + ph90); 
-	outputs->at(5) = tri(phase + ph120); 
-	outputs->at(6) = tri(phase + ph135); 
-	outputs->at(7) = tri(phase + ph150); 
+	outputs->at(0) = PO_Util::tri(phase + ph0);
+	outputs->at(1) = PO_Util::tri(phase + ph30); 
+	outputs->at(2) = PO_Util::tri(phase + ph45); 
+	outputs->at(3) = PO_Util::tri(phase + ph60); 
+	outputs->at(4) = PO_Util::tri(phase + ph90); 
+	outputs->at(5) = PO_Util::tri(phase + ph120); 
+	outputs->at(6) = PO_Util::tri(phase + ph135); 
+	outputs->at(7) = PO_Util::tri(phase + ph150); 
 	outputs->at(8) = -outputs->at(0); 
 	outputs->at(9) = -outputs->at(1); 
 	outputs->at(10) = -outputs->at(2); 
@@ -133,46 +149,34 @@ void PO_101::tri(std::vector<float> *outputs, float phase) {
 	outputs->at(15) = -outputs->at(7); 
 }
 
-float PO_101::saw(float phase) {
-	if (phase >= 1.0f)
-		phase -= 1.0f;
-	if (phase < 0.5f)
-		return 10.0f * phase;
-	return 10.0f * (phase - 1.0f);
-}
-
 void PO_101::saw(std::vector<float> *outputs, float phase) {
-	outputs->at(0) = saw(phase + ph0);
-	outputs->at(1) = saw(phase + ph30); 
-	outputs->at(2) = saw(phase + ph45); 
-	outputs->at(3) = saw(phase + ph60); 
-	outputs->at(4) = saw(phase + ph90); 
-	outputs->at(5) = saw(phase + ph120); 
-	outputs->at(6) = saw(phase + ph135); 
-	outputs->at(7) = saw(phase + ph150); 
-	outputs->at(8) = saw(phase + ph180);
-	outputs->at(9) = saw(phase + ph210); 
-	outputs->at(10) = saw(phase + ph225); 
-	outputs->at(11) = saw(phase + ph240); 
-	outputs->at(12) = saw(phase + ph270); 
-	outputs->at(13) = saw(phase + ph300); 
-	outputs->at(14) = saw(phase + ph315); 
-	outputs->at(15) = saw(phase + ph330); 
-}
-
-float PO_101::sqr(float phase) {
-	return ((phase < 0.5f) || (phase >= 1.0f))?5.0f:-5.0f;
+	outputs->at(0) = PO_Util::saw(phase + ph0);
+	outputs->at(1) = PO_Util::saw(phase + ph30); 
+	outputs->at(2) = PO_Util::saw(phase + ph45); 
+	outputs->at(3) = PO_Util::saw(phase + ph60); 
+	outputs->at(4) = PO_Util::saw(phase + ph90); 
+	outputs->at(5) = PO_Util::saw(phase + ph120); 
+	outputs->at(6) = PO_Util::saw(phase + ph135); 
+	outputs->at(7) = PO_Util::saw(phase + ph150); 
+	outputs->at(8) = PO_Util::saw(phase + ph180);
+	outputs->at(9) = PO_Util::saw(phase + ph210); 
+	outputs->at(10) = PO_Util::saw(phase + ph225); 
+	outputs->at(11) = PO_Util::saw(phase + ph240); 
+	outputs->at(12) = PO_Util::saw(phase + ph270); 
+	outputs->at(13) = PO_Util::saw(phase + ph300); 
+	outputs->at(14) = PO_Util::saw(phase + ph315); 
+	outputs->at(15) = PO_Util::saw(phase + ph330); 
 }
 
 void PO_101::sqr(std::vector<float> *outputs, float phase) {
-	outputs->at(0) = sqr(phase + ph0);
-	outputs->at(1) = sqr(phase + ph30); 
-	outputs->at(2) = sqr(phase + ph45); 
-	outputs->at(3) = sqr(phase + ph60); 
-	outputs->at(4) = sqr(phase + ph90); 
-	outputs->at(5) = sqr(phase + ph120); 
-	outputs->at(6) = sqr(phase + ph135); 
-	outputs->at(7) = sqr(phase + ph150); 
+	outputs->at(0) = PO_Util::sqr(phase + ph0);
+	outputs->at(1) = PO_Util::sqr(phase + ph30); 
+	outputs->at(2) = PO_Util::sqr(phase + ph45); 
+	outputs->at(3) = PO_Util::sqr(phase + ph60); 
+	outputs->at(4) = PO_Util::sqr(phase + ph90); 
+	outputs->at(5) = PO_Util::sqr(phase + ph120); 
+	outputs->at(6) = PO_Util::sqr(phase + ph135); 
+	outputs->at(7) = PO_Util::sqr(phase + ph150); 
 	outputs->at(8) = -outputs->at(0); 
 	outputs->at(9) = -outputs->at(1); 
 	outputs->at(10) = -outputs->at(2); 
