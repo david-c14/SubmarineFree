@@ -43,7 +43,7 @@ struct PO_101 : Module {
 };
 
 void PO_101::step() {
-	float freq = 440.0f * powf(2.0f, params[PARAM_TUNE].value + params[PARAM_FINE].value);
+	float freq = 440.0f * powf(2.0f, params[PARAM_TUNE].value + params[PARAM_FINE].value - 0.75f);
 	float deltaTime = freq / engineGetSampleRate();
 	phase += deltaTime;
 	double intPart;
