@@ -1,9 +1,39 @@
 #include "SubmarineFree.hpp"
 
 struct PO_101 : Module {
+	static constexpr float deg0   = 0.0f;
+	static constexpr float deg30  =         M_PI / 6.0f;
+	static constexpr float deg45  =         M_PI / 4.0f;
+	static constexpr float deg60  =         M_PI / 3.0f;
+	static constexpr float deg90  =         M_PI / 2.0f;
+	static constexpr float deg120 = 2.0f  * M_PI / 3.0f;
+	static constexpr float deg135 = 3.0f  * M_PI / 4.0f;
+	static constexpr float deg150 = 5.0f  * M_PI / 6.0f;
+	static constexpr float ph0 = 0.0f;
+	static constexpr float ph30 = 1.0f / 12.0f;
+	static constexpr float ph45 = 0.125f;
+	static constexpr float ph60 = 1.0f / 6.0f;
+	static constexpr float ph90 = 0.25f;
+	static constexpr float ph120 = 1.0f / 3.0f;
+	static constexpr float ph135 = 0.375f;
+	static constexpr float ph150 = 5.0f / 12.0f;
+	static constexpr float ph180 = 0.5f;
+	static constexpr float ph210 = 7.0f / 12.0f;
+	static constexpr float ph225 = 0.625;
+	static constexpr float ph240 = 2.0f / 3.0f;
+	static constexpr float ph270 = 0.75f;
+	static constexpr float ph300 = 5.0f / 6.0f;
+	static constexpr float ph315 = 0.875f;
+	static constexpr float ph330 = 11.0f / 12.0f;
+	
 	enum ParamIds {
 		PARAM_TUNE,
 		PARAM_FINE,
+		PARAM_WAVE,
+		PARAM_PHASE_1,
+		PARAM_PHASE_2,
+		PARAM_PHASE_3,
+		PARAM_PHASE_4,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -39,32 +69,143 @@ struct PO_101 : Module {
 
 	PO_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
+	float sin(float phase);
+	void sin(std::vector<float> *outputs, float phase);
+	float tri(float phase);
+	void tri(std::vector<float> *outputs, float phase);
+	float saw(float phase);
+	void saw(std::vector<float> *outputs, float phase);
+	float sqr(float phase);
+	void sqr(std::vector<float> *outputs, float phase);
 	float phase = 0.0f;
 };
 
+float PO_101::sin(float phase) {
+	return 5.0f * sinf(phase);
+}
+
+void PO_101::sin(std::vector<float> *outputs, float phase) {
+	phase *= (2 * M_PI);
+	outputs->at(0) = sin(phase + deg0);
+	outputs->at(1) = sin(phase + deg30); 
+	outputs->at(2) = sin(phase + deg45); 
+	outputs->at(3) = sin(phase + deg60); 
+	outputs->at(4) = sin(phase + deg90); 
+	outputs->at(5) = sin(phase + deg120); 
+	outputs->at(6) = sin(phase + deg135); 
+	outputs->at(7) = sin(phase + deg150); 
+	outputs->at(8) = -outputs->at(0); 
+	outputs->at(9) = -outputs->at(1); 
+	outputs->at(10) = -outputs->at(2); 
+	outputs->at(11) = -outputs->at(3); 
+	outputs->at(12) = -outputs->at(4); 
+	outputs->at(13) = -outputs->at(5); 
+	outputs->at(14) = -outputs->at(6); 
+	outputs->at(15) = -outputs->at(7); 
+}
+
+float PO_101::tri(float phase) {
+	if (phase >= 1.0f)
+		phase -= 1.0f;
+	if (phase < 0.25f)
+		return 20.0f * phase;
+	if (phase < 0.75f)
+		return 20.0f * (0.5f - phase);
+	return 20.0f * (phase - 1.0f);
+}
+
+void PO_101::tri(std::vector<float> *outputs, float phase) {
+	outputs->at(0) = tri(phase + ph0);
+	outputs->at(1) = tri(phase + ph30); 
+	outputs->at(2) = tri(phase + ph45); 
+	outputs->at(3) = tri(phase + ph60); 
+	outputs->at(4) = tri(phase + ph90); 
+	outputs->at(5) = tri(phase + ph120); 
+	outputs->at(6) = tri(phase + ph135); 
+	outputs->at(7) = tri(phase + ph150); 
+	outputs->at(8) = -outputs->at(0); 
+	outputs->at(9) = -outputs->at(1); 
+	outputs->at(10) = -outputs->at(2); 
+	outputs->at(11) = -outputs->at(3); 
+	outputs->at(12) = -outputs->at(4); 
+	outputs->at(13) = -outputs->at(5); 
+	outputs->at(14) = -outputs->at(6); 
+	outputs->at(15) = -outputs->at(7); 
+}
+
+float PO_101::saw(float phase) {
+	if (phase >= 1.0f)
+		phase -= 1.0f;
+	if (phase < 0.5f)
+		return 10.0f * phase;
+	return 10.0f * (phase - 1.0f);
+}
+
+void PO_101::saw(std::vector<float> *outputs, float phase) {
+	outputs->at(0) = saw(phase + ph0);
+	outputs->at(1) = saw(phase + ph30); 
+	outputs->at(2) = saw(phase + ph45); 
+	outputs->at(3) = saw(phase + ph60); 
+	outputs->at(4) = saw(phase + ph90); 
+	outputs->at(5) = saw(phase + ph120); 
+	outputs->at(6) = saw(phase + ph135); 
+	outputs->at(7) = saw(phase + ph150); 
+	outputs->at(8) = saw(phase + ph180);
+	outputs->at(9) = saw(phase + ph210); 
+	outputs->at(10) = saw(phase + ph225); 
+	outputs->at(11) = saw(phase + ph240); 
+	outputs->at(12) = saw(phase + ph270); 
+	outputs->at(13) = saw(phase + ph300); 
+	outputs->at(14) = saw(phase + ph315); 
+	outputs->at(15) = saw(phase + ph330); 
+}
+
+float PO_101::sqr(float phase) {
+	return ((phase < 0.5f) || (phase >= 1.0f))?5.0f:-5.0f;
+}
+
+void PO_101::sqr(std::vector<float> *outputs, float phase) {
+	outputs->at(0) = sqr(phase + ph0);
+	outputs->at(1) = sqr(phase + ph30); 
+	outputs->at(2) = sqr(phase + ph45); 
+	outputs->at(3) = sqr(phase + ph60); 
+	outputs->at(4) = sqr(phase + ph90); 
+	outputs->at(5) = sqr(phase + ph120); 
+	outputs->at(6) = sqr(phase + ph135); 
+	outputs->at(7) = sqr(phase + ph150); 
+	outputs->at(8) = -outputs->at(0); 
+	outputs->at(9) = -outputs->at(1); 
+	outputs->at(10) = -outputs->at(2); 
+	outputs->at(11) = -outputs->at(3); 
+	outputs->at(12) = -outputs->at(4); 
+	outputs->at(13) = -outputs->at(5); 
+	outputs->at(14) = -outputs->at(6); 
+	outputs->at(15) = -outputs->at(7); 
+}
+	
 void PO_101::step() {
-	float freq = 440.0f * powf(2.0f, params[PARAM_TUNE].value + params[PARAM_FINE].value - 0.75f);
+	float freq = 440.0f * powf(2.0f, (params[PARAM_TUNE].value + params[PARAM_FINE].value) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f) - 0.75f);
 	float deltaTime = freq / engineGetSampleRate();
 	phase += deltaTime;
 	double intPart;
 	phase = modf(phase, &intPart); 
 	
-	outputs[OUTPUT_1].value = 5.0f * sinf(phase * 2 * M_PI);
-	outputs[OUTPUT_2].value = 5.0f * sinf(phase * 2 * M_PI + M_PI / 6);
-	outputs[OUTPUT_3].value = 5.0f * sinf(phase * 2 * M_PI + M_PI / 4);
-	outputs[OUTPUT_4].value = 5.0f * sinf(phase * 2 * M_PI + M_PI / 3);
-	outputs[OUTPUT_5].value = 5.0f * sinf(phase * 2 * M_PI + M_PI / 2);
-	outputs[OUTPUT_6].value = 5.0f * sinf(phase * 2 * M_PI + 2 * M_PI / 3);
-	outputs[OUTPUT_7].value = 5.0f * sinf(phase * 2 * M_PI + 3 * M_PI / 4);
-	outputs[OUTPUT_8].value = 5.0f * sinf(phase * 2 * M_PI + 5 * M_PI / 6);
-	outputs[OUTPUT_9].value = 5.0f * sinf(phase * 2 * M_PI + M_PI);
-	outputs[OUTPUT_10].value = 5.0f * sinf(phase * 2 * M_PI + 7 * M_PI / 6);
-	outputs[OUTPUT_11].value = 5.0f * sinf(phase * 2 * M_PI + 5 * M_PI / 4);
-	outputs[OUTPUT_12].value = 5.0f * sinf(phase * 2 * M_PI + 4 * M_PI / 3);
-	outputs[OUTPUT_13].value = 5.0f * sinf(phase * 2 * M_PI + 3 * M_PI / 2);
-	outputs[OUTPUT_14].value = 5.0f * sinf(phase * 2 * M_PI + 5 * M_PI / 3);
-	outputs[OUTPUT_15].value = 5.0f * sinf(phase * 2 * M_PI + 7 * M_PI / 4);
-	outputs[OUTPUT_16].value = 5.0f * sinf(phase * 2 * M_PI + 11 * M_PI / 6);
+	{
+		std::vector<float> offsets(16,0.0f);
+		float waveShape = clamp(params[PARAM_WAVE].value, 0.0f, 3.0f);
+		if (waveShape < 0.5f)
+			sin(&offsets, phase);
+		else if (waveShape < 1.5f)
+			tri(&offsets, phase);
+		else if (waveShape < 2.5f)
+			saw(&offsets, phase);
+		else
+			sqr(&offsets, phase);
+			
+		for(unsigned int i = 0; i < 16; i++) {
+			outputs[OUTPUT_1 + i].value = offsets[i];
+		}
+	}
 
 }
 
@@ -72,8 +213,9 @@ struct PO101 : ModuleWidget {
 	PO101(PO_101 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PO-101.svg")));
 
-		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 19), module, PO_101::PARAM_TUNE, -5.0f, +5.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(71, 19), module, PO_101::PARAM_FINE, -0.1f, +0.1f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 19), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(71, 19), module, PO_101::PARAM_FINE, -3.0f, +3.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(131, 19), module, PO_101::PARAM_WAVE, 0.0f, +3.0f, 0.0f));
 
 		addInput(Port::create<sub_port_blue>(Vec(4,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
 
