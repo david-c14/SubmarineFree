@@ -1,4 +1,5 @@
 #include "SubmarineFree.hpp"
+#include "dsp/functions.hpp"
 
 struct PO_Util {
 	static constexpr float deg0   = 0.0f;
@@ -188,7 +189,7 @@ void PO_101::sqr(std::vector<float> *outputs, float phase) {
 }
 	
 void PO_101::step() {
-	float freq = 440.0f * powf(2.0f, (params[PARAM_TUNE].value + params[PARAM_FINE].value) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f) - 0.75f);
+	float freq = 440.0f * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f) - 0.75f);
 	float deltaTime = freq / engineGetSampleRate();
 	phase += deltaTime;
 	double intPart;
@@ -217,28 +218,28 @@ struct PO101 : ModuleWidget {
 	PO101(PO_101 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PO-101.svg")));
 
-		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 19), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(71, 19), module, PO_101::PARAM_FINE, -3.0f, +3.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(131, 19), module, PO_101::PARAM_WAVE, 0.0f, +3.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(56, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +3.0f, 0.0f));
 
-		addInput(Port::create<sub_port_blue>(Vec(4,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
+		addInput(Port::create<sub_port>(Vec(40,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
 
-		addOutput(Port::create<sub_port_blue>(Vec(62,33), Port::OUTPUT, module, PO_101::OUTPUT_1));
-		addOutput(Port::create<sub_port_blue>(Vec(62,63), Port::OUTPUT, module, PO_101::OUTPUT_2));
-		addOutput(Port::create<sub_port_blue>(Vec(62,93), Port::OUTPUT, module, PO_101::OUTPUT_3));
-		addOutput(Port::create<sub_port_blue>(Vec(62,123), Port::OUTPUT, module, PO_101::OUTPUT_4));
-		addOutput(Port::create<sub_port_blue>(Vec(62,153), Port::OUTPUT, module, PO_101::OUTPUT_5));
-		addOutput(Port::create<sub_port_blue>(Vec(62,183), Port::OUTPUT, module, PO_101::OUTPUT_6));
-		addOutput(Port::create<sub_port_blue>(Vec(62,213), Port::OUTPUT, module, PO_101::OUTPUT_7));
-		addOutput(Port::create<sub_port_blue>(Vec(62,243), Port::OUTPUT, module, PO_101::OUTPUT_8));
-		addOutput(Port::create<sub_port_blue>(Vec(62,273), Port::OUTPUT, module, PO_101::OUTPUT_9));
-		addOutput(Port::create<sub_port_blue>(Vec(92,93), Port::OUTPUT, module, PO_101::OUTPUT_10));
-		addOutput(Port::create<sub_port_blue>(Vec(92,123), Port::OUTPUT, module, PO_101::OUTPUT_11));
-		addOutput(Port::create<sub_port_blue>(Vec(92,153), Port::OUTPUT, module, PO_101::OUTPUT_12));
-		addOutput(Port::create<sub_port_blue>(Vec(92,183), Port::OUTPUT, module, PO_101::OUTPUT_13));
-		addOutput(Port::create<sub_port_blue>(Vec(92,213), Port::OUTPUT, module, PO_101::OUTPUT_14));
-		addOutput(Port::create<sub_port_blue>(Vec(92,243), Port::OUTPUT, module, PO_101::OUTPUT_15));
-		addOutput(Port::create<sub_port_blue>(Vec(92,273), Port::OUTPUT, module, PO_101::OUTPUT_16));
+		addOutput(Port::create<sub_port>(Vec(77.5,100), Port::OUTPUT, module, PO_101::OUTPUT_1));
+		addOutput(Port::create<sub_port>(Vec(105,107.5), Port::OUTPUT, module, PO_101::OUTPUT_2));
+		addOutput(Port::create<sub_port>(Vec(132.5,100), Port::OUTPUT, module, PO_101::OUTPUT_3));
+		addOutput(Port::create<sub_port>(Vec(125,127.5), Port::OUTPUT, module, PO_101::OUTPUT_4));
+		addOutput(Port::create<sub_port>(Vec(132.5,155), Port::OUTPUT, module, PO_101::OUTPUT_5));
+		addOutput(Port::create<sub_port>(Vec(125,182.5), Port::OUTPUT, module, PO_101::OUTPUT_6));
+		addOutput(Port::create<sub_port>(Vec(132.5,210), Port::OUTPUT, module, PO_101::OUTPUT_7));
+		addOutput(Port::create<sub_port>(Vec(105,202.5), Port::OUTPUT, module, PO_101::OUTPUT_8));
+		addOutput(Port::create<sub_port>(Vec(77.5,210), Port::OUTPUT, module, PO_101::OUTPUT_9));
+		addOutput(Port::create<sub_port>(Vec(50,202.5), Port::OUTPUT, module, PO_101::OUTPUT_10));
+		addOutput(Port::create<sub_port>(Vec(22.5,210), Port::OUTPUT, module, PO_101::OUTPUT_11));
+		addOutput(Port::create<sub_port>(Vec(30,182.5), Port::OUTPUT, module, PO_101::OUTPUT_12));
+		addOutput(Port::create<sub_port>(Vec(22.5,155), Port::OUTPUT, module, PO_101::OUTPUT_13));
+		addOutput(Port::create<sub_port>(Vec(30,127.5), Port::OUTPUT, module, PO_101::OUTPUT_14));
+		addOutput(Port::create<sub_port>(Vec(22.5,100), Port::OUTPUT, module, PO_101::OUTPUT_15));
+		addOutput(Port::create<sub_port>(Vec(50,107.5), Port::OUTPUT, module, PO_101::OUTPUT_16));
 	}
 };
 
