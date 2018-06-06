@@ -112,6 +112,7 @@ struct PO_101 : Module, PO_Util {
 	void saw(float phase);
 	void sqr(float phase);
 	float phase = 0.0f;
+	float baseFreq = 261.626f;
 };
 
 void PO_101::sin(float phase) {
@@ -201,7 +202,7 @@ void PO_101::sqr(float phase) {
 }
 	
 void PO_101::step() {
-	float freq = 440.0f * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f) - 0.75f);
+	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f));
 	float deltaTime = freq / engineGetSampleRate();
 	phase += deltaTime;
 	double intPart;
@@ -221,15 +222,13 @@ void PO_101::step() {
 
 }
 
-struct PO101 : ModuleWidget {
-	PO101(PO_101 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/PO-101.svg")));
-
-		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(56, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+struct PO_Layout : ModuleWidget {
+	PO_Layout(PO_101 *module) : ModuleWidget(module) {}
+	void Layout() {
+		addParam(ParamWidget::create<sub_knob_med>(Vec(66, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_knob_med_snap_narrow>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +3.0f, 0.0f));
 
-		addInput(Port::create<sub_port>(Vec(40,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
+		addInput(Port::create<sub_port>(Vec(45,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
 
 		addOutput(Port::create<sub_port>(Vec(77.5,100), Port::OUTPUT, module, PO_101::OUTPUT_1));
 		addOutput(Port::create<sub_port>(Vec(110,109), Port::OUTPUT, module, PO_101::OUTPUT_2));
@@ -256,4 +255,22 @@ struct PO101 : ModuleWidget {
 	}
 };
 
+struct PO101 : PO_Layout {
+	PO101(PO_101 *module) : PO_Layout(module) {
+		setPanel(SVG::load(assetPlugin(plugin, "res/PO-101.svg")));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		Layout();
+	}
+};
+
+struct PO102 : PO_Layout {
+	PO102(PO_101 *module) : PO_Layout(module) {
+		setPanel(SVG::load(assetPlugin(plugin, "res/PO-102.svg")));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 39), module, PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f));
+		module->baseFreq = 1.0f;
+		Layout();
+	}
+};
+
 Model *modelPO101 = Model::create<PO_101, PO101>("SubmarineFree", "PO-101", "PO-101 Phased VCO", OSCILLATOR_TAG, MULTIPLE_TAG);
+Model *modelPO102 = Model::create<PO_101, PO102>("SubmarineFree", "PO-102", "PO-102 Phased LFO", OSCILLATOR_TAG, MULTIPLE_TAG);
