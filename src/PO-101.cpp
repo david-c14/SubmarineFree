@@ -38,8 +38,7 @@ float PO_Util::sin(float phase) {
 }
 
 float PO_Util::tri(float phase) {
-	if (phase >= 1.0f)
-		phase -= 1.0f;
+	phase -= floor(phase);
 	if (phase < 0.25f)
 		return 20.0f * phase;
 	if (phase < 0.75f)
@@ -48,15 +47,15 @@ float PO_Util::tri(float phase) {
 }
 
 float PO_Util::saw(float phase) {
-	if (phase >= 1.0f)
-		phase -= 1.0f;
+	phase -= floor(phase);
 	if (phase < 0.5f)
 		return 10.0f * phase;
 	return 10.0f * (phase - 1.0f);
 }
 
 float PO_Util::sqr(float phase) {
-	return ((phase < 0.5f) || (phase >= 1.0f))?5.0f:-5.0f;
+	phase -= floor(phase);
+	return (phase < 0.5f)?5.0f:-5.0f;
 }
 
 struct PO_101 : Module, PO_Util {
@@ -73,6 +72,10 @@ struct PO_101 : Module, PO_Util {
 	};
 	enum InputIds {
 		INPUT_NOTE_CV,
+		INPUT_PHASE_1,
+		INPUT_PHASE_2,
+		INPUT_PHASE_3,
+		INPUT_PHASE_4,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -104,88 +107,97 @@ struct PO_101 : Module, PO_Util {
 
 	PO_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
-	void sin(std::vector<float> *outputs, float phase);
-	void tri(std::vector<float> *outputs, float phase);
-	void saw(std::vector<float> *outputs, float phase);
-	void sqr(std::vector<float> *outputs, float phase);
+	void sin(float phase);
+	void tri(float phase);
+	void saw(float phase);
+	void sqr(float phase);
 	float phase = 0.0f;
 };
 
-void PO_101::sin(std::vector<float> *outputs, float phase) {
+void PO_101::sin(float phase) {
 	phase *= (2 * M_PI);
-	outputs->at(0) = PO_Util::sin(phase + deg0);
-	outputs->at(1) = PO_Util::sin(phase + deg30); 
-	outputs->at(2) = PO_Util::sin(phase + deg45); 
-	outputs->at(3) = PO_Util::sin(phase + deg60); 
-	outputs->at(4) = PO_Util::sin(phase + deg90); 
-	outputs->at(5) = PO_Util::sin(phase + deg120); 
-	outputs->at(6) = PO_Util::sin(phase + deg135); 
-	outputs->at(7) = PO_Util::sin(phase + deg150); 
-	outputs->at(8) = -outputs->at(0); 
-	outputs->at(9) = -outputs->at(1); 
-	outputs->at(10) = -outputs->at(2); 
-	outputs->at(11) = -outputs->at(3); 
-	outputs->at(12) = -outputs->at(4); 
-	outputs->at(13) = -outputs->at(5); 
-	outputs->at(14) = -outputs->at(6); 
-	outputs->at(15) = -outputs->at(7); 
+	outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sin(phase + deg0));
+	outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sin(phase + deg30)); 
+	outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sin(phase + deg45)); 
+	outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sin(phase + deg60)); 
+	outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sin(phase + deg90)); 
+	outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sin(phase + deg120)); 
+	outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sin(phase + deg135)); 
+	outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sin(phase + deg150)); 
+	for (int i = 0; i < 4; i++) {
+		if (outputs[OUTPUT_17 + i].active) {
+			float offset = params[PARAM_PHASE_1 + i].value;
+			if (inputs[INPUT_PHASE_1 + i].active)
+				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+			offset *= 2 * M_PI;
+			outputs[OUTPUT_17 + i].value = PO_Util::sin(phase + offset);
+		}	
+	}
 }
 
-void PO_101::tri(std::vector<float> *outputs, float phase) {
-	outputs->at(0) = PO_Util::tri(phase + ph0);
-	outputs->at(1) = PO_Util::tri(phase + ph30); 
-	outputs->at(2) = PO_Util::tri(phase + ph45); 
-	outputs->at(3) = PO_Util::tri(phase + ph60); 
-	outputs->at(4) = PO_Util::tri(phase + ph90); 
-	outputs->at(5) = PO_Util::tri(phase + ph120); 
-	outputs->at(6) = PO_Util::tri(phase + ph135); 
-	outputs->at(7) = PO_Util::tri(phase + ph150); 
-	outputs->at(8) = -outputs->at(0); 
-	outputs->at(9) = -outputs->at(1); 
-	outputs->at(10) = -outputs->at(2); 
-	outputs->at(11) = -outputs->at(3); 
-	outputs->at(12) = -outputs->at(4); 
-	outputs->at(13) = -outputs->at(5); 
-	outputs->at(14) = -outputs->at(6); 
-	outputs->at(15) = -outputs->at(7); 
+void PO_101::tri(float phase) {
+	outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::tri(phase + ph0));
+	outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::tri(phase + ph30)); 
+	outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::tri(phase + ph45)); 
+	outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::tri(phase + ph60)); 
+	outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::tri(phase + ph90)); 
+	outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::tri(phase + ph120)); 
+	outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::tri(phase + ph135)); 
+	outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::tri(phase + ph150)); 
+	for (int i = 0; i < 4; i++) {
+		if (outputs[OUTPUT_17 + i].active) {
+			float offset = params[PARAM_PHASE_1 + i].value;
+			if (inputs[INPUT_PHASE_1 + i].active)
+				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+			outputs[OUTPUT_17 + i].value = PO_Util::tri(phase + offset);
+		}	
+	}
 }
 
-void PO_101::saw(std::vector<float> *outputs, float phase) {
-	outputs->at(0) = PO_Util::saw(phase + ph0);
-	outputs->at(1) = PO_Util::saw(phase + ph30); 
-	outputs->at(2) = PO_Util::saw(phase + ph45); 
-	outputs->at(3) = PO_Util::saw(phase + ph60); 
-	outputs->at(4) = PO_Util::saw(phase + ph90); 
-	outputs->at(5) = PO_Util::saw(phase + ph120); 
-	outputs->at(6) = PO_Util::saw(phase + ph135); 
-	outputs->at(7) = PO_Util::saw(phase + ph150); 
-	outputs->at(8) = PO_Util::saw(phase + ph180);
-	outputs->at(9) = PO_Util::saw(phase + ph210); 
-	outputs->at(10) = PO_Util::saw(phase + ph225); 
-	outputs->at(11) = PO_Util::saw(phase + ph240); 
-	outputs->at(12) = PO_Util::saw(phase + ph270); 
-	outputs->at(13) = PO_Util::saw(phase + ph300); 
-	outputs->at(14) = PO_Util::saw(phase + ph315); 
-	outputs->at(15) = PO_Util::saw(phase + ph330); 
+void PO_101::saw(float phase) {
+	outputs[OUTPUT_1].value = PO_Util::saw(phase + ph0);
+	outputs[OUTPUT_2].value = PO_Util::saw(phase + ph30); 
+	outputs[OUTPUT_3].value = PO_Util::saw(phase + ph45); 
+	outputs[OUTPUT_4].value = PO_Util::saw(phase + ph60); 
+	outputs[OUTPUT_5].value = PO_Util::saw(phase + ph90); 
+	outputs[OUTPUT_6].value = PO_Util::saw(phase + ph120); 
+	outputs[OUTPUT_7].value = PO_Util::saw(phase + ph135); 
+	outputs[OUTPUT_8].value = PO_Util::saw(phase + ph150); 
+	outputs[OUTPUT_9].value = PO_Util::saw(phase + ph180);
+	outputs[OUTPUT_10].value = PO_Util::saw(phase + ph210); 
+	outputs[OUTPUT_11].value = PO_Util::saw(phase + ph225); 
+	outputs[OUTPUT_12].value = PO_Util::saw(phase + ph240); 
+	outputs[OUTPUT_13].value = PO_Util::saw(phase + ph270); 
+	outputs[OUTPUT_14].value = PO_Util::saw(phase + ph300); 
+	outputs[OUTPUT_15].value = PO_Util::saw(phase + ph315); 
+	outputs[OUTPUT_16].value = PO_Util::saw(phase + ph330); 
+	for (int i = 0; i < 4; i++) {
+		if (outputs[OUTPUT_17 + i].active) {
+			float offset = params[PARAM_PHASE_1 + i].value;
+			if (inputs[INPUT_PHASE_1 + i].active)
+				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+			outputs[OUTPUT_17 + i].value = PO_Util::saw(phase + offset);
+		}	
+	}
 }
 
-void PO_101::sqr(std::vector<float> *outputs, float phase) {
-	outputs->at(0) = PO_Util::sqr(phase + ph0);
-	outputs->at(1) = PO_Util::sqr(phase + ph30); 
-	outputs->at(2) = PO_Util::sqr(phase + ph45); 
-	outputs->at(3) = PO_Util::sqr(phase + ph60); 
-	outputs->at(4) = PO_Util::sqr(phase + ph90); 
-	outputs->at(5) = PO_Util::sqr(phase + ph120); 
-	outputs->at(6) = PO_Util::sqr(phase + ph135); 
-	outputs->at(7) = PO_Util::sqr(phase + ph150); 
-	outputs->at(8) = -outputs->at(0); 
-	outputs->at(9) = -outputs->at(1); 
-	outputs->at(10) = -outputs->at(2); 
-	outputs->at(11) = -outputs->at(3); 
-	outputs->at(12) = -outputs->at(4); 
-	outputs->at(13) = -outputs->at(5); 
-	outputs->at(14) = -outputs->at(6); 
-	outputs->at(15) = -outputs->at(7); 
+void PO_101::sqr(float phase) {
+	outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sqr(phase + ph0));
+	outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sqr(phase + ph30)); 
+	outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sqr(phase + ph45)); 
+	outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sqr(phase + ph60)); 
+	outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sqr(phase + ph90)); 
+	outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sqr(phase + ph120)); 
+	outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sqr(phase + ph135)); 
+	outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sqr(phase + ph150)); 
+	for (int i = 0; i < 4; i++) {
+		if (outputs[OUTPUT_17 + i].active) {
+			float offset = params[PARAM_PHASE_1 + i].value;
+			if (inputs[INPUT_PHASE_1 + i].active)
+				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+			outputs[OUTPUT_17 + i].value = PO_Util::sqr(phase + offset);
+		}	
+	}
 }
 	
 void PO_101::step() {
@@ -196,20 +208,15 @@ void PO_101::step() {
 	phase = modf(phase, &intPart); 
 	
 	{
-		std::vector<float> offsets(16,0.0f);
 		float waveShape = clamp(params[PARAM_WAVE].value, 0.0f, 3.0f);
 		if (waveShape < 0.5f)
-			sin(&offsets, phase);
+			sin(phase);
 		else if (waveShape < 1.5f)
-			tri(&offsets, phase);
+			tri(phase);
 		else if (waveShape < 2.5f)
-			saw(&offsets, phase);
+			saw(phase);
 		else
-			sqr(&offsets, phase);
-			
-		for(unsigned int i = 0; i < 16; i++) {
-			outputs[OUTPUT_1 + i].value = offsets[i];
-		}
+			sqr(phase);
 	}
 
 }
@@ -220,26 +227,32 @@ struct PO101 : ModuleWidget {
 
 		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
 		addParam(ParamWidget::create<sub_knob_med>(Vec(56, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +3.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med_snap_narrow>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +3.0f, 0.0f));
 
 		addInput(Port::create<sub_port>(Vec(40,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
 
 		addOutput(Port::create<sub_port>(Vec(77.5,100), Port::OUTPUT, module, PO_101::OUTPUT_1));
-		addOutput(Port::create<sub_port>(Vec(105,107.5), Port::OUTPUT, module, PO_101::OUTPUT_2));
-		addOutput(Port::create<sub_port>(Vec(132.5,100), Port::OUTPUT, module, PO_101::OUTPUT_3));
-		addOutput(Port::create<sub_port>(Vec(125,127.5), Port::OUTPUT, module, PO_101::OUTPUT_4));
-		addOutput(Port::create<sub_port>(Vec(132.5,155), Port::OUTPUT, module, PO_101::OUTPUT_5));
-		addOutput(Port::create<sub_port>(Vec(125,182.5), Port::OUTPUT, module, PO_101::OUTPUT_6));
-		addOutput(Port::create<sub_port>(Vec(132.5,210), Port::OUTPUT, module, PO_101::OUTPUT_7));
-		addOutput(Port::create<sub_port>(Vec(105,202.5), Port::OUTPUT, module, PO_101::OUTPUT_8));
-		addOutput(Port::create<sub_port>(Vec(77.5,210), Port::OUTPUT, module, PO_101::OUTPUT_9));
-		addOutput(Port::create<sub_port>(Vec(50,202.5), Port::OUTPUT, module, PO_101::OUTPUT_10));
-		addOutput(Port::create<sub_port>(Vec(22.5,210), Port::OUTPUT, module, PO_101::OUTPUT_11));
-		addOutput(Port::create<sub_port>(Vec(30,182.5), Port::OUTPUT, module, PO_101::OUTPUT_12));
-		addOutput(Port::create<sub_port>(Vec(22.5,155), Port::OUTPUT, module, PO_101::OUTPUT_13));
-		addOutput(Port::create<sub_port>(Vec(30,127.5), Port::OUTPUT, module, PO_101::OUTPUT_14));
-		addOutput(Port::create<sub_port>(Vec(22.5,100), Port::OUTPUT, module, PO_101::OUTPUT_15));
-		addOutput(Port::create<sub_port>(Vec(50,107.5), Port::OUTPUT, module, PO_101::OUTPUT_16));
+		addOutput(Port::create<sub_port>(Vec(110,109), Port::OUTPUT, module, PO_101::OUTPUT_2));
+		addOutput(Port::create<sub_port>(Vec(142.5,100), Port::OUTPUT, module, PO_101::OUTPUT_3));
+		addOutput(Port::create<sub_port>(Vec(133.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_4));
+		addOutput(Port::create<sub_port>(Vec(142.5,165), Port::OUTPUT, module, PO_101::OUTPUT_5));
+		addOutput(Port::create<sub_port>(Vec(133.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_6));
+		addOutput(Port::create<sub_port>(Vec(142.5,230), Port::OUTPUT, module, PO_101::OUTPUT_7));
+		addOutput(Port::create<sub_port>(Vec(110,221), Port::OUTPUT, module, PO_101::OUTPUT_8));
+		addOutput(Port::create<sub_port>(Vec(77.5,230), Port::OUTPUT, module, PO_101::OUTPUT_9));
+		addOutput(Port::create<sub_port>(Vec(45,221), Port::OUTPUT, module, PO_101::OUTPUT_10));
+		addOutput(Port::create<sub_port>(Vec(12.5,230), Port::OUTPUT, module, PO_101::OUTPUT_11));
+		addOutput(Port::create<sub_port>(Vec(21.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_12));
+		addOutput(Port::create<sub_port>(Vec(12.5,165), Port::OUTPUT, module, PO_101::OUTPUT_13));
+		addOutput(Port::create<sub_port>(Vec(21.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_14));
+		addOutput(Port::create<sub_port>(Vec(12.5,100), Port::OUTPUT, module, PO_101::OUTPUT_15));
+		addOutput(Port::create<sub_port>(Vec(45,109), Port::OUTPUT, module, PO_101::OUTPUT_16));
+
+		for (int i = 0; i < 4; i++) {
+			addInput(Port::create<sub_port>(Vec(10 + 45 * i,260), Port::INPUT, module, PO_101::INPUT_PHASE_1 + i));
+			addParam(ParamWidget::create<sub_knob_med>(Vec(3.5 + 45 * i, 290), module, PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
+			addOutput(Port::create<sub_port>(Vec(10 + 45 * i,333), Port::OUTPUT, module, PO_101::OUTPUT_17 + i));
+		}
 	}
 };
 

@@ -162,6 +162,13 @@ struct sub_knob_large_snap : sub_knob_large {
 	}
 };
 
+struct sub_knob_med_snap_narrow : sub_knob_med_snap {
+	sub_knob_med_snap_narrow() {
+		minAngle = -0.75*M_PI;
+		maxAngle = 0.75*M_PI;
+	}
+};
+
 //////////////////
 // Lights
 //////////////////
