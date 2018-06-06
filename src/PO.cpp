@@ -222,6 +222,109 @@ void PO_101::step() {
 
 }
 
+struct PO_204 : Module, PO_Util {
+	
+	enum ParamIds {
+		PARAM_TUNE,
+		PARAM_FINE,
+		PARAM_WAVE_1,
+		PARAM_WAVE_2,
+		PARAM_WAVE_3,
+		PARAM_WAVE_4,
+		PARAM_PHASE_1,
+		PARAM_PHASE_2,
+		PARAM_PHASE_3,
+		PARAM_PHASE_4,
+		PARAM_MULT_1,
+		PARAM_MULT_2,
+		PARAM_MULT_3,
+		PARAM_MULT_4,
+		NUM_PARAMS
+	};
+	enum InputIds {
+		INPUT_TUNE,
+		INPUT_WAVE_1,
+		INPUT_WAVE_2,
+		INPUT_WAVE_3,
+		INPUT_WAVE_4,
+		INPUT_PHASE_1,
+		INPUT_PHASE_2,
+		INPUT_PHASE_3,
+		INPUT_PHASE_4,
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		OUTPUT_1,
+		OUTPUT_2,
+		OUTPUT_3,
+		OUTPUT_4,
+		NUM_OUTPUTS
+	};
+	enum LightIds {
+		NUM_LIGHTS
+	};
+
+	PO_204() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	void step() override;
+	float phase = 0.0f;
+	float baseFreq = 261.626f;
+};
+
+void PO_204::step() {
+	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_TUNE].active?inputs[INPUT_TUNE].value:0.0f));
+	float deltaTime = freq / engineGetSampleRate();
+	phase += deltaTime;
+	double intPart;
+	phase = modf(phase, &intPart); 
+	for (int i = 0; i < 4; i++) {
+		if (outputs[OUTPUT_1 + i].active) {
+			float offset = phase + params[PARAM_PHASE_1 + i].value;
+			if (inputs[INPUT_PHASE_1 + i].active)
+				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+			offset *= params[PARAM_MULT_1 + i].value;
+			float wave = params[PARAM_WAVE_1 + i].value + (inputs[INPUT_WAVE_1 + i].active?inputs[INPUT_WAVE_1 + i].value:0.0f);
+			double waveSection;
+			wave = modf(clamp(wave, 0.0f, 7.0f), &waveSection);		
+			float w1 = 0.0f;
+			float w2 = 0.0f;
+			switch ((int)waveSection) {
+				case 0:
+					w1 = PO_Util::sin(offset * 2 * M_PI);
+					w2 = PO_Util::tri(offset);
+					break;
+				case 1:
+					w1 = PO_Util::tri(offset);
+					w2 = PO_Util::saw(offset);
+					break;
+				case 2:
+					w1 = PO_Util::saw(offset);
+					w2 = PO_Util::sqr(offset);
+					break;
+				case 3:
+					w1 = PO_Util::sqr(offset);
+					w2 = PO_Util::sin(offset * 2 * M_PI);
+					break;
+				case 4:
+					w1 = PO_Util::sin(offset * 2 * M_PI);
+					w2 = PO_Util::saw(offset);
+					break;
+				case 5:
+					w1 = PO_Util::saw(offset);
+					w2 = PO_Util::tri(offset);
+					break;
+				case 6:
+					w1 = PO_Util::tri(offset);
+					w2 = PO_Util::sqr(offset);
+					break;
+				default:
+					w2 = w1 = PO_Util::sqr(offset);
+					break;
+			}
+			outputs[OUTPUT_1 + i].value = w1 * (1.0f - wave) + w2 * wave;
+		}	
+	}
+}
+
 struct PO_Layout : ModuleWidget {
 	PO_Layout(PO_101 *module) : ModuleWidget(module) {}
 	void Layout() {
@@ -272,5 +375,24 @@ struct PO102 : PO_Layout {
 	}
 };
 
+struct PO204 : ModuleWidget {
+	PO204(PO_204 *module) : ModuleWidget(module) {
+		setPanel(SVG::load(assetPlugin(plugin, "res/PO-204.svg")));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(60, 19), module, PO_204::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(105, 19), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+		addInput(Port::create<sub_port>(Vec(17.5, 25.5), Port::INPUT, module, PO_204::INPUT_TUNE));
+
+		for (int i = 0; i < 4; i++) {
+			addParam(ParamWidget::create<sub_knob_small>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 7.0f, 0.0f));
+			addParam(ParamWidget::create<sub_knob_small>(Vec(45, 89 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
+			addParam(ParamWidget::create<sub_knob_small_snap>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
+			addInput(Port::create<sub_port>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));
+			addInput(Port::create<sub_port>(Vec(44.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_PHASE_1 + i));
+			addOutput(Port::create<sub_port>(Vec(120.5, 125 + 70 * i), Port::OUTPUT, module, PO_204::OUTPUT_1 + i));
+		}
+	}
+};
+
 Model *modelPO101 = Model::create<PO_101, PO101>("SubmarineFree", "PO-101", "PO-101 Phased VCO", OSCILLATOR_TAG, MULTIPLE_TAG);
 Model *modelPO102 = Model::create<PO_101, PO102>("SubmarineFree", "PO-102", "PO-102 Phased LFO", OSCILLATOR_TAG, MULTIPLE_TAG);
+Model *modelPO204 = Model::create<PO_204, PO204>("SubmarineFree", "PO-204", "PO-204 Phase Modulation Engine", OSCILLATOR_TAG, MULTIPLE_TAG);
