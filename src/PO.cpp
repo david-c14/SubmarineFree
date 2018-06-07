@@ -60,7 +60,7 @@ float PO_Util::sqr(float phase) {
 }
 
 float PO_Util::rsn(float phase) {
-	return 5.0f * fabs(sinf(phase));
+	return 10.0f * fabs(sinf(phase)) - 5.0f; 
 }
 
 struct PO_101 : Module, PO_Util {

@@ -2,7 +2,7 @@
 SLUG = SubmarineFree
 
 # Must follow the format in the Versioning section of https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-VERSION = 0.6.3
+VERSION = 0.6.4
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=
@@ -18,7 +18,7 @@ SOURCES += $(wildcard src/*.cpp) $(wildcard src/ComponentLibrary/*.cpp)
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin is automatically added.
-DISTRIBUTABLES += $(wildcard LICENSE*) res Scala
+DISTRIBUTABLES += $(wildcard LICENSE*) res Scala manual WK_Custom.tunings.template
 
 # If RACK_DIR is not defined when calling the Makefile, default to two levels above
 RACK_DIR ?= ../..

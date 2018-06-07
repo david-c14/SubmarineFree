@@ -1,6 +1,9 @@
 # [AG](AG.md)
 Logical AND gates
 
+# [BB](BB.md)
+Bucket Brigade Sample and Hold
+
 # [BP](BP.md)
 Blanking plates
 
@@ -24,6 +27,12 @@ Logical OR gates
 
 # [PG](PG.md)
 Pulse Generators
+ 
+# [PO](PO.md)
+Phased Oscillators
+
+# [WK](WK.md)
+Das Wohltemperierte Klavier - Unequal Temperament Quantizer
 
 # [XF](XF.md)
 A range of mono and stereo equal power cross-faders with linear and logarithmic gain profiles and an autoselector
