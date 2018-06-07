@@ -16,7 +16,7 @@ The PO-101 and PO-102 devices are digital oscillators which offer a choice of 5 
 
 ## Basic Operation
 
-The PO-204 does not offer the wealth of fixed phase outputs, instead it offers a greater level of control over 4 output signals from the same oscillator. Each of the 4 outputs can be adjusted independantly while remaining in tune with the master tuning controls.
+The PO-204 does not offer the wealth of fixed phase outputs, instead it offers a greater level of control over 4 output signals from the same oscillator. Each of the 4 outputs can be adjusted independantly while remaining in tune with the master tuning controls. This can be used in conjunction with envelope generators to produce a Yamaha style FM [sic] synthesiser.
 
 ## Phase
 
