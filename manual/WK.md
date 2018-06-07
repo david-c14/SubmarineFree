@@ -1,6 +1,5 @@
 # Das Wohltemperierte Klavier - Unequal Temperament Quantizer
 #### WK-101 Das Wohltemperierte Klavier
-#### WK-205 Das Wohltemperierte Klavier Nano
 
 ![View of the Das Wohltemperierte Klavier](WK-101.png "Das Wohltemperierte Klavier")
 
@@ -11,6 +10,8 @@ The WK-101 takes a note CV and quantizes it to a 12-ET chromatic scale. It then 
 The currently recognized pitch is indicated by a small blue led in the centre of the 12 adjustment knobs.
 
 The context menu offers presets which you can configure. See below for more details
+
+#### WK-205 Das Wohltemperierte Klavier Nano
 
 ![View of the Das Wohltemperierte Klavier nano](WK-205.png "Das Wohltemperierte Klavier nano")
 
