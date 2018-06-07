@@ -31,6 +31,7 @@ struct PO_Util {
 	float tri(float phase);
 	float saw(float phase);
 	float sqr(float phase);
+	float rsn(float phase);
 };
 
 float PO_Util::sin(float phase) {
@@ -56,6 +57,10 @@ float PO_Util::saw(float phase) {
 float PO_Util::sqr(float phase) {
 	phase -= floor(phase);
 	return (phase < 0.5f)?5.0f:-5.0f;
+}
+
+float PO_Util::rsn(float phase) {
+	return 5.0f * fabs(sinf(phase));
 }
 
 struct PO_101 : Module, PO_Util {
@@ -111,6 +116,7 @@ struct PO_101 : Module, PO_Util {
 	void tri(float phase);
 	void saw(float phase);
 	void sqr(float phase);
+	void rsn(float phase);
 	float phase = 0.0f;
 	float baseFreq = 261.626f;
 };
@@ -201,6 +207,27 @@ void PO_101::sqr(float phase) {
 	}
 }
 	
+void PO_101::rsn(float phase) {
+	phase *= (2 * M_PI);
+	outputs[OUTPUT_9].value = (outputs[OUTPUT_1].value = PO_Util::rsn(phase + deg0));
+	outputs[OUTPUT_10].value = (outputs[OUTPUT_2].value = PO_Util::rsn(phase + deg30)); 
+	outputs[OUTPUT_11].value = (outputs[OUTPUT_3].value = PO_Util::rsn(phase + deg45)); 
+	outputs[OUTPUT_12].value = (outputs[OUTPUT_4].value = PO_Util::rsn(phase + deg60)); 
+	outputs[OUTPUT_13].value = (outputs[OUTPUT_5].value = PO_Util::rsn(phase + deg90)); 
+	outputs[OUTPUT_14].value = (outputs[OUTPUT_6].value = PO_Util::rsn(phase + deg120)); 
+	outputs[OUTPUT_15].value = (outputs[OUTPUT_7].value = PO_Util::rsn(phase + deg135)); 
+	outputs[OUTPUT_16].value = (outputs[OUTPUT_8].value = PO_Util::rsn(phase + deg150)); 
+	for (int i = 0; i < 4; i++) {
+		if (outputs[OUTPUT_17 + i].active) {
+			float offset = params[PARAM_PHASE_1 + i].value;
+			if (inputs[INPUT_PHASE_1 + i].active)
+				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+			offset *= 2 * M_PI;
+			outputs[OUTPUT_17 + i].value = PO_Util::rsn(phase + offset);
+		}	
+	}
+}
+
 void PO_101::step() {
 	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f));
 	float deltaTime = freq / engineGetSampleRate();
@@ -209,15 +236,17 @@ void PO_101::step() {
 	phase = modf(phase, &intPart); 
 	
 	{
-		float waveShape = clamp(params[PARAM_WAVE].value, 0.0f, 3.0f);
+		float waveShape = clamp(params[PARAM_WAVE].value, 0.0f, 4.0f);
 		if (waveShape < 0.5f)
 			sin(phase);
 		else if (waveShape < 1.5f)
 			tri(phase);
 		else if (waveShape < 2.5f)
 			saw(phase);
-		else
+		else if (waveShape < 3.5f)
 			sqr(phase);
+		else
+			rsn(phase);
 	}
 
 }
@@ -284,40 +313,52 @@ void PO_204::step() {
 			offset *= params[PARAM_MULT_1 + i].value;
 			float wave = params[PARAM_WAVE_1 + i].value + (inputs[INPUT_WAVE_1 + i].active?inputs[INPUT_WAVE_1 + i].value:0.0f);
 			double waveSection;
-			wave = modf(clamp(wave, 0.0f, 7.0f), &waveSection);		
+			wave = modf(clamp(wave, 0.0f, 10.0f), &waveSection);		
 			float w1 = 0.0f;
 			float w2 = 0.0f;
 			switch ((int)waveSection) {
 				case 0:
 					w1 = PO_Util::sin(offset * 2 * M_PI);
-					w2 = PO_Util::tri(offset);
-					break;
-				case 1:
-					w1 = PO_Util::tri(offset);
 					w2 = PO_Util::saw(offset);
 					break;
-				case 2:
+				case 1:
 					w1 = PO_Util::saw(offset);
-					w2 = PO_Util::sqr(offset);
+					w2 = PO_Util::rsn(offset * 2 * M_PI);
+					break;
+				case 2:
+					w1 = PO_Util::rsn(offset * 2 * M_PI);
+					w2 = PO_Util::tri(offset);
 					break;
 				case 3:
+					w1 = PO_Util::tri(offset);
+					w2 = PO_Util::sqr(offset);
+					break;
+				case 4:
 					w1 = PO_Util::sqr(offset);
 					w2 = PO_Util::sin(offset * 2 * M_PI);
 					break;
-				case 4:
-					w1 = PO_Util::sin(offset * 2 * M_PI);
-					w2 = PO_Util::saw(offset);
-					break;
 				case 5:
-					w1 = PO_Util::saw(offset);
+					w1 = PO_Util::sin(offset * 2 * M_PI);
 					w2 = PO_Util::tri(offset);
 					break;
 				case 6:
 					w1 = PO_Util::tri(offset);
+					w2 = PO_Util::saw(offset);
+					break;
+				case 7:
+					w1 = PO_Util::saw(offset);
 					w2 = PO_Util::sqr(offset);
 					break;
+				case 8:
+					w1 = PO_Util::sqr(offset);
+					w2 = PO_Util::rsn(offset * 2 * M_PI);
+					break;
+				case 9:
+					w1 = PO_Util::rsn(offset * 2 * M_PI);
+					w2 = PO_Util::sin(offset * 2 * M_PI);
+					break;
 				default:
-					w2 = w1 = PO_Util::sqr(offset);
+					w2 = w1 = PO_Util::sin(offset * 2 * M_PI);
 					break;
 			}
 			outputs[OUTPUT_1 + i].value = w1 * (1.0f - wave) + w2 * wave;
@@ -329,7 +370,7 @@ struct PO_Layout : ModuleWidget {
 	PO_Layout(PO_101 *module) : ModuleWidget(module) {}
 	void Layout() {
 		addParam(ParamWidget::create<sub_knob_med>(Vec(66, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med_snap_narrow>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +3.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med_snap_narrow>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f));
 
 		addInput(Port::create<sub_port>(Vec(45,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
 
@@ -383,7 +424,7 @@ struct PO204 : ModuleWidget {
 		addInput(Port::create<sub_port>(Vec(17.5, 25.5), Port::INPUT, module, PO_204::INPUT_TUNE));
 
 		for (int i = 0; i < 4; i++) {
-			addParam(ParamWidget::create<sub_knob_small>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 7.0f, 0.0f));
+			addParam(ParamWidget::create<sub_knob_small>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
 			addParam(ParamWidget::create<sub_knob_small>(Vec(45, 89 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
 			addParam(ParamWidget::create<sub_knob_small_snap>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
 			addInput(Port::create<sub_port>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));

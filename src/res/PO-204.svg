@@ -46,15 +46,49 @@
     <text x="75" y="12" text-anchor="middle">PO-204</text>
   </g>
   <g
-     inkscape:label="Group"
+     inkscape:label="ScreenBlue"
      inkscape:groupmode="layer"
-     font-family="DejaVu Sans"
-     font-size="8"
      stroke="#719fcf"
      stroke-width="1"
      stroke-linecap="round"
      stroke-linejoin="round"
-     fill="#719fcf">
+     fill="none">
+    <line x1="14.5" y1="79.5" x2="17.5" y2="79.5" />
+    <line x1="27.5" y1="79.5" x2="30.5" y2="79.5" />
+    <line x1="40.5" y1="79.5" x2="43.5" y2="79.5" />
+    <line x1="53.5" y1="79.5" x2="56.5" y2="79.5" />
+    <line x1="66.5" y1="79.5" x2="70" y2="79.5" />
+    <line x1="80" y1="79.5" x2="83.5" y2="79.5" />
+    <line x1="93.5" y1="79.5" x2="96.5" y2="79.5" />
+    <line x1="106.5" y1="79.5" x2="109.5" y2="79.5" />
+    <line x1="119.5" y1="79.5" x2="122.5" y2="79.5" />
+    <line x1="132.5" y1="79.5" x2="135.5" y2="79.5" />
+  </g>
+  <g
+     inkscape:label="ScreenWhite"
+     inkscape:groupmode="layer"
+     stroke="#ffffff"
+     stroke-width="1"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     fill="none">
+    <line x1="3" y1="154.5" x2="147" y2="154.5" />
+    <line x1="3" y1="224.5" x2="147" y2="224.5" />
+    <line x1="3" y1="294.5" x2="147" y2="294.5" />
+
+    <path d="M 9.5 79.5 m -5 0 a 2.5 3 0 0 1 5 0 a 2.5 3 0 0 0 5 0" />
+    <path d="M 22.5 79.5 m -5 0 l 5 -3 v 6 l 5 -3" />
+    <path d="M 35.5 79.5 m -5 0 a 2.5 3 0 0 1 5 0 a 2.5 3 0 0 1 5 0" />
+    <path d="M 48.5 79.5 m -5 0 l 2.5 -3 l 5 6 l 2.5 -3" />
+    <path d="M 61.5 79.5 m -5 0 v -3 h 5 v 6 h 5 v -3" />
+    <path d="M 75 79.5 m -5 0 a 2.5 3 0 0 1 5 0 a 2.5 3 0 0 0 5 0" />
+    <path d="M 88.5 79.5 m -5 0 l 2.5 -3 l 5 6 l 2.5 -3" />
+    <path d="M 101.5 79.5 m -5 0 l 5 -3 v 6 l 5 -3" />
+    <path d="M 114.5 79.5 m -5 0 v -3 h 5 v 6 h 5 v -3" />
+    <path d="M 127.5 79.5 m -5 0 a 2.5 3 0 0 1 5 0 a 2.5 3 0 0 1 5 0" />
+    <path d="M 140.5 79.5 m -5 0 a 2.5 3 0 0 1 5 0 a 2.5 3 0 0 0 5 0" />
+
+
   </g>
   <g
      inkscape:label="Text"
@@ -62,7 +96,26 @@
      stroke="none"
      fill="#ffffff"
      font-family="DejaVu Sans"
-     font-size="8">
-    <text x="133.5" y="61" text-anchor="middle">OUT</text>
+     font-size="10">
+    <text x="30.5" y="67" text-anchor="middle">V/Oct</text>
+    <text x="79.5" y="67" text-anchor="middle">TUNE</text>
+    <text x="124.5" y="67" text-anchor="middle">FINE</text>
+    <text x="17" y="123.6" text-anchor="middle">WAVE</text>
+    <text x="57" y="123.6" text-anchor="middle">PHASE</text>
+    <text x="97" y="123.6" text-anchor="middle">MULT</text>
+    <text x="133" y="123.6" text-anchor="middle">OUT</text>
+    <text x="17" y="193.6" text-anchor="middle">WAVE</text>
+    <text x="57" y="193.6" text-anchor="middle">PHASE</text>
+    <text x="97" y="193.6" text-anchor="middle">MULT</text>
+    <text x="133" y="193.6" text-anchor="middle">OUT</text>
+    <text x="17" y="263.6" text-anchor="middle">WAVE</text>
+    <text x="57" y="263.6" text-anchor="middle">PHASE</text>
+    <text x="97" y="263.6" text-anchor="middle">MULT</text>
+    <text x="133" y="263.6" text-anchor="middle">OUT</text>
+    <text x="17" y="333.6" text-anchor="middle">WAVE</text>
+    <text x="57" y="333.6" text-anchor="middle">PHASE</text>
+    <text x="97" y="333.6" text-anchor="middle">MULT</text>
+    <text x="133" y="333.6" text-anchor="middle">OUT</text>
+
   </g>
 </svg>
