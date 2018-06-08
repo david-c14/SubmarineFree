@@ -1,7 +1,6 @@
 #include "SubmarineFree.hpp"
 #include <mutex>
 #include "torpedo.hpp"
-#include <dirent.h>
 #include <fstream>
 #include <cctype>
 
@@ -17,7 +16,7 @@ int tuningsLoaded = false;
 struct WK_Tunings {
 	static void loadTuningsFromWK(const char *path);
 	static void loadTuningsFromScala(Plugin *plugin);
-	static void loadScalaFile(Plugin *plugin, const char *path);
+	static void loadScalaFile(std::string path);
 	static void loadTunings(Plugin *plugin) {
 		if (tuningsLoaded)
 			return;
@@ -72,11 +71,8 @@ void WK_Tunings::loadTuningsFromWK(const char *path) {
 	fclose(file);
 }
 
-void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
-	std::string fname {"Scala"};
-	fname.append("/");
-	fname.append(path);
-	std::ifstream fs{assetPlugin(plugin, fname), std::ios_base::in};
+void WK_Tunings::loadScalaFile(std::string path) {
+	std::ifstream fs{path, std::ios_base::in};
 	if (fs) {
 		std::vector<std::string> strings;
 		while (!fs.eof()) {
@@ -113,7 +109,7 @@ void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
 				line.append(1,c);
 				strings[i].erase(0,1);
 				if (!std::isdigit(c) && (c != '/') && (c != '.')) {
-					warn("SubmarineFree WK: Scala file format error in %s", path);
+					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 					return;
 				}
 				if (c == '.')
@@ -121,7 +117,7 @@ void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
 				if (c == '/' && !ratio)
 					ratio = line.size();
 				if (decimal && ratio) {
-					warn("SubmarineFree WK: Scala file format error in %s", path);
+					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 					return;
 				}
 			}
@@ -130,13 +126,13 @@ void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
 					float d = std::stof(line, nullptr);
 					d -= (i-1) * 100.0;
 					if ((d < -50.0) || (d > 50.0)) {
-						warn("SubmarineFree WK: Scala file format error in %s", path);
+						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 						return;
 					}
 					tuning.offsets[(i-1)%12] = d;
 				}
 				catch (std::exception &err) {
-					warn("SubmarineFree WK: Scala file format error in %s", path);
+					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 					return;
 				}
 			}
@@ -148,20 +144,20 @@ void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
 						int inum = std::stoi(num,nullptr);
 						int idenom = std::stoi(denom, nullptr);
 						if (!idenom) {
-							warn("SubmarineFree WK: Scala file format error in %s", path);
+							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 							return;
 						}
 						float r = (1.0f * inum / idenom);  
 						float d = 1200.0 * log2(r);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
-							warn("SubmarineFree WK: Scala file format error in %s", path);
+							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 							return;
 						}
 						tuning.offsets[(i-1)%12] = d;
 					}
 					catch (std::exception &err) {
-						warn("SubmarineFree WK: Scala file format error in %s", path);
+						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 						return;
 					}
 				}
@@ -171,13 +167,13 @@ void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
 						float d = 1200.0 * log2(inum);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
-							warn("SubmarineFree WK: Scala file format error in %s", path);
+							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 							return;
 						}
 						tuning.offsets[(i-1)%12] = d;
 					}
 					catch (std::exception &err) {
-						warn("SubmarineFree WK: Scala file format error in %s", path);
+						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 						return;
 					}
 				}
@@ -194,20 +190,11 @@ void WK_Tunings::loadScalaFile(Plugin *plugin, const char *path) {
 }
 
 void WK_Tunings::loadTuningsFromScala(Plugin *plugin) {
-	DIR *dir;
-	struct dirent *ent;
-	if ((dir = opendir (assetPlugin(plugin, "Scala").c_str())) != NULL) {
-  		/* print all the files and directories within directory */
-  		while ((ent = readdir (dir)) != NULL) {
-			if (strlen(ent->d_name) > 3)
-				if (!strcmp(ent->d_name + strlen(ent->d_name) - 4, ".scl"))
-					loadScalaFile(plugin, ent->d_name);
-  		}
-  		closedir (dir);
-	} else {
-  		/* could not open directory */
-  		warn("SubmarineFree WK: Could not open Scala directory");
-  		return;
+	std::vector<std::string> dirList = systemListEntries(assetPlugin(plugin, "Scala"));
+	for (auto entry : dirList) {
+		if (systemIsDirectory(entry)) continue;
+		if (stringExtension(entry).compare("scl")) continue;
+		loadScalaFile(entry);
 	}
 }
 
