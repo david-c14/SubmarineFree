@@ -66,7 +66,7 @@ void WK_Tunings::loadTuningsFromWK(const char *path) {
 	}
 	else {
 		std::string message = stringf("SubmarineFree WK: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		warn(message.c_str());
+		//warn(message.c_str());
 	}
 	fclose(file);
 }
@@ -109,7 +109,7 @@ void WK_Tunings::loadScalaFile(std::string path) {
 				line.append(1,c);
 				strings[i].erase(0,1);
 				if (!std::isdigit(c) && (c != '/') && (c != '.')) {
-					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+					//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 					return;
 				}
 				if (c == '.')
@@ -117,7 +117,7 @@ void WK_Tunings::loadScalaFile(std::string path) {
 				if (c == '/' && !ratio)
 					ratio = line.size();
 				if (decimal && ratio) {
-					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+					//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 					return;
 				}
 			}
@@ -126,13 +126,13 @@ void WK_Tunings::loadScalaFile(std::string path) {
 					float d = std::stof(line, nullptr);
 					d -= (i-1) * 100.0;
 					if ((d < -50.0) || (d > 50.0)) {
-						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+						//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 						return;
 					}
 					tuning.offsets[(i-1)%12] = d;
 				}
 				catch (std::exception &err) {
-					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+					//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 					return;
 				}
 			}
@@ -144,20 +144,20 @@ void WK_Tunings::loadScalaFile(std::string path) {
 						int inum = std::stoi(num,nullptr);
 						int idenom = std::stoi(denom, nullptr);
 						if (!idenom) {
-							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+							//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 							return;
 						}
 						float r = (1.0f * inum / idenom);  
 						float d = 1200.0 * log2(r);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
-							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+							//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 							return;
 						}
 						tuning.offsets[(i-1)%12] = d;
 					}
 					catch (std::exception &err) {
-						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+						//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 						return;
 					}
 				}
@@ -167,13 +167,13 @@ void WK_Tunings::loadScalaFile(std::string path) {
 						float d = 1200.0 * log2(inum);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
-							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+							//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 							return;
 						}
 						tuning.offsets[(i-1)%12] = d;
 					}
 					catch (std::exception &err) {
-						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+						//warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
 						return;
 					}
 				}
@@ -184,7 +184,7 @@ void WK_Tunings::loadScalaFile(std::string path) {
 		tunings[index].name = tuning.name;
 		for (int i = 0; i < 12; i++)
 			tunings[index].offsets[i] = tuning.offsets[i];
-		info("SubmarineFree WK: Loaded Scala file %s", tuning.name.c_str());
+		//info("SubmarineFree WK: Loaded Scala file %s", tuning.name.c_str());
 	}
 
 }
