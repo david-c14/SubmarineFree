@@ -419,7 +419,7 @@ struct PO102 : PO_Layout {
 struct PO204 : ModuleWidget {
 	PO204(PO_204 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PO-204.svg")));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(60, 19), module, PO_204::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(60, 19), module, PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f));
 		addParam(ParamWidget::create<sub_knob_med>(Vec(105, 19), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
 		addInput(Port::create<sub_port>(Vec(17.5, 25.5), Port::INPUT, module, PO_204::INPUT_TUNE));
 
