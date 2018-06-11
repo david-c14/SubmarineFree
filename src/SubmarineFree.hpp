@@ -40,6 +40,8 @@ extern Model *modelPO102;
 extern Model *modelPO204;
 
 extern Model *modelSS112;
+extern Model *modelSS207;
+extern Model *modelSS221;
 
 extern Model *modelWK101;
 extern Model *modelWK205;
