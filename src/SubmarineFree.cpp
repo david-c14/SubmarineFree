@@ -25,7 +25,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelPO204);
 
 	p->addModel(modelSS112);
-	p->addModel(modelSS207);
+	p->addModel(modelSS208);
 	p->addModel(modelSS212);
 	p->addModel(modelSS220);
 	p->addModel(modelSS221);
