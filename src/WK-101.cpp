@@ -3,6 +3,12 @@
 #include "torpedo.hpp"
 #include <fstream>
 #include <cctype>
+#include "UpdateRing.hpp"
+
+struct WK_Update {
+	float offsets[12];
+	int isDirty = false;
+};
 
 struct WK_Tuning {
 	std::string name;
@@ -248,14 +254,20 @@ struct WK_101 : Module {
 		NUM_LIGHTS
 	};
 	float tunings[12];
-	int isDirty = 0;
 	int toSend = 0;
-	std::mutex mtx;
+	UpdateRing<WK_Update> updateRing;
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
 	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
 
 	WK_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
+	void PrepareUpdate() {
+		WK_Update *upd = updateRing.bg();
+		for (int i = 0; i < 12; i++)
+			upd->offsets[i] = tunings[i];
+		upd->isDirty = true;
+		updateRing.swap();
+	}
 };
 
 void WK_101::step() {
@@ -290,10 +302,13 @@ void WK101_InputPort::received(std::string pluginName, std::string moduleName, j
 			tunings[i] = json_number_value(j1);
 	}
 	{
-		std::lock_guard<std::mutex> guard(wkModule->mtx);
+		//std::lock_guard<std::mutex> guard(wkModule->mtx);
+		//wkModule->isDirty = true;
+		WK_Update *upd = wkModule->updateRing.bg();
 		for (int i = 0; i < 12; i++)
-			wkModule->tunings[i] = tunings[i];
-		wkModule->isDirty = true;
+			upd->offsets[i] = tunings[i];
+		upd->isDirty = true;
+		wkModule->updateRing.swap();
 	}
 }
 
@@ -324,7 +339,7 @@ struct WK101_MenuItem : MenuItem {
 	void onAction(EventAction &e) override {
 		for (int i = 0; i < 12; i++)
 			module->tunings[i] = tunings[index].offsets[i];
-		module->isDirty = true;
+		module->PrepareUpdate();
 		module->toSend = true;
 	}
 };
@@ -395,10 +410,11 @@ void WK101::step() {
 	int isDirty = 0;
 	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
 	{
-		std::lock_guard<std::mutex> guard(module->mtx);
-		if (module->isDirty) {
+		//std::lock_guard<std::mutex> guard(module->mtx);
+		WK_Update *upd  = module->updateRing.fg();
+		if (upd->isDirty) {
 			for (int i = 0; i < 12; i++)
-				tunings[i] = module->tunings[i];
+				tunings[i] = upd->offsets[i];
 			isDirty = 1;
 		}
 	}
