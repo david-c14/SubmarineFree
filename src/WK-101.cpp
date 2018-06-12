@@ -415,7 +415,8 @@ void WK101::step() {
 		if (upd->isDirty) {
 			for (int i = 0; i < 12; i++)
 				tunings[i] = upd->offsets[i];
-			isDirty = 1;
+			upd->isDirty = false;
+			isDirty = true;
 		}
 	}
 	if (isDirty) {
