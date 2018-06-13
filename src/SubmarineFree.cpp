@@ -30,6 +30,8 @@ void init(rack::Plugin *p) {
 	p->addModel(modelSS220);
 	p->addModel(modelSS221);
 
+	p->addModel(modelTD116);
+
 	p->addModel(modelWK101);
 	p->addModel(modelWK205);
 
