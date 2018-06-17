@@ -46,6 +46,7 @@ extern Model *modelSS220;
 extern Model *modelSS221;
 
 extern Model *modelTD116;
+extern Model *modelTF101;
 
 extern Model *modelWK101;
 extern Model *modelWK205;

@@ -26,25 +26,61 @@ struct TD_116 : Module {
 		outPort.send("SubmarineFree", "TDNotesText", rootJ); 
 	}
 	std::string text;
+	int fontSize = 12;
 	int isDirty = false;
+	int isDirtyC = false;
 };
 
 struct TDText : LedDisplayTextField {
 	TD_116 *tdModule;
+	std::shared_ptr<Font> font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
+	NVGcolor bgColor = nvgRGB(0x00, 0x00, 0x00);
+	int fontSize = 12;
 	void onTextChange() override {
 		LedDisplayTextField::onTextChange();
 		tdModule->sendText(text);
+	}
+	void draw(NVGcontext *vg) override {
+		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+		//Background
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 5.0);
+		nvgFillColor(vg, bgColor);
+		nvgFill(vg);
+
+		//Text
+		if (font->handle >= 0) {
+			bndSetFont(font->handle);
+			
+			NVGcolor highlightColor = color;
+			highlightColor.a = 0.5;
+			int begin = min(cursor, selection);
+			int end = (this == gFocusedWidget) ? max(cursor, selection) : -1;
+			bndIconLabelCaret(vg, textOffset.x, textOffset.y,
+				box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
+				-1, color, fontSize, text.c_str(), highlightColor, begin, end);
+			bndSetFont(font->handle);
+		}
+		nvgResetScissor(vg);
 	}
 };
 
 void TDInput::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
 	if (pluginName.compare("SubmarineFree")) return;
-	if (moduleName.compare("TDNotesText")) return;
-	json_t *text = json_object_get(rootJ, "text");
-	if (text) {
-		tdModule->text.assign(json_string_value(text));
-		tdModule->isDirty = true;
+	if (!moduleName.compare("TDNotesText")) { 
+		json_t *text = json_object_get(rootJ, "text");
+		if (text) {
+			tdModule->text.assign(json_string_value(text));
+			tdModule->isDirty = true;
+		}
 	}
+	else if (!moduleName.compare("TDNotesColor")) {
+		json_t *size = json_object_get(rootJ, "size");
+		if (size) {
+			tdModule->fontSize = json_number_value(size);
+			tdModule->isDirtyC = true;
+		}	
+	}	
 }
 
 struct TD116 : ModuleWidget {
@@ -86,6 +122,10 @@ struct TD116 : ModuleWidget {
 		if (tdModule->isDirty) {
 			textField->text = tdModule->text;
 			tdModule->isDirty = false;
+		}
+		if (tdModule->isDirtyC) {
+			textField->fontSize = tdModule->fontSize;
+			tdModule->isDirtyC = false;
 		}
 		ModuleWidget::step();
 	}
