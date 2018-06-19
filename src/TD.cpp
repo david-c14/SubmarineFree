@@ -1,4 +1,5 @@
 #include "SubmarineFree.hpp"
+#include "window.hpp"
 #include "torpedo.hpp"
 
 struct TD_116;
@@ -7,6 +8,7 @@ struct TDInput : Torpedo::PatchInputPort {
 	TD_116 *tdModule;
 	TDInput(TD_116 *module, unsigned int portNum) : Torpedo::PatchInputPort((Module *)module, portNum) { tdModule = module; }
 	void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
+	NVGcolor decodeColor(std::string colorStr);
 };
 
 struct TD_116 : Module {
@@ -27,15 +29,19 @@ struct TD_116 : Module {
 	}
 	std::string text;
 	int fontSize = 12;
+	NVGcolor fg = nvgRGB(0x28, 0xb0, 0xf3);
+	NVGcolor bg = nvgRGB(0,0,0);
 	int isDirty = false;
 	int isDirtyC = false;
 };
 
 struct TDText : LedDisplayTextField {
 	TD_116 *tdModule;
-	std::shared_ptr<Font> font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	NVGcolor bgColor = nvgRGB(0x00, 0x00, 0x00);
 	int fontSize = 12;
+	TDText() {
+		color = nvgRGB(0x28, 0xb0, 0xf3);
+	}
 	void onTextChange() override {
 		LedDisplayTextField::onTextChange();
 		tdModule->sendText(text);
@@ -59,11 +65,18 @@ struct TDText : LedDisplayTextField {
 			bndIconLabelCaret(vg, textOffset.x, textOffset.y,
 				box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 				-1, color, fontSize, text.c_str(), highlightColor, begin, end);
-			bndSetFont(font->handle);
 		}
 		nvgResetScissor(vg);
+		bndSetFont(gGuiFont->handle);
 	}
 };
+
+NVGcolor TDInput::decodeColor(std::string colorStr) {
+	int r = (colorStr[0] - 'A') * 16 + (colorStr[1] - 'A');
+	int g = (colorStr[2] - 'A') * 16 + (colorStr[3] - 'A');
+	int b = (colorStr[4] - 'A') * 16 + (colorStr[5] - 'A');
+	return nvgRGB(r, g, b);
+}
 
 void TDInput::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
 	if (pluginName.compare("SubmarineFree")) return;
@@ -80,6 +93,16 @@ void TDInput::received(std::string pluginName, std::string moduleName, json_t *r
 			tdModule->fontSize = json_number_value(size);
 			tdModule->isDirtyC = true;
 		}	
+		json_t *fg = json_object_get(rootJ, "fg");
+		if (fg) {
+			tdModule->fg = decodeColor(std::string(json_string_value(fg)));
+			tdModule->isDirtyC = true;
+		}
+		json_t *bg = json_object_get(rootJ, "bg");
+		if (bg) {
+			tdModule->bg = decodeColor(std::string(json_string_value(bg)));
+			tdModule->isDirtyC = true;
+		}
 	}	
 }
 
@@ -93,7 +116,7 @@ struct TD116 : ModuleWidget {
 		addOutput(Port::create<sub_port_black>(Vec(211,19), Port::OUTPUT, module, 0));	
 
 		textField = Widget::create<TDText>(mm2px(Vec(3.39962, 15.8373)));
-		textField->box.size = mm2px(Vec(74.480, 100.753));
+		textField->box.size = mm2px(Vec(74.480, 102.753));
 		textField->multiline = true;
 		textField->tdModule = module;
 		addChild(textField);
@@ -102,8 +125,10 @@ struct TD116 : ModuleWidget {
 	json_t *toJson() override {
 		json_t *rootJ = ModuleWidget::toJson();
 
-		// text
 		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
+		json_object_set_new(rootJ, "size", json_real(textField->fontSize));
+		json_object_set_new(rootJ, "fg", colorToJson(textField->color));
+		json_object_set_new(rootJ, "bg", colorToJson(textField->bgColor));
 
 		return rootJ;
 	}
@@ -111,10 +136,18 @@ struct TD116 : ModuleWidget {
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
 
-		// text
 		json_t *textJ = json_object_get(rootJ, "text");
 		if (textJ)
 			textField->text = json_string_value(textJ);
+		json_t *sizeJ = json_object_get(rootJ, "size");
+		if (sizeJ)
+			textField->fontSize = json_number_value(sizeJ);
+		json_t *fgJ = json_object_get(rootJ, "fg");
+		if (fgJ)
+			textField->color = jsonToColor(fgJ);
+		json_t *bgJ = json_object_get(rootJ, "bg");
+		if (bgJ)
+			textField->bgColor = jsonToColor(bgJ);
 	}
 
 	void step() override {
@@ -125,9 +158,19 @@ struct TD116 : ModuleWidget {
 		}
 		if (tdModule->isDirtyC) {
 			textField->fontSize = tdModule->fontSize;
+			textField->color = tdModule->fg;
+			textField->bgColor = tdModule->bg;
 			tdModule->isDirtyC = false;
 		}
 		ModuleWidget::step();
+	}
+
+	void reset() override {
+		textField->fontSize = 12;
+		textField->text = "";
+		textField->color = nvgRGB(0x28, 0xb0, 0xf3);
+		textField->bgColor = nvgRGB(0,0,0);	
+		ModuleWidget::reset();
 	}
 };
 
