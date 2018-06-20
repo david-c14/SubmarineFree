@@ -96,28 +96,28 @@ struct WhiteLight : GrayModuleLightWidget {
 
 struct TF101 : ModuleWidget {
 	TF101(TF_101 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/AG-106.svg")));
+		setPanel(SVG::load(assetPlugin(plugin, "res/TF-101.svg")));
 
-		addInput(Port::create<sub_port>(Vec(4,25), Port::INPUT, module, TF_101::INPUT_FG_RED));
-		addInput(Port::create<sub_port>(Vec(4,60), Port::INPUT, module, TF_101::INPUT_FG_GREEN));
-		addInput(Port::create<sub_port>(Vec(4,95), Port::INPUT, module, TF_101::INPUT_FG_BLUE));
-		addInput(Port::create<sub_port>(Vec(4,135), Port::INPUT, module, TF_101::INPUT_BG_RED));
-		addInput(Port::create<sub_port>(Vec(4,170), Port::INPUT, module, TF_101::INPUT_BG_GREEN));
-		addInput(Port::create<sub_port>(Vec(4,205), Port::INPUT, module, TF_101::INPUT_BG_BLUE));
-		addInput(Port::create<sub_port>(Vec(4,245), Port::INPUT, module, TF_101::INPUT_FONT_SIZE));
+		addInput(Port::create<sub_port>(Vec(4,66.5), Port::INPUT, module, TF_101::INPUT_FG_RED));
+		addInput(Port::create<sub_port>(Vec(4,106.5), Port::INPUT, module, TF_101::INPUT_FG_GREEN));
+		addInput(Port::create<sub_port>(Vec(4,146.5), Port::INPUT, module, TF_101::INPUT_FG_BLUE));
+		addInput(Port::create<sub_port>(Vec(4,200.5), Port::INPUT, module, TF_101::INPUT_BG_RED));
+		addInput(Port::create<sub_port>(Vec(4,240.5), Port::INPUT, module, TF_101::INPUT_BG_GREEN));
+		addInput(Port::create<sub_port>(Vec(4,280.5), Port::INPUT, module, TF_101::INPUT_BG_BLUE));
+		addInput(Port::create<sub_port>(Vec(4,334.5), Port::INPUT, module, TF_101::INPUT_FONT_SIZE));
 
-		addParam(ParamWidget::create<sub_knob_small>(Vec(33, 25.5), module, TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(33, 60.5), module, TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(33, 95.5), module, TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(33, 135.5), module, TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(33, 170.5), module, TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(33, 205.5), module, TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_small_snap>(Vec(33, 245.5), module, TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 60), module, TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 100), module, TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 140), module, TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 194), module, TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 234), module, TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 274), module, TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 328), module, TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f));
 
-		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(66, 63), module, TF_101::LIGHT_FG_RED));
-		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(66, 173), module, TF_101::LIGHT_BG_RED));
+		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(10, 51), module, TF_101::LIGHT_FG_RED));
+		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(10, 185), module, TF_101::LIGHT_BG_RED));
 
-		addOutput(Port::create<sub_port_black>(Vec(61,245), Port::OUTPUT, module, TF_101::OUTPUT_TOR));
+		addOutput(Port::create<sub_port_black>(Vec(61,19), Port::OUTPUT, module, TF_101::OUTPUT_TOR));
 	}
 };
 
