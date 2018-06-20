@@ -38,13 +38,14 @@ struct TF_101 : Module  {
 
 	float prevValues[7];
 	int isDirty = false;
+	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);	
 	TF_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		prevValues[0] = 0.1569f;
 		prevValues[1] = 0.6902f;
 		prevValues[2] = 0.9529f;
 		prevValues[6] = 12.0f;
+		outPort.size(1);
 	}
-	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);	
 	void step() override;
 	std::string encodeColor(float r, float g, float b) {
 		std::string out;

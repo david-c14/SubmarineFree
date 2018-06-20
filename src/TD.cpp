@@ -14,7 +14,7 @@ struct TDInput : Torpedo::PatchInputPort {
 struct TD_116 : Module {
 	TDInput inPort = TDInput(this, 0);
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, 0);
-	TD_116() : Module (0, 1, 1, 0) {}
+	TD_116() : Module (0, 1, 1, 0) {outPort.size(1);}
 	void step() override {
 		inPort.process();
 		outPort.process();
