@@ -10,6 +10,9 @@ extern Model *modelAG106;
 
 extern Model *modelBB120;
 
+extern Model *modelAO101;
+extern Model *modelAO102;
+
 extern Model *modelBP101;
 extern Model *modelBP102;
 extern Model *modelBP104;
