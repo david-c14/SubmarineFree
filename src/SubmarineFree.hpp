@@ -64,3 +64,11 @@ extern Model *modelXF202;
 extern Model *modelXG106;
 
 #include "ComponentLibrary/components.hpp"
+
+struct SubHelper {
+	static std::shared_ptr<SVG> LoadPanel(Plugin *plugin, const char *str, int num) {
+		char workingSpace[100];
+		snprintf(workingSpace, 100, "res/%s%02d.svg", str, num);
+		return SVG::load(assetPlugin(plugin, workingSpace));
+	}
+};
