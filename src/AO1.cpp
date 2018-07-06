@@ -3,20 +3,23 @@
 namespace SubmarineAO {
 
 	float None(float x, float y, float c) { return 0.0f; }
-	float X(float x, float y, float c) { return x; }
-	float Y(float x, float y, float c) { return y; }
-	float C(float x, float y, float c) { return c; }
-	float XAddY(float x, float y, float c) { return x + y; }
 	float XAddC(float x, float y, float c) { return x + c; }
 	float YAddC(float x, float y, float c) { return y + c; }
+	float C(float x, float y, float c) { return c; }
 	float XAddYAddC(float x, float y, float c) { return x + y + c; }
-	float XSubY(float x, float y, float c) { return x - y; }
-	float YSubX(float x, float y, float c) { return y - x; }
+	
 	float XSubC(float x, float y, float c) { return x - c; }
 	float CSubX(float x, float y, float c) { return c - x; }
 	float YSubC(float x, float y, float c) { return y - c; }
 	float CSubY(float x, float y, float c) { return c - y; }
-	float XMulY(float x, float y, float c) { return x * y; }
+	float XSubYAddC(float x, float y, float c) { return x - y - c; }
+	float XAddCSubY(float x, float y, float c) { return x + c - y; }
+	float YSubXAddC(float x, float y, float c) { return y - x - c; }
+	float YAddCSubX(float x, float y, float c) { return y + c - x; }
+
+	float XMulYAddC(float x, float y, float c) { return x * y + c; }
+	float XAddCMulY(float x, float y, float c) { return (x + c) * y; }
+	float XMulCAddY(float x, float y, float c) { return x * (y + c); }
 	float XMulC(float x, float y, float c) { return x * c; }
 	float YMulC(float x, float y, float c) { return y * c; }
 	float XMulYMulC(float x, float y, float c) { return x * y * c; }
@@ -28,31 +31,68 @@ namespace SubmarineAO {
 		func_t func;
 	};
 
-#define SUB_MULT_SYM "\xc3\x97"
-#define SUB_DIV_SYM "\xc3\xb7"
+#define SUB_M "\xc3\x97"
+#define SUB_D "\xc3\xb7"
 
 	std::vector<Functor> functions {
 		{ "", *None },
-		{ "x", *X },
-		{ "y", *Y },
-		{ "c", *C },
-		{ "x + y", *XAddY },
-		{ "x + c", *XAddC },
-		{ "y + c", *YAddC },
-		{ "x + y + c", *XAddYAddC },
-		{ "x - y", *XSubY },
-		{ "y - x", *YSubX },
-		{ "x - c", *XSubC },
-		{ "c - x", *CSubX },
-		{ "y - c", *YSubC },
-		{ "c - y", *CSubY },
-		{ "x " SUB_MULT_SYM " y", *XMulY },
-		{ "x " SUB_MULT_SYM " c", *XMulC },
-		{ "y " SUB_MULT_SYM " c", *YMulC },
-		{ "x " SUB_MULT_SYM " y " SUB_MULT_SYM " c", *XMulYMulC }
+		{ "X+C", *XAddC },
+		{ "Y+C", *YAddC },
+		{ "C", *C },
+		{ "X+Y+C", *XAddYAddC },
+		{ "X-C", *XSubC },
+		{ "C-X", *CSubX },
+		{ "Y-C", *YSubC },
+		{ "C-Y", *CSubY },
+		{ "X-(Y+C)", *XSubYAddC },
+		{ "(X+C)-Y", *XAddCSubY },
+		{ "Y-(X+C)", *YSubXAddC },
+		{ "(Y+C)-X", *YAddCSubX },
+		{ "(X" SUB_M "Y)+C", *XMulYAddC },
+		{ "(X+C)" SUB_M "Y", *XAddCMulY },
+		{ "X" SUB_M "(Y+C)", *XMulCAddY },
+		{ "X" SUB_M "C", *XMulC },
+		{ "Y" SUB_M "C", *YMulC },
+		{ "X" SUB_M "Y" SUB_M "C", *XMulYMulC }
 	};	
 
 }
+
+struct AOFuncDisplay : Knob {
+	std::shared_ptr<Font> font;
+	AOFuncDisplay() {
+		box.size.x = 50;
+		box.size.y = 16;
+		snap = true;
+		smooth = false;
+		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
+	}
+	void draw(NVGcontext *vg) override {
+		nvgFontSize(vg, 14);
+		nvgFontFaceId(vg, font->handle);
+		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
+		nvgTextAlign(vg, NVG_ALIGN_CENTER);
+		nvgText(vg, 25, 12, SubmarineAO::functions[value].name.c_str(), NULL);
+	}
+};
+
+struct AOConstDisplay : Knob {
+	std::shared_ptr<Font> font;
+	AOConstDisplay() {
+		box.size.x = 50;
+		box.size.y = 16;
+		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
+	}
+	void draw(NVGcontext *vg) override {
+		char mtext[41];
+		sprintf(mtext, "%6.2f", floor(value * 100.0f + 0.5f)/100.0f);
+		nvgFontSize(vg, 14);
+		nvgFontFaceId(vg, font->handle);
+		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
+		nvgTextAlign(vg, NVG_ALIGN_CENTER);
+		nvgText(vg, 25, 12, mtext, NULL);
+	}
+};
 
 template <unsigned int x, unsigned int y>
 struct AO1 : Module {
@@ -79,7 +119,7 @@ struct AO1 : Module {
 	void step() override {
 		float result = 0;
 		if (params[PARAM_FUNC_1].value) {
-			result = SubmarineAO::functions[params[PARAM_FUNC_1].value].func(inputs[INPUT_X_1].value, inputs[INPUT_Y_1].value, params[PARAM_CONST_1].value);
+			result = SubmarineAO::functions[params[PARAM_FUNC_1].value].func(inputs[INPUT_X_1].value, inputs[INPUT_Y_1].value, floor(params[PARAM_CONST_1].value * 100.0f + 0.5f)/100.0f);
 		}
 		outputs[OUTPUT_X_1].value = result; 
 		outputs[OUTPUT_Y_1].value = result;
@@ -98,8 +138,8 @@ struct AOWidget : ModuleWidget {
 			addInput(Port::create<sub_port>(Vec(77.5 + 120 * i, 19), Port::INPUT, module, AO1<x,y>::INPUT_X_1 + i));
 			addOutput(Port::create<sub_port>(Vec(77.5 + 120 * i, 330), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + i));
 		}
-		addParam(ParamWidget::create<sub_knob_small_snap>(Vec(33, 40), module, AO1<x,y>::PARAM_FUNC_1, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(33, 70), module, AO1<x,y>::PARAM_CONST_1, 0.0f, 100.0f, 0.0f));
+		addParam(ParamWidget::create<AOFuncDisplay>(Vec(33, 40), module, AO1<x,y>::PARAM_FUNC_1, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
+		addParam(ParamWidget::create<AOConstDisplay>(Vec(33, 70), module, AO1<x,y>::PARAM_CONST_1, -INFINITY, INFINITY, 0.0f));
 	}
 };
 
