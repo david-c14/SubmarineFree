@@ -2,28 +2,6 @@
 
 namespace SubmarineAO {
 
-	float None(float x, float y, float c) { return 0.0f; }
-	float XAddC(float x, float y, float c) { return x + c; }
-	float YAddC(float x, float y, float c) { return y + c; }
-	float C(float x, float y, float c) { return c; }
-	float XAddYAddC(float x, float y, float c) { return x + y + c; }
-	
-	float XSubC(float x, float y, float c) { return x - c; }
-	float CSubX(float x, float y, float c) { return c - x; }
-	float YSubC(float x, float y, float c) { return y - c; }
-	float CSubY(float x, float y, float c) { return c - y; }
-	float XSubYAddC(float x, float y, float c) { return x - y - c; }
-	float XAddCSubY(float x, float y, float c) { return x + c - y; }
-	float YSubXAddC(float x, float y, float c) { return y - x - c; }
-	float YAddCSubX(float x, float y, float c) { return y + c - x; }
-
-	float XMulYAddC(float x, float y, float c) { return x * y + c; }
-	float XAddCMulY(float x, float y, float c) { return (x + c) * y; }
-	float XMulCAddY(float x, float y, float c) { return x * (y + c); }
-	float XMulC(float x, float y, float c) { return x * c; }
-	float YMulC(float x, float y, float c) { return y * c; }
-	float XMulYMulC(float x, float y, float c) { return x * y * c; }
-
 	typedef float (*func_t)(float, float, float);
 
 	struct Functor {
@@ -31,29 +9,28 @@ namespace SubmarineAO {
 		func_t func;
 	};
 
+#define LAMBDA [](float x, float y, float c)->float
 #define SUB_M "\xc3\x97"
 #define SUB_D "\xc3\xb7"
 
 	std::vector<Functor> functions {
-		{ "", *None },
-		{ "X+C", *XAddC },
-		{ "Y+C", *YAddC },
-		{ "C", *C },
-		{ "X+Y+C", *XAddYAddC },
-		{ "X-C", *XSubC },
-		{ "C-X", *CSubX },
-		{ "Y-C", *YSubC },
-		{ "C-Y", *CSubY },
-		{ "X-(Y+C)", *XSubYAddC },
-		{ "(X+C)-Y", *XAddCSubY },
-		{ "Y-(X+C)", *YSubXAddC },
-		{ "(Y+C)-X", *YAddCSubX },
-		{ "(X" SUB_M "Y)+C", *XMulYAddC },
-		{ "(X+C)" SUB_M "Y", *XAddCMulY },
-		{ "X" SUB_M "(Y+C)", *XMulCAddY },
-		{ "X" SUB_M "C", *XMulC },
-		{ "Y" SUB_M "C", *YMulC },
-		{ "X" SUB_M "Y" SUB_M "C", *XMulYMulC }
+		{ "",                      LAMBDA { return 0; } },
+		{ "X+C",                   LAMBDA { return x + c; } },
+		{ "Y+C",                   LAMBDA { return y + c; } },
+		{ "C",                     LAMBDA { return c; } },
+		{ "X+Y+C",                 LAMBDA { return x + y + c; } },
+		{ "C-X",                   LAMBDA { return c - x; } },
+		{ "C-Y",                   LAMBDA { return c - y; } },
+		{ "X-(Y+C)",               LAMBDA { return x - ( y + c ); } },
+		{ "(X+C)-Y",               LAMBDA { return ( x + c ) - y; } },
+		{ "Y-(X+C)",               LAMBDA { return y - ( x + c ); } },
+		{ "(Y+C)-X",               LAMBDA { return ( y + c ) - x; } },
+		{ "(X" SUB_M "Y)+C",       LAMBDA { return ( x * y ) + c; } },
+		{ "(X+C)" SUB_M "Y",       LAMBDA { return ( x + c ) * y; } },
+		{ "X" SUB_M "(Y+C)",       LAMBDA { return x * ( y + c ); } },
+		{ "X" SUB_M "C",           LAMBDA { return x * c; } },
+		{ "Y" SUB_M "C",           LAMBDA { return y * c; } },
+		{ "X" SUB_M "Y" SUB_M "C", LAMBDA { return x * y * c; } }
 	};	
 
 }
@@ -129,6 +106,7 @@ struct AO1 : Module {
 template <unsigned int x, unsigned int y>
 struct AOWidget : ModuleWidget {
 	AOWidget(AO1<x,y> *module) : ModuleWidget(module) {
+		debug ("%d", SubmarineAO::functions.size());
 		setPanel(SubHelper::LoadPanel(plugin, "AO-1", x*y));
 		for (unsigned int i = 0; i < y; i++) {
 			addInput(Port::create<sub_port>(Vec(4, 65 + i * 58), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + i));
