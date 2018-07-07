@@ -96,7 +96,7 @@ struct LightKnob : Knob {
 	/** Radii in standard units */
 	float radius = 19.0;
 	int enabled = 1;
-	LightKnob() {}
+	LightKnob() {smooth = false;}
 	void draw(NVGcontext *vg) override;
 	void setEnabled(int val);
 	void setRadius(int r);
@@ -144,21 +144,18 @@ struct sub_knob_large_narrow : sub_knob_large {
 struct sub_knob_small_snap : sub_knob_small {
 	sub_knob_small_snap() {
 		snap = true;
-		smooth = false;
 	}
 };
 
 struct sub_knob_med_snap : sub_knob_med {
 	sub_knob_med_snap() {
 		snap = true;
-		smooth = false;
 	}
 };
 
 struct sub_knob_large_snap : sub_knob_large {
 	sub_knob_large_snap() {
 		snap = true;
-		smooth = false;
 	}
 };
 
