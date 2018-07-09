@@ -2,7 +2,7 @@
 <svg
    xmlns="http://www.w3.org/2000/svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="180px"
+   width="165px"
    height="380px"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -14,17 +14,17 @@
     <rect
        x="0"
        y="0"
-       width="180"
+       width="165"
        height="380"
        style="fill:#294f77;stroke:none;"
        id="rect4255" />
     <path
        style="fill:#3a6ea5;fill-rule:nonzero;stroke:none"
-       d="m 0 380 v -380 h 180 l -1 1 h -178 v 378 z"
+       d="m 0 380 v -380 h 165 l -1 1 h -163 v 378 z"
        id="path4230" />
     <path
        style="fill:#182d44;fill-rule:nonzero;stroke:none"
-       d="m 0 380 h 180 v -380 l -1 1 v 378 h -178 z"
+       d="m 0 380 h 165 v -380 l -1 1 v 378 h -163 z"
        id="path4232" />
   </g>
   <g
@@ -42,7 +42,7 @@
        x="3"
        y="377"
        id="text4236">submarine</text>
-    <text x="90" y="12" text-anchor="middle">AO-105</text>
+    <text x="82.5" y="12" text-anchor="middle">AO-106</text>
   </g>
   <g
      inkscape:label="Group"
@@ -55,6 +55,24 @@
      stroke-linecap="round"
      stroke-linejoin="round"
      fill="none">
+    <g stroke="#719fcf">
+      <line x1="37.5" y1="51.5" x2="127.5" y2="51.5" />
+      <line x1="37.5" y1="97.5" x2="127.5" y2="97.5" />
+      <line x1="37.5" y1="143.5" x2="127.5" y2="143.5" />
+      <line x1="37.5" y1="189.5" x2="127.5" y2="189.5" />
+      <line x1="37.5" y1="235.5" x2="127.5" y2="235.5" />
+      <line x1="37.5" y1="281.5" x2="127.5" y2="281.5" />
+      <line x1="37.5" y1="327.5" x2="127.5" y2="327.5" />
+
+      <line x1="37.5" y1="51.5" x2="37.5" y2="327.5" />
+      <line x1="127.5" y1="51.5" x2="127.5" y2="327.5" />
+    </g>
+    <g
+       fill="#000000"
+       stroke="none">
+      <rect x="42.5" y="60" width="80" height="13" rx="2" ry="2" />
+      <rect x="42.5" y="76" width="80" height="13" rx="2" ry="2" />
+    </g>
     <g
        fill="#ffffff"
        stroke="none">

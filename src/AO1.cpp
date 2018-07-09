@@ -62,8 +62,8 @@ namespace SubmarineAO {
 struct AOFuncDisplay : Knob {
 	std::shared_ptr<Font> font;
 	AOFuncDisplay() {
-		box.size.x = 50;
-		box.size.y = 16;
+		box.size.x = 80;
+		box.size.y = 15;
 		snap = true;
 		smooth = false;
 		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
@@ -73,27 +73,27 @@ struct AOFuncDisplay : Knob {
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 25, 12, SubmarineAO::functions[value].name.c_str(), NULL);
+		nvgText(vg, 40, 11, SubmarineAO::functions[value].name.c_str(), NULL);
 	}
 };
 
 struct AOConstDisplay : Knob {
 	std::shared_ptr<Font> font;
 	AOConstDisplay() {
-		box.size.x = 50;
-		box.size.y = 16;
+		box.size.x = 80;
+		box.size.y = 15;
 		snap = true;
 		speed = 0.005;
 		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	}
 	void draw(NVGcontext *vg) override {
 		char mtext[41];
-		sprintf(mtext, "c=%6.2f", ((int)value)/100.0f);
+		sprintf(mtext, "C=%4.2f", ((int)value)/100.0f);
 		nvgFontSize(vg, 14);
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 25, 12, mtext, NULL);
+		nvgText(vg, 40, 11, mtext, NULL);
 	}
 };
 
@@ -133,18 +133,18 @@ template <unsigned int x, unsigned int y>
 struct AOWidget : ModuleWidget {
 	AOWidget(AO1<x,y> *module) : ModuleWidget(module) {
 		setPanel(SubHelper::LoadPanel(plugin, "AO-1", x*y));
-		for (unsigned int i = 0; i < y; i++) {
-			addInput(Port::create<sub_port>(Vec(4, 65 + i * 58), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + i));
-			addOutput(Port::create<sub_port>(Vec(31 + x * 120, 65 + i * 58), Port::OUTPUT, module, AO1<x,y>::OUTPUT_Y_1 + i));
+		for (unsigned int ix = 0; ix < x; ix++) {
+			addInput(Port::create<sub_port>(Vec(4, 61 + ix * 46), Port::INPUT, module, AO1<x,y>::INPUT_X_1 + ix));
+			addOutput(Port::create<sub_port>(Vec(61 + y * 75, 61 + ix * 46), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + ix));
 		}
-		for (unsigned int i = 0; i < x; i++) {
-			addInput(Port::create<sub_port>(Vec(77.5 + 120 * i, 19), Port::INPUT, module, AO1<x,y>::INPUT_X_1 + i));
-			addOutput(Port::create<sub_port>(Vec(77.5 + 120 * i, 330), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + i));
+		for (unsigned int iy = 0; iy < y; iy++) {
+			addInput(Port::create<sub_port>(Vec(70 + 75 * iy, 19), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + iy));
+			addOutput(Port::create<sub_port>(Vec(70 + 75 * iy, 330), Port::OUTPUT, module, AO1<x,y>::OUTPUT_Y_1 + iy));
 		}
-		addParam(ParamWidget::create<AOFuncDisplay>(Vec(33, 40), module, AO1<x,y>::PARAM_FUNC_1, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
-		addParam(ParamWidget::create<AOConstDisplay>(Vec(33, 70), module, AO1<x,y>::PARAM_CONST_1, -10000.0f, 10000.0f, 0.0f));
+		addParam(ParamWidget::create<AOFuncDisplay>(Vec(42.5, 60), module, AO1<x,y>::PARAM_FUNC_1, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
+		addParam(ParamWidget::create<AOConstDisplay>(Vec(42.5, 76), module, AO1<x,y>::PARAM_CONST_1, -10000.0f, 10000.0f, 0.0f));
 	}
 };
 
-Model *modelAO105 = Model::create<AO1<1,5>, AOWidget<1,5>>("SubmarineFree", "A0-105", "A0-105 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
-Model *modelAO110 = Model::create<AO1<2,5>, AOWidget<2,5>>("SubmarineFree", "A0-110", "A0-110 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
+Model *modelAO106 = Model::create<AO1<6,1>, AOWidget<6,1>>("SubmarineFree", "A0-106", "A0-106 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
+Model *modelAO112 = Model::create<AO1<6,2>, AOWidget<6,2>>("SubmarineFree", "A0-112", "A0-112 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
