@@ -9,31 +9,55 @@ namespace SubmarineAO {
 		func_t func;
 	};
 
-#define LAMBDA [](float x, float y, float c)->float
-#define SUB_M "\xc3\x97"
-#define SUB_D "\xc3\xb7"
+#define LAMBDA(e) [](float x, float y, float c)->float { return e ; }
+#define M "\xc3\x97"
+#define D "\xc3\xb7"
+#define R "\xe2\x88\x9a"
+#define S2 "\xc2\xb2"
+#define S3 "\xc2\xb3"
+#define s0 "\xe2\x82\x80"
+#define s1 "\xe2\x82\x81"
+#define s2 "\xe2\x82\x82"
+#define E "\xe2\x84\xaf"
+#define SX "\xcb\xa3"
+#define SY "\xca\xb8"
+#define SC "\xe1\xb6\x9c"
 
 	std::vector<Functor> functions {
-		{ "",                      LAMBDA { return 0; } },
-		{ "X+C",                   LAMBDA { return x + c; } },
-		{ "Y+C",                   LAMBDA { return y + c; } },
-		{ "C",                     LAMBDA { return c; } },
-		{ "X+Y+C",                 LAMBDA { return x + y + c; } },
-		{ "C-X",                   LAMBDA { return c - x; } },
-		{ "C-Y",                   LAMBDA { return c - y; } },
-		{ "X-(Y+C)",               LAMBDA { return x - ( y + c ); } },
-		{ "(X+C)-Y",               LAMBDA { return ( x + c ) - y; } },
-		{ "Y-(X+C)",               LAMBDA { return y - ( x + c ); } },
-		{ "(Y+C)-X",               LAMBDA { return ( y + c ) - x; } },
-		{ "(X" SUB_M "Y)+C",       LAMBDA { return ( x * y ) + c; } },
-		{ "(X+C)" SUB_M "Y",       LAMBDA { return ( x + c ) * y; } },
-		{ "X" SUB_M "(Y+C)",       LAMBDA { return x * ( y + c ); } },
-		{ "X" SUB_M "C",           LAMBDA { return x * c; } },
-		{ "Y" SUB_M "C",           LAMBDA { return y * c; } },
-		{ "X" SUB_M "Y" SUB_M "C", LAMBDA { return x * y * c; } }
+		{ "",                      LAMBDA(0) },
+		{ "X+C",                   LAMBDA(x + c) },
+		{ "Y+C",                   LAMBDA(y + c) },
+		{ "C",                     LAMBDA(c) },
+		{ "X+Y+C",                 LAMBDA(x + y + c) },
+		{ "C-X",                   LAMBDA(c - x) },
+		{ "C-Y",                   LAMBDA(c - y) },
+		{ "X-(Y+C)",               LAMBDA(x - ( y + c )) },
+		{ "(X+C)-Y",               LAMBDA(( x + c ) - y) },
+		{ "Y-(X+C)",               LAMBDA(y - ( x + c )) },
+		{ "(Y+C)-X",               LAMBDA(( y + c ) - x) },
+		{ "(X" M "Y)+C",       LAMBDA(( x * y ) + c) },
+		{ "(X+C)" M "Y",       LAMBDA(( x + c ) * y) },
+		{ "X" M "(Y+C)",       LAMBDA(x * ( y + c )) },
+		{ "X" M "C",           LAMBDA(x * c) },
+		{ "Y" M "C",           LAMBDA(y * c) },
+		{ "X" M "Y" M "C", LAMBDA(x * y * c) },
+		{ D R S2 S3 s0 s1 s2 E SX SY SC, LAMBDA(0) }
 	};	
 
 }
+
+#undef M
+#undef D
+#undef R
+#undef S2
+#undef S3
+#undef s0
+#undef s1
+#undef s2
+#undef E
+#undef SX
+#undef SY
+#undef SC
 
 struct AOFuncDisplay : Knob {
 	std::shared_ptr<Font> font;
@@ -58,11 +82,13 @@ struct AOConstDisplay : Knob {
 	AOConstDisplay() {
 		box.size.x = 50;
 		box.size.y = 16;
+		snap = true;
+		speed = 0.005;
 		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	}
 	void draw(NVGcontext *vg) override {
 		char mtext[41];
-		sprintf(mtext, "%6.2f", floor(value * 100.0f + 0.5f)/100.0f);
+		sprintf(mtext, "c=%6.2f", ((int)value)/100.0f);
 		nvgFontSize(vg, 14);
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
@@ -96,7 +122,7 @@ struct AO1 : Module {
 	void step() override {
 		float result = 0;
 		if (params[PARAM_FUNC_1].value) {
-			result = SubmarineAO::functions[params[PARAM_FUNC_1].value].func(inputs[INPUT_X_1].value, inputs[INPUT_Y_1].value, floor(params[PARAM_CONST_1].value * 100.0f + 0.5f)/100.0f);
+			result = SubmarineAO::functions[params[PARAM_FUNC_1].value].func(inputs[INPUT_X_1].value, inputs[INPUT_Y_1].value, ((int)params[PARAM_CONST_1].value)/100.0f);
 		}
 		outputs[OUTPUT_X_1].value = result; 
 		outputs[OUTPUT_Y_1].value = result;
@@ -106,7 +132,6 @@ struct AO1 : Module {
 template <unsigned int x, unsigned int y>
 struct AOWidget : ModuleWidget {
 	AOWidget(AO1<x,y> *module) : ModuleWidget(module) {
-		debug ("%d", SubmarineAO::functions.size());
 		setPanel(SubHelper::LoadPanel(plugin, "AO-1", x*y));
 		for (unsigned int i = 0; i < y; i++) {
 			addInput(Port::create<sub_port>(Vec(4, 65 + i * 58), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + i));
@@ -117,7 +142,7 @@ struct AOWidget : ModuleWidget {
 			addOutput(Port::create<sub_port>(Vec(77.5 + 120 * i, 330), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + i));
 		}
 		addParam(ParamWidget::create<AOFuncDisplay>(Vec(33, 40), module, AO1<x,y>::PARAM_FUNC_1, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
-		addParam(ParamWidget::create<AOConstDisplay>(Vec(33, 70), module, AO1<x,y>::PARAM_CONST_1, -INFINITY, INFINITY, 0.0f));
+		addParam(ParamWidget::create<AOConstDisplay>(Vec(33, 70), module, AO1<x,y>::PARAM_CONST_1, -10000.0f, 10000.0f, 0.0f));
 	}
 };
 
