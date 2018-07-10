@@ -14,6 +14,7 @@ extern Model *modelAO106;
 extern Model *modelAO112;
 extern Model *modelAO118;
 extern Model *modelAO124;
+extern Model *modelAO136;
 
 extern Model *modelBP101;
 extern Model *modelBP102;
