@@ -44,8 +44,6 @@ namespace SubmarineAO {
 		{ D R S2 S3 s0 s1 s2 E SX SY SC, LAMBDA(0) }
 	};	
 
-}
-
 #undef M
 #undef D
 #undef R
@@ -58,6 +56,8 @@ namespace SubmarineAO {
 #undef SX
 #undef SY
 #undef SC
+
+} // end namespace SubmarineA0
 
 struct AOFuncDisplay : Knob {
 	std::shared_ptr<Font> font;
@@ -120,12 +120,24 @@ struct AO1 : Module {
 
 	AO1() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override {
-		float result = 0;
-		if (params[PARAM_FUNC_1].value) {
-			result = SubmarineAO::functions[params[PARAM_FUNC_1].value].func(inputs[INPUT_X_1].value, inputs[INPUT_Y_1].value, ((int)params[PARAM_CONST_1].value)/100.0f);
+		float vx[x];
+		for (unsigned int ix = 0; ix < x; ix++) {
+			vx[ix] = inputs[INPUT_X_1 + ix].value;
 		}
-		outputs[OUTPUT_X_1].value = result; 
-		outputs[OUTPUT_Y_1].value = result;
+		for (unsigned int iy = 0; iy < y; iy++) {
+			float vy = inputs[INPUT_Y_1 + iy].value;
+			for (unsigned int ix = 0; ix < x; ix++) {
+				unsigned int f = params[PARAM_FUNC_1 + ix + iy * x].value;
+				if (f >= SubmarineAO::functions.size())
+					f = SubmarineAO::functions.size() - 1;
+				if (f > 0)
+					vy = vx[ix] = SubmarineAO::functions[f].func(vx[ix], vy, ((int)params[PARAM_CONST_1 + ix + iy * x].value)/100.0f);
+			}
+			outputs[OUTPUT_Y_1 + iy].value = isfinite(vy)?vy:0.0f;
+		}
+		for (unsigned int ix = 0; ix < x; ix++) {
+			outputs[OUTPUT_X_1 + ix].value = isfinite(vx[ix])?vx[ix]:0.0f;
+		}
 	}
 };
 
@@ -135,14 +147,18 @@ struct AOWidget : ModuleWidget {
 		setPanel(SubHelper::LoadPanel(plugin, "AO-1", x*y));
 		for (unsigned int ix = 0; ix < x; ix++) {
 			addInput(Port::create<sub_port>(Vec(4, 61 + ix * 46), Port::INPUT, module, AO1<x,y>::INPUT_X_1 + ix));
-			addOutput(Port::create<sub_port>(Vec(61 + y * 75, 61 + ix * 46), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + ix));
+			addOutput(Port::create<sub_port>(Vec(46 + y * 90, 61 + ix * 46), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + ix));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			addInput(Port::create<sub_port>(Vec(70 + 75 * iy, 19), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + iy));
-			addOutput(Port::create<sub_port>(Vec(70 + 75 * iy, 330), Port::OUTPUT, module, AO1<x,y>::OUTPUT_Y_1 + iy));
+			addInput(Port::create<sub_port>(Vec(70 + 90 * iy, 19), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + iy));
+			addOutput(Port::create<sub_port>(Vec(70 + 90 * iy, 335), Port::OUTPUT, module, AO1<x,y>::OUTPUT_Y_1 + iy));
 		}
-		addParam(ParamWidget::create<AOFuncDisplay>(Vec(42.5, 60), module, AO1<x,y>::PARAM_FUNC_1, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
-		addParam(ParamWidget::create<AOConstDisplay>(Vec(42.5, 76), module, AO1<x,y>::PARAM_CONST_1, -10000.0f, 10000.0f, 0.0f));
+		for (unsigned int iy = 0; iy < y; iy++) {
+			for (unsigned int ix = 0; ix < x; ix++) {
+				addParam(ParamWidget::create<AOFuncDisplay>(Vec(42.5 + 90 * iy, 60 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
+				addParam(ParamWidget::create<AOConstDisplay>(Vec(42.5 + 90 * iy, 76 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f));
+			}
+		}
 	}
 };
 
