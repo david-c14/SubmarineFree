@@ -10,40 +10,63 @@ namespace SubmarineAO {
 	};
 
 #define LAMBDA(e) [](float x, float y, float c)->float { return e ; }
-#define M "\xc3\x97"
-#define D "\xc3\xb7"
-#define R "\xe2\x88\x9a"
-#define S2 "\xc2\xb2"
-#define S3 "\xc2\xb3"
-#define s0 "\xe2\x82\x80"
-#define s1 "\xe2\x82\x81"
-#define s2 "\xe2\x82\x82"
-#define E "\xe2\x84\xaf"
-#define SX "\xcb\xa3"
-#define SY "\xca\xb8"
-#define SC "\xe1\xb6\x9c"
+#define X "X"			// X
+#define Y "Y"			// Y
+#define C "C"			// C
+#define A "+"			// Addition symbol
+#define S "-"			// Subtraction symbol
+#define OP "("			// Open Parenthesis
+#define CP ")"			// Close Parenthesis
+#define M "\xc3\x97"		// Multiplication symbol
+#define D "\xc3\xb7"		// Division symbol
+#define R "\xe2\x88\x9a"	// Root symbol
+#define S2 "\xc2\xb2"		// Superscript 2
+#define S3 "\xc2\xb3"		// Superscript 3
+#define s0 "\xe2\x82\x80"	// Subscript 0
+#define s1 "\xe2\x82\x81"	// Subscript 1
+#define s2 "\xe2\x82\x82"	// Subscript 2
+#define E "\xe2\x84\xaf"	// e
+#define SX "\xcb\xa3"		// Superscript x
+#define SY "\xca\xb8"		// Superscript y
+#define SC "\xe1\xb6\x9c"	// Superscript c
+#define SIN "sin"		// sine function
+#define COS "cos"		// cosine function
+#define TAN "tan"		// tangent function
+#define ASIN "asin"		// arcsine function
+#define ACOS "acos"		// arcosine function
+#define ATAN "atan"		// arctangent function
+#define LOG "log"		// log function
+#define LOG2 LOG s2		// base-2 log function
+#define LOG10 LOG s1 s0		// base-10 log function
+
 
 	std::vector<Functor> functions {
 		{ "",                      LAMBDA(0) },
-		{ "X+C",                   LAMBDA(x + c) },
-		{ "Y+C",                   LAMBDA(y + c) },
-		{ "C",                     LAMBDA(c) },
-		{ "X+Y+C",                 LAMBDA(x + y + c) },
-		{ "C-X",                   LAMBDA(c - x) },
-		{ "C-Y",                   LAMBDA(c - y) },
-		{ "X-(Y+C)",               LAMBDA(x - ( y + c )) },
-		{ "(X+C)-Y",               LAMBDA(( x + c ) - y) },
-		{ "Y-(X+C)",               LAMBDA(y - ( x + c )) },
-		{ "(Y+C)-X",               LAMBDA(( y + c ) - x) },
-		{ "(X" M "Y)+C",       LAMBDA(( x * y ) + c) },
-		{ "(X+C)" M "Y",       LAMBDA(( x + c ) * y) },
-		{ "X" M "(Y+C)",       LAMBDA(x * ( y + c )) },
-		{ "X" M "C",           LAMBDA(x * c) },
-		{ "Y" M "C",           LAMBDA(y * c) },
-		{ "X" M "Y" M "C", LAMBDA(x * y * c) },
-		{ D R S2 S3 s0 s1 s2 E SX SY SC, LAMBDA(0) }
+		{ X A C,                   LAMBDA(x + c) },
+		{ Y A C,                   LAMBDA(y + c) },
+		{ C,                       LAMBDA(c) },
+		{ X A Y X C,               LAMBDA(x + y + c) },
+		{ C S X,                   LAMBDA(c - x) },
+		{ C S Y,                   LAMBDA(c - y) },
+		{ X S OP Y A C CP,         LAMBDA(x - ( y + c )) },
+		{ OP X A C CP S Y,         LAMBDA(( x + c ) - y) },
+		{ Y S OP X A C CP,         LAMBDA(y - ( x + c )) },
+		{ OP Y A C CP S X,         LAMBDA(( y + c ) - x) },
+		{ OP X M Y CP A C,         LAMBDA(( x * y ) + c) },
+		{ OP X A C CP M Y,         LAMBDA(( x + c ) * y) },
+		{ X M OP Y A C CP,        LAMBDA(x * ( y + c )) },
+		{ X M C,                   LAMBDA(x * c) },
+		{ Y M C,                   LAMBDA(y * c) },
+		{ X M Y M C,               LAMBDA(x * y * c) }
 	};	
 
+#undef X
+#undef Y
+#undef C
+#undef A
+#undef S
+#undef OP
+#undef CP
 #undef M
 #undef D
 #undef R
@@ -56,6 +79,15 @@ namespace SubmarineAO {
 #undef SX
 #undef SY
 #undef SC
+#undef SIN
+#undef COS
+#undef TAN
+#undef ASIN
+#undef ACOS
+#undef ATAN
+#undef LOG
+#undef LOG2
+#undef LOG10
 
 } // end namespace SubmarineA0
 
