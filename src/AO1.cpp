@@ -196,3 +196,5 @@ struct AOWidget : ModuleWidget {
 
 Model *modelAO106 = Model::create<AO1<6,1>, AOWidget<6,1>>("SubmarineFree", "A0-106", "A0-106 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
 Model *modelAO112 = Model::create<AO1<6,2>, AOWidget<6,2>>("SubmarineFree", "A0-112", "A0-112 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
+Model *modelAO118 = Model::create<AO1<6,3>, AOWidget<6,3>>("SubmarineFree", "A0-118", "A0-118 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
+Model *modelAO124 = Model::create<AO1<6,4>, AOWidget<6,4>>("SubmarineFree", "A0-124", "A0-124 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
