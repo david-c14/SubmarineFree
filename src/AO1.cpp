@@ -29,6 +29,9 @@ namespace SubmarineAO {
 #define SX "\xcb\xa3"		// Superscript x
 #define SY "\xca\xb8"		// Superscript y
 #define SC "\xe1\xb6\x9c"	// Superscript c
+#define MIN "min"		// Minimum function
+#define MAX "max"		// Maximum function
+#define COMMA ","		// Comma symbol
 #define SIN "sin"		// sine function
 #define COS "cos"		// cosine function
 #define TAN "tan"		// tangent function
@@ -38,26 +41,108 @@ namespace SubmarineAO {
 #define LOG "log"		// log function
 #define LOG2 LOG s2		// base-2 log function
 #define LOG10 LOG s1 s0		// base-10 log function
-
+#define IF "if"			// if conditional
 
 	std::vector<Functor> functions {
-		{ "",                      LAMBDA(0) },
-		{ X A C,                   LAMBDA(x + c) },
-		{ Y A C,                   LAMBDA(y + c) },
-		{ C,                       LAMBDA(c) },
-		{ X A Y X C,               LAMBDA(x + y + c) },
-		{ C S X,                   LAMBDA(c - x) },
-		{ C S Y,                   LAMBDA(c - y) },
-		{ X S OP Y A C CP,         LAMBDA(x - ( y + c )) },
-		{ OP X A C CP S Y,         LAMBDA(( x + c ) - y) },
-		{ Y S OP X A C CP,         LAMBDA(y - ( x + c )) },
-		{ OP Y A C CP S X,         LAMBDA(( y + c ) - x) },
-		{ OP X M Y CP A C,         LAMBDA(( x * y ) + c) },
-		{ OP X A C CP M Y,         LAMBDA(( x + c ) * y) },
-		{ X M OP Y A C CP,        LAMBDA(x * ( y + c )) },
-		{ X M C,                   LAMBDA(x * c) },
-		{ Y M C,                   LAMBDA(y * c) },
-		{ X M Y M C,               LAMBDA(x * y * c) }
+		{ "",                      LAMBDA(  0                      ) }, // Passthrough
+		{ C,                       LAMBDA(  c                      ) }, // Addition 
+		{ X A C,                   LAMBDA(  x + c                  ) },
+		{ Y A C,                   LAMBDA(  y + c                  ) },
+		{ X A Y A C,               LAMBDA(  x + y + c              ) },
+		{ C S X,                   LAMBDA(  c - x                  ) }, // Subtraction
+		{ C S Y,                   LAMBDA(  c - y                  ) },
+		{ X S OP Y A C CP,         LAMBDA(  x - ( y + c )          ) },
+		{ OP X A C CP S Y,         LAMBDA(  ( x + c ) - y          ) },
+		{ Y S OP X A C CP,         LAMBDA(  y - ( x + c )          ) },
+		{ OP Y A C CP S X,         LAMBDA(  ( y + c ) - x          ) },
+		{ OP X M Y CP A C,         LAMBDA(  ( x * y ) + c          ) }, // Multiplication
+		{ OP X A C CP M Y,         LAMBDA(  ( x + c ) * y          ) },
+		{ X M OP Y A C CP,         LAMBDA(  x * ( y + c )          ) },
+		{ X M C,                   LAMBDA(  x * c                  ) },
+		{ Y M C,                   LAMBDA(  y * c                  ) },
+		{ X M Y M C,               LAMBDA(  x * y * c              ) },
+		{ X D C,                   LAMBDA(  x / c                  ) }, // Division
+		{ C D X,                   LAMBDA(  c / x                  ) },
+		{ Y D C,                   LAMBDA(  y / c                  ) },
+		{ C D Y,                   LAMBDA(  c / y                  ) },
+		{ C A OP X D Y CP,         LAMBDA(  c + ( x / y )          ) },
+		{ C A OP Y D X CP,         LAMBDA(  c + ( y / x )          ) },
+		{ OP X A C CP D Y,         LAMBDA(  ( x + c ) / y          ) },
+		{ X D OP Y A C CP,         LAMBDA(  x / ( y + c )          ) },
+		{ OP Y A C CP D X,         LAMBDA(  ( y + c ) / x          ) },
+		{ Y D OP X A C CP,         LAMBDA(  y / ( x + c )          ) },
+		{ X S2 A C,                LAMBDA(  x * x + c              ) }, // Quadratic
+		{ Y S2 A C,                LAMBDA(  y * y + c              ) },
+		{ OP X A C CP S2,          LAMBDA(  ( x + c ) * ( x + c )  ) },
+		{ OP Y A C CP S2,          LAMBDA(  ( y + c ) * ( y + c )  ) },
+		{ X S2 A Y A C,            LAMBDA(  x * x + y + c          ) },
+		{ Y S2 A X A C,            LAMBDA(  y * y + x + c          ) },
+		{ X S2 A C Y,              LAMBDA(  x * x + c * y          ) },
+		{ Y S2 A C X,              LAMBDA(  y * y + c * x          ) },
+		{ R OP X A C CP,           LAMBDA(  sqrt( x + c )          ) }, // Square Root
+		{ R OP Y A C CP,           LAMBDA(  sqrt( y + c )          ) },
+                { "|X|",                   LAMBDA(  abs( x + c )           ) }, // Modulus
+		{ "|Y|",                   LAMBDA(  abs( y + c )           ) },
+		{ MIN OP X A C COMMA Y CP, LAMBDA(  min( x + c, y )        ) }, // Minmax
+		{ MIN OP X COMMA C CP,     LAMBDA(  min( x, c )            ) },
+      		{ MIN OP Y COMMA C CP,     LAMBDA(  min( y, c )            ) },
+     		{ MAX OP X A C COMMA Y CP, LAMBDA(  max( x + c, y )        ) },
+		{ MAX OP X COMMA C CP,     LAMBDA(  max( x, c )            ) },
+		{ MAX OP Y COMMA C CP,     LAMBDA(  max( y, c )            ) },
+		{ SIN OP X A C CP,         LAMBDA(  sin( x + c )           ) }, // Trigonometric
+		{ SIN OP Y A C CP,         LAMBDA(  sin( y + c )           ) },
+		{ SIN OP X A Y CP,         LAMBDA(  sin( x + y )           ) },
+ 		{ SIN OP C X CP,           LAMBDA(  sin( c * x )           ) },
+		{ SIN OP C Y CP,           LAMBDA(  sin( c * y )           ) },
+		{ SIN OP X Y CP,           LAMBDA(  sin( x * y )           ) },
+		{ COS OP X A C CP,         LAMBDA(  cos( x + c )           ) },
+		{ COS OP Y A C CP,         LAMBDA(  cos( y + c )           ) },
+		{ COS OP X A Y CP,         LAMBDA(  cos( x + y )           ) },
+ 		{ COS OP C X CP,           LAMBDA(  cos( c * x )           ) },
+		{ COS OP C Y CP,           LAMBDA(  cos( c * y )           ) },
+		{ COS OP X Y CP,           LAMBDA(  cos( x * y )           ) },
+		{ TAN OP X A C CP,         LAMBDA(  tan( x + c )           ) },
+		{ TAN OP Y A C CP,         LAMBDA(  tan( y + c )           ) },
+		{ TAN OP X A Y CP,         LAMBDA(  tan( x + y )           ) },
+ 		{ TAN OP C X CP,           LAMBDA(  tan( c * x )           ) },
+		{ TAN OP C Y CP,           LAMBDA(  tan( c * y )           ) },
+		{ TAN OP X Y CP,           LAMBDA(  tan( x * y )           ) },
+		{ ASIN OP X A C CP,        LAMBDA(  asin( x + c )          ) },
+		{ ASIN OP Y A C CP,        LAMBDA(  asin( y + c )          ) },
+		{ ASIN OP X A Y CP,        LAMBDA(  asin( x + y )          ) },
+ 		{ ASIN OP C X CP,          LAMBDA(  asin( c * x )          ) },
+		{ ASIN OP C Y CP,          LAMBDA(  asin( c * y )          ) },
+		{ ASIN OP X Y CP,          LAMBDA(  asin( x * y )          ) },
+		{ ACOS OP X A C CP,        LAMBDA(  acos( x + c )          ) },
+		{ ACOS OP Y A C CP,        LAMBDA(  acos( y + c )          ) },
+		{ ACOS OP X A Y CP,        LAMBDA(  acos( x + y )          ) },
+ 		{ ACOS OP C X CP,          LAMBDA(  acos( c * x )          ) },
+		{ ACOS OP C Y CP,          LAMBDA(  acos( c * y )          ) },
+		{ ACOS OP X Y CP,          LAMBDA(  acos( x * y )          ) },
+		{ ATAN OP X A C CP,        LAMBDA(  atan( x + c )          ) },
+		{ ATAN OP Y A C CP,        LAMBDA(  atan( y + c )          ) },
+		{ ATAN OP X A Y CP,        LAMBDA(  atan( x + y )          ) },
+ 		{ ATAN OP C X CP,          LAMBDA(  atan( c * x )          ) },
+		{ ATAN OP C Y CP,          LAMBDA(  atan( c * y )          ) },
+		{ ATAN OP X Y CP,          LAMBDA(  atan( x * y )          ) },
+		{ LOG OP X A C CP,         LAMBDA(  log( x + c )           ) }, // Logarithmic
+		{ LOG OP Y A C CP,         LAMBDA(  log( y + c )           ) },
+		{ LOG2 OP X A C CP,        LAMBDA(  log2( x + c )          ) },
+		{ LOG2 OP Y A C CP,        LAMBDA(  log2( y + c )          ) },
+		{ LOG10 OP X A C CP,       LAMBDA(  log10( x + c )         ) },
+		{ LOG10 OP Y A C CP,       LAMBDA(  log10( y + c )         ) },
+		{ E SX A SC,               LAMBDA(  exp( x + c )           ) }, // Exponential
+		{ E SY A SC,               LAMBDA(  exp( y + c )           ) },
+		{ E SC SX,                 LAMBDA(  exp( c * x )           ) },
+		{ E SC SY,                 LAMBDA(  exp( c * y )           ) },
+		{ "2" SX A SC,             LAMBDA(  powf( 2, x + c )       ) },
+		{ "2" SY A SC,             LAMBDA(  powf( 2, y + c )       ) },
+		{ "2" SC SX,               LAMBDA(  powf( 2, c * x )       ) },
+		{ "2" SC SY,               LAMBDA(  powf( 2, c * y )       ) },
+		{ "10" SX A SC,            LAMBDA(  powf( 10, x + c )      ) },
+		{ "10" SY A SC,            LAMBDA(  powf( 10, y + c )      ) },
+		{ "10" SC SX,              LAMBDA(  powf( 10, c * x )      ) },
+		{ "10" SC SY,              LAMBDA(  powf( 10, c * y )      ) }
 	};	
 
 #undef X
@@ -79,6 +164,9 @@ namespace SubmarineAO {
 #undef SX
 #undef SY
 #undef SC
+#undef COMMA
+#undef MIN
+#undef MAX
 #undef SIN
 #undef COS
 #undef TAN
@@ -88,6 +176,7 @@ namespace SubmarineAO {
 #undef LOG
 #undef LOG2
 #undef LOG10
+#undef IF
 
 } // end namespace SubmarineA0
 
