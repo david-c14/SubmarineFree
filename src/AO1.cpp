@@ -17,7 +17,8 @@ namespace SubmarineAO {
 #define S "-"			// Subtraction symbol
 #define OP "("			// Open Parenthesis
 #define CP ")"			// Close Parenthesis
-#define M "\xc3\x97"		// Multiplication symbol
+#define P "|"			// Pipe symbol
+#define M "\xe2\xa8\xaf"	
 #define D "\xc3\xb7"		// Division symbol
 #define R "\xe2\x88\x9a"	// Root symbol
 #define S2 "\xc2\xb2"		// Superscript 2
@@ -26,6 +27,7 @@ namespace SubmarineAO {
 #define s1 "\xe2\x82\x81"	// Subscript 1
 #define s2 "\xe2\x82\x82"	// Subscript 2
 #define E "\xe2\x84\xaf"	// e
+#define SA "\xe2\x81\xba"	// Superscript +
 #define SX "\xcb\xa3"		// Superscript x
 #define SY "\xca\xb8"		// Superscript y
 #define SC "\xe1\xb6\x9c"	// Superscript c
@@ -81,8 +83,8 @@ namespace SubmarineAO {
 		{ Y S2 A C X,              LAMBDA(  y * y + c * x          ) },
 		{ R OP X A C CP,           LAMBDA(  sqrt( x + c )          ) }, // Square Root
 		{ R OP Y A C CP,           LAMBDA(  sqrt( y + c )          ) },
-                { "|X|",                   LAMBDA(  abs( x + c )           ) }, // Modulus
-		{ "|Y|",                   LAMBDA(  abs( y + c )           ) },
+                { P X P,                   LAMBDA(  abs( x + c )           ) }, // Modulus
+		{ P Y P,                   LAMBDA(  abs( y + c )           ) },
 		{ MIN OP X A C COMMA Y CP, LAMBDA(  min( x + c, y )        ) }, // Minmax
 		{ MIN OP X COMMA C CP,     LAMBDA(  min( x, c )            ) },
       		{ MIN OP Y COMMA C CP,     LAMBDA(  min( y, c )            ) },
@@ -131,16 +133,16 @@ namespace SubmarineAO {
 		{ LOG2 OP Y A C CP,        LAMBDA(  log2( y + c )          ) },
 		{ LOG10 OP X A C CP,       LAMBDA(  log10( x + c )         ) },
 		{ LOG10 OP Y A C CP,       LAMBDA(  log10( y + c )         ) },
-		{ E SX A SC,               LAMBDA(  exp( x + c )           ) }, // Exponential
-		{ E SY A SC,               LAMBDA(  exp( y + c )           ) },
+		{ E SX SA SC,               LAMBDA(  exp( x + c )           ) }, // Exponential
+		{ E SY SA SC,               LAMBDA(  exp( y + c )           ) },
 		{ E SC SX,                 LAMBDA(  exp( c * x )           ) },
 		{ E SC SY,                 LAMBDA(  exp( c * y )           ) },
-		{ "2" SX A SC,             LAMBDA(  powf( 2, x + c )       ) },
-		{ "2" SY A SC,             LAMBDA(  powf( 2, y + c )       ) },
+		{ "2" SX SA SC,             LAMBDA(  powf( 2, x + c )       ) },
+		{ "2" SY SA SC,             LAMBDA(  powf( 2, y + c )       ) },
 		{ "2" SC SX,               LAMBDA(  powf( 2, c * x )       ) },
 		{ "2" SC SY,               LAMBDA(  powf( 2, c * y )       ) },
-		{ "10" SX A SC,            LAMBDA(  powf( 10, x + c )      ) },
-		{ "10" SY A SC,            LAMBDA(  powf( 10, y + c )      ) },
+		{ "10" SX SA SC,            LAMBDA(  powf( 10, x + c )      ) },
+		{ "10" SY SA SC,            LAMBDA(  powf( 10, y + c )      ) },
 		{ "10" SC SX,              LAMBDA(  powf( 10, c * x )      ) },
 		{ "10" SC SY,              LAMBDA(  powf( 10, c * y )      ) }
 	};	
@@ -152,6 +154,7 @@ namespace SubmarineAO {
 #undef S
 #undef OP
 #undef CP
+#undef P
 #undef M
 #undef D
 #undef R
@@ -161,6 +164,7 @@ namespace SubmarineAO {
 #undef s1
 #undef s2
 #undef E
+#undef SA
 #undef SX
 #undef SY
 #undef SC
@@ -190,11 +194,11 @@ struct AOFuncDisplay : Knob {
 		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	}
 	void draw(NVGcontext *vg) override {
-		nvgFontSize(vg, 14);
+		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 40, 11, SubmarineAO::functions[value].name.c_str(), NULL);
+		nvgText(vg, 41.5, 13, SubmarineAO::functions[value].name.c_str(), NULL);
 	}
 };
 
@@ -210,11 +214,11 @@ struct AOConstDisplay : Knob {
 	void draw(NVGcontext *vg) override {
 		char mtext[41];
 		sprintf(mtext, "C=%4.2f", ((int)value)/100.0f);
-		nvgFontSize(vg, 14);
+		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 40, 11, mtext, NULL);
+		nvgText(vg, 41.5, 13, mtext, NULL);
 	}
 };
 
@@ -253,6 +257,7 @@ struct AO1 : Module {
 					f = SubmarineAO::functions.size() - 1;
 				if (f > 0)
 					vy = vx[ix] = SubmarineAO::functions[f].func(vx[ix], vy, ((int)params[PARAM_CONST_1 + ix + iy * x].value)/100.0f);
+				// if f is equal to 0, then both x and y pass (crossing) through the module unchanged.
 			}
 			outputs[OUTPUT_Y_1 + iy].value = isfinite(vy)?vy:0.0f;
 		}
@@ -276,8 +281,8 @@ struct AOWidget : ModuleWidget {
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < x; ix++) {
-				addParam(ParamWidget::create<AOFuncDisplay>(Vec(42.5 + 90 * iy, 60 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
-				addParam(ParamWidget::create<AOConstDisplay>(Vec(42.5 + 90 * iy, 76 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f));
+				addParam(ParamWidget::create<AOFuncDisplay>(Vec(42.5 + 90 * iy, 59 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
+				addParam(ParamWidget::create<AOConstDisplay>(Vec(42.5 + 90 * iy, 78 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f));
 			}
 		}
 	}
