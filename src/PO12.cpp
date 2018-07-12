@@ -123,14 +123,22 @@ struct PO_101 : Module, PO_Util {
 
 void PO_101::sin(float phase) {
 	phase *= (2 * M_PI);
-	outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sin(phase + deg0));
-	outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sin(phase + deg30)); 
-	outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sin(phase + deg45)); 
-	outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sin(phase + deg60)); 
-	outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sin(phase + deg90)); 
-	outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sin(phase + deg120)); 
-	outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sin(phase + deg135)); 
-	outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sin(phase + deg150)); 
+	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
+		outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sin(phase + deg0));
+	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
+		outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sin(phase + deg30)); 
+	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
+		outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sin(phase + deg45)); 
+	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
+		outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sin(phase + deg60)); 
+	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
+		outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sin(phase + deg90)); 
+	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
+		outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sin(phase + deg120)); 
+	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
+		outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sin(phase + deg135)); 
+	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
+		outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sin(phase + deg150)); 
 	for (int i = 0; i < 4; i++) {
 		if (outputs[OUTPUT_17 + i].active) {
 			float offset = params[PARAM_PHASE_1 + i].value;
@@ -143,14 +151,22 @@ void PO_101::sin(float phase) {
 }
 
 void PO_101::tri(float phase) {
-	outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::tri(phase + ph0));
-	outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::tri(phase + ph30)); 
-	outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::tri(phase + ph45)); 
-	outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::tri(phase + ph60)); 
-	outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::tri(phase + ph90)); 
-	outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::tri(phase + ph120)); 
-	outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::tri(phase + ph135)); 
-	outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::tri(phase + ph150)); 
+	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
+		outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::tri(phase + ph0));
+	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
+		outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::tri(phase + ph30)); 
+	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
+		outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::tri(phase + ph45)); 
+	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
+		outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::tri(phase + ph60)); 
+	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
+		outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::tri(phase + ph90)); 
+	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
+		outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::tri(phase + ph120)); 
+	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
+		outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::tri(phase + ph135)); 
+	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
+		outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::tri(phase + ph150)); 
 	for (int i = 0; i < 4; i++) {
 		if (outputs[OUTPUT_17 + i].active) {
 			float offset = params[PARAM_PHASE_1 + i].value;
@@ -162,22 +178,38 @@ void PO_101::tri(float phase) {
 }
 
 void PO_101::saw(float phase) {
-	outputs[OUTPUT_1].value = PO_Util::saw(phase + ph0);
-	outputs[OUTPUT_2].value = PO_Util::saw(phase + ph30); 
-	outputs[OUTPUT_3].value = PO_Util::saw(phase + ph45); 
-	outputs[OUTPUT_4].value = PO_Util::saw(phase + ph60); 
-	outputs[OUTPUT_5].value = PO_Util::saw(phase + ph90); 
-	outputs[OUTPUT_6].value = PO_Util::saw(phase + ph120); 
-	outputs[OUTPUT_7].value = PO_Util::saw(phase + ph135); 
-	outputs[OUTPUT_8].value = PO_Util::saw(phase + ph150); 
-	outputs[OUTPUT_9].value = PO_Util::saw(phase + ph180);
-	outputs[OUTPUT_10].value = PO_Util::saw(phase + ph210); 
-	outputs[OUTPUT_11].value = PO_Util::saw(phase + ph225); 
-	outputs[OUTPUT_12].value = PO_Util::saw(phase + ph240); 
-	outputs[OUTPUT_13].value = PO_Util::saw(phase + ph270); 
-	outputs[OUTPUT_14].value = PO_Util::saw(phase + ph300); 
-	outputs[OUTPUT_15].value = PO_Util::saw(phase + ph315); 
-	outputs[OUTPUT_16].value = PO_Util::saw(phase + ph330); 
+	if (outputs[OUTPUT_1].active)
+		outputs[OUTPUT_1].value = PO_Util::saw(phase + ph0);
+	if (outputs[OUTPUT_2].active)
+		outputs[OUTPUT_2].value = PO_Util::saw(phase + ph30); 
+	if (outputs[OUTPUT_3].active)
+		outputs[OUTPUT_3].value = PO_Util::saw(phase + ph45); 
+	if (outputs[OUTPUT_4].active)
+		outputs[OUTPUT_4].value = PO_Util::saw(phase + ph60); 
+	if (outputs[OUTPUT_5].active)
+		outputs[OUTPUT_5].value = PO_Util::saw(phase + ph90); 
+	if (outputs[OUTPUT_6].active)
+		outputs[OUTPUT_6].value = PO_Util::saw(phase + ph120); 
+	if (outputs[OUTPUT_7].active)
+		outputs[OUTPUT_7].value = PO_Util::saw(phase + ph135); 
+	if (outputs[OUTPUT_8].active)
+		outputs[OUTPUT_8].value = PO_Util::saw(phase + ph150); 
+	if (outputs[OUTPUT_9].active)
+		outputs[OUTPUT_9].value = PO_Util::saw(phase + ph180);
+	if (outputs[OUTPUT_10].active)
+		outputs[OUTPUT_10].value = PO_Util::saw(phase + ph210); 
+	if (outputs[OUTPUT_11].active)
+		outputs[OUTPUT_11].value = PO_Util::saw(phase + ph225); 
+	if (outputs[OUTPUT_12].active)
+		outputs[OUTPUT_12].value = PO_Util::saw(phase + ph240); 
+	if (outputs[OUTPUT_13].active)
+		outputs[OUTPUT_13].value = PO_Util::saw(phase + ph270); 
+	if (outputs[OUTPUT_14].active)
+		outputs[OUTPUT_14].value = PO_Util::saw(phase + ph300); 
+	if (outputs[OUTPUT_15].active)
+		outputs[OUTPUT_15].value = PO_Util::saw(phase + ph315); 
+	if (outputs[OUTPUT_16].active)
+		outputs[OUTPUT_16].value = PO_Util::saw(phase + ph330); 
 	for (int i = 0; i < 4; i++) {
 		if (outputs[OUTPUT_17 + i].active) {
 			float offset = params[PARAM_PHASE_1 + i].value;
@@ -189,14 +221,22 @@ void PO_101::saw(float phase) {
 }
 
 void PO_101::sqr(float phase) {
-	outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sqr(phase + ph0));
-	outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sqr(phase + ph30)); 
-	outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sqr(phase + ph45)); 
-	outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sqr(phase + ph60)); 
-	outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sqr(phase + ph90)); 
-	outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sqr(phase + ph120)); 
-	outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sqr(phase + ph135)); 
-	outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sqr(phase + ph150)); 
+	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
+		outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sqr(phase + ph0));
+	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
+		outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sqr(phase + ph30)); 
+	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
+		outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sqr(phase + ph45)); 
+	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
+		outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sqr(phase + ph60)); 
+	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
+		outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sqr(phase + ph90)); 
+	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
+		outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sqr(phase + ph120)); 
+	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
+		outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sqr(phase + ph135)); 
+	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
+		outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sqr(phase + ph150)); 
 	for (int i = 0; i < 4; i++) {
 		if (outputs[OUTPUT_17 + i].active) {
 			float offset = params[PARAM_PHASE_1 + i].value;
@@ -209,14 +249,22 @@ void PO_101::sqr(float phase) {
 	
 void PO_101::rsn(float phase) {
 	phase *= (2 * M_PI);
-	outputs[OUTPUT_9].value = (outputs[OUTPUT_1].value = PO_Util::rsn(phase + deg0));
-	outputs[OUTPUT_10].value = (outputs[OUTPUT_2].value = PO_Util::rsn(phase + deg30)); 
-	outputs[OUTPUT_11].value = (outputs[OUTPUT_3].value = PO_Util::rsn(phase + deg45)); 
-	outputs[OUTPUT_12].value = (outputs[OUTPUT_4].value = PO_Util::rsn(phase + deg60)); 
-	outputs[OUTPUT_13].value = (outputs[OUTPUT_5].value = PO_Util::rsn(phase + deg90)); 
-	outputs[OUTPUT_14].value = (outputs[OUTPUT_6].value = PO_Util::rsn(phase + deg120)); 
-	outputs[OUTPUT_15].value = (outputs[OUTPUT_7].value = PO_Util::rsn(phase + deg135)); 
-	outputs[OUTPUT_16].value = (outputs[OUTPUT_8].value = PO_Util::rsn(phase + deg150)); 
+	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
+		outputs[OUTPUT_9].value = (outputs[OUTPUT_1].value = PO_Util::rsn(phase + deg0));
+	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
+		outputs[OUTPUT_10].value = (outputs[OUTPUT_2].value = PO_Util::rsn(phase + deg30)); 
+	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
+		outputs[OUTPUT_11].value = (outputs[OUTPUT_3].value = PO_Util::rsn(phase + deg45)); 
+	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
+		outputs[OUTPUT_12].value = (outputs[OUTPUT_4].value = PO_Util::rsn(phase + deg60)); 
+	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
+		outputs[OUTPUT_13].value = (outputs[OUTPUT_5].value = PO_Util::rsn(phase + deg90)); 
+	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
+		outputs[OUTPUT_14].value = (outputs[OUTPUT_6].value = PO_Util::rsn(phase + deg120)); 
+	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
+		outputs[OUTPUT_15].value = (outputs[OUTPUT_7].value = PO_Util::rsn(phase + deg135)); 
+	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
+		outputs[OUTPUT_16].value = (outputs[OUTPUT_8].value = PO_Util::rsn(phase + deg150)); 
 	for (int i = 0; i < 4; i++) {
 		if (outputs[OUTPUT_17 + i].active) {
 			float offset = params[PARAM_PHASE_1 + i].value;
