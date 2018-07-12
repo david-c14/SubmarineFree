@@ -49,6 +49,7 @@ namespace SubmarineAO {
 #define L "<"			// Less Than symbol
 #define Q "="			// Equality symbol
 #define Z "0"			// Zero
+#define W "1"			// One
 #define T "\xe2\x86\xa3"	// Right arrow
 #define H "/"			// Slashb
 
@@ -172,36 +173,87 @@ namespace SubmarineAO {
 		{ "10" SY SA SC,           LAMBDA(  powf( 10, y + c )      ) },
 		{ "10" SC SX,              LAMBDA(  powf( 10, c * x )      ) },
 		{ "10" SC SY,              LAMBDA(  powf( 10, c * y )      ) },
-		{ IF X G Z T Y H C,	   LAMBDA(  (x > 0) ? y : c	   ) },
+
+		{ IF X G Z T Y H C,	   LAMBDA(  (x > 0) ? y : c	   ) }, // Conditional
 		{ IF X L Z T Y H C,	   LAMBDA(  (x < 0) ? y : c	   ) },
 		{ IF X Q Z T Y H C,	   LAMBDA(  (x == 0) ? y : c	   ) },
 		{ IF X G Z T C H Y,	   LAMBDA(  (x > 0) ? c : y	   ) },
 		{ IF X L Z T C H Y,	   LAMBDA(  (x < 0) ? c : y	   ) },
 		{ IF X Q Z T C H Y,	   LAMBDA(  (x == 0) ? c : y	   ) },
+		{ IF X G Z T W H Z,	   LAMBDA(  (x > 0) ? 1 : 0	   ) },
+		{ IF X L Z T W H Z,	   LAMBDA(  (x < 0) ? 1 : 0	   ) },
+		{ IF X Q Z T W H Z,	   LAMBDA(  (x == 0) ? 1 : 0	   ) },
+		{ IF X G Z T X H C,	   LAMBDA(  (x > 0) ? x : c	   ) },
+		{ IF X L Z T X H C,	   LAMBDA(  (x < 0) ? x : c	   ) },
+		{ IF X Q Z T X H C,	   LAMBDA(  (x == 0) ? x : c	   ) },
+		{ IF X G Z T C H X,	   LAMBDA(  (x > 0) ? c : x	   ) },
+		{ IF X L Z T C H X,	   LAMBDA(  (x < 0) ? c : x	   ) },
+		{ IF X Q Z T C H X,	   LAMBDA(  (x == 0) ? c : x	   ) },
+
 		{ IF Y G Z T X H C,	   LAMBDA(  (y > 0) ? x : c	   ) },
 		{ IF Y L Z T X H C,	   LAMBDA(  (y < 0) ? x : c	   ) },
 		{ IF Y Q Z T X H C,	   LAMBDA(  (y == 0) ? x : c	   ) },
 		{ IF Y G Z T C H X,	   LAMBDA(  (y > 0) ? c : x	   ) },
 		{ IF Y L Z T C H X,	   LAMBDA(  (y < 0) ? c : x	   ) },
 		{ IF Y Q Z T C H X,	   LAMBDA(  (y == 0) ? c : x	   ) },
+		{ IF Y G Z T W H Z,	   LAMBDA(  (y > 0) ? 1 : 0	   ) },
+		{ IF Y L Z T W H Z,	   LAMBDA(  (y < 0) ? 1 : 0	   ) },
+		{ IF Y Q Z T W H Z,	   LAMBDA(  (y == 0) ? 1 : 0	   ) },
+		{ IF Y G Z T Y H C,	   LAMBDA(  (y > 0) ? y : c	   ) },
+		{ IF Y L Z T Y H C,	   LAMBDA(  (y < 0) ? y : c	   ) },
+		{ IF Y Q Z T Y H C,	   LAMBDA(  (y == 0) ? y : c	   ) },
+		{ IF Y G Z T C H Y,	   LAMBDA(  (y > 0) ? c : y	   ) },
+		{ IF Y L Z T C H Y,	   LAMBDA(  (y < 0) ? c : y	   ) },
+		{ IF Y Q Z T C H Y,	   LAMBDA(  (y == 0) ? c : y	   ) },
+
 		{ IF X G Y T C H Z,	   LAMBDA(  (x > y) ? c : 0	   ) },
 		{ IF X L Y T C H Z,        LAMBDA(  (x < y) ? c : 0	   ) },
 		{ IF X Q Y T C H Z,	   LAMBDA(  (x == y) ? c : 0	   ) },
 		{ IF Y G X T C H Z,	   LAMBDA(  (y > x) ? c : 0	   ) },
 		{ IF Y L X T C H Z,        LAMBDA(  (y < x) ? c : 0	   ) },
-		{ IF Y Q X T C H Z,	   LAMBDA(  (y == x) ? c : 0	   ) },
+		{ IF X G Y T X H Z,	   LAMBDA(  (x > y) ? x : 0	   ) },
+		{ IF X L Y T X H Z,        LAMBDA(  (x < y) ? x : 0	   ) },
+		{ IF X Q Y T X H Z,	   LAMBDA(  (x == y) ? x : 0	   ) },
+		{ IF Y G X T X H Z,	   LAMBDA(  (y > x) ? x : 0	   ) },
+		{ IF Y L X T X H Z,        LAMBDA(  (y < x) ? x : 0	   ) },
+		{ IF X G Y T Y H Z,	   LAMBDA(  (x > y) ? y : 0	   ) },
+		{ IF X L Y T Y H Z,        LAMBDA(  (x < y) ? y : 0	   ) },
+		{ IF X Q Y T Y H Z,	   LAMBDA(  (x == y) ? y : 0	   ) },
+		{ IF Y G X T Y H Z,	   LAMBDA(  (y > x) ? y : 0	   ) },
+		{ IF Y L X T Y H Z,        LAMBDA(  (y < x) ? y : 0	   ) },
+
 		{ IF X G C T Y H Z,	   LAMBDA(  (x > c) ? y : 0	   ) },
 		{ IF X L C T Y H Z,        LAMBDA(  (x < c) ? y : 0	   ) },
 		{ IF X Q C T Y H Z,	   LAMBDA(  (x == c) ? y : 0	   ) },
 		{ IF C G X T Y H Z,	   LAMBDA(  (c > x) ? y : 0	   ) },
 		{ IF C L X T Y H Z,        LAMBDA(  (c < x) ? y : 0	   ) },
-		{ IF C Q X T Y H Z,	   LAMBDA(  (c == x) ? y : 0	   ) },
+		{ IF X G C T X H Z,	   LAMBDA(  (x > c) ? x : 0	   ) },
+		{ IF X L C T X H Z,        LAMBDA(  (x < c) ? x : 0	   ) },
+		{ IF X Q C T X H Z,	   LAMBDA(  (x == c) ? x : 0	   ) },
+		{ IF C G X T X H Z,	   LAMBDA(  (c > x) ? x : 0	   ) },
+		{ IF C L X T X H Z,        LAMBDA(  (c < x) ? x : 0	   ) },
+		{ IF X G C T X H Y,	   LAMBDA(  (x > c) ? x : y	   ) },
+		{ IF X L C T X H Y,        LAMBDA(  (x < c) ? x : y	   ) },
+		{ IF X Q C T X H Y,	   LAMBDA(  (x == c) ? x : y	   ) },
+		{ IF C G X T X H Y,	   LAMBDA(  (c > x) ? x : y	   ) },
+		{ IF C L X T X H Y,        LAMBDA(  (c < x) ? x : y	   ) },
+
 		{ IF Y G C T X H Z,	   LAMBDA(  (y > c) ? x : 0	   ) },
 		{ IF Y L C T X H Z,        LAMBDA(  (y < c) ? x : 0	   ) },
 		{ IF Y Q C T X H Z,	   LAMBDA(  (y == c) ? x : 0	   ) },
 		{ IF C G Y T X H Z,	   LAMBDA(  (c > y) ? x : 0	   ) },
 		{ IF C L Y T X H Z,        LAMBDA(  (c < y) ? x : 0	   ) },
-		{ IF C Q Y T X H Z,	   LAMBDA(  (c == y) ? x : 0	   ) }
+		{ IF Y G C T Y H Z,	   LAMBDA(  (y > c) ? y : 0	   ) },
+		{ IF Y L C T Y H Z,        LAMBDA(  (y < c) ? y : 0	   ) },
+		{ IF Y Q C T Y H Z,	   LAMBDA(  (y == c) ? y : 0	   ) },
+		{ IF C G Y T Y H Z,	   LAMBDA(  (c > y) ? y : 0	   ) },
+		{ IF C L Y T Y H Z,        LAMBDA(  (c < y) ? y : 0	   ) },
+		{ IF Y G C T Y H X,	   LAMBDA(  (y > c) ? y : x	   ) },
+		{ IF Y L C T Y H X,        LAMBDA(  (y < c) ? y : x	   ) },
+		{ IF Y Q C T Y H X,	   LAMBDA(  (y == c) ? y : x	   ) },
+		{ IF C G Y T Y H X,	   LAMBDA(  (c > y) ? y : x	   ) },
+		{ IF C L Y T Y H X,        LAMBDA(  (c < y) ? y : x	   ) },
+
 	};	
 
 #undef X
@@ -243,7 +295,7 @@ namespace SubmarineAO {
 #undef L
 #undef Q
 #undef Z
-#undef Q
+#undef W
 #undef T
 #undef H
 
