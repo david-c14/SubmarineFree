@@ -15,6 +15,7 @@ namespace SubmarineAO {
 #define C "C"			// C
 #define A "+"			// Addition symbol
 #define S "-"			// Subtraction symbol
+#define O "%"			// Modulo symbol
 #define OP "("			// Open Parenthesis
 #define CP ")"			// Close Parenthesis
 #define P "|"			// Pipe symbol
@@ -43,7 +44,13 @@ namespace SubmarineAO {
 #define LOG "log"		// log function
 #define LOG2 LOG s2		// base-2 log function
 #define LOG10 LOG s1 s0		// base-10 log function
-#define IF "if"			// if conditional
+#define IF "if "		// if conditional
+#define G ">"			// Greater Than symbol
+#define L "<"			// Less Than symbol
+#define Q "="			// Equality symbol
+#define Z "0"			// Zero
+#define T "\xe2\x86\xa3"	// Right arrow
+#define H "/"			// Slashb
 
 	std::vector<Functor> functions {
 		{ "",                      LAMBDA(  0                      ) }, // Passthrough
@@ -69,10 +76,20 @@ namespace SubmarineAO {
 		{ C D Y,                   LAMBDA(  c / y                  ) },
 		{ C A OP X D Y CP,         LAMBDA(  c + ( x / y )          ) },
 		{ C A OP Y D X CP,         LAMBDA(  c + ( y / x )          ) },
+		{ X A OP Y D C CP,	   LAMBDA(  x + ( y / c )	   ) },	
+		{ X A OP C D Y CP,	   LAMBDA(  x + ( c / y ) 	   ) },
+ 		{ Y A OP X D C CP,	   LAMBDA(  y + ( x / c )	   ) },
+		{ Y A OP C D X CP,	   LAMBDA(  y + ( c / x ) 	   ) },
 		{ OP X A C CP D Y,         LAMBDA(  ( x + c ) / y          ) },
 		{ X D OP Y A C CP,         LAMBDA(  x / ( y + c )          ) },
 		{ OP Y A C CP D X,         LAMBDA(  ( y + c ) / x          ) },
 		{ Y D OP X A C CP,         LAMBDA(  y / ( x + c )          ) },
+		{ OP X A C CP O Y,	   LAMBDA(  fmodf( x + c , y )	   ) }, // Modulo
+		{ OP Y A C CP O X,	   LAMBDA(  fmodf( y + c , x )	   ) },
+		{ X O OP Y A C CP,	   LAMBDA(  fmodf( x , y + c )	   ) },
+		{ Y O OP X A C CP,	   LAMBDA(  fmodf( y , x + c)	   ) },
+		{ X O C,		   LAMBDA(  fmodf( x , c )	   ) },
+		{ Y O C,		   LAMBDA(  fmodf( y , c )  	   ) },
 		{ X S2 A C,                LAMBDA(  x * x + c              ) }, // Quadratic
 		{ Y S2 A C,                LAMBDA(  y * y + c              ) },
 		{ OP X A C CP S2,          LAMBDA(  ( x + c ) * ( x + c )  ) },
@@ -83,6 +100,16 @@ namespace SubmarineAO {
 		{ Y S2 A C X,              LAMBDA(  y * y + c * x          ) },
 		{ R OP X A C CP,           LAMBDA(  sqrt( x + c )          ) }, // Square Root
 		{ R OP Y A C CP,           LAMBDA(  sqrt( y + c )          ) },
+		{ C SX,			   LAMBDA(  powf( c , x )	   ) }, // Powers
+		{ C SY,			   LAMBDA(  powf( c , y )	   ) },
+		{ C SX SA SY,		   LAMBDA(  powf( c , x + y ) 	   ) },
+		{ C SX SY,		   LAMBDA(  powf( c , x * y )	   ) },
+		{ X SC,			   LAMBDA(  powf( x , c ) 	   ) },
+		{ Y SC,			   LAMBDA(  powf( y , c )	   ) },
+		{ X SY SA SC, 		   LAMBDA(  powf( x , y + c )	   ) },
+		{ Y SX SA SC,		   LAMBDA(  powf( y , x + c )	   ) },
+		{ X SC SY,		   LAMBDA(  powf( x , c * y )	   ) },
+		{ Y SC SX,		   LAMBDA(  powf( y , c * x )	   ) },
                 { P X P,                   LAMBDA(  abs( x + c )           ) }, // Modulus
 		{ P Y P,                   LAMBDA(  abs( y + c )           ) },
 		{ MIN OP X A C COMMA Y CP, LAMBDA(  min( x + c, y )        ) }, // Minmax
@@ -133,18 +160,48 @@ namespace SubmarineAO {
 		{ LOG2 OP Y A C CP,        LAMBDA(  log2( y + c )          ) },
 		{ LOG10 OP X A C CP,       LAMBDA(  log10( x + c )         ) },
 		{ LOG10 OP Y A C CP,       LAMBDA(  log10( y + c )         ) },
-		{ E SX SA SC,               LAMBDA(  exp( x + c )           ) }, // Exponential
-		{ E SY SA SC,               LAMBDA(  exp( y + c )           ) },
+		{ E SX SA SC,              LAMBDA(  exp( x + c )           ) }, // Exponential
+		{ E SY SA SC,              LAMBDA(  exp( y + c )           ) },
 		{ E SC SX,                 LAMBDA(  exp( c * x )           ) },
 		{ E SC SY,                 LAMBDA(  exp( c * y )           ) },
-		{ "2" SX SA SC,             LAMBDA(  powf( 2, x + c )       ) },
-		{ "2" SY SA SC,             LAMBDA(  powf( 2, y + c )       ) },
+		{ "2" SX SA SC,            LAMBDA(  powf( 2, x + c )       ) },
+		{ "2" SY SA SC,            LAMBDA(  powf( 2, y + c )       ) },
 		{ "2" SC SX,               LAMBDA(  powf( 2, c * x )       ) },
 		{ "2" SC SY,               LAMBDA(  powf( 2, c * y )       ) },
-		{ "10" SX SA SC,            LAMBDA(  powf( 10, x + c )      ) },
-		{ "10" SY SA SC,            LAMBDA(  powf( 10, y + c )      ) },
+		{ "10" SX SA SC,           LAMBDA(  powf( 10, x + c )      ) },
+		{ "10" SY SA SC,           LAMBDA(  powf( 10, y + c )      ) },
 		{ "10" SC SX,              LAMBDA(  powf( 10, c * x )      ) },
-		{ "10" SC SY,              LAMBDA(  powf( 10, c * y )      ) }
+		{ "10" SC SY,              LAMBDA(  powf( 10, c * y )      ) },
+		{ IF X G Z T Y H C,	   LAMBDA(  (x > 0) ? y : c	   ) },
+		{ IF X L Z T Y H C,	   LAMBDA(  (x < 0) ? y : c	   ) },
+		{ IF X Q Z T Y H C,	   LAMBDA(  (x == 0) ? y : c	   ) },
+		{ IF X G Z T C H Y,	   LAMBDA(  (x > 0) ? c : y	   ) },
+		{ IF X L Z T C H Y,	   LAMBDA(  (x < 0) ? c : y	   ) },
+		{ IF X Q Z T C H Y,	   LAMBDA(  (x == 0) ? c : y	   ) },
+		{ IF Y G Z T X H C,	   LAMBDA(  (y > 0) ? x : c	   ) },
+		{ IF Y L Z T X H C,	   LAMBDA(  (y < 0) ? x : c	   ) },
+		{ IF Y Q Z T X H C,	   LAMBDA(  (y == 0) ? x : c	   ) },
+		{ IF Y G Z T C H X,	   LAMBDA(  (y > 0) ? c : x	   ) },
+		{ IF Y L Z T C H X,	   LAMBDA(  (y < 0) ? c : x	   ) },
+		{ IF Y Q Z T C H X,	   LAMBDA(  (y == 0) ? c : x	   ) },
+		{ IF X G Y T C H Z,	   LAMBDA(  (x > y) ? c : 0	   ) },
+		{ IF X L Y T C H Z,        LAMBDA(  (x < y) ? c : 0	   ) },
+		{ IF X Q Y T C H Z,	   LAMBDA(  (x == y) ? c : 0	   ) },
+		{ IF Y G X T C H Z,	   LAMBDA(  (y > x) ? c : 0	   ) },
+		{ IF Y L X T C H Z,        LAMBDA(  (y < x) ? c : 0	   ) },
+		{ IF Y Q X T C H Z,	   LAMBDA(  (y == x) ? c : 0	   ) },
+		{ IF X G C T Y H Z,	   LAMBDA(  (x > c) ? y : 0	   ) },
+		{ IF X L C T Y H Z,        LAMBDA(  (x < c) ? y : 0	   ) },
+		{ IF X Q C T Y H Z,	   LAMBDA(  (x == c) ? y : 0	   ) },
+		{ IF C G X T Y H Z,	   LAMBDA(  (c > x) ? y : 0	   ) },
+		{ IF C L X T Y H Z,        LAMBDA(  (c < x) ? y : 0	   ) },
+		{ IF C Q X T Y H Z,	   LAMBDA(  (c == x) ? y : 0	   ) },
+		{ IF Y G C T X H Z,	   LAMBDA(  (y > c) ? x : 0	   ) },
+		{ IF Y L C T X H Z,        LAMBDA(  (y < c) ? x : 0	   ) },
+		{ IF Y Q C T X H Z,	   LAMBDA(  (y == c) ? x : 0	   ) },
+		{ IF C G Y T X H Z,	   LAMBDA(  (c > y) ? x : 0	   ) },
+		{ IF C L Y T X H Z,        LAMBDA(  (c < y) ? x : 0	   ) },
+		{ IF C Q Y T X H Z,	   LAMBDA(  (c == y) ? x : 0	   ) }
 	};	
 
 #undef X
@@ -152,6 +209,7 @@ namespace SubmarineAO {
 #undef C
 #undef A
 #undef S
+#undef O
 #undef OP
 #undef CP
 #undef P
@@ -181,6 +239,13 @@ namespace SubmarineAO {
 #undef LOG2
 #undef LOG10
 #undef IF
+#undef G
+#undef L
+#undef Q
+#undef Z
+#undef Q
+#undef T
+#undef H
 
 } // end namespace SubmarineA0
 
@@ -191,6 +256,7 @@ struct AOFuncDisplay : Knob {
 		box.size.y = 15;
 		snap = true;
 		smooth = false;
+		speed = 0.5f;
 		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	}
 	void draw(NVGcontext *vg) override {
