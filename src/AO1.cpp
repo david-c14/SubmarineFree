@@ -51,7 +51,9 @@ namespace SubmarineAO {
 #define Z "0"			// Zero
 #define W "1"			// One
 #define T "\xe2\x86\xa3"	// Right arrow
-#define H "/"			// Slashb
+#define H "/"			// Slash
+#define Pi "\xcf\x80"		// PI
+#define TAU "\xcf\x84"		// TAU
 
 	std::vector<Functor> functions {
 		{ "",                      LAMBDA(  0                      ) }, // Passthrough
@@ -71,6 +73,10 @@ namespace SubmarineAO {
 		{ X M C,                   LAMBDA(  x * c                  ) },
 		{ Y M C,                   LAMBDA(  y * c                  ) },
 		{ X M Y M C,               LAMBDA(  x * y * c              ) },
+		{ Pi M OP X A C CP,	   LAMBDA(  M_PI * ( x + c )	   ) },
+		{ Pi M OP Y A C CP,	   LAMBDA(  M_PI * ( y + c )	   ) },
+		{ TAU M OP X A C CP,	   LAMBDA(  2 * M_PI * ( x + c )   ) },
+		{ TAU M OP Y A C CP,	   LAMBDA(  2 * M_PI * ( y + c )   ) },
 		{ X D C,                   LAMBDA(  x / c                  ) }, // Division
 		{ C D X,                   LAMBDA(  c / x                  ) },
 		{ Y D C,                   LAMBDA(  y / c                  ) },
@@ -111,8 +117,8 @@ namespace SubmarineAO {
 		{ Y SX SA SC,		   LAMBDA(  powf( y , x + c )	   ) },
 		{ X SC SY,		   LAMBDA(  powf( x , c * y )	   ) },
 		{ Y SC SX,		   LAMBDA(  powf( y , c * x )	   ) },
-                { P X P,                   LAMBDA(  abs( x + c )           ) }, // Modulus
-		{ P Y P,                   LAMBDA(  abs( y + c )           ) },
+                { P X A C P,               LAMBDA(  abs( x + c )           ) }, // Modulus
+		{ P Y A C P,               LAMBDA(  abs( y + c )           ) },
 		{ MIN OP X A C COMMA Y CP, LAMBDA(  min( x + c, y )        ) }, // Minmax
 		{ MIN OP X COMMA C CP,     LAMBDA(  min( x, c )            ) },
       		{ MIN OP Y COMMA C CP,     LAMBDA(  min( y, c )            ) },
@@ -298,6 +304,8 @@ namespace SubmarineAO {
 #undef W
 #undef T
 #undef H
+#undef Pi
+#undef TAU
 
 } // end namespace SubmarineA0
 
