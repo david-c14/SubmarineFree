@@ -1,6 +1,9 @@
+#AO-1xx Algorithms
+
+## Arithmetical
 | Display                  | Code               | Description          |
 | ------------------------ | ------------------ | -------------------- |
-| | 0 ||
+| | ||
 | C | c ||
 | X+C | x + c ||
 | Y+C | y + c ||
@@ -35,12 +38,18 @@
 | X&#xf7;(Y+C) | x / ( y + c ) ||
 | (Y+C)&#xf7;X | ( y + c ) / x ||
 | Y&#xf7;(X+C) | y / ( x + c ) ||
+## Modular
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | (X+C)%Y | fmodf( x + c , y ) ||
 | (Y+C)%X | fmodf( y + c , x ) ||
 | X%(Y+C) | fmodf( x , y + c ) ||
 | Y%(X+C) | fmodf( y , x + c) ||
 | X%C | fmodf( x , c ) ||
 | Y%C | fmodf( y , c ) ||
+## Quadratic
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | X&#xb2;+C | x * x + c ||
 | Y&#xb2;+C | y * y + c ||
 | (X+C)&#xb2; | ( x + c ) * ( x + c ) ||
@@ -49,6 +58,9 @@
 | Y&#xb2;+X+C | y * y + x + c ||
 | X&#xb2;+CY | x * x + c * y ||
 | Y&#xb2;+CX | y * y + c * x ||
+## Powers
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | &#x221a;(X+C) | sqrt( x + c ) ||
 | &#x221a;(Y+C) | sqrt( y + c ) ||
 | C&#x2e3; | powf( c , x ) ||
@@ -61,14 +73,23 @@
 | Y&#x2e3;&#x207a;&#x1D9c; | powf( y , x + c ) ||
 | X&#x1D9c;&#x2b8; | powf( x , c * y ) ||
 | Y&#x1D9c;&#x2e3; | powf( y , c * x ) ||
+## Positive values only
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | &#124;X+C&#124; | abs( x + c ) ||
 | &#124;Y+C&#124; | abs( y + c ) ||
+## Maximum and Minimum
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | min(X+C,Y) | min( x + c, y ) ||
 | min(X,C) | min( x, c ) ||
 | min(Y,C) | min( y, c ) ||
 | max(X+C,Y) | max( x + c, y ) ||
 | max(X,C) | max( x, c ) ||
 | max(Y,C) | max( y, c ) ||
+## Trigonometric
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | sin(X+C) | sin( x + c ) ||
 | sin(Y+C) | sin( y + c ) ||
 | sin(X+Y) | sin( x + y ) ||
@@ -105,12 +126,18 @@
 | atan(CX) | atan( c * x ) ||
 | atan(CY) | atan( c * y ) ||
 | atan(XY) | atan( x * y ) ||
+## Logarithmic
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | log(X+C) | log( x + c ) ||
 | log(Y+C) | log( y + c ) ||
 | log&#x2082;(X+C) | log2( x + c ) ||
 | log&#x2082;(Y+C) | log2( y + c ) ||
 | log&#x2081;&#x2080;(X+C) | log10( x + c ) ||
 | log&#x2081;&#x2080;(Y+C) | log10( y + c ) ||
+## Exponential
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | &#x212f;&#x2e3;&#x207a;&#x1D9c; | exp( x + c ) ||
 | &#x212f;&#x2b8;&#x207a;&#x1D9c; | exp( y + c ) ||
 | &#x212f;&#x1D9c;&#x2e3; | exp( c * x ) ||
@@ -123,6 +150,9 @@
 | 10&#x2b8;&#x207a;&#x1D9c; | powf( 10, y + c ) ||
 | 10&#x1D9c;&#x2e3; | powf( 10, c * x ) ||
 | 10&#x1D9c;&#x2b8; | powf( 10, c * y ) ||
+## Conditional
+| Display                  | Code               | Description          |
+| ------------------------ | ------------------ | -------------------- |
 | if X>0&#x21a3;Y/C | (x > 0) ? y : c ||
 | if X<0&#x21a3;Y/C | (x < 0) ? y : c ||
 | if X=0&#x21a3;Y/C | (x == 0) ? y : c ||
