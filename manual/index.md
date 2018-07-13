@@ -3,6 +3,9 @@
 # [AG](AG.md)
 Logical AND gates
 
+# [AO](AO.md)
+Arithmetic Operators
+
 # [BB](BB.md)
 Bucket Brigade Sample and Hold
 
@@ -32,6 +35,18 @@ Pulse Generators
  
 # [PO](PO.md)
 Phased Oscillators
+
+# [SS](SS.md)
+Voltage Sources and Sinks
+
+# [TD](TD.md)
+Formattable Text Display
+
+# [TF](TF.md)
+Text Format Controller
+
+# [TM](TM.md)
+Torpedo Message Merge
 
 # [WK](WK.md)
 Das Wohltemperierte Klavier - Unequal Temperament Quantizer
