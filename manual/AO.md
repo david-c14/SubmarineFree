@@ -13,3 +13,5 @@ The AO-1xx series of modules take a number of inputs down the left (X-inputs) an
 
 If no algorithm is selected, the X-input to the block passes directly through to the block (or output) on the right, and the Y-input passes directly through to the block (or output) below.
 
+#### [All Algorithms](AO-list.md)
+
