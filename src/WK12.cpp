@@ -344,10 +344,10 @@ struct WK101_MenuItem : MenuItem {
 	}
 };
 
-struct WK_Param : sub_knob_med {
+struct WK_Param : MedKnob<LightKnob> {
 	
 	void onChange(EventChange &e) override {
-		sub_knob_med::onChange(e);
+		MedKnob<LightKnob>::onChange(e);
 		WK_101 *module = dynamic_cast<WK_101 *>(this->module);
 		module->tunings[paramId - WK_101::PARAM_1] = value;
 		module->toSend = true;

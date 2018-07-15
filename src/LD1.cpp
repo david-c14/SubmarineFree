@@ -42,9 +42,9 @@ struct LD106 : ModuleWidget {
 
 			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, LD_1<6>::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(4, 47 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+			cutoffWidgets[i] = ParamWidget::create<SmallKnob<LightKnob>>(Vec(4, 47 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
 			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = ParamWidget::create<sub_knob_small>(Vec(62, 47 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			widthWidgets[i] = ParamWidget::create<SmallKnob<LightKnob>>(Vec(62, 47 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
 			addParam(widthWidgets[i]);
 		}
 	}

@@ -47,7 +47,7 @@ struct PG112 : ModuleWidget {
 
 			addOutput(Port::create<sub_port_blue>(Vec(92,19 + offset), Port::OUTPUT, module, PG_1<12>::OUTPUT_1 + i));
 
-			addParam(ParamWidget::create<sub_knob_small>(Vec(33,19.5 + offset), module, PG_1<12>::PARAM_1 + i, -5.0f, 2.0f, -2.0f));
+			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(33,19.5 + offset), module, PG_1<12>::PARAM_1 + i, -5.0f, 2.0f, -2.0f));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {

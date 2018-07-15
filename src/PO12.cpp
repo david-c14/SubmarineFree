@@ -417,8 +417,8 @@ void PO_204::step() {
 struct PO_Layout : ModuleWidget {
 	PO_Layout(PO_101 *module) : ModuleWidget(module) {}
 	void Layout() {
-		addParam(ParamWidget::create<sub_knob_med>(Vec(66, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med_snap_narrow>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(66, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+		addParam(ParamWidget::create<NarrowKnob<SnapKnob<MedKnob<LightKnob>>>>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f));
 
 		addInput(Port::create<sub_port>(Vec(45,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
 
@@ -441,7 +441,7 @@ struct PO_Layout : ModuleWidget {
 
 		for (int i = 0; i < 4; i++) {
 			addInput(Port::create<sub_port>(Vec(10 + 45 * i,260), Port::INPUT, module, PO_101::INPUT_PHASE_1 + i));
-			addParam(ParamWidget::create<sub_knob_med>(Vec(3.5 + 45 * i, 290), module, PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
+			addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(3.5 + 45 * i, 290), module, PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
 			addOutput(Port::create<sub_port>(Vec(10 + 45 * i,333), Port::OUTPUT, module, PO_101::OUTPUT_17 + i));
 		}
 	}
@@ -450,7 +450,7 @@ struct PO_Layout : ModuleWidget {
 struct PO101 : PO_Layout {
 	PO101(PO_101 *module) : PO_Layout(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PO-101.svg")));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
 		Layout();
 	}
 };
@@ -458,7 +458,7 @@ struct PO101 : PO_Layout {
 struct PO102 : PO_Layout {
 	PO102(PO_101 *module) : PO_Layout(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PO-102.svg")));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(11, 39), module, PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f));
 		module->baseFreq = 1.0f;
 		Layout();
 	}
@@ -467,14 +467,14 @@ struct PO102 : PO_Layout {
 struct PO204 : ModuleWidget {
 	PO204(PO_204 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PO-204.svg")));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(60, 19), module, PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(105, 19), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(60, 19), module, PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(105, 19), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
 		addInput(Port::create<sub_port>(Vec(17.5, 25.5), Port::INPUT, module, PO_204::INPUT_TUNE));
 
 		for (int i = 0; i < 4; i++) {
-			addParam(ParamWidget::create<sub_knob_small>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
-			addParam(ParamWidget::create<sub_knob_small>(Vec(45, 89 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
-			addParam(ParamWidget::create<sub_knob_small_snap>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
+			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
+			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(45, 89 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
+			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
 			addInput(Port::create<sub_port>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));
 			addInput(Port::create<sub_port>(Vec(44.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_PHASE_1 + i));
 			addOutput(Port::create<sub_port>(Vec(120.5, 125 + 70 * i), Port::OUTPUT, module, PO_204::OUTPUT_1 + i));

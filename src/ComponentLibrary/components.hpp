@@ -102,67 +102,39 @@ struct LightKnob : Knob {
 	void setRadius(int r);
 };
 
-struct sub_knob_small : LightKnob {
-	sub_knob_small() {
-		setRadius(12.0);	
+template <class K>
+struct SmallKnob : K {
+	SmallKnob() {
+		K::setRadius(12.0f);
 	}
 };
 
-struct sub_knob_med : LightKnob {
-	sub_knob_med() {
-		setRadius(19.0);
+template <class K>
+struct MedKnob : K {
+	MedKnob() {
+		K::setRadius(19.0f);
 	}
 };
 
-struct sub_knob_large : LightKnob {
-	sub_knob_large() {
-		setRadius(27.0);
+template <class K>
+struct LargeKnob : K {
+	LargeKnob() {
+		K::setRadius(27.0f);
 	}
 };
 
-struct sub_knob_small_narrow : sub_knob_small {
-	sub_knob_small_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+template <class K>
+struct SnapKnob : K {
+	SnapKnob() {
+		K::snap = true;
 	}
 };
 
-struct sub_knob_med_narrow : sub_knob_med {
-	sub_knob_med_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
-	}
-};
-
-struct sub_knob_large_narrow : sub_knob_large {
-	sub_knob_large_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
-	}
-};
-
-struct sub_knob_small_snap : sub_knob_small {
-	sub_knob_small_snap() {
-		snap = true;
-	}
-};
-
-struct sub_knob_med_snap : sub_knob_med {
-	sub_knob_med_snap() {
-		snap = true;
-	}
-};
-
-struct sub_knob_large_snap : sub_knob_large {
-	sub_knob_large_snap() {
-		snap = true;
-	}
-};
-
-struct sub_knob_med_snap_narrow : sub_knob_med_snap {
-	sub_knob_med_snap_narrow() {
-		minAngle = -0.75*M_PI;
-		maxAngle = 0.75*M_PI;
+template <class K>
+struct NarrowKnob : K {
+	NarrowKnob() {
+		K::minAngle = -0.75*M_PI;
+		K::maxAngle = 0.75*M_PI;	
 	}
 };
 

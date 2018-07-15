@@ -314,15 +314,15 @@ struct LA108 : ModuleWidget {
 		addInput(Port::create<sub_port_blue>(Vec(4, 310), Port::INPUT, module, LA_108::INPUT_EXT));
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, LA_108::LIGHT_EXT));
 
-		addParam(ParamWidget::create<sub_knob_med_snap>(Vec(39, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
+		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(39, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(82, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
 		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(151, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
 		addParam(module->resetButtonWidget);
-		addParam(ParamWidget::create<sub_knob_med>(Vec(171, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(214, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_small>(Vec(242, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
-		addParam(ParamWidget::create<sub_knob_small_snap>(Vec(271, 315), module, LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(171, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
+		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(214, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(242, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
+		addParam(ParamWidget::create<SnapKnob<SmallKnob<LightKnob>>>(Vec(271, 315), module, LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f));
 	}
 	void appendContextMenu(Menu *menu) override {
 		((DS_Module *)module)->appendContextMenu(menu);

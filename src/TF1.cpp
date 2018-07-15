@@ -106,13 +106,13 @@ struct TF101 : ModuleWidget {
 		addInput(Port::create<sub_port>(Vec(4,280.5), Port::INPUT, module, TF_101::INPUT_BG_BLUE));
 		addInput(Port::create<sub_port>(Vec(4,334.5), Port::INPUT, module, TF_101::INPUT_FONT_SIZE));
 
-		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 60), module, TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 100), module, TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 140), module, TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 194), module, TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 234), module, TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 274), module, TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_knob_med>(Vec(46, 328), module, TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 60), module, TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 100), module, TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 140), module, TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 194), module, TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 234), module, TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 274), module, TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 328), module, TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f));
 
 		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(10, 51), module, TF_101::LIGHT_FG_RED));
 		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(10, 185), module, TF_101::LIGHT_BG_RED));
