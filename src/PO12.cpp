@@ -328,6 +328,10 @@ struct PO_204 : Module, PO_Util {
 		INPUT_PHASE_2,
 		INPUT_PHASE_3,
 		INPUT_PHASE_4,
+		INPUT_MULT_1,
+		INPUT_MULT_2,
+		INPUT_MULT_3,
+		INPUT_MULT_4,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -358,7 +362,7 @@ void PO_204::step() {
 			float offset = phase + params[PARAM_PHASE_1 + i].value;
 			if (inputs[INPUT_PHASE_1 + i].active)
 				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
-			offset *= params[PARAM_MULT_1 + i].value;
+			offset *= floor(clamp(params[PARAM_MULT_1 + i].value + (inputs[INPUT_MULT_1 + i].active?inputs[INPUT_MULT_1 + i].value:0.0f) * 16.0f / 10.0f, 1.0f, 16.5f));
 			float wave = params[PARAM_WAVE_1 + i].value + (inputs[INPUT_WAVE_1 + i].active?inputs[INPUT_WAVE_1 + i].value:0.0f);
 			double waveSection;
 			wave = modf(clamp(wave, 0.0f, 10.0f), &waveSection);		
@@ -477,6 +481,7 @@ struct PO204 : ModuleWidget {
 			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
 			addInput(Port::create<sub_port>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));
 			addInput(Port::create<sub_port>(Vec(44.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_PHASE_1 + i));
+			addInput(Port::create<sub_port>(Vec(84.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_MULT_1 + i));
 			addOutput(Port::create<sub_port>(Vec(120.5, 125 + 70 * i), Port::OUTPUT, module, PO_204::OUTPUT_1 + i));
 		}
 	}
