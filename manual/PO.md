@@ -28,4 +28,4 @@ The waveform of the output can be adjusted using the WAVE control knob and assoc
 
 ## Frequency multiplier
 
-The output frequency can be multiplied by an integer value from 1 to 16 using the MULT control knob.
+The output frequency can be multiplied by an integer value from 1 to 16 using the MULT control knob and associated CV.

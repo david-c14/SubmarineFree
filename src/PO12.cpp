@@ -478,7 +478,7 @@ struct PO204 : ModuleWidget {
 		for (int i = 0; i < 4; i++) {
 			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
 			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(45, 89 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
-			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
+			addParam(ParamWidget::create<SnapKnob<SmallKnob<LightKnob>>>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
 			addInput(Port::create<sub_port>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));
 			addInput(Port::create<sub_port>(Vec(44.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_PHASE_1 + i));
 			addInput(Port::create<sub_port>(Vec(84.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_MULT_1 + i));
