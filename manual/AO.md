@@ -15,3 +15,5 @@ If no algorithm is selected, the X-input to the block passes directly through to
 
 #### [All Algorithms](AO-list.md)
 
+#### [Oscillator Example](AO-example-osc.md)
+
