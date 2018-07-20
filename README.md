@@ -14,3 +14,5 @@ Free plugins for VCV Rack
 Source code licensed under BSD-3-Clause by carbon14 (David O'Rourke)
 
 All graphics in res/ and src/res are © 2018 by carbon14 (David O'Rourke)
+
+Some portions of this source code are based on code © 2017 by Andrew Belt
