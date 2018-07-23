@@ -1,4 +1,3 @@
-/* Portions of this code derive from the src/Core/Notes.cpp and src/app/LedDisplay.cpp - Copyright 2017 Andrew Belt */
 #include "SubmarineFree.hpp"
 #include "window.hpp"
 #include "torpedo.hpp"

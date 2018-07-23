@@ -1,4 +1,4 @@
-/* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright 2017 by Andrew Belt */
+/* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright © 2016 by Andrew Belt */
 #include <string.h>
 #include "DS.hpp"
 
