@@ -6,15 +6,16 @@ using namespace rack;
 extern Plugin *plugin;
 
 // Forward-declare each Model, defined in each module source file
+extern Model *modelAG104;
 extern Model *modelAG106;
-
-extern Model *modelBB120;
 
 extern Model *modelAO106;
 extern Model *modelAO112;
 extern Model *modelAO118;
 extern Model *modelAO124;
 extern Model *modelAO136;
+
+extern Model *modelBB120;
 
 extern Model *modelBP101;
 extern Model *modelBP102;
@@ -37,8 +38,10 @@ extern Model *modelLA108;
 
 extern Model *modelLD106;
 
+extern Model *modelNG106;
 extern Model *modelNG112;
 
+extern Model *modelOG104;
 extern Model *modelOG106;
 
 extern Model *modelPG112;
@@ -66,6 +69,7 @@ extern Model *modelXF104;
 extern Model *modelXF201;
 extern Model *modelXF202;
 
+extern Model *modelXG104;
 extern Model *modelXG106;
 
 #include "ComponentLibrary/components.hpp"

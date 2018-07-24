@@ -36,6 +36,23 @@ struct OG_1 : DS_Module {
 	}
 };
 
+struct OG104 : ModuleWidget {
+	OG104(OG_1<4> *module) : ModuleWidget(module) {
+		setPanel(SVG::load(assetPlugin(plugin, "res/OG-104.svg")));
+
+		for (int i = 0; i < 4; i++) {
+			int offset = 87 * i;
+			addInput(Port::create<sub_port_blue>(Vec(2.5,19 + offset), Port::INPUT, module, OG_1<4>::INPUT_A_1 + i));
+			addInput(Port::create<sub_port_blue>(Vec(2.5,47 + offset), Port::INPUT, module, OG_1<4>::INPUT_B_1 + i));
+
+			addOutput(Port::create<sub_port_blue>(Vec(2.5,75 + offset), Port::OUTPUT, module, OG_1<4>::OUTPUT_1 + i));
+		}
+	}
+	void appendContextMenu(Menu *menu) override {
+		((DS_Module *)module)->appendContextMenu(menu);
+	}
+};
+
 struct OG106 : ModuleWidget {
 	OG106(OG_1<6> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/OG-106.svg")));
@@ -53,4 +70,5 @@ struct OG106 : ModuleWidget {
 	}
 };
 
+Model *modelOG104 = Model::create<OG_1<4>, OG104>("SubmarineFree", "OG-104", "OG-104 OR Gates", LOGIC_TAG, MULTIPLE_TAG);
 Model *modelOG106 = Model::create<OG_1<6>, OG106>("SubmarineFree", "OG-106", "OG-106 OR Gates", LOGIC_TAG, MULTIPLE_TAG);

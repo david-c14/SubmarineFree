@@ -25,6 +25,22 @@ struct NG_1 : DS_Module {
 	}
 };
 
+struct NG106 : ModuleWidget {
+	NG106(NG_1<6> *module) : ModuleWidget(module) {
+		setPanel(SVG::load(assetPlugin(plugin, "res/NG-106.svg")));
+
+		for (int i = 0; i < 6; i++) {
+			int offset = 29 * i;
+			addInput(Port::create<sub_port_blue>(Vec(4,19 + offset), Port::INPUT, module, NG_1<6>::INPUT_1 + i));
+
+			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, NG_1<6>::OUTPUT_1 + i));
+		}
+	}
+	void appendContextMenu(Menu *menu) override {
+		((DS_Module *)module)->appendContextMenu(menu);
+	}
+};
+
 struct NG112 : ModuleWidget {
 	NG112(NG_1<12> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/NG-112.svg")));
@@ -41,4 +57,5 @@ struct NG112 : ModuleWidget {
 	}
 };
 
+Model *modelNG106 = Model::create<NG_1<6>, NG106>("SubmarineFree", "NG-106", "NG-106 NOT Gates", LOGIC_TAG, MULTIPLE_TAG);
 Model *modelNG112 = Model::create<NG_1<12>, NG112>("SubmarineFree", "NG-112", "NG-112 NOT Gates", LOGIC_TAG, MULTIPLE_TAG);
