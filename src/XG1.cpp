@@ -41,7 +41,7 @@ struct XG104 : ModuleWidget {
 		setPanel(SVG::load(assetPlugin(plugin, "res/XG-104.svg")));
 
 		for (int i = 0; i < 4; i++) {
-			int offset = 58 * i;
+			int offset = 87 * i;
 			addInput(Port::create<sub_port_blue>(Vec(2.5,19 + offset), Port::INPUT, module, XG_1<4>::INPUT_A_1 + i));
 			addInput(Port::create<sub_port_blue>(Vec(2.5,47 + offset), Port::INPUT, module, XG_1<4>::INPUT_B_1 + i));
 
