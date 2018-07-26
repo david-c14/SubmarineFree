@@ -1,7 +1,11 @@
 #include "DS.hpp"
+#include <random>
+#include <chrono>
 
 template <int deviceCount>
 struct FF_1 : DS_Module {
+	int doResetFlag = 0;
+	int doRandomFlag = 0;
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -23,15 +27,55 @@ struct FF_1 : DS_Module {
 	FF_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 
 	void step() override {
+		if (doResetFlag) doReset();
+		if (doRandomFlag) doRandomize();
 		if (inputs[INPUT].active) {
 			if (schmittTrigger[0].redge(this, inputs[INPUT].value))
 				state[0] = !state[0];
 		}
 		outputs[OUTPUT_1].value = state[0]?voltage1:voltage0;
 		for (int i = 1; i < deviceCount; i++) {
-			if (schmittTrigger[i].redge(this, state[i-1]?voltage0:voltage1))
+			if (schmittTrigger[i].fedge(this, state[i-1]?voltage1:voltage0))
 						state[i] = !state[i];
 			outputs[OUTPUT_1 + i].value = state[i]?voltage1:voltage0;
+		}
+	}
+	void doRandomize() {
+		doRandomFlag = 0;
+		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+		std::uniform_int_distribution<int> distribution(0,1);
+		state[0] = distribution(generator);
+		outputs[OUTPUT_1].value = state[0]?voltage1:voltage0;
+		for (int i = 1; i < deviceCount; i++) {
+			state[i] = distribution(generator);
+			schmittTrigger[i].set(state[i-1]);
+			outputs[OUTPUT_1 + i].value = state[i]?voltage1:voltage0;
+		}
+	}
+	void doReset() {
+		doResetFlag = 0;
+		for (int i = 0; i < deviceCount; i++) {
+			state[i] = 0;
+			if (i) schmittTrigger[i].reset();
+			outputs[OUTPUT_1 + i].value = voltage0;
+		}
+	}
+	void onRandomize() override {
+		if (gPaused) {
+			doRandomize();
+		}
+		else {
+			doResetFlag = 0;
+			doRandomFlag = 1;
+		}
+	}
+	void onReset() override {
+		if (gPaused) {
+			doReset();
+		}
+		else {
+			doRandomFlag = 0;
+			doResetFlag = 1;
 		}
 	}
 };
