@@ -61,8 +61,8 @@ struct XF201 : ModuleWidget {
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-201.svg")));
 		for (int i = 0; i < XF_201::deviceCount; i++) {
 			int offset = 176 * i;
-			addInput(Port::create<sub_port>(Vec(3,18 + offset), Port::INPUT, module, XF_201::INPUT_A_1 + i));
-			addInput(Port::create<sub_port_red>(Vec(3,45 + offset), Port::INPUT, module, XF_201::INPUT_AR_1 + i));
+			addInput(Port::create<SilverPort>(Vec(3,18 + offset), Port::INPUT, module, XF_201::INPUT_A_1 + i));
+			addInput(Port::create<RedPort>(Vec(3,45 + offset), Port::INPUT, module, XF_201::INPUT_AR_1 + i));
 			addInput(Port::create<sub_port>(Vec(92,18 + offset), Port::INPUT, module, XF_201::INPUT_B_1 + i));
 			addInput(Port::create<sub_port_red>(Vec(92,45 + offset), Port::INPUT, module, XF_201::INPUT_BR_1 + i));
 			addInput(Port::create<sub_port>(Vec(3,120 + offset), Port::INPUT, module, XF_201::INPUT_CV_1 + i));

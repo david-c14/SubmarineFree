@@ -312,7 +312,7 @@ struct LA108 : ModuleWidget {
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 22 + 35 * i), module, LA_108::LIGHT_1 + i));
 		}
 
-		addInput(Port::create<sub_port_blue>(Vec(4, 310), Port::INPUT, module, LA_108::INPUT_EXT));
+		addInput(Port::create<BluePort>(Vec(4, 310), Port::INPUT, module, LA_108::INPUT_EXT));
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, LA_108::LIGHT_EXT));
 
 		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(39, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));

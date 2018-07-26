@@ -2,6 +2,27 @@
 // Ports
 //////////////////
 
+struct SilverPort : Port {
+	NVGcolor col = nvgRGB(0xf0, 0xf0, 0xf0);
+	SilverPort() {
+		box.size.x = 25;
+		box.size.y = 25;
+	}
+	void draw(NVGcontext *vg) override;
+};
+
+struct RedPort : SilverPort {
+	RedPort() { col = nvgRGB(0xff, 0x20, 0x20); }
+};
+
+struct BluePort : SilverPort {
+	BluePort() { col = nvgRGB(0x29, 0xb2, 0xef); }
+};
+
+struct BlackPort : SilverPort {
+	BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
+};
+
 struct sub_port : SVGPort {
 	sub_port() {
 		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port.svg")));

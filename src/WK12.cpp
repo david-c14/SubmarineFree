@@ -361,7 +361,7 @@ struct WK101 : ModuleWidget {
 
 		addInput(Port::create<sub_port>(Vec(4,29), Port::INPUT, module, WK_101::INPUT_CV));
 		addOutput(Port::create<sub_port>(Vec(43,29), Port::OUTPUT, module, WK_101::OUTPUT_CV));
-		addInput(Port::create<sub_port_black>(Vec(82,29), Port::INPUT, module, WK_101::INPUT_TOR));
+		addInput(Port::create<BlackPort>(Vec(82,29), Port::INPUT, module, WK_101::INPUT_TOR));
 		addOutput(Port::create<sub_port_black>(Vec(121,29), Port::OUTPUT, module, WK_101::OUTPUT_TOR));
 
 		for (int i = 0; i < 5; i++)

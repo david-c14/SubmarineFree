@@ -38,9 +38,9 @@ struct LD106 : ModuleWidget {
 
 		for (int i = 0; i < deviceCount; i++) {
 			int offset = 58 * i;
-			addInput(Port::create<sub_port>(Vec(4,19 + offset), Port::INPUT, module, LD_1<6>::INPUT_1 + i));
+			addInput(Port::create<SilverPort>(Vec(4,19 + offset), Port::INPUT, module, LD_1<6>::INPUT_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(62,19 + offset), Port::OUTPUT, module, LD_1<6>::OUTPUT_1 + i));
+			addOutput(Port::create<BluePort>(Vec(62,19 + offset), Port::OUTPUT, module, LD_1<6>::OUTPUT_1 + i));
 
 			cutoffWidgets[i] = ParamWidget::create<SmallKnob<LightKnob>>(Vec(4, 47 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
 			addParam(cutoffWidgets[i]);
