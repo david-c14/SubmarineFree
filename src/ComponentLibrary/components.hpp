@@ -124,6 +124,13 @@ struct LightKnob : Knob {
 };
 
 template <class K>
+struct TinyKnob : K {
+	TinyKnob() {
+		K::setRadius(9.0f);
+	}
+};
+
+template <class K>
 struct SmallKnob : K {
 	SmallKnob() {
 		K::setRadius(12.0f);

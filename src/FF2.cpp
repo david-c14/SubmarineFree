@@ -80,6 +80,22 @@ struct FF_2 : DS_Module {
 	}
 };
 
+struct FF206 : ModuleWidget {
+	FF206(FF_2<6> *module) : ModuleWidget(module) {
+		setPanel(SVG::load(assetPlugin(plugin, "res/FF-206.svg")));
+
+		for (int i = 0; i < 6; i++) {
+			int offset = 58 * i;
+			addInput(Port::create<sub_port_blue>(Vec(2.5,19 + offset), Port::INPUT, module, FF_2<6>::INPUT_1 + i));
+
+			addOutput(Port::create<sub_port_blue>(Vec(2.5,47 + offset), Port::OUTPUT, module, FF_2<6>::OUTPUT_1 + i));
+		}
+	}
+	void appendContextMenu(Menu *menu) override {
+		((DS_Module *)module)->appendContextMenu(menu);
+	}
+};
+
 struct FF212 : ModuleWidget {
 	FF212(FF_2<12> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/FF-212.svg")));
@@ -96,4 +112,5 @@ struct FF212 : ModuleWidget {
 	}
 };
 
+Model *modelFF206 = Model::create<FF_2<6>, FF206>("SubmarineFree", "FF-206", "FF-206 Edge Triggered Flip-Flops", LOGIC_TAG, MULTIPLE_TAG);
 Model *modelFF212 = Model::create<FF_2<12>, FF212>("SubmarineFree", "FF-212", "FF-212 Edge Triggered Flip-Flops", LOGIC_TAG, MULTIPLE_TAG);

@@ -37,6 +37,24 @@ struct PG_1 : DS_Module {
 	}
 };
 
+struct PG104 : ModuleWidget {
+	PG104(PG_1<4> *module) : ModuleWidget(module) {
+		setPanel(SVG::load(assetPlugin(plugin, "res/PG-104.svg")));
+
+		for (int i = 0; i < 4; i++) {
+			int offset = 87 * i;
+			addInput(Port::create<sub_port_blue>(Vec(2.5,19 + offset), Port::INPUT, module, PG_1<4>::INPUT_1 + i));
+
+			addOutput(Port::create<sub_port_blue>(Vec(2.5,75 + offset), Port::OUTPUT, module, PG_1<4>::OUTPUT_1 + i));
+
+			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(3,47.5 + offset), module, PG_1<4>::PARAM_1 + i, -5.0f, 2.0f, -2.0f));
+		}
+	}
+	void appendContextMenu(Menu *menu) override {
+		((DS_Module *)module)->appendContextMenu(menu);
+	}
+};
+
 struct PG112 : ModuleWidget {
 	PG112(PG_1<12> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PG-112.svg")));
@@ -55,4 +73,5 @@ struct PG112 : ModuleWidget {
 	}
 };
 
+Model *modelPG104 = Model::create<PG_1<4>, PG104>("SubmarineFree", "PG-104", "PG-104 Pulse Generators", LOGIC_TAG, MULTIPLE_TAG);
 Model *modelPG112 = Model::create<PG_1<12>, PG112>("SubmarineFree", "PG-112", "PG-112 Pulse Generators", LOGIC_TAG, MULTIPLE_TAG);

@@ -32,10 +32,12 @@ extern Model *modelEO102;
 
 extern Model *modelFF110;
 extern Model *modelFF120;
+extern Model *modelFF206;
 extern Model *modelFF212;
 
 extern Model *modelLA108;
 
+extern Model *modelLD103;
 extern Model *modelLD106;
 
 extern Model *modelNG106;
@@ -44,6 +46,7 @@ extern Model *modelNG112;
 extern Model *modelOG104;
 extern Model *modelOG106;
 
+extern Model *modelPG104;
 extern Model *modelPG112;
 
 extern Model *modelPO101;
