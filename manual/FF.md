@@ -2,6 +2,7 @@
 ### [Part of the Digital Suite](DS.md)
 #### FF-110 10-Stage Flip-Flop Cascade
 #### FF-120 20-Stage Flip-Flop Cascade
+#### FF-206 6 Edge Triggered Flip-Flops
 #### FF-212 12 Edge Triggered Flip-Flops
 
 ![View of the Flip-Flop modules](FF.png "Flip-Flop Range")
@@ -17,3 +18,11 @@ The FF-110 and FF-120 Flip-Flop cascade devices contain a chain of linked Flip-F
 ## Normalling
 
 The FF-212 module contains 12 independant Flip-Flops each triggered on the rising edge. However, if nothing is connected to the input, the device is normally connected through an inverter to the output of the previous device. The module can be used as independant Flip-Flops, or as one or more multi-stage cascades.
+
+The FF-206 provides 6 independant Flip-Flops in a small form factor. Otherwise functionality is as for the FF-212 above.
+
+## Initialize and Randomize
+
+All the FF-1xx and FF-2xx devices can be reset using the Initialize context menu. All the Flip-Flop gates will turn off.
+
+All the FF-1xx and FF-2xx devices can be randomized using the Randomize context menu. Each Flip-Flop gate will be randomly turned on or off.
