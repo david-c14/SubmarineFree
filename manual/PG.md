@@ -1,5 +1,6 @@
 # Pulse Generators
 ### [Part of the Digital Suite](DS.md)
+#### PG-104 Pulse Generators
 #### PG-112 Pulse Generators
 
 
@@ -13,3 +14,6 @@ The PG-112 provides 12 Pulse Generators. It is designed to take digital signals,
 
 The voltage range of the digital gates can be configured from the context menu. The device will output at the full range of the configured settings. The inputs will measure a logical high signal anywhere above the midpoint of the configured range.
 
+## PG-104
+
+The PG-104 provides 4 Pulse generators in a small form factor. Otherwise functionality is as for the PG-112 above.

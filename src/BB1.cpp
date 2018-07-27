@@ -1,7 +1,11 @@
 #include "DS.hpp"
+#include <random>
+#include <chrono>
 
 template <int x>
 struct BB_1 : DS_Module {
+	int doResetFlag = 0;
+	int doRandomFlag = 0;
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -23,6 +27,8 @@ struct BB_1 : DS_Module {
 
 	BB_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override {
+		if (doResetFlag) doReset();
+		if (doRandomFlag) doRandomize();
 		int triggered = true;
 		if (inputs[INPUT_CLK].active) {
 			triggered = schmittTrigger.redge(this, inputs[INPUT_CLK].value);
@@ -35,20 +41,51 @@ struct BB_1 : DS_Module {
 		for (int i = 0; i < x; i++)
 			outputs[OUTPUT_1 + i].value = sample[i];
 	}
+	void doRandomize() {
+		doRandomFlag = 0;
+		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+		std::uniform_real_distribution<float> distribution(voltage0, voltage1);	
+		for (int i = 0; i < x; i++) {
+			outputs[OUTPUT_1 + i].value = sample[i] = distribution(generator); 
+		}
+	}
+	void doReset() {
+		doResetFlag = 0;
+		for (int i = 0; i < x; i++)
+			outputs[OUTPUT_1 + i].value = sample[i] = 0.0f;
+	}
+	void onRandomize() override {
+		if (gPaused) {
+			doRandomize();
+		}
+		else {
+			doResetFlag = 0;
+			doRandomFlag = 1;
+		}
+	}
+	void onReset() override {
+		if (gPaused) {
+			doReset();
+		}
+		else {
+			doRandomFlag = 0;
+			doResetFlag = 1;
+		}
+	}
 };
 
 struct BB120 : ModuleWidget {
 	BB120(BB_1<20> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/BB-120.svg")));
 
-		addInput(Port::create<sub_port_blue>(Vec(4.5,19), Port::INPUT, module, BB_1<20>::INPUT_CLK));
-		addInput(Port::create<sub_port>(Vec(31.5,34), Port::INPUT, module, BB_1<20>::INPUT_CV));
+		addInput(Port::create<BluePort>(Vec(4.5,19), Port::INPUT, module, BB_1<20>::INPUT_CLK));
+		addInput(Port::create<SilverPort>(Vec(31.5,34), Port::INPUT, module, BB_1<20>::INPUT_CV));
 
 		for (int i = 0; i < 20; i+=2) {
 			int offset = 15 * i;
 
-			addOutput(Port::create<sub_port>(Vec(4,53 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i));
-			addOutput(Port::create<sub_port>(Vec(31,68 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i + 1));
+			addOutput(Port::create<SilverPort>(Vec(4,53 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i));
+			addOutput(Port::create<SilverPort>(Vec(31,68 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i + 1));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {

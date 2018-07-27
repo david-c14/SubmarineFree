@@ -1,5 +1,6 @@
 # Logical AND Gates
 ### [Part of the Digital Suite](DS.md)
+#### AG-104 AND Gates
 #### AG-106 AND Gates
 
 
@@ -18,3 +19,7 @@ The voltage range of the digital gates can be configured from the context menu. 
 Any output not connected will be normalled into a third input on the gate below. In this way multi-input gates can be created up to a maximum of 12 inputs. 
 
 An input not connected will be ignored.
+
+## AG-104
+
+The AG-104 provides four two-input AND gates in a small form factor. Otherwise functionality is as for the AG-106 above.

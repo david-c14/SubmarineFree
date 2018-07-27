@@ -424,29 +424,29 @@ struct PO_Layout : ModuleWidget {
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(66, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
 		addParam(ParamWidget::create<NarrowKnob<SnapKnob<MedKnob<LightKnob>>>>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f));
 
-		addInput(Port::create<sub_port>(Vec(45,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
+		addInput(Port::create<SilverPort>(Vec(45,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
 
-		addOutput(Port::create<sub_port>(Vec(77.5,100), Port::OUTPUT, module, PO_101::OUTPUT_1));
-		addOutput(Port::create<sub_port>(Vec(110,109), Port::OUTPUT, module, PO_101::OUTPUT_2));
-		addOutput(Port::create<sub_port>(Vec(142.5,100), Port::OUTPUT, module, PO_101::OUTPUT_3));
-		addOutput(Port::create<sub_port>(Vec(133.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_4));
-		addOutput(Port::create<sub_port>(Vec(142.5,165), Port::OUTPUT, module, PO_101::OUTPUT_5));
-		addOutput(Port::create<sub_port>(Vec(133.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_6));
-		addOutput(Port::create<sub_port>(Vec(142.5,230), Port::OUTPUT, module, PO_101::OUTPUT_7));
-		addOutput(Port::create<sub_port>(Vec(110,221), Port::OUTPUT, module, PO_101::OUTPUT_8));
-		addOutput(Port::create<sub_port>(Vec(77.5,230), Port::OUTPUT, module, PO_101::OUTPUT_9));
-		addOutput(Port::create<sub_port>(Vec(45,221), Port::OUTPUT, module, PO_101::OUTPUT_10));
-		addOutput(Port::create<sub_port>(Vec(12.5,230), Port::OUTPUT, module, PO_101::OUTPUT_11));
-		addOutput(Port::create<sub_port>(Vec(21.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_12));
-		addOutput(Port::create<sub_port>(Vec(12.5,165), Port::OUTPUT, module, PO_101::OUTPUT_13));
-		addOutput(Port::create<sub_port>(Vec(21.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_14));
-		addOutput(Port::create<sub_port>(Vec(12.5,100), Port::OUTPUT, module, PO_101::OUTPUT_15));
-		addOutput(Port::create<sub_port>(Vec(45,109), Port::OUTPUT, module, PO_101::OUTPUT_16));
+		addOutput(Port::create<SilverPort>(Vec(77.5,100), Port::OUTPUT, module, PO_101::OUTPUT_1));
+		addOutput(Port::create<SilverPort>(Vec(110,109), Port::OUTPUT, module, PO_101::OUTPUT_2));
+		addOutput(Port::create<SilverPort>(Vec(142.5,100), Port::OUTPUT, module, PO_101::OUTPUT_3));
+		addOutput(Port::create<SilverPort>(Vec(133.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_4));
+		addOutput(Port::create<SilverPort>(Vec(142.5,165), Port::OUTPUT, module, PO_101::OUTPUT_5));
+		addOutput(Port::create<SilverPort>(Vec(133.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_6));
+		addOutput(Port::create<SilverPort>(Vec(142.5,230), Port::OUTPUT, module, PO_101::OUTPUT_7));
+		addOutput(Port::create<SilverPort>(Vec(110,221), Port::OUTPUT, module, PO_101::OUTPUT_8));
+		addOutput(Port::create<SilverPort>(Vec(77.5,230), Port::OUTPUT, module, PO_101::OUTPUT_9));
+		addOutput(Port::create<SilverPort>(Vec(45,221), Port::OUTPUT, module, PO_101::OUTPUT_10));
+		addOutput(Port::create<SilverPort>(Vec(12.5,230), Port::OUTPUT, module, PO_101::OUTPUT_11));
+		addOutput(Port::create<SilverPort>(Vec(21.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_12));
+		addOutput(Port::create<SilverPort>(Vec(12.5,165), Port::OUTPUT, module, PO_101::OUTPUT_13));
+		addOutput(Port::create<SilverPort>(Vec(21.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_14));
+		addOutput(Port::create<SilverPort>(Vec(12.5,100), Port::OUTPUT, module, PO_101::OUTPUT_15));
+		addOutput(Port::create<SilverPort>(Vec(45,109), Port::OUTPUT, module, PO_101::OUTPUT_16));
 
 		for (int i = 0; i < 4; i++) {
-			addInput(Port::create<sub_port>(Vec(10 + 45 * i,260), Port::INPUT, module, PO_101::INPUT_PHASE_1 + i));
+			addInput(Port::create<SilverPort>(Vec(10 + 45 * i,260), Port::INPUT, module, PO_101::INPUT_PHASE_1 + i));
 			addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(3.5 + 45 * i, 290), module, PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
-			addOutput(Port::create<sub_port>(Vec(10 + 45 * i,333), Port::OUTPUT, module, PO_101::OUTPUT_17 + i));
+			addOutput(Port::create<SilverPort>(Vec(10 + 45 * i,333), Port::OUTPUT, module, PO_101::OUTPUT_17 + i));
 		}
 	}
 };
@@ -473,16 +473,16 @@ struct PO204 : ModuleWidget {
 		setPanel(SVG::load(assetPlugin(plugin, "res/PO-204.svg")));
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(60, 19), module, PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f));
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(105, 19), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
-		addInput(Port::create<sub_port>(Vec(17.5, 25.5), Port::INPUT, module, PO_204::INPUT_TUNE));
+		addInput(Port::create<SilverPort>(Vec(17.5, 25.5), Port::INPUT, module, PO_204::INPUT_TUNE));
 
 		for (int i = 0; i < 4; i++) {
 			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
 			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(45, 89 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
 			addParam(ParamWidget::create<SnapKnob<SmallKnob<LightKnob>>>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
-			addInput(Port::create<sub_port>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));
-			addInput(Port::create<sub_port>(Vec(44.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_PHASE_1 + i));
-			addInput(Port::create<sub_port>(Vec(84.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_MULT_1 + i));
-			addOutput(Port::create<sub_port>(Vec(120.5, 125 + 70 * i), Port::OUTPUT, module, PO_204::OUTPUT_1 + i));
+			addInput(Port::create<SilverPort>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));
+			addInput(Port::create<SilverPort>(Vec(44.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_PHASE_1 + i));
+			addInput(Port::create<SilverPort>(Vec(84.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_MULT_1 + i));
+			addOutput(Port::create<SilverPort>(Vec(120.5, 125 + 70 * i), Port::OUTPUT, module, PO_204::OUTPUT_1 + i));
 		}
 	}
 };

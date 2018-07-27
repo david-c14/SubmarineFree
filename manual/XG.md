@@ -1,5 +1,6 @@
 # Logical XOR Gates
 ### [Part of the Digital Suite](DS.md)
+#### XG-104 XOR Gates
 #### XG-106 XOR Gates
 
 ![View of the XOR Gates](XG.png "XOR Gates")
@@ -17,3 +18,7 @@ The voltage range of the digital gates can be configured from the context menu. 
 Any output not connected will be normalled into a third input on the gate below. In this way multi-input gates can be created up to a maximum of 12 inputs. 
 
 An input not connected will be ignored.
+
+## XG-104
+
+The XG-104 provides four two-input XOR gates in a small form factor. Otherwise functionality is as for the XG-106 above.

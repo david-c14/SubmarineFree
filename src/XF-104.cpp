@@ -89,11 +89,11 @@ struct XF104 : ModuleWidget {
 		setPanel(SVG::load(assetPlugin(plugin, "res/XF-104.svg")));
 		for (int i = 0; i < XF_104::deviceCount; i++) {
 			int offset = 88 * i;
-			addInput(Port::create<sub_port>(Vec(27.5,18 + offset), Port::INPUT, module, XF_104::INPUT_A_1 + i));
-			addInput(Port::create<sub_port>(Vec(127.5,18 + offset), Port::INPUT, module, XF_104::INPUT_B_1 + i));
-			addInput(Port::create<sub_port>(Vec(27.5,74 + offset), Port::INPUT, module, XF_104::INPUT_CV_1 + i));
+			addInput(Port::create<SilverPort>(Vec(27.5,18 + offset), Port::INPUT, module, XF_104::INPUT_A_1 + i));
+			addInput(Port::create<SilverPort>(Vec(127.5,18 + offset), Port::INPUT, module, XF_104::INPUT_B_1 + i));
+			addInput(Port::create<SilverPort>(Vec(27.5,74 + offset), Port::INPUT, module, XF_104::INPUT_CV_1 + i));
 
-			addOutput(Port::create<sub_port>(Vec(127.5,74 + offset), Port::OUTPUT, module, XF_104::OUTPUT_1 + i));
+			addOutput(Port::create<SilverPort>(Vec(127.5,74 + offset), Port::OUTPUT, module, XF_104::OUTPUT_1 + i));
 
 			addParam(ParamWidget::create<sub_sw_2>(Vec(41, 46 + offset), module, XF_104::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
 			addParam(ParamWidget::create<sub_sw_3>(Vec(125, 43.5 + offset), module, XF_104::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));

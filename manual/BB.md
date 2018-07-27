@@ -16,3 +16,7 @@ The voltage range of the digital gates can be configured from the context menu. 
 ## Normalling
 
 If the clock input is not connected, the BB-120 will sample and shift outputs once per engine sample. This is useful for delaying signals by just a few samples to compensate for propagation delays in other parts of your patch, for example to ensure that the start of a signal passes through a gate, you can delay the signal by one or two samples while the gate cv gets to where it needs to be. Note that with no clock input connected, the BB-120 will operate faster at faster engine sample rates; this is by design.
+
+The Initialize context menu option will empty all the buckets in the BB-120. Each bucket will revert to 0v.
+
+The Randomize context menu option will randomly set the value of every bucket in the BB-120. The value will lie within the range of the expected voltage range set on the context menu.

@@ -9,7 +9,7 @@ struct SS112 : ModuleWidget {
 	SS112(SS_112 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/SS-112.svg")));
 		for (int i = 0; i < SS_112::deviceCount; i++) {
-			addInput(Port::create<sub_port>(Vec(2.5,19 + i * 29), Port::INPUT, module, i));
+			addInput(Port::create<SilverPort>(Vec(2.5,19 + i * 29), Port::INPUT, module, i));
 		}
 	}
 };
@@ -32,7 +32,7 @@ struct SS208 : ModuleWidget {
 	SS208(SS_208 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/SS-208.svg")));
 		for (int i = 0; i < SS_208::deviceCount; i++) {
-			addOutput(Port::create<sub_port>(Vec(2.5,19 + 43 * i), Port::OUTPUT, module, i));
+			addOutput(Port::create<SilverPort>(Vec(2.5,19 + 43 * i), Port::OUTPUT, module, i));
 		}
 	}
 };
@@ -68,7 +68,7 @@ struct SS212 : ModuleWidget {
 	SS212(SS_212 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/SS-212.svg")));
 		for (int i = 0; i < SS_212::deviceCount; i++) {
-			addOutput(Port::create<sub_port>(Vec(2.5,19 + i * 29), Port::OUTPUT, module, i));
+			addOutput(Port::create<SilverPort>(Vec(2.5,19 + i * 29), Port::OUTPUT, module, i));
 		}
 	}
 
@@ -114,7 +114,7 @@ struct SS221 : ModuleWidget {
 	SS221(SS_221 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/SS-221.svg")));
 		for (int i = 0; i < SS_221::deviceCount; i++) {
-			addOutput(Port::create<sub_port>(Vec(2.5 + 45 * (i % 2),19 + i * 16), Port::OUTPUT, module, i));
+			addOutput(Port::create<SilverPort>(Vec(2.5 + 45 * (i % 2),19 + i * 16), Port::OUTPUT, module, i));
 		}
 	}
 };
@@ -136,7 +136,7 @@ struct SS220 : ModuleWidget {
 		setPanel(SVG::load(assetPlugin(plugin, "res/SS-220.svg")));
 		for (int j = 0; j < SS_220::deviceSetCount; j++) {
 			for (int i = 0; i < SS_220::deviceCount; i++) {
-				addOutput(Port::create<sub_port>(Vec(2.5 + 30 * j, 19 + i * 29), Port::OUTPUT, module, j * SS_220::deviceCount + i));
+				addOutput(Port::create<SilverPort>(Vec(2.5 + 30 * j, 19 + i * 29), Port::OUTPUT, module, j * SS_220::deviceCount + i));
 			}
 		}
 	}

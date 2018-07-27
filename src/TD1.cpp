@@ -112,8 +112,8 @@ struct TD116 : ModuleWidget {
 	TD116(TD_116 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/TD-116.svg")));
 
-		addInput(Port::create<sub_port_black>(Vec(4,19), Port::INPUT, module, 0));
-		addOutput(Port::create<sub_port_black>(Vec(211,19), Port::OUTPUT, module, 0));	
+		addInput(Port::create<BlackPort>(Vec(4,19), Port::INPUT, module, 0));
+		addOutput(Port::create<BlackPort>(Vec(211,19), Port::OUTPUT, module, 0));	
 
 		textField = Widget::create<TDText>(mm2px(Vec(3.39962, 15.8373)));
 		textField->box.size = mm2px(Vec(74.480, 102.753));
