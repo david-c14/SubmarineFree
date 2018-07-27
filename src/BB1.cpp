@@ -1,7 +1,11 @@
 #include "DS.hpp"
+#include <random>
+#include <chrono>
 
 template <int x>
 struct BB_1 : DS_Module {
+	int doResetFlag = 0;
+	int doRandomFlag = 0;
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -23,6 +27,8 @@ struct BB_1 : DS_Module {
 
 	BB_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override {
+		if (doResetFlag) doReset();
+		if (doRandomFlag) doRandomize();
 		int triggered = true;
 		if (inputs[INPUT_CLK].active) {
 			triggered = schmittTrigger.redge(this, inputs[INPUT_CLK].value);
@@ -34,6 +40,37 @@ struct BB_1 : DS_Module {
 		}
 		for (int i = 0; i < x; i++)
 			outputs[OUTPUT_1 + i].value = sample[i];
+	}
+	void doRandomize() {
+		doRandomFlag = 0;
+		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+		std::uniform_real_distribution<float> distribution(voltage0, voltage1);	
+		for (int i = 0; i < x; i++) {
+			outputs[OUTPUT_1 + i].value = sample[i] = distribution(generator); 
+		}
+	}
+	void doReset() {
+		doResetFlag = 0;
+		for (int i = 0; i < x; i++)
+			outputs[OUTPUT_1 + i].value = sample[i] = 0.0f;
+	}
+	void onRandomize() override {
+		if (gPaused) {
+			doRandomize();
+		}
+		else {
+			doResetFlag = 0;
+			doRandomFlag = 1;
+		}
+	}
+	void onReset() override {
+		if (gPaused) {
+			doReset();
+		}
+		else {
+			doRandomFlag = 0;
+			doResetFlag = 1;
+		}
 	}
 };
 
