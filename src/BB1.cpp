@@ -78,14 +78,14 @@ struct BB120 : ModuleWidget {
 	BB120(BB_1<20> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/BB-120.svg")));
 
-		addInput(Port::create<sub_port_blue>(Vec(4.5,19), Port::INPUT, module, BB_1<20>::INPUT_CLK));
-		addInput(Port::create<sub_port>(Vec(31.5,34), Port::INPUT, module, BB_1<20>::INPUT_CV));
+		addInput(Port::create<BluePort>(Vec(4.5,19), Port::INPUT, module, BB_1<20>::INPUT_CLK));
+		addInput(Port::create<SilverPort>(Vec(31.5,34), Port::INPUT, module, BB_1<20>::INPUT_CV));
 
 		for (int i = 0; i < 20; i+=2) {
 			int offset = 15 * i;
 
-			addOutput(Port::create<sub_port>(Vec(4,53 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i));
-			addOutput(Port::create<sub_port>(Vec(31,68 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i + 1));
+			addOutput(Port::create<SilverPort>(Vec(4,53 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i));
+			addOutput(Port::create<SilverPort>(Vec(31,68 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i + 1));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {

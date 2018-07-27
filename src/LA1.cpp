@@ -308,7 +308,7 @@ struct LA108 : ModuleWidget {
 		}
 
 		for (int i = 0; i < 8; i++) {
-			addInput(Port::create<sub_port_blue>(Vec(4, 20 + 35 * i), Port::INPUT, module, LA_108::INPUT_1 + i));
+			addInput(Port::create<BluePort>(Vec(4, 20 + 35 * i), Port::INPUT, module, LA_108::INPUT_1 + i));
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 22 + 35 * i), module, LA_108::LIGHT_1 + i));
 		}
 

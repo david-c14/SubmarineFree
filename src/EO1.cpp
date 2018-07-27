@@ -289,11 +289,11 @@ struct EO102 : ModuleWidget {
 		}
 
 		for (int i = 0; i < 2; i++) {
-			addInput(Port::create<sub_port_blue>(Vec(4, 20 + 35 * i), Port::INPUT, module, EO_102::INPUT_1 + i));
+			addInput(Port::create<BluePort>(Vec(4, 20 + 35 * i), Port::INPUT, module, EO_102::INPUT_1 + i));
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 22 + 35 * i), module, EO_102::LIGHT_1 + i));
 		}
 
-		addInput(Port::create<sub_port_blue>(Vec(4, 310), Port::INPUT, module, EO_102::INPUT_EXT));
+		addInput(Port::create<BluePort>(Vec(4, 310), Port::INPUT, module, EO_102::INPUT_EXT));
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, EO_102::LIGHT_EXT));
 
 		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(39, 301), module, EO_102::PARAM_TRIGGER, 0.0f, 2.0f, 0.0f));

@@ -84,12 +84,12 @@ struct FF110 : ModuleWidget {
 	FF110(FF_1<10> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/FF-110.svg")));
 
-		addInput(Port::create<sub_port_blue>(Vec(2.5,19), Port::INPUT, module, FF_1<10>::INPUT));
+		addInput(Port::create<BluePort>(Vec(2.5,19), Port::INPUT, module, FF_1<10>::INPUT));
 
 		for (int i = 0; i < 10; i++) {
 			int offset = 29 * i;
 
-			addOutput(Port::create<sub_port_blue>(Vec(2.5,77 + offset), Port::OUTPUT, module, FF_1<10>::OUTPUT_1 + i));
+			addOutput(Port::create<BluePort>(Vec(2.5,77 + offset), Port::OUTPUT, module, FF_1<10>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -101,13 +101,13 @@ struct FF120 : ModuleWidget {
 	FF120(FF_1<20> *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/FF-120.svg")));
 
-		addInput(Port::create<sub_port_blue>(Vec(17.5,19), Port::INPUT, module, FF_1<20>::INPUT));
+		addInput(Port::create<BluePort>(Vec(17.5,19), Port::INPUT, module, FF_1<20>::INPUT));
 
 		for (int i = 0; i < 20; i+=2) {
 			int offset = 15 * i;
 
-			addOutput(Port::create<sub_port_blue>(Vec(4,53 + offset), Port::OUTPUT, module, FF_1<20>::OUTPUT_1 + i));
-			addOutput(Port::create<sub_port_blue>(Vec(31,68 + offset), Port::OUTPUT, module, FF_1<20>::OUTPUT_1 + i + 1));
+			addOutput(Port::create<BluePort>(Vec(4,53 + offset), Port::OUTPUT, module, FF_1<20>::OUTPUT_1 + i));
+			addOutput(Port::create<BluePort>(Vec(31,68 + offset), Port::OUTPUT, module, FF_1<20>::OUTPUT_1 + i + 1));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {

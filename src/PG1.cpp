@@ -43,9 +43,9 @@ struct PG104 : ModuleWidget {
 
 		for (int i = 0; i < 4; i++) {
 			int offset = 87 * i;
-			addInput(Port::create<sub_port_blue>(Vec(2.5,19 + offset), Port::INPUT, module, PG_1<4>::INPUT_1 + i));
+			addInput(Port::create<BluePort>(Vec(2.5,19 + offset), Port::INPUT, module, PG_1<4>::INPUT_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(2.5,75 + offset), Port::OUTPUT, module, PG_1<4>::OUTPUT_1 + i));
+			addOutput(Port::create<BluePort>(Vec(2.5,75 + offset), Port::OUTPUT, module, PG_1<4>::OUTPUT_1 + i));
 
 			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(3,47.5 + offset), module, PG_1<4>::PARAM_1 + i, -5.0f, 2.0f, -2.0f));
 		}
@@ -61,9 +61,9 @@ struct PG112 : ModuleWidget {
 
 		for (int i = 0; i < 12; i++) {
 			int offset = 29 * i;
-			addInput(Port::create<sub_port_blue>(Vec(4,19 + offset), Port::INPUT, module, PG_1<12>::INPUT_1 + i));
+			addInput(Port::create<BluePort>(Vec(4,19 + offset), Port::INPUT, module, PG_1<12>::INPUT_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(92,19 + offset), Port::OUTPUT, module, PG_1<12>::OUTPUT_1 + i));
+			addOutput(Port::create<BluePort>(Vec(92,19 + offset), Port::OUTPUT, module, PG_1<12>::OUTPUT_1 + i));
 
 			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(33,19.5 + offset), module, PG_1<12>::PARAM_1 + i, -5.0f, 2.0f, -2.0f));
 		}

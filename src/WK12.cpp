@@ -359,10 +359,10 @@ struct WK101 : ModuleWidget {
 	WK101(WK_101 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/WK-101.svg")));
 
-		addInput(Port::create<sub_port>(Vec(4,29), Port::INPUT, module, WK_101::INPUT_CV));
-		addOutput(Port::create<sub_port>(Vec(43,29), Port::OUTPUT, module, WK_101::OUTPUT_CV));
+		addInput(Port::create<SilverPort>(Vec(4,29), Port::INPUT, module, WK_101::INPUT_CV));
+		addOutput(Port::create<SilverPort>(Vec(43,29), Port::OUTPUT, module, WK_101::OUTPUT_CV));
 		addInput(Port::create<BlackPort>(Vec(82,29), Port::INPUT, module, WK_101::INPUT_TOR));
-		addOutput(Port::create<sub_port_black>(Vec(121,29), Port::OUTPUT, module, WK_101::OUTPUT_TOR));
+		addOutput(Port::create<BlackPort>(Vec(121,29), Port::OUTPUT, module, WK_101::OUTPUT_TOR));
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -522,10 +522,10 @@ struct WK205 : ModuleWidget {
 	WK205(WK_205 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/WK-205.svg")));
 
-		addInput(Port::create<sub_port_black>(Vec(2.5,19), Port::INPUT, module, WK_205::INPUT_TOR));
+		addInput(Port::create<BlackPort>(Vec(2.5,19), Port::INPUT, module, WK_205::INPUT_TOR));
 		for (int i = 0; i < WK_205::deviceCount; i++) {
-			addInput(Port::create<sub_port>(Vec(2.5,63 + i * 60), Port::INPUT, module, WK_205::INPUT_CV_1 + i));
-			addOutput(Port::create<sub_port>(Vec(2.5,92 + i * 60), Port::OUTPUT, module, WK_205::OUTPUT_CV_1 + i));
+			addInput(Port::create<SilverPort>(Vec(2.5,63 + i * 60), Port::INPUT, module, WK_205::INPUT_CV_1 + i));
+			addOutput(Port::create<SilverPort>(Vec(2.5,92 + i * 60), Port::OUTPUT, module, WK_205::OUTPUT_CV_1 + i));
 		}
 
 		WK_Tunings::loadTunings(plugin);

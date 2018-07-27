@@ -22,7 +22,7 @@ struct BluePort : SilverPort {
 struct BlackPort : SilverPort {
 	BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
 };
-
+/*
 struct sub_port : SVGPort {
 	sub_port() {
 		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port.svg")));
@@ -47,6 +47,7 @@ struct sub_port_black : SVGPort {
 	}
 };
 
+*/
 //////////////////
 // Switches
 //////////////////

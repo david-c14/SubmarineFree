@@ -398,12 +398,12 @@ struct AOWidget : ModuleWidget {
 	AOWidget(AO1<x,y> *module) : ModuleWidget(module) {
 		setPanel(SubHelper::LoadPanel(plugin, "AO-1", x*y));
 		for (unsigned int ix = 0; ix < x; ix++) {
-			addInput(Port::create<sub_port>(Vec(4, 61 + ix * 46), Port::INPUT, module, AO1<x,y>::INPUT_X_1 + ix));
-			addOutput(Port::create<sub_port>(Vec(46 + y * 90, 61 + ix * 46), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + ix));
+			addInput(Port::create<SilverPort>(Vec(4, 61 + ix * 46), Port::INPUT, module, AO1<x,y>::INPUT_X_1 + ix));
+			addOutput(Port::create<SilverPort>(Vec(46 + y * 90, 61 + ix * 46), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + ix));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			addInput(Port::create<sub_port>(Vec(70 + 90 * iy, 19), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + iy));
-			addOutput(Port::create<sub_port>(Vec(70 + 90 * iy, 335), Port::OUTPUT, module, AO1<x,y>::OUTPUT_Y_1 + iy));
+			addInput(Port::create<SilverPort>(Vec(70 + 90 * iy, 19), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + iy));
+			addOutput(Port::create<SilverPort>(Vec(70 + 90 * iy, 335), Port::OUTPUT, module, AO1<x,y>::OUTPUT_Y_1 + iy));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < x; ix++) {

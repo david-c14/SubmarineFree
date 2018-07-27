@@ -52,10 +52,10 @@ struct AG104 : ModuleWidget {
 
 		for (int i = 0; i < 4; i++) {
 			int offset = 87 * i;
-			addInput(Port::create<sub_port_blue>(Vec(2.5,19 + offset), Port::INPUT, module, AG_1<4>::INPUT_A_1 + i));
-			addInput(Port::create<sub_port_blue>(Vec(2.5,47 + offset), Port::INPUT, module, AG_1<4>::INPUT_B_1 + i));
+			addInput(Port::create<BluePort>(Vec(2.5,19 + offset), Port::INPUT, module, AG_1<4>::INPUT_A_1 + i));
+			addInput(Port::create<BluePort>(Vec(2.5,47 + offset), Port::INPUT, module, AG_1<4>::INPUT_B_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(2.5,75 + offset), Port::OUTPUT, module, AG_1<4>::OUTPUT_1 + i));
+			addOutput(Port::create<BluePort>(Vec(2.5,75 + offset), Port::OUTPUT, module, AG_1<4>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -69,10 +69,10 @@ struct AG106 : ModuleWidget {
 
 		for (int i = 0; i < 6; i++) {
 			int offset = 58 * i;
-			addInput(Port::create<sub_port_blue>(Vec(4,19 + offset), Port::INPUT, module, AG_1<6>::INPUT_A_1 + i));
-			addInput(Port::create<sub_port_blue>(Vec(4,47 + offset), Port::INPUT, module, AG_1<6>::INPUT_B_1 + i));
+			addInput(Port::create<BluePort>(Vec(4,19 + offset), Port::INPUT, module, AG_1<6>::INPUT_A_1 + i));
+			addInput(Port::create<BluePort>(Vec(4,47 + offset), Port::INPUT, module, AG_1<6>::INPUT_B_1 + i));
 
-			addOutput(Port::create<sub_port_blue>(Vec(62,33 + offset), Port::OUTPUT, module, AG_1<6>::OUTPUT_1 + i));
+			addOutput(Port::create<BluePort>(Vec(62,33 + offset), Port::OUTPUT, module, AG_1<6>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {

@@ -112,7 +112,7 @@ struct TM105 : ModuleWidget {
 	TM105(TM_105 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/TM-105.svg")));
 		for (unsigned int i = 0; i < 5; i++) {
-			addInput(Port::create<sub_port_black>(Vec(2.5,29 + 32 * i), Port::INPUT, module, TM_105::INPUT_1 + i));
+			addInput(Port::create<BlackPort>(Vec(2.5,29 + 32 * i), Port::INPUT, module, TM_105::INPUT_1 + i));
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(2.5, 53 + 32 * i), module, TM_105::LIGHT_M_1 + i));
 			addChild(ModuleLightWidget::create<TinyLight<RedLight>>(Vec(24.5, 53 + 32 * i), module, TM_105::LIGHT_E_1 + i));
 		}
@@ -121,7 +121,7 @@ struct TM105 : ModuleWidget {
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(13.5, 270), module, TM_105::LIGHT_Q_3));
 		addChild(ModuleLightWidget::create<TinyLight<RedLight>>(Vec(13.5, 275), module, TM_105::LIGHT_Q_4));
 		addChild(ModuleLightWidget::create<TinyLight<RedLight>>(Vec(13.5, 280), module, TM_105::LIGHT_Q_5));
-		addOutput(Port::create<sub_port_black>(Vec(2.5,232), Port::OUTPUT, module, TM_105::OUTPUT_TOR));
+		addOutput(Port::create<BlackPort>(Vec(2.5,232), Port::OUTPUT, module, TM_105::OUTPUT_TOR));
 	}
 };
 
