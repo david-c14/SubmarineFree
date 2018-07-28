@@ -28,7 +28,7 @@ extern Model *modelBP120;
 extern Model *modelBP124;
 extern Model *modelBP132;
 
-//extern Model *modelEO102;
+extern Model *modelEO102;
 
 extern Model *modelFF110;
 extern Model *modelFF120;
