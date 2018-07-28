@@ -44,6 +44,10 @@
        stroke="none" font-size="8">
       <text x="22" y="72">C</text>
       <text x="3" y="80">W</text>
+      <text x="22" y="188">C</text>
+      <text x="3" y="196">W</text>
+      <text x="22" y="304">C</text>
+      <text x="3" y="312">W</text>
     </g>
   </g>
   <g 
