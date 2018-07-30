@@ -46,7 +46,7 @@ void LightKnob::draw(NVGcontext *vg) {
 	}
 
 	float angle;
-	if (isfinite(minValue) && isfinite(maxValue)) {
+	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
 		angle = rescale(value, minValue, maxValue, minAngle, maxAngle);
 	}
 	else {

@@ -119,12 +119,12 @@ namespace SubmarineAO {
 		{ Y SC SX,		   LAMBDA(  powf( y , c * x )	   ) },
                 { P X A C P,               LAMBDA(  abs( x + c )           ) }, // Modulus
 		{ P Y A C P,               LAMBDA(  abs( y + c )           ) },
-		{ MIN OP X A C COMMA Y CP, LAMBDA(  min( x + c, y )        ) }, // Minmax
-		{ MIN OP X COMMA C CP,     LAMBDA(  min( x, c )            ) },
-      		{ MIN OP Y COMMA C CP,     LAMBDA(  min( y, c )            ) },
-     		{ MAX OP X A C COMMA Y CP, LAMBDA(  max( x + c, y )        ) },
-		{ MAX OP X COMMA C CP,     LAMBDA(  max( x, c )            ) },
-		{ MAX OP Y COMMA C CP,     LAMBDA(  max( y, c )            ) },
+		{ MIN OP X A C COMMA Y CP, LAMBDA(  std::min( x + c, y )   ) }, // Minmax
+		{ MIN OP X COMMA C CP,     LAMBDA(  std::min( x, c )       ) },
+      		{ MIN OP Y COMMA C CP,     LAMBDA(  std::min( y, c )       ) },
+     		{ MAX OP X A C COMMA Y CP, LAMBDA(  std::max( x + c, y )   ) },
+		{ MAX OP X COMMA C CP,     LAMBDA(  std::max( x, c )       ) },
+		{ MAX OP Y COMMA C CP,     LAMBDA(  std::max( y, c )       ) },
 		{ SIN OP X A C CP,         LAMBDA(  sin( x + c )           ) }, // Trigonometric
 		{ SIN OP Y A C CP,         LAMBDA(  sin( y + c )           ) },
 		{ SIN OP X A Y CP,         LAMBDA(  sin( x + y )           ) },
@@ -385,10 +385,10 @@ struct AO1 : Module {
 					vy = vx[ix] = SubmarineAO::functions[f].func(vx[ix], vy, ((int)params[PARAM_CONST_1 + ix + iy * x].value)/100.0f);
 				// if f is equal to 0, then both x and y pass (crossing) through the module unchanged.
 			}
-			outputs[OUTPUT_Y_1 + iy].value = isfinite(vy)?vy:0.0f;
+			outputs[OUTPUT_Y_1 + iy].value = std::isfinite(vy)?vy:0.0f;
 		}
 		for (unsigned int ix = 0; ix < x; ix++) {
-			outputs[OUTPUT_X_1 + ix].value = isfinite(vx[ix])?vx[ix]:0.0f;
+			outputs[OUTPUT_X_1 + ix].value = std::isfinite(vx[ix])?vx[ix]:0.0f;
 		}
 	}
 };
