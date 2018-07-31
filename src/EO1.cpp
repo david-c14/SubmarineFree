@@ -1,13 +1,17 @@
 /* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright 2017 by Andrew Belt */
 #include <string.h>
 #include "DS.hpp"
+#include "dsp/digital.hpp"
 
 #define BUFFER_SIZE 512
 
 struct EO_102 : DS_Module {
 	enum ParamIds {
+		PARAM_SCALE_1,
+		PARAM_SCALE_2,
+		PARAM_OFFSET_1,
+		PARAM_OFFSET_2,
 		PARAM_TRIGGER,
-		PARAM_EDGE,
 		PARAM_TIME,
 		PARAM_INDEX_1,
 		PARAM_INDEX_2,
@@ -26,9 +30,6 @@ struct EO_102 : DS_Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		LIGHT_1,
-		LIGHT_2,
-		LIGHT_EXT,
 		NUM_LIGHTS
 	};
 	
@@ -41,7 +42,7 @@ struct EO_102 : DS_Module {
 	float preFrameIndex = 0;
 	int preCount = 0;
 
-	DS_Schmitt trigger;
+	SchmittTrigger trigger;
 	sub_btn *resetButtonWidget;
 
 	EO_102() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
@@ -65,9 +66,6 @@ void EO_102::startFrame() {
 }
 
 void EO_102::step() {
-	// Set trigger lights
-	for (int i = 0; i < 3; i++)
-		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
 	int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
@@ -92,8 +90,9 @@ void EO_102::step() {
 		}
 	}
 
-	int triggerInput = INPUT_1 + (int)(clamp(params[PARAM_TRIGGER].value, 0.0f, 2.0f));
-	int edge = (params[PARAM_EDGE].value > 0.5f);
+	int triggerInput = INPUT_1;
+	if (inputs[INPUT_EXT].active)
+		triggerInput = INPUT_EXT;
 	
 	// Are we waiting on the next trigger?
 	if (bufferIndex >= BUFFER_SIZE) {
@@ -105,12 +104,12 @@ void EO_102::step() {
 
 		// Reset the Schmitt trigger so we don't trigger immediately if the input is high
 		if (frameIndex == 0) {
-			//trigger.set(edge);
+			trigger.reset();
 		}
 		frameIndex++;
 
 		float gate = inputs[triggerInput].value;
-		int triggered = trigger.edge(this, gate, edge);
+		int triggered = trigger.process(rescale(gate, params[PARAM_TRIGGER].value - 0.1f, params[PARAM_TRIGGER].value, 0.0f, 1.0f)); 
 
 		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
 			resetButtonWidget->setValue(0.0f);
@@ -135,9 +134,10 @@ void EO_102::step() {
 struct EO_Display : TransparentWidget {
 	EO_102 *module;
 
-	void drawTrace(NVGcontext *vg, float *values, float offset) {
+	void drawTrace(NVGcontext *vg, float *values, float offset, float scale) {
 		if (!values)
 			return;
+		float scaling = powf(2.0, scale);
 		nvgSave(vg);
 		Rect b = Rect(Vec(0, 0), box.size);
 		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
@@ -145,9 +145,7 @@ struct EO_Display : TransparentWidget {
 		for (int i = 0; i < BUFFER_SIZE; i++) {
 			float x, y;
 			x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-			y = module->voltage0 -clamp(values[i], module->voltage0, module->voltage1);
-			y *= 29.0f / (module->voltage1 - module->voltage0);
-			y += offset;
+			y = ((values[i] * scaling + offset ) / 20.0f - 0.5f) * -b.size.y;
 			if (i == 0)
 				nvgMoveTo(vg, x, y);
 			else
@@ -217,7 +215,7 @@ struct EO_Display : TransparentWidget {
 	void draw(NVGcontext *vg) override {
 		for (int i = 0; i < 2; i++) {
 			if (module->inputs[EO_102::INPUT_1 + i].active) {
-				drawTrace(vg, module->buffer[i], 32.5f + 35 * i); 
+				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value); 
 			}
 		}
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
@@ -290,14 +288,15 @@ struct EO102 : ModuleWidget {
 
 		for (int i = 0; i < 2; i++) {
 			addInput(Port::create<BluePort>(Vec(4, 20 + 35 * i), Port::INPUT, module, EO_102::INPUT_1 + i));
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 22 + 35 * i), module, EO_102::LIGHT_1 + i));
 		}
 
 		addInput(Port::create<BluePort>(Vec(4, 310), Port::INPUT, module, EO_102::INPUT_EXT));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, EO_102::LIGHT_EXT));
+		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(4, 90), module, EO_102::PARAM_SCALE_1, -5.0f, 5.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(4, 130), module, EO_102::PARAM_OFFSET_1, -10.0f, 10.0f, 0.0f));
+		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(4, 170), module, EO_102::PARAM_SCALE_2, -5.0f, 5.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(4, 210), module, EO_102::PARAM_OFFSET_2, -10.0f, 10.0f, 0.0f));
 
-		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(39, 301), module, EO_102::PARAM_TRIGGER, 0.0f, 2.0f, 0.0f));
-		addParam(ParamWidget::create<sub_sw_2>(Vec(82, 308), module, EO_102::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(39, 301), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 0.0f));
 		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(151, 312), module, EO_102::PARAM_RESET, 0.0f, 1.0f, 0.0f);
 		addParam(module->resetButtonWidget);
