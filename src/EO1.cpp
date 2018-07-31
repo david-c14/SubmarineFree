@@ -1,11 +1,11 @@
 /* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright 2017 by Andrew Belt */
 #include <string.h>
-#include "DS.hpp"
+#include "SubmarineFree.hpp"
 #include "dsp/digital.hpp"
 
 #define BUFFER_SIZE 512
 
-struct EO_102 : DS_Module {
+struct EO_102 : Module {
 	enum ParamIds {
 		PARAM_SCALE_1,
 		PARAM_SCALE_2,
@@ -45,7 +45,7 @@ struct EO_102 : DS_Module {
 	SchmittTrigger trigger;
 	sub_btn *resetButtonWidget;
 
-	EO_102() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	EO_102() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 	void startFrame(void);
 };
@@ -304,9 +304,6 @@ struct EO102 : ModuleWidget {
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(214, 315), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(242, 315), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
 		addParam(ParamWidget::create<SnapKnob<SmallKnob<LightKnob>>>(Vec(271, 315), module, EO_102::PARAM_PRE, 0.0f, 32.0f, 0.0f));
-	}
-	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
 	}
 };
 
