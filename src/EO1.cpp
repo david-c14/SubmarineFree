@@ -30,6 +30,7 @@ struct EO_102 : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		LIGHT_TRIGGER,
 		NUM_LIGHTS
 	};
 	
@@ -43,7 +44,9 @@ struct EO_102 : Module {
 	int preCount = 0;
 
 	SchmittTrigger trigger;
+	PulseGenerator triggerLight;
 	sub_btn *resetButtonWidget;
+	float runMode;
 
 	EO_102() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -51,6 +54,7 @@ struct EO_102 : Module {
 };
 
 void EO_102::startFrame() {
+	triggerLight.trigger(0.1f);
 	frameIndex = 0;
 	preCount = (int)(params[PARAM_PRE].value + 0.5f);
 	if (preCount) {
@@ -66,9 +70,15 @@ void EO_102::startFrame() {
 }
 
 void EO_102::step() {
+	if (runMode > 0.5f) {
+		if (params[PARAM_RUN].value < 0.5f)
+			resetButtonWidget->setValue(1.0f);
+	}
+	runMode = params[PARAM_RUN].value;
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
 	int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
+	lights[LIGHT_TRIGGER].value = triggerLight.process(engineGetSampleTime());
 	
 	// Add frame to preBuffer
 	if (++preFrameIndex >= frameCount) {
@@ -111,21 +121,12 @@ void EO_102::step() {
 		float gate = inputs[triggerInput].value;
 		int triggered = trigger.process(rescale(gate, params[PARAM_TRIGGER].value - 0.1f, params[PARAM_TRIGGER].value, 0.0f, 1.0f)); 
 
-		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
-			resetButtonWidget->setValue(0.0f);
-			// Reset if triggered
+		if (params[PARAM_RESET].value > 0.5f) {
 			if (triggered) {
 				startFrame();
-				return;
-			}
-		}
-		else {
-			if (params[PARAM_RESET].value > 0.5f) {
-				if (triggered) {
-					startFrame();
+				if (runMode > 0.5f) // Continuous run mode
 					resetButtonWidget->setValue(0.0f);
-					return;
-				}
+				return;
 			}
 		}
 	}
@@ -134,7 +135,7 @@ void EO_102::step() {
 struct EO_Display : TransparentWidget {
 	EO_102 *module;
 
-	void drawTrace(NVGcontext *vg, float *values, float offset, float scale) {
+	void drawTrace(NVGcontext *vg, float *values, float offset, float scale, NVGcolor col) {
 		if (!values)
 			return;
 		float scaling = powf(2.0, scale);
@@ -151,12 +152,22 @@ struct EO_Display : TransparentWidget {
 			else
 				nvgLineTo(vg, x, y);
 		} 
-		nvgStrokeColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xc0));
-		nvgLineCap(vg, NVG_ROUND);
-		nvgMiterLimit(vg, 2.0f);
-		nvgStrokeWidth(vg, 1.5f);
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-		nvgStroke(vg);
+		if (0) {
+			nvgStrokeColor(vg, col);
+			nvgLineCap(vg, NVG_ROUND);
+			nvgMiterLimit(vg, 2.0f);
+			nvgStrokeWidth(vg, 1.5f);
+			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+			nvgStroke(vg);
+		}
+		else {
+			nvgLineTo(vg, b.size.x, (offset / 20.0f - 0.5f) * -b.size.y);
+			nvgLineTo(vg, 0, (offset / 20.0f - 0.5f) * -b.size.y);
+			nvgClosePath(vg);
+			nvgFillColor(vg, col);
+			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+			nvgFill(vg);
+		}
 		nvgResetScissor(vg);
 		nvgRestore(vg);	
 	}
@@ -213,10 +224,12 @@ struct EO_Display : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
+		NVGcolor col = nvgRGBA(0x28, 0xb0, 0xf3, 0xc0);
 		for (int i = 0; i < 2; i++) {
 			if (module->inputs[EO_102::INPUT_1 + i].active) {
-				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value); 
+				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col); 
 			}
+			col = nvgRGBA(0xe1, 0x02, 0x78, 0xc0);
 		}
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_2].value, 0.0f, 1.0f));
@@ -297,8 +310,9 @@ struct EO102 : ModuleWidget {
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(4, 210), module, EO_102::PARAM_OFFSET_2, -10.0f, 10.0f, 0.0f));
 
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(39, 301), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
+		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(74, 333), module, EO_102::LIGHT_TRIGGER));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 0.0f));
-		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(151, 312), module, EO_102::PARAM_RESET, 0.0f, 1.0f, 0.0f);
+		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(151, 312), module, EO_102::PARAM_RESET, 0.0f, 1.0f, 1.0f);
 		addParam(module->resetButtonWidget);
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(171, 301), module, EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f));
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(214, 315), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
