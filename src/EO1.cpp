@@ -15,9 +15,11 @@ struct EO_102 : Module {
 		PARAM_TIME,
 		PARAM_INDEX_1,
 		PARAM_INDEX_2,
+		PARAM_RUNMODE,
 		PARAM_RUN,
-		PARAM_RESET,
 		PARAM_PRE,
+		PARAM_MODE_1,
+		PARAM_MODE_2,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -45,8 +47,10 @@ struct EO_102 : Module {
 
 	SchmittTrigger trigger;
 	PulseGenerator triggerLight;
-	sub_btn *resetButtonWidget;
+	sub_btn *runningButtonWidget;
 	float runMode;
+	int traceMode[2];
+	int traceStep;	
 
 	EO_102() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -57,46 +61,69 @@ void EO_102::startFrame() {
 	triggerLight.trigger(0.1f);
 	frameIndex = 0;
 	preCount = (int)(params[PARAM_PRE].value + 0.5f);
-	if (preCount) {
-		for (int i = 0; i < 2; i++) {
-			for (int s = 0; s < preCount; s++) {
-				buffer[i][s] = preBuffer[i][(preBufferIndex + 64 - preCount + s) % 32];
-			}
+	for (int i = 0; i < 2; i++) {
+		for (int s = 0; s < preCount; s++) {
+			buffer[i][s] = preBuffer[i][(preBufferIndex + 64 - preCount + s) % 32];
 		}
-		bufferIndex = preCount;
-		return;
+		traceMode[i] = (int)(params[PARAM_MODE_1 + i].value + 0.5f);
 	}
-	bufferIndex = 0;
+	bufferIndex = preCount;
+	traceStep = 1;
 }
 
 void EO_102::step() {
 	if (runMode > 0.5f) {
-		if (params[PARAM_RUN].value < 0.5f)
-			resetButtonWidget->setValue(1.0f);
+		if (params[PARAM_RUNMODE].value < 0.5f)
+			runningButtonWidget->setValue(1.0f);
 	}
-	runMode = params[PARAM_RUN].value;
+	runMode = params[PARAM_RUNMODE].value;
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
 	int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
 	lights[LIGHT_TRIGGER].value = triggerLight.process(engineGetSampleTime());
 	
 	// Add frame to preBuffer
+	for (int i = 0; i < 2; i++) {
+		if (params[PARAM_MODE_1 + i].value > 0.5f) {
+			if (traceStep) {
+				preBuffer[i][preBufferIndex] = fabs(inputs[INPUT_1 + i].value);
+			}
+			preBuffer[i][preBufferIndex] = std::max(preBuffer[i][preBufferIndex], (float)fabs(inputs[INPUT_1 + i].value));
+		}
+	}
 	if (++preFrameIndex >= frameCount) {
 		preFrameIndex = 0;
-		for (int i = 0; i < 2; i++)
-			preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].value;
+		for (int i = 0; i < 2; i++) {
+			if (params[PARAM_MODE_1 + i].value < 0.5f) {
+				preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].value;
+			}
+		}
 		preBufferIndex++;
-		if (preBufferIndex >= 32)
+		if (preBufferIndex >= 32) {
 			preBufferIndex = 0;
+		}
 	}
 
 	// Add frame to buffer
 	if (bufferIndex < BUFFER_SIZE) {
+		for (int i = 0; i < 2; i++) {
+			if (traceMode[i]) {
+				if (traceStep) {
+					buffer[i][bufferIndex] = fabs(inputs[INPUT_1 + i].value);
+				}
+				buffer[i][bufferIndex] = std::max(buffer[i][bufferIndex], (float)fabs(inputs[INPUT_1 + i].value));
+			}
+		}
+		traceStep = 0;
 		if (++frameIndex >= frameCount) {
 			frameIndex = 0;
-			for (int i = 0; i < 2; i++)
-				buffer[i][bufferIndex] = inputs[INPUT_1 + i].value;
+			for (int i = 0; i < 2; i++) {
+				if (!traceMode[i]) {
+					buffer[i][bufferIndex] = inputs[INPUT_1 + i].value;
+				}
+			}
 			bufferIndex++;
+			traceStep = 1;
 		}
 	}
 
@@ -121,11 +148,12 @@ void EO_102::step() {
 		float gate = inputs[triggerInput].value;
 		int triggered = trigger.process(rescale(gate, params[PARAM_TRIGGER].value - 0.1f, params[PARAM_TRIGGER].value, 0.0f, 1.0f)); 
 
-		if (params[PARAM_RESET].value > 0.5f) {
+		if (params[PARAM_RUN].value > 0.5f) {
 			if (triggered) {
 				startFrame();
 				if (runMode > 0.5f) // Continuous run mode
-					resetButtonWidget->setValue(0.0f);
+					if (runningButtonWidget) // This is bad - try to move away from dependency on widget
+						runningButtonWidget->setValue(0.0f);
 				return;
 			}
 		}
@@ -152,7 +180,7 @@ struct EO_Display : TransparentWidget {
 			else
 				nvgLineTo(vg, x, y);
 		} 
-		if (0) {
+		if (1) {
 			nvgStrokeColor(vg, col);
 			nvgLineCap(vg, NVG_ROUND);
 			nvgMiterLimit(vg, 2.0f);
@@ -308,12 +336,14 @@ struct EO102 : ModuleWidget {
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(4, 130), module, EO_102::PARAM_OFFSET_1, -10.0f, 10.0f, 0.0f));
 		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(4, 170), module, EO_102::PARAM_SCALE_2, -5.0f, 5.0f, 0.0f));
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(4, 210), module, EO_102::PARAM_OFFSET_2, -10.0f, 10.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_2>(Vec(4, 250), module, EO_102::PARAM_MODE_1, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<sub_sw_2>(Vec(4, 290), module, EO_102::PARAM_MODE_2, 0.0f, 1.0f, 0.0f));
 
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(39, 301), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(74, 333), module, EO_102::LIGHT_TRIGGER));
-		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 0.0f));
-		module->resetButtonWidget = ParamWidget::create<sub_btn>(Vec(151, 312), module, EO_102::PARAM_RESET, 0.0f, 1.0f, 1.0f);
-		addParam(module->resetButtonWidget);
+		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
+		module->runningButtonWidget = ParamWidget::create<sub_btn>(Vec(151, 312), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
+		addParam(module->runningButtonWidget);
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(171, 301), module, EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f));
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(214, 315), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(242, 315), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
