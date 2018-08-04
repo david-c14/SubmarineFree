@@ -163,7 +163,7 @@ void EO_102::step() {
 struct EO_Display : TransparentWidget {
 	EO_102 *module;
 
-	void drawTrace(NVGcontext *vg, float *values, float offset, float scale, NVGcolor col) {
+	void drawTrace(NVGcontext *vg, float *values, float offset, float scale, NVGcolor col, int mode) {
 		if (!values)
 			return;
 		float scaling = powf(2.0, scale);
@@ -174,27 +174,27 @@ struct EO_Display : TransparentWidget {
 		for (int i = 0; i < BUFFER_SIZE; i++) {
 			float x, y;
 			x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-			y = ((values[i] * scaling + offset ) / 20.0f - 0.5f) * -b.size.y;
+			y = ((values[i] * scaling + offset ) / 20.0f - 0.8f) * -b.size.y;
 			if (i == 0)
 				nvgMoveTo(vg, x, y);
 			else
 				nvgLineTo(vg, x, y);
 		} 
-		if (1) {
+		if (mode) {
+			nvgLineTo(vg, b.size.x, (offset / 20.0f - 0.8f) * -b.size.y);
+			nvgLineTo(vg, 0, (offset / 20.0f - 0.8f) * -b.size.y);
+			nvgClosePath(vg);
+			nvgFillColor(vg, col);
+			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+			nvgFill(vg);
+		}
+		else {
 			nvgStrokeColor(vg, col);
 			nvgLineCap(vg, NVG_ROUND);
 			nvgMiterLimit(vg, 2.0f);
 			nvgStrokeWidth(vg, 1.5f);
 			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 			nvgStroke(vg);
-		}
-		else {
-			nvgLineTo(vg, b.size.x, (offset / 20.0f - 0.5f) * -b.size.y);
-			nvgLineTo(vg, 0, (offset / 20.0f - 0.5f) * -b.size.y);
-			nvgClosePath(vg);
-			nvgFillColor(vg, col);
-			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-			nvgFill(vg);
 		}
 		nvgResetScissor(vg);
 		nvgRestore(vg);	
@@ -255,7 +255,7 @@ struct EO_Display : TransparentWidget {
 		NVGcolor col = nvgRGBA(0x28, 0xb0, 0xf3, 0xc0);
 		for (int i = 0; i < 2; i++) {
 			if (module->inputs[EO_102::INPUT_1 + i].active) {
-				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col); 
+				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col, module->traceMode[i]); 
 			}
 			col = nvgRGBA(0xe1, 0x02, 0x78, 0xc0);
 		}
