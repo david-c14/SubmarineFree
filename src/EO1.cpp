@@ -15,6 +15,7 @@ struct EO_102 : Module {
 		PARAM_TIME,
 		PARAM_INDEX_1,
 		PARAM_INDEX_2,
+		PARAM_INDEX_3,
 		PARAM_RUNMODE,
 		PARAM_RUN,
 		PARAM_PRE,
@@ -215,6 +216,21 @@ struct EO_Display : TransparentWidget {
 		nvgStroke(vg);
 		nvgResetScissor(vg);
 	}
+	void drawIndexV(NVGcontext *vg, float value) {
+		Rect b = Rect(Vec(0, 0), box.size);
+		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+		value = (1-value) * b.size.y;
+
+		nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
+		{
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 0, value);
+			nvgLineTo(vg, b.size.x, value);
+			nvgClosePath(vg);
+		}
+		nvgStroke(vg);
+		nvgResetScissor(vg);
+	}
 
 	void drawPre(NVGcontext *vg, float value) {
 		if (value == 0.0f)
@@ -257,10 +273,11 @@ struct EO_Display : TransparentWidget {
 			if (module->inputs[EO_102::INPUT_1 + i].active) {
 				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col, module->traceMode[i]); 
 			}
-			col = nvgRGBA(0xe1, 0x02, 0x78, 0xc0);
+			col = nvgRGBA(0xed, 0x2c, 0x24, 0xc0);
 		}
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_2].value, 0.0f, 1.0f));
+		drawIndexV(vg, clamp(module->params[EO_102::PARAM_INDEX_3].value, 0.0f, 1.0f));
 		drawMask(vg, clamp(module->params[EO_102::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
 		drawPre(vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
@@ -270,12 +287,27 @@ struct EO_Measure : TransparentWidget {
 	std::shared_ptr<Font> font;
 	EO_102 *module;
 	char measureText[41];
+	NVGcolor col;
 
 	EO_Measure() {
 		font = Font::load(assetGlobal( "res/fonts/DejaVuSans.ttf"));
 	}
 
+	virtual void updateText() {
+	} 
+
 	void draw(NVGcontext *vg) override {
+		updateText();
+		nvgFontSize(vg, 14);
+		nvgFontFaceId(vg, font->handle);
+		nvgFillColor(vg, col);
+		nvgTextAlign(vg, NVG_ALIGN_CENTER);
+		nvgText(vg, 27, 12, measureText, NULL);
+	}
+};
+
+struct EO_Measure_Horz : EO_Measure {
+	void updateText() override {
 		float deltaTime = powf(2.0f, module->params[EO_102::PARAM_TIME].value);
 		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
 		frameCount *= BUFFER_SIZE;
@@ -299,14 +331,35 @@ struct EO_Measure : TransparentWidget {
 			sprintf(measureText, "%4.2fs", width);
 		else
 			sprintf(measureText, "%4.1fs", width);
-		nvgFontSize(vg, 14);
-		nvgFontFaceId(vg, font->handle);
-		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
-		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 27, 12, measureText, NULL);
 	}
 };
 
+struct EO_Measure_Vert : EO_Measure {
+	int index = 0;
+	void updateText() override {
+		float height = ((module->params[EO_102::PARAM_INDEX_3].value - 0.2f) * 20.0f - module->params[EO_102::PARAM_OFFSET_1 + index].value) / powf(2, module->params[EO_102::PARAM_SCALE_1 + index].value);
+		
+		float ah = fabs(height);
+		if (ah < 0.00000995f)
+			sprintf(measureText, "%4.3f\xc2\xb5V", height * 1000000.0f);
+		else if (ah < 0.0000995f)
+			sprintf(measureText, "%4.2f\xc2\xb5V", height * 1000000.0f);
+		else if (ah < 0.000995f)
+			sprintf(measureText, "%4.1f\xc2\xb5V", height * 1000000.0f);
+		else if (ah < 0.00995f)
+			sprintf(measureText, "%4.3fmV", height * 1000.0f);
+		else if (ah < 0.0995f)
+			sprintf(measureText, "%4.2fmV", height * 1000.0f);
+		else if (ah < 0.995f)
+			sprintf(measureText, "%4.1fmV", height * 1000.0f);
+		else if (ah < 9.95f)
+			sprintf(measureText, "%4.3fV", height);
+		else if (ah < 99.5f)
+			sprintf(measureText, "%4.2fV", height);
+		else
+			sprintf(measureText, "%4.1fV", height);
+	}
+};
 
 struct EO102 : ModuleWidget {
 	EO102(EO_102 *module) : ModuleWidget(module) {
@@ -320,10 +373,29 @@ struct EO102 : ModuleWidget {
 			addChild(display);
 		}
 		{
-			EO_Measure * display = new EO_Measure();
+			EO_Measure_Horz * display = new EO_Measure_Horz();
 			display->module = module;
 			display->box.pos = Vec(213, 297);
 			display->box.size = Vec(54, 16);
+			display->col = nvgRGBA(0xff, 0xff, 0xff, 0xff);
+			addChild(display);
+		}
+		{
+			EO_Measure_Vert * display = new EO_Measure_Vert();
+			display->module = module;
+			display->box.pos = Vec(213, 100);
+			display->box.size = Vec(54, 16);
+			display->index = 0;
+			display->col = nvgRGBA(0x28, 0xb0, 0xf3, 0xff);
+			addChild(display);
+		}
+		{
+			EO_Measure_Vert * display = new EO_Measure_Vert();
+			display->module = module;
+			display->box.pos = Vec(213, 200);
+			display->box.size = Vec(54, 16);
+			display->index = 1;
+			display->col = nvgRGBA(0xed, 0x2c, 0x24, 0xff);
 			addChild(display);
 		}
 
@@ -348,6 +420,7 @@ struct EO102 : ModuleWidget {
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(214, 315), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(242, 315), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
 		addParam(ParamWidget::create<SnapKnob<SmallKnob<LightKnob>>>(Vec(271, 315), module, EO_102::PARAM_PRE, 0.0f, 32.0f, 0.0f));
+		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(262, 315), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 1.0f));
 	}
 };
 
