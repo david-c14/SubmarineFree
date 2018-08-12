@@ -61,17 +61,17 @@
        ry="2"
        id="rect4247" />
     <rect
-       x="349"
+       x="341"
        y="254"
-       width="54"
+       width="62"
        height="16"
        rx="2"
        ry="2"
        id="rect4247" />
     <rect
-       x="349"
+       x="341"
        y="272"
-       width="54"
+       width="62"
        height="16"
        rx="2"
        ry="2"
@@ -98,15 +98,22 @@
     <text x="172.5" y="363" text-anchor="middle" fill="#294f77">TIME</text>
     <text x="232.5" y="363" text-anchor="middle" fill="#294f77">TRIGGER</text>
     <text x="337.5" y="363" text-anchor="middle" fill="#294f77">INDICES</text>
-    <text x="16.5" y="350" text-anchor="middle" id="text4252">EXT.TR</text>
-    <text x="58" y="350" text-anchor="middle" id="text4254">TRIGGER</text>
-    <text x="93" y="350" text-anchor="middle" id="text4256">EDGE</text>
-    <text x="128" y="350" text-anchor="middle" id="text4258">MODE</text>
-    <text x="125" y="318" id="text4260">CONT</text>
-    <text x="125" y="330" id="text4262">ONCE</text>
-    <text x="158" y="350" text-anchor="middle" id="text4264">RESET</text>
-    <text x="190" y="350" text-anchor="middle" id="text4266">TIME</text>
-    <text x="240" y="350" text-anchor="middle" id="text4268">L INDEX R</text>
-    <text x="283" y="350" text-anchor="middle" id="text4270">PRE.</text>
+    <text x="16.5" y="265" text-anchor="middle">CV</text>
+    <text x="16.5" y="302" text-anchor="middle" font-size="11">&#x266A;</text>
+    <text x="50" y="298" text-anchor="middle">SCALE</text>
+    <text x="50" y="350" text-anchor="middle">OFFSET</text>
+    <text x="91.5" y="265" text-anchor="middle">CV</text>
+    <text x="91.5" y="302" text-anchor="middle" font-size="11">&#x266A;</text>
+    <text x="125" y="298" text-anchor="middle">SCALE</text>
+    <text x="125" y="350" text-anchor="middle">OFFSET</text>
+    <text x="172.5" y="298" text-anchor="middle">PRE</text>
+    <text x="172.5" y="350" text-anchor="middle">TIME</text>
+    <text x="211.5" y="265" text-anchor="middle">CONT.</text>
+    <text x="211.5" y="302" text-anchor="middle">ONCE</text>
+    <text x="245" y="265" text-anchor="middle">RUN</text>
+    <text x="245" y="350" text-anchor="middle">LEVEL</text>
+    <text x="290" y="350" text-anchor="middle">LEFT</text>
+    <text x="332" y="350" text-anchor="middle">RIGHT</text>
+    <text x="376" y="350" text-anchor="middle">HORZ</text>
   </g>
 </svg>

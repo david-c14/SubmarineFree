@@ -302,7 +302,7 @@ struct EO_Measure : TransparentWidget {
 		nvgFontFaceId(vg, font->handle);
 		nvgFillColor(vg, col);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 27, 12, measureText, NULL);
+		nvgText(vg, box.size.x / 2, 12, measureText, NULL);
 	}
 };
 
@@ -383,8 +383,8 @@ struct EO102 : ModuleWidget {
 		{
 			EO_Measure_Vert * display = new EO_Measure_Vert();
 			display->module = module;
-			display->box.pos = Vec(349, 254);
-			display->box.size = Vec(54, 16);
+			display->box.pos = Vec(341, 254);
+			display->box.size = Vec(62, 16);
 			display->index = 0;
 			display->col = nvgRGBA(0x28, 0xb0, 0xf3, 0xff);
 			addChild(display);
@@ -392,32 +392,32 @@ struct EO102 : ModuleWidget {
 		{
 			EO_Measure_Vert * display = new EO_Measure_Vert();
 			display->module = module;
-			display->box.pos = Vec(349, 272);
-			display->box.size = Vec(54, 16);
+			display->box.pos = Vec(341, 272);
+			display->box.size = Vec(62, 16);
 			display->index = 1;
 			display->col = nvgRGBA(0xed, 0x2c, 0x24, 0xff);
 			addChild(display);
 		}
 
 		for (int i = 0; i < 2; i++) {
-			addInput(createInputCentered<BluePort>(Vec(16.5 + 75 * i, 318), module, EO_102::INPUT_1 + i));
-			addParam(createParamCentered<sub_sw_2>(Vec(16.5 + 75 * i, 270), module, EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f));
-			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 318), module, EO_102::PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f));
+			addInput(createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i));
+			addParam(createParamCentered<sub_sw_2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f));
+			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 320), module, EO_102::PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f));
 			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f));
 		}
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(172.5, 318), module, EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE, 0.0f, 32.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(172.5, 320), module, EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f));
+		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE, 0.0f, 32.0f, 0.0f));
 
-		addInput(createInputCentered<BluePort>(Vec(211.5, 318), module, EO_102::INPUT_EXT));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 318), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
+		addInput(createInputCentered<BluePort>(Vec(211.5, 326.5), module, EO_102::INPUT_EXT));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(226, 333), module, EO_102::LIGHT_TRIGGER));
-		addParam(createParamCentered<sub_sw_2>(Vec(211.5, 270), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
-		module->runningButtonWidget = createParamCentered<sub_btn>(Vec(245, 270), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
+		addParam(createParamCentered<sub_sw_2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
+		module->runningButtonWidget = createParamCentered<sub_btn>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
 		addParam(module->runningButtonWidget);
 
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 318), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 318), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 318), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 1.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.0f));
 	}
 };
 
