@@ -3,7 +3,8 @@
 #include "SubmarineFree.hpp"
 #include "dsp/digital.hpp"
 
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 800
+#define PRE_SIZE 100
 
 struct EO_102 : Module {
 	enum ParamIds {
@@ -41,7 +42,7 @@ struct EO_102 : Module {
 	int bufferIndex = 0;
 	float frameIndex = 0;
 	
-	float preBuffer[2][32] = {};
+	float preBuffer[2][PRE_SIZE] = {};
 	int preBufferIndex = 0;
 	float preFrameIndex = 0;
 	int preCount = 0;
@@ -64,7 +65,7 @@ void EO_102::startFrame() {
 	preCount = (int)(params[PARAM_PRE].value + 0.5f);
 	for (int i = 0; i < 2; i++) {
 		for (int s = 0; s < preCount; s++) {
-			buffer[i][s] = preBuffer[i][(preBufferIndex + 64 - preCount + s) % 32];
+			buffer[i][s] = preBuffer[i][(preBufferIndex + (PRE_SIZE * 2) - preCount + s) % PRE_SIZE];
 		}
 		traceMode[i] = (int)(params[PARAM_MODE_1 + i].value + 0.5f);
 	}
@@ -100,7 +101,7 @@ void EO_102::step() {
 			}
 		}
 		preBufferIndex++;
-		if (preBufferIndex >= 32) {
+		if (preBufferIndex >= PRE_SIZE) {
 			preBufferIndex = 0;
 		}
 	}
@@ -232,6 +233,25 @@ struct EO_Display : TransparentWidget {
 		nvgResetScissor(vg);
 	}
 
+	void drawTrigger(NVGcontext *vg, float value, float offset, float scale) {
+		Rect b = Rect(Vec(0, 0), box.size);
+		float scaling = powf(2.0f, scale);
+		float y = ((value * scaling + offset ) / 20.0f - 0.8f) * -b.size.y;
+		if (y < 0) return;
+		if (y > b.size.y) return;
+		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+
+		nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
+		{
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 0, y);
+			nvgLineTo(vg, b.size.x, y);
+			nvgClosePath(vg);
+		}
+		nvgStroke(vg);
+		nvgResetScissor(vg);
+	}
+
 	void drawPre(NVGcontext *vg, float value) {
 		if (value == 0.0f)
 			return;
@@ -278,7 +298,11 @@ struct EO_Display : TransparentWidget {
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_2].value, 0.0f, 1.0f));
 		drawIndexV(vg, clamp(module->params[EO_102::PARAM_INDEX_3].value, 0.0f, 1.0f));
-		drawMask(vg, clamp(module->params[EO_102::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
+		if (module->inputs[EO_102::INPUT_EXT].active)
+			drawTrigger(vg, module->params[EO_102::PARAM_TRIGGER].value, 0.0f, 1.0f);
+		else
+			drawTrigger(vg, module->params[EO_102::PARAM_TRIGGER].value, module->params[EO_102::PARAM_OFFSET_1].value, module->params[EO_102::PARAM_SCALE_1].value);
+		drawMask(vg, clamp(module->params[EO_102::PARAM_PRE].value, 0.0f, 1.0f * PRE_SIZE) / BUFFER_SIZE);
 		drawPre(vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
 };
@@ -406,7 +430,7 @@ struct EO102 : ModuleWidget {
 			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f));
 		}
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(172.5, 320), module, EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE, 0.0f, 32.0f, 0.0f));
+		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f));
 
 		addInput(createInputCentered<BluePort>(Vec(211.5, 326.5), module, EO_102::INPUT_EXT));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
