@@ -42,11 +42,19 @@ void SilverPort::draw(NVGcontext *vg) {
 		nvgArc(vg, radius, radius, radius - 1, 0.2076, M_PI - 0.2076, NVG_CW);
 		nvgArc(vg, 0.5, 12.5, 2.5, 1.467, -1.467, NVG_CCW);
 		nvgClosePath(vg);
-		nvgCircle(vg, radius, radius, 8.5709);
+		//nvgCircle(vg, radius, radius, 8.5709);
+		nvgCircle(vg, radius, radius, 8.0);
 		nvgPathWinding(vg, NVG_HOLE);
 		nvgStrokeColor(vg, nvgRGB(0x66,0x66,0x66));
 		nvgStrokeWidth(vg, 0.80645);
-		nvgFillPaint(vg, nvgRadialGradient(vg, radius + 0.3, radius + 1, 1, 12, col, nvgRGB(0xff, 0xff, 0xff)));
+		if (type == Port::OUTPUT) {
+			nvgFillPaint(vg, nvgRadialGradient(vg, radius + 0.3, radius + 1, 1, 12, col, nvgRGB(0x3f, 0x3f, 0x3f)));
+			nvgStrokeColor(vg, nvgRGB(0x36,0x36,0x36));
+		}
+		else {
+			nvgFillPaint(vg, nvgRadialGradient(vg, radius + 0.3, radius + 1, 1, 12, col, nvgRGB(0xff, 0xff, 0xff)));
+			nvgStrokeColor(vg, nvgRGB(0x66,0x66,0x66));
+		}
 		nvgFill(vg);
 		nvgStroke(vg); 
 	}
