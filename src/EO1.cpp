@@ -441,7 +441,7 @@ struct EO102 : ModuleWidget {
 
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.2f));
 	}
 };
 
