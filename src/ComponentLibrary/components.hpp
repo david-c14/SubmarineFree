@@ -105,6 +105,9 @@ struct sub_btn : SVGSwitch, ToggleSwitch {
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_btn.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_btn_a.svg")));
 	}
+	void step() override {
+		setValue(module->params[paramId].value);
+	}
 };
 
 //////////////////

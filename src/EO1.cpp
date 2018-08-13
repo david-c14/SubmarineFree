@@ -49,7 +49,6 @@ struct EO_102 : Module {
 
 	SchmittTrigger trigger;
 	PulseGenerator triggerLight;
-	sub_btn *runningButtonWidget;
 	float runMode;
 	int traceMode[2];
 	int traceStep;	
@@ -76,7 +75,8 @@ void EO_102::startFrame() {
 void EO_102::step() {
 	if (runMode > 0.5f) {
 		if (params[PARAM_RUNMODE].value < 0.5f)
-			runningButtonWidget->setValue(1.0f);
+		//	runningButtonWidget->setValue(1.0f);
+			engineSetParam(this, PARAM_RUN, 1.0f);
 	}
 	runMode = params[PARAM_RUNMODE].value;
 	// Compute time
@@ -154,8 +154,7 @@ void EO_102::step() {
 			if (triggered) {
 				startFrame();
 				if (runMode > 0.5f) // Continuous run mode
-					if (runningButtonWidget) // This is bad - try to move away from dependency on widget
-						runningButtonWidget->setValue(0.0f);
+					engineSetParam(this, PARAM_RUN, 0.0f);
 				return;
 			}
 		}
@@ -436,8 +435,7 @@ struct EO102 : ModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(226, 333), module, EO_102::LIGHT_TRIGGER));
 		addParam(createParamCentered<sub_sw_2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
-		module->runningButtonWidget = createParamCentered<sub_btn>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
-		addParam(module->runningButtonWidget);
+		addParam(createParamCentered<sub_btn>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f));
 
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
