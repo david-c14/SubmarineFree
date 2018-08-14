@@ -3,12 +3,19 @@
 #include "torpedo.hpp"
 
 struct TDVText : LedDisplayTextField {
+	NVGcolor bgColor;
 	TDVText() {
 		multiline = false;
 		color = nvgRGB(0x28, 0xb0, 0xf3);
+		bgColor = nvgRGBA(0, 0, 0, 0);
 	}
 	void draw(NVGcontext *vg) override {
 		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 2);
+		nvgFillColor(vg, bgColor);
+		nvgFill(vg);
 
 		nvgTranslate(vg, 24, 0);
 		nvgRotate(vg, M_PI / 2.0f);
@@ -45,6 +52,7 @@ struct TD202 : ModuleWidget {
 
 		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
 		json_object_set_new(rootJ, "fg", json_string(colorToHexString(textField->color).c_str()));
+		json_object_set_new(rootJ, "bg", json_string(colorToHexString(textField->bgColor).c_str()));
 
 		return rootJ;
 	}
@@ -57,12 +65,17 @@ struct TD202 : ModuleWidget {
 			textField->text = json_string_value(textJ);
 		json_t *fgJ = json_object_get(rootJ, "fg");
 		if (fgJ) {
-			if (json_is_object(fgJ)) {
+			if (json_is_object(fgJ))
 				textField->color = jsonToColor(fgJ);
-			}
-			else {
+			else
 				textField->color = colorFromHexString(json_string_value(fgJ));
-			}
+		}
+		json_t *bgJ = json_object_get(rootJ, "bg");
+		if (bgJ) {
+			if (json_is_object(bgJ))
+				textField->bgColor = jsonToColor(bgJ);
+			else
+				textField->bgColor = colorFromHexString(json_string_value(bgJ));
 		}
 	}
 
@@ -70,6 +83,7 @@ struct TD202 : ModuleWidget {
 		textField->text = "";
 		textField->multiline = false;
 		textField->color = nvgRGB(0x28, 0xb0, 0xf3);
+		textField->bgColor = nvgRGBA(0, 0, 0, 0);
 		ModuleWidget::reset();
 	}
 	
@@ -81,6 +95,14 @@ struct TD202_MenuItem : MenuItem {
 	NVGcolor color;
 	void onAction(EventAction &e) override {
 		widget->textField->color = color;
+	}
+};
+
+struct TD202_MenuItemB : MenuItem {
+	TD202 *widget;
+	NVGcolor color;
+	void onAction(EventAction &e) override {
+		widget->textField->bgColor = color;
 	}
 };
 
@@ -126,6 +148,21 @@ void TD202::appendContextMenu(Menu *menu) {
 	m->color = nvgRGB(0x00, 0x00, 0x00);
 	menu->addChild(m);
 
+	menu->addChild(MenuEntry::create());
+	TD202_MenuItemB *b = MenuItem::create<TD202_MenuItemB>("Background - None");
+	b->widget = this;
+	b->color = nvgRGBA(0, 0, 0, 0);
+	menu->addChild(b);
+
+	b = MenuItem::create<TD202_MenuItemB>("Background - Black");
+	b->widget = this;
+	b->color = nvgRGB(0, 0, 0);
+	menu->addChild(b);
+
+	b = MenuItem::create<TD202_MenuItemB>("Background - White");
+	b->widget = this;
+	b->color = nvgRGB(0xff, 0xff, 0xff);
+	menu->addChild(b);
 }
 
 
