@@ -12,3 +12,14 @@ The TD-116 features [Torpedo](https://github.com/david-c14/Torpedo) input and ou
 Text or formatting information can be sent into the TD-116 through the Torpedo input port, allowing you to change the text or formatting programmatically.
 
 The [TF-101](TF.md) is a suitable device to control the formatting.
+
+#### TD-202 Vertical Text Display
+
+![View of the Vertical Text Display](TD-202.png "Vertical Text Display")
+
+## Basic Operation
+
+The TD-202 is a small 2-HP text display which can show a single line of text running down the rack. It is useful for labelling or separating
+sections of a patch.
+
+The colors of the TD-202 can be adjusted using the context menu.

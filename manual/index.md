@@ -15,6 +15,9 @@ Blanking plates
 # [DS](DS.md)
 Digital Suite
 
+# [EO](EO.md)
+Envelope Oscilloscope
+
 # [FF](FF.md)
 Flip-Flops
 
