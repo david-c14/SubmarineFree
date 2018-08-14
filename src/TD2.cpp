@@ -10,7 +10,7 @@ struct TDVText : LedDisplayTextField {
 	void draw(NVGcontext *vg) override {
 		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 
-		nvgTranslate(vg, 25, 0);
+		nvgTranslate(vg, 24, 0);
 		nvgRotate(vg, M_PI / 2.0f);
 		//Text
 		if (font->handle >= 0) {
@@ -22,7 +22,7 @@ struct TDVText : LedDisplayTextField {
 			int end = (this == gFocusedWidget) ? max(cursor, selection) : -1;
 			bndIconLabelCaret(vg, textOffset.y, textOffset.x,
 				box.size.y - 2*textOffset.y, box.size.x - 2*textOffset.x,
-				-1, color, 24, text.c_str(), highlightColor, begin, end);
+				-1, color, 28, text.c_str(), highlightColor, begin, end);
 		}
 		nvgResetScissor(vg);
 		bndSetFont(gGuiFont->handle);
@@ -113,6 +113,11 @@ void TD202::appendContextMenu(Menu *menu) {
 	m = MenuItem::create<TD202_MenuItem>("White");
 	m->widget = this;
 	m->color = nvgRGB(0xff, 0xff, 0xff);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD202_MenuItem>("Black");
+	m->widget = this;
+	m->color = nvgRGB(0x00, 0x00, 0x00);
 	menu->addChild(m);
 
 }
