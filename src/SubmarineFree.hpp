@@ -60,6 +60,7 @@ extern Model *modelSS220;
 extern Model *modelSS221;
 
 extern Model *modelTD116;
+extern Model *modelTD202;
 extern Model *modelTF101;
 extern Model *modelTM105;
 
