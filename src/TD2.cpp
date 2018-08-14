@@ -2,23 +2,10 @@
 #include "window.hpp"
 #include "torpedo.hpp"
 
-static const NVGcolor wireColors[] = {
-	nvgRGB(0xc9, 0xb7, 0x0e), // yellow
-	nvgRGB(0xc9, 0x18, 0x47), // red
-	nvgRGB(0x0c, 0x8e, 0x15), // green
-	nvgRGB(0x09, 0x86, 0xad), // blue
-	// nvgRGB(0x44, 0x44, 0x44), // black
-	// nvgRGB(0x66, 0x66, 0x66), // gray
-	// nvgRGB(0x88, 0x88, 0x88), // light gray
-	// nvgRGB(0xaa, 0xaa, 0xaa), // white
-};
-static int lastWireColorId = -1;
-
 struct TDVText : LedDisplayTextField {
 	TDVText() {
 		multiline = false;
 		color = nvgRGB(0x28, 0xb0, 0xf3);
-		color = wireColors[++lastWireColorId];
 	}
 	void draw(NVGcontext *vg) override {
 		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
@@ -79,7 +66,56 @@ struct TD202 : ModuleWidget {
 		textField->color = nvgRGB(0x28, 0xb0, 0xf3);
 		ModuleWidget::reset();
 	}
+	
+	void appendContextMenu(Menu *menu) override;
 };
+
+struct TD202_MenuItem : MenuItem {
+	TD202 *widget;
+	NVGcolor color;
+	void onAction(EventAction &e) override {
+		widget->textField->color = color;
+	}
+};
+
+void TD202::appendContextMenu(Menu *menu) {
+	menu->addChild(MenuEntry::create());
+	TD202_MenuItem *m = MenuItem::create<TD202_MenuItem>("Blue");
+	m->widget = this;
+	m->color = nvgRGB(0x28, 0xb0, 0xf3);
+	menu->addChild(m);
+	
+	m = MenuItem::create<TD202_MenuItem>("Yellow");
+	m->widget = this;
+	m->color = nvgRGB(0xc9, 0xb7, 0x0e);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD202_MenuItem>("Red");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0x13, 0x13);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD202_MenuItem>("Green");
+	m->widget = this;
+	m->color = nvgRGB(0x0a, 0xff, 0x13);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD202_MenuItem>("Orange");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0xa5, 0x2d);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD202_MenuItem>("Pink");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0x7d, 0xec);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD202_MenuItem>("White");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0xff, 0xff);
+	menu->addChild(m);
+
+}
 
 
 Model *modelTD202 = Model::create<Module, TD202>("SubmarineFree", "TD-202", "TD-202 Vertical Text Display", VISUAL_TAG);

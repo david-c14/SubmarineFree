@@ -172,7 +172,58 @@ struct TD116 : ModuleWidget {
 		textField->bgColor = nvgRGB(0,0,0);	
 		ModuleWidget::reset();
 	}
+
+	void appendContextMenu(Menu *menu) override;
 };
+
+struct TD116_MenuItem : MenuItem {
+	TD116 *widget;
+	NVGcolor color;
+	void onAction(EventAction &e) override {
+		widget->textField->tdModule->fg = color;
+		widget->textField->color = color;
+	}
+};
+
+void TD116::appendContextMenu(Menu *menu) {
+	menu->addChild(MenuEntry::create());
+	TD116_MenuItem *m = MenuItem::create<TD116_MenuItem>("Blue");
+	m->widget = this;
+	m->color = nvgRGB(0x28, 0xb0, 0xf3);
+	menu->addChild(m);
+	
+	m = MenuItem::create<TD116_MenuItem>("Yellow");
+	m->widget = this;
+	m->color = nvgRGB(0xc9, 0xb7, 0x0e);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD116_MenuItem>("Red");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0x13, 0x13);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD116_MenuItem>("Green");
+	m->widget = this;
+	m->color = nvgRGB(0x0a, 0xff, 0x13);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD116_MenuItem>("Orange");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0xa5, 0x2d);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD116_MenuItem>("Pink");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0x7d, 0xec);
+	menu->addChild(m);
+
+	m = MenuItem::create<TD116_MenuItem>("White");
+	m->widget = this;
+	m->color = nvgRGB(0xff, 0xff, 0xff);
+	menu->addChild(m);
+
+}
+
 
 
 Model *modelTD116 = Model::create<TD_116, TD116>("SubmarineFree", "TD-116", "TD-116 Text Display", VISUAL_TAG);
