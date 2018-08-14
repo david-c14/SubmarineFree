@@ -44,7 +44,7 @@ struct TD202 : ModuleWidget {
 		json_t *rootJ = ModuleWidget::toJson();
 
 		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
-		json_object_set_new(rootJ, "fg", colorToJson(textField->color));
+		json_object_set_new(rootJ, "fg", json_string(colorToHexString(textField->color).c_str()));
 
 		return rootJ;
 	}
@@ -56,8 +56,14 @@ struct TD202 : ModuleWidget {
 		if (textJ)
 			textField->text = json_string_value(textJ);
 		json_t *fgJ = json_object_get(rootJ, "fg");
-		if (fgJ)
-			textField->color = jsonToColor(fgJ);
+		if (fgJ) {
+			if (json_is_object(fgJ)) {
+				textField->color = jsonToColor(fgJ);
+			}
+			else {
+				textField->color = colorFromHexString(json_string_value(fgJ));
+			}
+		}
 	}
 
 	void reset() override {

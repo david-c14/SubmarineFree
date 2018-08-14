@@ -127,8 +127,8 @@ struct TD116 : ModuleWidget {
 
 		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
 		json_object_set_new(rootJ, "size", json_real(textField->fontSize));
-		json_object_set_new(rootJ, "fg", colorToJson(textField->color));
-		json_object_set_new(rootJ, "bg", colorToJson(textField->bgColor));
+		json_object_set_new(rootJ, "fg", json_string(colorToHexString(textField->color).c_str()));
+		json_object_set_new(rootJ, "bg", json_string(colorToHexString(textField->bgColor).c_str()));
 
 		return rootJ;
 	}
@@ -143,11 +143,19 @@ struct TD116 : ModuleWidget {
 		if (sizeJ)
 			textField->fontSize = json_number_value(sizeJ);
 		json_t *fgJ = json_object_get(rootJ, "fg");
-		if (fgJ)
-			textField->color = jsonToColor(fgJ);
+		if (fgJ) {
+			if (json_is_object(fgJ)) 
+				textField->color = jsonToColor(fgJ);
+			else
+				textField->color = colorFromHexString(json_string_value(fgJ));
+		}
 		json_t *bgJ = json_object_get(rootJ, "bg");
-		if (bgJ)
-			textField->bgColor = jsonToColor(bgJ);
+		if (bgJ) {
+			if (json_is_object(bgJ))
+				textField->bgColor = jsonToColor(bgJ);
+			else
+				textField->bgColor = colorFromHexString(json_string_value(bgJ));
+		}
 	}
 
 	void step() override {
