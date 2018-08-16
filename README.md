@@ -1,7 +1,7 @@
 # SubmarineFree
 Free plugins for VCV Rack
 
-### [.plan (what I'm working on)](https://github.com/david-c14/SubmarineFree/issues/23)
+[.plan (what I'm working on)](https://github.com/david-c14/SubmarineFree/issues/23)
 
 # [Manual](https://github.com/david-c14/SubmarineFree/blob/master/manual/index.md)
 
