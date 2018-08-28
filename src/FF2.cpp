@@ -112,5 +112,5 @@ struct FF212 : ModuleWidget {
 	}
 };
 
-Model *modelFF206 = Model::create<FF_2<6>, FF206>("SubmarineFree", "FF-206", "FF-206 Edge Triggered Flip-Flops", LOGIC_TAG, MULTIPLE_TAG);
-Model *modelFF212 = Model::create<FF_2<12>, FF212>("SubmarineFree", "FF-212", "FF-212 Edge Triggered Flip-Flops", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelFF206 = Model::create<FF_2<6>, FF206>("Submarine (Free)", "FF-206", "FF-206 Edge Triggered Flip-Flops", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelFF212 = Model::create<FF_2<12>, FF212>("Submarine (Free)", "FF-212", "FF-212 Edge Triggered Flip-Flops", LOGIC_TAG, MULTIPLE_TAG);

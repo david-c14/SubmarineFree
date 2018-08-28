@@ -73,5 +73,5 @@ struct PG112 : ModuleWidget {
 	}
 };
 
-Model *modelPG104 = Model::create<PG_1<4>, PG104>("SubmarineFree", "PG-104", "PG-104 Pulse Generators", LOGIC_TAG, MULTIPLE_TAG);
-Model *modelPG112 = Model::create<PG_1<12>, PG112>("SubmarineFree", "PG-112", "PG-112 Pulse Generators", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelPG104 = Model::create<PG_1<4>, PG104>("Submarine (Free)", "PG-104", "PG-104 Pulse Generators", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelPG112 = Model::create<PG_1<12>, PG112>("Submarine (Free)", "PG-112", "PG-112 Pulse Generators", LOGIC_TAG, MULTIPLE_TAG);

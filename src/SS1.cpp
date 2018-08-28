@@ -142,8 +142,8 @@ struct SS220 : ModuleWidget {
 	}
 };
 
-Model *modelSS112 = Model::create<SS_112, SS112>("SubmarineFree", "SS-112", "SS-112 12 Input Sinks", UTILITY_TAG);
-Model *modelSS208 = Model::create<SS_208, SS208>("SubmarineFree", "SS-208", "SS-208 8 Irrational Output Voltage Sources", UTILITY_TAG);
-Model *modelSS212 = Model::create<SS_212, SS212>("SubmarineFree", "SS-212", "SS-212 12 Chromatic Output Voltage Sources", UTILITY_TAG);
-Model *modelSS220 = Model::create<SS_220, SS220>("SubmarineFree", "SS-220", "SS-220 120 Chromatic Output Voltage Sources", UTILITY_TAG);
-Model *modelSS221 = Model::create<SS_221, SS221>("SubmarineFree", "SS-221", "SS-221 21 Output Voltage Sources", UTILITY_TAG);
+Model *modelSS112 = Model::create<SS_112, SS112>("Submarine (Free)", "SS-112", "SS-112 12 Input Sinks", UTILITY_TAG);
+Model *modelSS208 = Model::create<SS_208, SS208>("Submarine (Free)", "SS-208", "SS-208 8 Irrational Output Voltage Sources", UTILITY_TAG);
+Model *modelSS212 = Model::create<SS_212, SS212>("Submarine (Free)", "SS-212", "SS-212 12 Chromatic Output Voltage Sources", UTILITY_TAG);
+Model *modelSS220 = Model::create<SS_220, SS220>("Submarine (Free)", "SS-220", "SS-220 120 Chromatic Output Voltage Sources", UTILITY_TAG);
+Model *modelSS221 = Model::create<SS_221, SS221>("Submarine (Free)", "SS-221", "SS-221 21 Output Voltage Sources", UTILITY_TAG);

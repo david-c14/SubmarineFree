@@ -21,7 +21,7 @@ struct OG_1 : DS_Module {
 	OG_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override {
 		int setCount = 0;
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < x; i++) {
 			if (inputs[INPUT_A_1 + i].active)
 				if (inputs[INPUT_A_1 + i].value > midpoint())
 					setCount++;
@@ -70,5 +70,5 @@ struct OG106 : ModuleWidget {
 	}
 };
 
-Model *modelOG104 = Model::create<OG_1<4>, OG104>("SubmarineFree", "OG-104", "OG-104 OR Gates", LOGIC_TAG, MULTIPLE_TAG);
-Model *modelOG106 = Model::create<OG_1<6>, OG106>("SubmarineFree", "OG-106", "OG-106 OR Gates", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelOG104 = Model::create<OG_1<4>, OG104>("Submarine (Free)", "OG-104", "OG-104 OR Gates", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelOG106 = Model::create<OG_1<6>, OG106>("Submarine (Free)", "OG-106", "OG-106 OR Gates", LOGIC_TAG, MULTIPLE_TAG);

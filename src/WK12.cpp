@@ -544,5 +544,5 @@ void WK205::appendContextMenu(Menu *menu) {
 	}
 }
 
-Model *modelWK101 = Model::create<WK_101, WK101>("SubmarineFree", "WK-101", "WK-101 Das Wohltemperierte Klavier", QUANTIZER_TAG, TUNER_TAG);
-Model *modelWK205 = Model::create<WK_205, WK205>("SubmarineFree", "WK-205", "WK-205 Das Wohltemperierte Klavier Nano", QUANTIZER_TAG, TUNER_TAG, MULTIPLE_TAG);
+Model *modelWK101 = Model::create<WK_101, WK101>("Submarine (Free)", "WK-101", "WK-101 Das Wohltemperierte Klavier", QUANTIZER_TAG, TUNER_TAG);
+Model *modelWK205 = Model::create<WK_205, WK205>("Submarine (Free)", "WK-205", "WK-205 Das Wohltemperierte Klavier Nano", QUANTIZER_TAG, TUNER_TAG, MULTIPLE_TAG);

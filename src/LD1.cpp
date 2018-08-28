@@ -151,5 +151,5 @@ void LD106::appendContextMenu(Menu *menu) {
 	((DS_Module *)module)->appendContextMenu(menu);
 }
 
-Model *modelLD103 = Model::create<LD_1<3>, LD103>("SubmarineFree", "LD-103", "LD-103 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
-Model *modelLD106 = Model::create<LD_1<6>, LD106>("SubmarineFree", "LD-106", "LD-106 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelLD103 = Model::create<LD_1<3>, LD103>("Submarine (Free)", "LD-103", "LD-103 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelLD106 = Model::create<LD_1<6>, LD106>("Submarine (Free)", "LD-106", "LD-106 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);

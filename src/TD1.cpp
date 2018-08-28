@@ -234,4 +234,4 @@ void TD116::appendContextMenu(Menu *menu) {
 
 
 
-Model *modelTD116 = Model::create<TD_116, TD116>("SubmarineFree", "TD-116", "TD-116 Text Display", VISUAL_TAG);
+Model *modelTD116 = Model::create<TD_116, TD116>("Submarine (Free)", "TD-116", "TD-116 Text Display", VISUAL_TAG);

@@ -85,4 +85,4 @@ struct XF201 : ModuleWidget {
 	}
 };
 
-Model *modelXF201 = Model::create<XF_201, XF201>("SubmarineFree", "XF-201", "XF-201 Single Stereo Cross Fader", MIXER_TAG);
+Model *modelXF201 = Model::create<XF_201, XF201>("Submarine (Free)", "XF-201", "XF-201 Single Stereo Cross Fader", MIXER_TAG);

@@ -443,4 +443,4 @@ struct EO102 : ModuleWidget {
 	}
 };
 
-Model *modelEO102 = Model::create<EO_102, EO102>("SubmarineFree", "EO-102", "EO-102 Envelope Oscilloscope", VISUAL_TAG);
+Model *modelEO102 = Model::create<EO_102, EO102>("Submarine (Free)", "EO-102", "EO-102 Envelope Oscilloscope", VISUAL_TAG);
