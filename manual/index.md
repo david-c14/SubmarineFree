@@ -1,4 +1,4 @@
-## [Get Latest Builds](https://github.com/david-c14/SubmarineFree/issues/14)
+## [Get Latest Builds](https://github.com/david-c14/SubmarineFree/releases/tag/v0.6.7)
 
 # [AG](AG.md)
 Logical AND gates
