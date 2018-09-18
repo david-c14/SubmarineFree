@@ -2,6 +2,8 @@
 #include <random>
 #include <chrono>
 
+static std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+
 template <int x>
 struct DN_1 : DS_Module {
 	enum ParamIds {
@@ -20,7 +22,6 @@ struct DN_1 : DS_Module {
 	uint32_t lfsr[x];
 
 	DN_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
 		std::uniform_int_distribution<int> distribution(1, 0xffffffffu);
 		for (unsigned int i = 0; i < x; i++) {
 			lfsr[i] = distribution(generator);
