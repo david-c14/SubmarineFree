@@ -106,63 +106,92 @@ struct TD202_MenuItemB : MenuItem {
 	}
 };
 
+struct TD202_ParentItem : MenuItem {
+	TD202 *widget;
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
+
+		TD202_MenuItem *m = MenuItem::create<TD202_MenuItem>("Blue");
+		m->widget = widget;
+		m->color = nvgRGB(0x28, 0xb0, 0xf3);
+		menu->addChild(m);
+	
+		m = MenuItem::create<TD202_MenuItem>("Yellow");
+		m->widget = widget;
+		m->color = nvgRGB(0xc9, 0xb7, 0x0e);
+		menu->addChild(m);
+
+		m = MenuItem::create<TD202_MenuItem>("Red");
+		m->widget = widget;
+		m->color = nvgRGB(0xff, 0x13, 0x13);
+		menu->addChild(m);
+
+		m = MenuItem::create<TD202_MenuItem>("Green");
+		m->widget = widget;
+		m->color = nvgRGB(0x0a, 0xff, 0x13);
+		menu->addChild(m);
+
+		m = MenuItem::create<TD202_MenuItem>("Orange");
+		m->widget = widget;
+		m->color = nvgRGB(0xff, 0xa5, 0x2d);
+		menu->addChild(m);
+
+		m = MenuItem::create<TD202_MenuItem>("Pink");
+		m->widget = widget;
+		m->color = nvgRGB(0xff, 0x7d, 0xec);
+		menu->addChild(m);
+
+		m = MenuItem::create<TD202_MenuItem>("White");
+		m->widget = widget;
+		m->color = nvgRGB(0xff, 0xff, 0xff);
+		menu->addChild(m);
+
+		m = MenuItem::create<TD202_MenuItem>("Black");
+		m->widget = widget;
+		m->color = nvgRGB(0x00, 0x00, 0x00);
+		menu->addChild(m);
+
+		return menu;
+	}
+};
+
+struct TD202_ParentItemB : MenuItem {
+	TD202 *widget;
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
+
+		TD202_MenuItemB *b = MenuItem::create<TD202_MenuItemB>("None");
+		b->widget = widget;
+		b->color = nvgRGBA(0, 0, 0, 0);
+		menu->addChild(b);
+
+		b = MenuItem::create<TD202_MenuItemB>("Black");
+		b->widget = widget;
+		b->color = nvgRGB(0, 0, 0);
+		menu->addChild(b);
+
+		b = MenuItem::create<TD202_MenuItemB>("White");
+		b->widget = widget;
+		b->color = nvgRGB(0xff, 0xff, 0xff);
+		menu->addChild(b);
+		
+		return menu;
+	}
+};
+
 void TD202::appendContextMenu(Menu *menu) {
 	menu->addChild(MenuEntry::create());
-	TD202_MenuItem *m = MenuItem::create<TD202_MenuItem>("Blue");
+
+	TD202_ParentItem *m = MenuItem::create<TD202_ParentItem>("Text Color");
+	m->rightText = "\xe2\x96\xb6";
 	m->widget = this;
-	m->color = nvgRGB(0x28, 0xb0, 0xf3);
-	menu->addChild(m);
-	
-	m = MenuItem::create<TD202_MenuItem>("Yellow");
-	m->widget = this;
-	m->color = nvgRGB(0xc9, 0xb7, 0x0e);
 	menu->addChild(m);
 
-	m = MenuItem::create<TD202_MenuItem>("Red");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0x13, 0x13);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD202_MenuItem>("Green");
-	m->widget = this;
-	m->color = nvgRGB(0x0a, 0xff, 0x13);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD202_MenuItem>("Orange");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0xa5, 0x2d);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD202_MenuItem>("Pink");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0x7d, 0xec);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD202_MenuItem>("White");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0xff, 0xff);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD202_MenuItem>("Black");
-	m->widget = this;
-	m->color = nvgRGB(0x00, 0x00, 0x00);
-	menu->addChild(m);
-
-	menu->addChild(MenuEntry::create());
-	TD202_MenuItemB *b = MenuItem::create<TD202_MenuItemB>("Background - None");
+	TD202_ParentItemB *b = MenuItem::create<TD202_ParentItemB>("Background Color");
+	b->rightText = "\xe2\x96\xb6";
 	b->widget = this;
-	b->color = nvgRGBA(0, 0, 0, 0);
 	menu->addChild(b);
 
-	b = MenuItem::create<TD202_MenuItemB>("Background - Black");
-	b->widget = this;
-	b->color = nvgRGB(0, 0, 0);
-	menu->addChild(b);
-
-	b = MenuItem::create<TD202_MenuItemB>("Background - White");
-	b->widget = this;
-	b->color = nvgRGB(0xff, 0xff, 0xff);
-	menu->addChild(b);
 }
 
 
