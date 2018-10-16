@@ -46,6 +46,14 @@ struct TDText : LedDisplayTextField {
 		LedDisplayTextField::onTextChange();
 		tdModule->sendText(text);
 	}
+	int getTextPosition(Vec mousePos) override {
+	    bndSetFont(font->handle);
+	    int textPos = bndIconLabelTextPosition(gVg, textOffset.x, textOffset.y,
+	      box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
+	      -1, fontSize, text.c_str(), mousePos.x, mousePos.y);
+	    bndSetFont(gGuiFont->handle);
+	    return textPos;
+	}
 	void draw(NVGcontext *vg) override {
 		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
 		//Background
