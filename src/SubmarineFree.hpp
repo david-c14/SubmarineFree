@@ -87,3 +87,5 @@ struct SubHelper {
 		return SVG::load(assetPlugin(plugin, workingSpace));
 	}
 };
+
+#define SUBMENU "\xe2\x96\xb6"
