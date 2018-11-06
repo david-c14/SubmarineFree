@@ -43,7 +43,7 @@ namespace SubmarineAO {
 #define OP "("			// Open Parenthesis
 #define CP ")"			// Close Parenthesis
 #define P "|"			// Pipe symbol
-#define M "\xe2\xa8\xaf"	
+#define M "\xe2\xa8\xaf"	// Multiplication symbol
 #define D "\xc3\xb7"		// Division symbol
 #define R "\xe2\x88\x9a"	// Root symbol
 #define S2 "\xc2\xb2"		// Superscript 2
@@ -78,246 +78,248 @@ namespace SubmarineAO {
 #define H "/"			// Slash
 #define Pi "\xcf\x80"		// PI
 #define TAU "\xcf\x84"		// TAU
+#define F "\xc6\x92"		// frequency
+#define LAM "\xce\xbb"		// lambda
 
 
 	std::vector<Functor> functions {
 #define CATEGORY 0
-		{ CATEGORY, "",                      LAMBDA(  0                      ) }, // Passthrough
+		{ CATEGORY, "",                      	LAMBDA(  0                      ) }, // Passthrough
 #undef CATEGORY
 #define CATEGORY 1
-		{ CATEGORY, C,                       LAMBDA(  c                      ) }, // Addition 
-		{ CATEGORY, X A C,                   LAMBDA(  x + c                  ) },
-		{ CATEGORY, Y A C,                   LAMBDA(  y + c                  ) },
-		{ CATEGORY, X A Y A C,               LAMBDA(  x + y + c              ) },
+		{ CATEGORY, C,                       	LAMBDA(  c                      ) }, // Addition 
+		{ CATEGORY, X A C,                   	LAMBDA(  x + c                  ) },
+		{ CATEGORY, Y A C,                   	LAMBDA(  y + c                  ) },
+		{ CATEGORY, X A Y A C,               	LAMBDA(  x + y + c              ) },
 #undef CATEGORY
 #define CATEGORY 2
-		{ CATEGORY, C S X,                   LAMBDA(  c - x                  ) }, // Subtraction
-		{ CATEGORY, C S Y,                   LAMBDA(  c - y                  ) },
-		{ CATEGORY, X S OP Y A C CP,         LAMBDA(  x - ( y + c )          ) },
-		{ CATEGORY, OP X A C CP S Y,         LAMBDA(  ( x + c ) - y          ) },
-		{ CATEGORY, Y S OP X A C CP,         LAMBDA(  y - ( x + c )          ) },
-		{ CATEGORY, OP Y A C CP S X,         LAMBDA(  ( y + c ) - x          ) },
+		{ CATEGORY, C S X,                   	LAMBDA(  c - x                  ) }, // Subtraction
+		{ CATEGORY, C S Y,                   	LAMBDA(  c - y                  ) },
+		{ CATEGORY, X S OP Y A C CP,         	LAMBDA(  x - ( y + c )          ) },
+		{ CATEGORY, OP X A C CP S Y,         	LAMBDA(  ( x + c ) - y          ) },
+		{ CATEGORY, Y S OP X A C CP,         	LAMBDA(  y - ( x + c )          ) },
+		{ CATEGORY, OP Y A C CP S X,         	LAMBDA(  ( y + c ) - x          ) },
 #undef CATEGORY
 #define CATEGORY 3
-		{ CATEGORY, OP X M Y CP A C,         LAMBDA(  ( x * y ) + c          ) }, // Multiplication
-		{ CATEGORY, OP X A C CP M Y,         LAMBDA(  ( x + c ) * y          ) },
-		{ CATEGORY, X M OP Y A C CP,         LAMBDA(  x * ( y + c )          ) },
-		{ CATEGORY, X M C,                   LAMBDA(  x * c                  ) },
-		{ CATEGORY, Y M C,                   LAMBDA(  y * c                  ) },
-		{ CATEGORY, X M Y M C,               LAMBDA(  x * y * c              ) },
-		{ CATEGORY, Pi M OP X A C CP,	   LAMBDA(  M_PI * ( x + c )	   ) },
-		{ CATEGORY, Pi M OP Y A C CP,	   LAMBDA(  M_PI * ( y + c )	   ) },
-		{ CATEGORY, TAU M OP X A C CP,	   LAMBDA(  2 * M_PI * ( x + c )   ) },
-		{ CATEGORY, TAU M OP Y A C CP,	   LAMBDA(  2 * M_PI * ( y + c )   ) },
+		{ CATEGORY, OP X M Y CP A C,         	LAMBDA(  ( x * y ) + c          ) }, // Multiplication
+		{ CATEGORY, OP X A C CP M Y,         	LAMBDA(  ( x + c ) * y          ) },
+		{ CATEGORY, X M OP Y A C CP,         	LAMBDA(  x * ( y + c )          ) },
+		{ CATEGORY, X M C,                   	LAMBDA(  x * c                  ) },
+		{ CATEGORY, Y M C,                   	LAMBDA(  y * c                  ) },
+		{ CATEGORY, X M Y M C,               	LAMBDA(  x * y * c              ) },
+		{ CATEGORY, Pi M OP X A C CP,	   	LAMBDA(  M_PI * ( x + c )	   ) },
+		{ CATEGORY, Pi M OP Y A C CP,	   	LAMBDA(  M_PI * ( y + c )	   ) },
+		{ CATEGORY, TAU M OP X A C CP,	   	LAMBDA(  2 * M_PI * ( x + c )   ) },
+		{ CATEGORY, TAU M OP Y A C CP,	   	LAMBDA(  2 * M_PI * ( y + c )   ) },
 #undef CATEGORY
 #define CATEGORY 4
-		{ CATEGORY, X D C,                   LAMBDA(  x / c                  ) }, // Division
-		{ CATEGORY, C D X,                   LAMBDA(  c / x                  ) },
-		{ CATEGORY, Y D C,                   LAMBDA(  y / c                  ) },
-		{ CATEGORY, C D Y,                   LAMBDA(  c / y                  ) },
-		{ CATEGORY, C A OP X D Y CP,         LAMBDA(  c + ( x / y )          ) },
-		{ CATEGORY, C A OP Y D X CP,         LAMBDA(  c + ( y / x )          ) },
-		{ CATEGORY, X A OP Y D C CP,	   LAMBDA(  x + ( y / c )	   ) },	
-		{ CATEGORY, X A OP C D Y CP,	   LAMBDA(  x + ( c / y ) 	   ) },
- 		{ CATEGORY, Y A OP X D C CP,	   LAMBDA(  y + ( x / c )	   ) },
-		{ CATEGORY, Y A OP C D X CP,	   LAMBDA(  y + ( c / x ) 	   ) },
-		{ CATEGORY, OP X A C CP D Y,         LAMBDA(  ( x + c ) / y          ) },
-		{ CATEGORY, X D OP Y A C CP,         LAMBDA(  x / ( y + c )          ) },
-		{ CATEGORY, OP Y A C CP D X,         LAMBDA(  ( y + c ) / x          ) },
-		{ CATEGORY, Y D OP X A C CP,         LAMBDA(  y / ( x + c )          ) },
+		{ CATEGORY, X D C,                   	LAMBDA(  x / c                  ) }, // Division
+		{ CATEGORY, C D X,                   	LAMBDA(  c / x                  ) },
+		{ CATEGORY, Y D C,                   	LAMBDA(  y / c                  ) },
+		{ CATEGORY, C D Y,                   	LAMBDA(  c / y                  ) },
+		{ CATEGORY, C A OP X D Y CP,         	LAMBDA(  c + ( x / y )          ) },
+		{ CATEGORY, C A OP Y D X CP,      	LAMBDA(  c + ( y / x )          ) },
+		{ CATEGORY, X A OP Y D C CP,	   	LAMBDA(  x + ( y / c )	   ) },	
+		{ CATEGORY, X A OP C D Y CP,	   	LAMBDA(  x + ( c / y ) 	   ) },
+ 		{ CATEGORY, Y A OP X D C CP,	   	LAMBDA(  y + ( x / c )	   ) },
+		{ CATEGORY, Y A OP C D X CP,	   	LAMBDA(  y + ( c / x ) 	   ) },
+		{ CATEGORY, OP X A C CP D Y,         	LAMBDA(  ( x + c ) / y          ) },
+		{ CATEGORY, X D OP Y A C CP,         	LAMBDA(  x / ( y + c )          ) },
+		{ CATEGORY, OP Y A C CP D X,         	LAMBDA(  ( y + c ) / x          ) },
+		{ CATEGORY, Y D OP X A C CP,         	LAMBDA(  y / ( x + c )          ) },
 #undef CATEGORY
 #define CATEGORY 5
-		{ CATEGORY, OP X A C CP O Y,	   LAMBDA(  fmodf( x + c , y )	   ) }, // Modulo
-		{ CATEGORY, OP Y A C CP O X,	   LAMBDA(  fmodf( y + c , x )	   ) },
-		{ CATEGORY, X O OP Y A C CP,	   LAMBDA(  fmodf( x , y + c )	   ) },
-		{ CATEGORY, Y O OP X A C CP,	   LAMBDA(  fmodf( y , x + c)	   ) },
-		{ CATEGORY, X O C,		   LAMBDA(  fmodf( x , c )	   ) },
-		{ CATEGORY, Y O C,		   LAMBDA(  fmodf( y , c )  	   ) },
+		{ CATEGORY, OP X A C CP O Y,	   	LAMBDA(  fmodf( x + c , y )	   ) }, // Modulo
+		{ CATEGORY, OP Y A C CP O X,	   	LAMBDA(  fmodf( y + c , x )	   ) },
+		{ CATEGORY, X O OP Y A C CP,	   	LAMBDA(  fmodf( x , y + c )	   ) },
+		{ CATEGORY, Y O OP X A C CP,	   	LAMBDA(  fmodf( y , x + c)	   ) },
+		{ CATEGORY, X O C,		   	LAMBDA(  fmodf( x , c )	   ) },
+		{ CATEGORY, Y O C,		   	LAMBDA(  fmodf( y , c )  	   ) },
 #undef CATEGORY
 #define CATEGORY 6
-		{ CATEGORY, X S2 A C,                LAMBDA(  x * x + c              ) }, // Quadratic
-		{ CATEGORY, Y S2 A C,                LAMBDA(  y * y + c              ) },
-		{ CATEGORY, OP X A C CP S2,          LAMBDA(  ( x + c ) * ( x + c )  ) },
-		{ CATEGORY, OP Y A C CP S2,          LAMBDA(  ( y + c ) * ( y + c )  ) },
-		{ CATEGORY, X S2 A Y A C,            LAMBDA(  x * x + y + c          ) },
-		{ CATEGORY, Y S2 A X A C,            LAMBDA(  y * y + x + c          ) },
-		{ CATEGORY, X S2 A C Y,              LAMBDA(  x * x + c * y          ) },
-		{ CATEGORY, Y S2 A C X,              LAMBDA(  y * y + c * x          ) },
+		{ CATEGORY, X S2 A C,                	LAMBDA(  x * x + c              ) }, // Quadratic
+		{ CATEGORY, Y S2 A C,                	LAMBDA(  y * y + c              ) },
+		{ CATEGORY, OP X A C CP S2,          	LAMBDA(  ( x + c ) * ( x + c )  ) },
+		{ CATEGORY, OP Y A C CP S2,          	LAMBDA(  ( y + c ) * ( y + c )  ) },
+		{ CATEGORY, X S2 A Y A C,            	LAMBDA(  x * x + y + c          ) },
+		{ CATEGORY, Y S2 A X A C,            	LAMBDA(  y * y + x + c          ) },
+		{ CATEGORY, X S2 A C Y,              	LAMBDA(  x * x + c * y          ) },
+		{ CATEGORY, Y S2 A C X,              	LAMBDA(  y * y + c * x          ) },
 #undef CATEGORY
 #define CATEGORY 7
-		{ CATEGORY, R OP X A C CP,           LAMBDA(  sqrt( x + c )          ) }, // Square Root
-		{ CATEGORY, R OP Y A C CP,           LAMBDA(  sqrt( y + c )          ) },
+		{ CATEGORY, R OP X A C CP,           	LAMBDA(  sqrt( x + c )          ) }, // Square Root
+		{ CATEGORY, R OP Y A C CP,           	LAMBDA(  sqrt( y + c )          ) },
 #undef CATEGORY
 #define CATEGORY 8
-		{ CATEGORY, C SX,			   LAMBDA(  powf( c , x )	   ) }, // Powers
-		{ CATEGORY, C SY,			   LAMBDA(  powf( c , y )	   ) },
-		{ CATEGORY, C SX SA SY,		   LAMBDA(  powf( c , x + y ) 	   ) },
-		{ CATEGORY, C SX SY,		   LAMBDA(  powf( c , x * y )	   ) },
-		{ CATEGORY, X SC,			   LAMBDA(  powf( x , c ) 	   ) },
-		{ CATEGORY, Y SC,			   LAMBDA(  powf( y , c )	   ) },
-		{ CATEGORY, X SY SA SC, 		   LAMBDA(  powf( x , y + c )	   ) },
-		{ CATEGORY, Y SX SA SC,		   LAMBDA(  powf( y , x + c )	   ) },
-		{ CATEGORY, X SC SY,		   LAMBDA(  powf( x , c * y )	   ) },
-		{ CATEGORY, Y SC SX,		   LAMBDA(  powf( y , c * x )	   ) },
+		{ CATEGORY, C SX,			LAMBDA(  powf( c , x )	   ) }, // Powers
+		{ CATEGORY, C SY,			LAMBDA(  powf( c , y )	   ) },
+		{ CATEGORY, C SX SA SY,		   	LAMBDA(  powf( c , x + y ) 	   ) },
+		{ CATEGORY, C SX SY,		   	LAMBDA(  powf( c , x * y )	   ) },
+		{ CATEGORY, X SC,			LAMBDA(  powf( x , c ) 	   ) },
+		{ CATEGORY, Y SC,			LAMBDA(  powf( y , c )	   ) },
+		{ CATEGORY, X SY SA SC, 		LAMBDA(  powf( x , y + c )	   ) },
+		{ CATEGORY, Y SX SA SC,		   	LAMBDA(  powf( y , x + c )	   ) },
+		{ CATEGORY, X SC SY,		   	LAMBDA(  powf( x , c * y )	   ) },
+		{ CATEGORY, Y SC SX,		   	LAMBDA(  powf( y , c * x )	   ) },
 #undef CATEGORY
 #define CATEGORY 9
-                { CATEGORY, P X A C P,               LAMBDA(  abs( x + c )           ) }, // Modulus
-		{ CATEGORY, P Y A C P,               LAMBDA(  abs( y + c )           ) },
+                { CATEGORY, P X A C P,               	LAMBDA(  abs( x + c )           ) }, // Modulus
+		{ CATEGORY, P Y A C P,               	LAMBDA(  abs( y + c )           ) },
 #undef CATEGORY
 #define CATEGORY 10
-		{ CATEGORY, MIN OP X A C COMMA Y CP, LAMBDA(  std::min( x + c, y )   ) }, // Minmax
-		{ CATEGORY, MIN OP X COMMA C CP,     LAMBDA(  std::min( x, c )       ) },
-      		{ CATEGORY, MIN OP Y COMMA C CP,     LAMBDA(  std::min( y, c )       ) },
-     		{ CATEGORY, MAX OP X A C COMMA Y CP, LAMBDA(  std::max( x + c, y )   ) },
-		{ CATEGORY, MAX OP X COMMA C CP,     LAMBDA(  std::max( x, c )       ) },
-		{ CATEGORY, MAX OP Y COMMA C CP,     LAMBDA(  std::max( y, c )       ) },
+		{ CATEGORY, MIN OP X A C COMMA Y CP, 	LAMBDA(  std::min( x + c, y )   ) }, // Minmax
+		{ CATEGORY, MIN OP X COMMA C CP,     	LAMBDA(  std::min( x, c )       ) },
+      		{ CATEGORY, MIN OP Y COMMA C CP,     	LAMBDA(  std::min( y, c )       ) },
+     		{ CATEGORY, MAX OP X A C COMMA Y CP, 	LAMBDA(  std::max( x + c, y )   ) },
+		{ CATEGORY, MAX OP X COMMA C CP,     	LAMBDA(  std::max( x, c )       ) },
+		{ CATEGORY, MAX OP Y COMMA C CP,     	LAMBDA(  std::max( y, c )       ) },
 #undef CATEGORY
 #define CATEGORY 11
-		{ CATEGORY, SIN OP X A C CP,         LAMBDA(  sin( x + c )           ) }, // Trigonometric
-		{ CATEGORY, SIN OP Y A C CP,         LAMBDA(  sin( y + c )           ) },
-		{ CATEGORY, SIN OP X A Y CP,         LAMBDA(  sin( x + y )           ) },
- 		{ CATEGORY, SIN OP C X CP,           LAMBDA(  sin( c * x )           ) },
-		{ CATEGORY, SIN OP C Y CP,           LAMBDA(  sin( c * y )           ) },
-		{ CATEGORY, SIN OP X Y CP,           LAMBDA(  sin( x * y )           ) },
-		{ CATEGORY, COS OP X A C CP,         LAMBDA(  cos( x + c )           ) },
-		{ CATEGORY, COS OP Y A C CP,         LAMBDA(  cos( y + c )           ) },
-		{ CATEGORY, COS OP X A Y CP,         LAMBDA(  cos( x + y )           ) },
- 		{ CATEGORY, COS OP C X CP,           LAMBDA(  cos( c * x )           ) },
-		{ CATEGORY, COS OP C Y CP,           LAMBDA(  cos( c * y )           ) },
-		{ CATEGORY, COS OP X Y CP,           LAMBDA(  cos( x * y )           ) },
-		{ CATEGORY, TAN OP X A C CP,         LAMBDA(  tan( x + c )           ) },
-		{ CATEGORY, TAN OP Y A C CP,         LAMBDA(  tan( y + c )           ) },
-		{ CATEGORY, TAN OP X A Y CP,         LAMBDA(  tan( x + y )           ) },
- 		{ CATEGORY, TAN OP C X CP,           LAMBDA(  tan( c * x )           ) },
-		{ CATEGORY, TAN OP C Y CP,           LAMBDA(  tan( c * y )           ) },
-		{ CATEGORY, TAN OP X Y CP,           LAMBDA(  tan( x * y )           ) },
+		{ CATEGORY, SIN OP X A C CP,         	LAMBDA(  sin( x + c )           ) }, // Trigonometric
+		{ CATEGORY, SIN OP Y A C CP,         	LAMBDA(  sin( y + c )           ) },
+		{ CATEGORY, SIN OP X A Y CP,         	LAMBDA(  sin( x + y )           ) },
+ 		{ CATEGORY, SIN OP C X CP,           	LAMBDA(  sin( c * x )           ) },
+		{ CATEGORY, SIN OP C Y CP,           	LAMBDA(  sin( c * y )           ) },
+		{ CATEGORY, SIN OP X Y CP,           	LAMBDA(  sin( x * y )           ) },
+		{ CATEGORY, COS OP X A C CP,         	LAMBDA(  cos( x + c )           ) },
+		{ CATEGORY, COS OP Y A C CP,         	LAMBDA(  cos( y + c )           ) },
+		{ CATEGORY, COS OP X A Y CP,         	LAMBDA(  cos( x + y )           ) },
+ 		{ CATEGORY, COS OP C X CP,           	LAMBDA(  cos( c * x )           ) },
+		{ CATEGORY, COS OP C Y CP,           	LAMBDA(  cos( c * y )           ) },
+		{ CATEGORY, COS OP X Y CP,           	LAMBDA(  cos( x * y )           ) },
+		{ CATEGORY, TAN OP X A C CP,         	LAMBDA(  tan( x + c )           ) },
+		{ CATEGORY, TAN OP Y A C CP,         	LAMBDA(  tan( y + c )           ) },
+		{ CATEGORY, TAN OP X A Y CP,         	LAMBDA(  tan( x + y )           ) },
+ 		{ CATEGORY, TAN OP C X CP,           	LAMBDA(  tan( c * x )           ) },
+		{ CATEGORY, TAN OP C Y CP,           	LAMBDA(  tan( c * y )           ) },
+		{ CATEGORY, TAN OP X Y CP,           	LAMBDA(  tan( x * y )           ) },
 #undef CATEGORY
 #define CATEGORY 12
-		{ CATEGORY, ASIN OP X A C CP,        LAMBDA(  asin( x + c )          ) }, // Inverse Trigonometric
-		{ CATEGORY, ASIN OP Y A C CP,        LAMBDA(  asin( y + c )          ) },
-		{ CATEGORY, ASIN OP X A Y CP,        LAMBDA(  asin( x + y )          ) },
- 		{ CATEGORY, ASIN OP C X CP,          LAMBDA(  asin( c * x )          ) },
-		{ CATEGORY, ASIN OP C Y CP,          LAMBDA(  asin( c * y )          ) },
-		{ CATEGORY, ASIN OP X Y CP,          LAMBDA(  asin( x * y )          ) },
-		{ CATEGORY, ACOS OP X A C CP,        LAMBDA(  acos( x + c )          ) },
-		{ CATEGORY, ACOS OP Y A C CP,        LAMBDA(  acos( y + c )          ) },
-		{ CATEGORY, ACOS OP X A Y CP,        LAMBDA(  acos( x + y )          ) },
- 		{ CATEGORY, ACOS OP C X CP,          LAMBDA(  acos( c * x )          ) },
-		{ CATEGORY, ACOS OP C Y CP,          LAMBDA(  acos( c * y )          ) },
-		{ CATEGORY, ACOS OP X Y CP,          LAMBDA(  acos( x * y )          ) },
-		{ CATEGORY, ATAN OP X A C CP,        LAMBDA(  atan( x + c )          ) },
-		{ CATEGORY, ATAN OP Y A C CP,        LAMBDA(  atan( y + c )          ) },
-		{ CATEGORY, ATAN OP X A Y CP,        LAMBDA(  atan( x + y )          ) },
- 		{ CATEGORY, ATAN OP C X CP,          LAMBDA(  atan( c * x )          ) },
-		{ CATEGORY, ATAN OP C Y CP,          LAMBDA(  atan( c * y )          ) },
-		{ CATEGORY, ATAN OP X Y CP,          LAMBDA(  atan( x * y )          ) },
+		{ CATEGORY, ASIN OP X A C CP,        	LAMBDA(  asin( x + c )          ) }, // Inverse Trigonometric
+		{ CATEGORY, ASIN OP Y A C CP,        	LAMBDA(  asin( y + c )          ) },
+		{ CATEGORY, ASIN OP X A Y CP,        	LAMBDA(  asin( x + y )          ) },
+ 		{ CATEGORY, ASIN OP C X CP,          	LAMBDA(  asin( c * x )          ) },
+		{ CATEGORY, ASIN OP C Y CP,          	LAMBDA(  asin( c * y )          ) },
+		{ CATEGORY, ASIN OP X Y CP,          	LAMBDA(  asin( x * y )          ) },
+		{ CATEGORY, ACOS OP X A C CP,        	LAMBDA(  acos( x + c )          ) },
+		{ CATEGORY, ACOS OP Y A C CP,        	LAMBDA(  acos( y + c )          ) },
+		{ CATEGORY, ACOS OP X A Y CP,        	LAMBDA(  acos( x + y )          ) },
+ 		{ CATEGORY, ACOS OP C X CP,          	LAMBDA(  acos( c * x )          ) },
+		{ CATEGORY, ACOS OP C Y CP,          	LAMBDA(  acos( c * y )          ) },
+		{ CATEGORY, ACOS OP X Y CP,          	LAMBDA(  acos( x * y )          ) },
+		{ CATEGORY, ATAN OP X A C CP,        	LAMBDA(  atan( x + c )          ) },
+		{ CATEGORY, ATAN OP Y A C CP,        	LAMBDA(  atan( y + c )          ) },
+		{ CATEGORY, ATAN OP X A Y CP,        	LAMBDA(  atan( x + y )          ) },
+ 		{ CATEGORY, ATAN OP C X CP,          	LAMBDA(  atan( c * x )          ) },
+		{ CATEGORY, ATAN OP C Y CP,          	LAMBDA(  atan( c * y )          ) },
+		{ CATEGORY, ATAN OP X Y CP,          	LAMBDA(  atan( x * y )          ) },
 #undef CATEGORY
 #define CATEGORY 13
-		{ CATEGORY, LOG OP X A C CP,         LAMBDA(  log( x + c )           ) }, // Logarithmic
-		{ CATEGORY, LOG OP Y A C CP,         LAMBDA(  log( y + c )           ) },
-		{ CATEGORY, LOG2 OP X A C CP,        LAMBDA(  log2( x + c )          ) },
-		{ CATEGORY, LOG2 OP Y A C CP,        LAMBDA(  log2( y + c )          ) },
-		{ CATEGORY, LOG10 OP X A C CP,       LAMBDA(  log10( x + c )         ) },
-		{ CATEGORY, LOG10 OP Y A C CP,       LAMBDA(  log10( y + c )         ) },
+		{ CATEGORY, LOG OP X A C CP,         	LAMBDA(  log( x + c )           ) }, // Logarithmic
+		{ CATEGORY, LOG OP Y A C CP,         	LAMBDA(  log( y + c )           ) },
+		{ CATEGORY, LOG2 OP X A C CP,        	LAMBDA(  log2( x + c )          ) },
+		{ CATEGORY, LOG2 OP Y A C CP,        	LAMBDA(  log2( y + c )          ) },
+		{ CATEGORY, LOG10 OP X A C CP,       	LAMBDA(  log10( x + c )         ) },
+		{ CATEGORY, LOG10 OP Y A C CP,       	LAMBDA(  log10( y + c )         ) },
 #undef CATEGORY
 #define CATEGORY 14
-		{ CATEGORY, E SX SA SC,              LAMBDA(  exp( x + c )           ) }, // Exponential
-		{ CATEGORY, E SY SA SC,              LAMBDA(  exp( y + c )           ) },
-		{ CATEGORY, E SC SX,                 LAMBDA(  exp( c * x )           ) },
-		{ CATEGORY, E SC SY,                 LAMBDA(  exp( c * y )           ) },
-		{ CATEGORY, "2" SX SA SC,            LAMBDA(  powf( 2, x + c )       ) },
-		{ CATEGORY, "2" SY SA SC,            LAMBDA(  powf( 2, y + c )       ) },
-		{ CATEGORY, "2" SC SX,               LAMBDA(  powf( 2, c * x )       ) },
-		{ CATEGORY, "2" SC SY,               LAMBDA(  powf( 2, c * y )       ) },
-		{ CATEGORY, "10" SX SA SC,           LAMBDA(  powf( 10, x + c )      ) },
-		{ CATEGORY, "10" SY SA SC,           LAMBDA(  powf( 10, y + c )      ) },
-		{ CATEGORY, "10" SC SX,              LAMBDA(  powf( 10, c * x )      ) },
-		{ CATEGORY, "10" SC SY,              LAMBDA(  powf( 10, c * y )      ) },
+		{ CATEGORY, E SX SA SC,              	LAMBDA(  exp( x + c )           ) }, // Exponential
+		{ CATEGORY, E SY SA SC,              	LAMBDA(  exp( y + c )           ) },
+		{ CATEGORY, E SC SX,                 	LAMBDA(  exp( c * x )           ) },
+		{ CATEGORY, E SC SY,                 	LAMBDA(  exp( c * y )           ) },
+		{ CATEGORY, "2" SX SA SC,            	LAMBDA(  powf( 2, x + c )       ) },
+		{ CATEGORY, "2" SY SA SC,            	LAMBDA(  powf( 2, y + c )       ) },
+		{ CATEGORY, "2" SC SX,               	LAMBDA(  powf( 2, c * x )       ) },
+		{ CATEGORY, "2" SC SY,               	LAMBDA(  powf( 2, c * y )       ) },
+		{ CATEGORY, "10" SX SA SC,           	LAMBDA(  powf( 10, x + c )      ) },
+		{ CATEGORY, "10" SY SA SC,           	LAMBDA(  powf( 10, y + c )      ) },
+		{ CATEGORY, "10" SC SX,              	LAMBDA(  powf( 10, c * x )      ) },
+		{ CATEGORY, "10" SC SY,              	LAMBDA(  powf( 10, c * y )      	) },
 #undef CATEGORY
 #define CATEGORY 15
-		{ CATEGORY, IF X G Z T Y H C,	   LAMBDA(  (x > 0) ? y : c	   ) }, // Conditional X and 0
-		{ CATEGORY, IF X L Z T Y H C,	   LAMBDA(  (x < 0) ? y : c	   ) },
-		{ CATEGORY, IF X Q Z T Y H C,	   LAMBDA(  (x == 0) ? y : c	   ) },
-		{ CATEGORY, IF X G Z T C H Y,	   LAMBDA(  (x > 0) ? c : y	   ) },
-		{ CATEGORY, IF X L Z T C H Y,	   LAMBDA(  (x < 0) ? c : y	   ) },
-		{ CATEGORY, IF X Q Z T C H Y,	   LAMBDA(  (x == 0) ? c : y	   ) },
-		{ CATEGORY, IF X G Z T W H Z,	   LAMBDA(  (x > 0) ? 1 : 0	   ) },
-		{ CATEGORY, IF X L Z T W H Z,	   LAMBDA(  (x < 0) ? 1 : 0	   ) },
-		{ CATEGORY, IF X Q Z T W H Z,	   LAMBDA(  (x == 0) ? 1 : 0	   ) },
-		{ CATEGORY, IF X G Z T X H C,	   LAMBDA(  (x > 0) ? x : c	   ) },
-		{ CATEGORY, IF X L Z T X H C,	   LAMBDA(  (x < 0) ? x : c	   ) },
-		{ CATEGORY, IF X Q Z T X H C,	   LAMBDA(  (x == 0) ? x : c	   ) },
-		{ CATEGORY, IF X G Z T C H X,	   LAMBDA(  (x > 0) ? c : x	   ) },
-		{ CATEGORY, IF X L Z T C H X,	   LAMBDA(  (x < 0) ? c : x	   ) },
-		{ CATEGORY, IF X Q Z T C H X,	   LAMBDA(  (x == 0) ? c : x	   ) },
+		{ CATEGORY, IF X G Z T Y H C,	   	LAMBDA(  (x > 0) ? y : c	   ) }, // Conditional X and 0
+		{ CATEGORY, IF X L Z T Y H C,	   	LAMBDA(  (x < 0) ? y : c	   ) },
+		{ CATEGORY, IF X Q Z T Y H C,	   	LAMBDA(  (x == 0) ? y : c	   ) },
+		{ CATEGORY, IF X G Z T C H Y,	   	LAMBDA(  (x > 0) ? c : y	   ) },
+		{ CATEGORY, IF X L Z T C H Y,	   	LAMBDA(  (x < 0) ? c : y	   ) },
+		{ CATEGORY, IF X Q Z T C H Y,	   	LAMBDA(  (x == 0) ? c : y	   ) },
+		{ CATEGORY, IF X G Z T W H Z,	   	LAMBDA(  (x > 0) ? 1 : 0	   ) },
+		{ CATEGORY, IF X L Z T W H Z,	   	LAMBDA(  (x < 0) ? 1 : 0	   ) },
+		{ CATEGORY, IF X Q Z T W H Z,	   	LAMBDA(  (x == 0) ? 1 : 0	   ) },
+		{ CATEGORY, IF X G Z T X H C,	   	LAMBDA(  (x > 0) ? x : c	   ) },
+		{ CATEGORY, IF X L Z T X H C,	   	LAMBDA(  (x < 0) ? x : c	   ) },
+		{ CATEGORY, IF X Q Z T X H C,	   	LAMBDA(  (x == 0) ? x : c	   ) },
+		{ CATEGORY, IF X G Z T C H X,	   	LAMBDA(  (x > 0) ? c : x	   ) },
+		{ CATEGORY, IF X L Z T C H X,	   	LAMBDA(  (x < 0) ? c : x	   ) },
+		{ CATEGORY, IF X Q Z T C H X,	   	LAMBDA(  (x == 0) ? c : x	   ) },
 #undef CATEGORY
 #define CATEGORY 16
-		{ CATEGORY, IF Y G Z T X H C,	   LAMBDA(  (y > 0) ? x : c	   ) }, // Conditional Y and 0
-		{ CATEGORY, IF Y L Z T X H C,	   LAMBDA(  (y < 0) ? x : c	   ) },
-		{ CATEGORY, IF Y Q Z T X H C,	   LAMBDA(  (y == 0) ? x : c	   ) },
-		{ CATEGORY, IF Y G Z T C H X,	   LAMBDA(  (y > 0) ? c : x	   ) },
-		{ CATEGORY, IF Y L Z T C H X,	   LAMBDA(  (y < 0) ? c : x	   ) },
-		{ CATEGORY, IF Y Q Z T C H X,	   LAMBDA(  (y == 0) ? c : x	   ) },
-		{ CATEGORY, IF Y G Z T W H Z,	   LAMBDA(  (y > 0) ? 1 : 0	   ) },
-		{ CATEGORY, IF Y L Z T W H Z,	   LAMBDA(  (y < 0) ? 1 : 0	   ) },
-		{ CATEGORY, IF Y Q Z T W H Z,	   LAMBDA(  (y == 0) ? 1 : 0	   ) },
-		{ CATEGORY, IF Y G Z T Y H C,	   LAMBDA(  (y > 0) ? y : c	   ) },
-		{ CATEGORY, IF Y L Z T Y H C,	   LAMBDA(  (y < 0) ? y : c	   ) },
-		{ CATEGORY, IF Y Q Z T Y H C,	   LAMBDA(  (y == 0) ? y : c	   ) },
-		{ CATEGORY, IF Y G Z T C H Y,	   LAMBDA(  (y > 0) ? c : y	   ) },
-		{ CATEGORY, IF Y L Z T C H Y,	   LAMBDA(  (y < 0) ? c : y	   ) },
-		{ CATEGORY, IF Y Q Z T C H Y,	   LAMBDA(  (y == 0) ? c : y	   ) },
+		{ CATEGORY, IF Y G Z T X H C,	   	LAMBDA(  (y > 0) ? x : c	   ) }, // Conditional Y and 0
+		{ CATEGORY, IF Y L Z T X H C,	   	LAMBDA(  (y < 0) ? x : c	   ) },
+		{ CATEGORY, IF Y Q Z T X H C,	   	LAMBDA(  (y == 0) ? x : c	   ) },
+		{ CATEGORY, IF Y G Z T C H X,	   	LAMBDA(  (y > 0) ? c : x	   ) },
+		{ CATEGORY, IF Y L Z T C H X,	   	LAMBDA(  (y < 0) ? c : x	   ) },
+		{ CATEGORY, IF Y Q Z T C H X,	   	LAMBDA(  (y == 0) ? c : x	   ) },
+		{ CATEGORY, IF Y G Z T W H Z,	   	LAMBDA(  (y > 0) ? 1 : 0	   ) },
+		{ CATEGORY, IF Y L Z T W H Z,	   	LAMBDA(  (y < 0) ? 1 : 0	   ) },
+		{ CATEGORY, IF Y Q Z T W H Z,	   	LAMBDA(  (y == 0) ? 1 : 0	   ) },
+		{ CATEGORY, IF Y G Z T Y H C,	   	LAMBDA(  (y > 0) ? y : c	   ) },
+		{ CATEGORY, IF Y L Z T Y H C,	   	LAMBDA(  (y < 0) ? y : c	   ) },
+		{ CATEGORY, IF Y Q Z T Y H C,	   	LAMBDA(  (y == 0) ? y : c	   ) },
+		{ CATEGORY, IF Y G Z T C H Y,	   	LAMBDA(  (y > 0) ? c : y	   ) },
+		{ CATEGORY, IF Y L Z T C H Y,	   	LAMBDA(  (y < 0) ? c : y	   ) },
+		{ CATEGORY, IF Y Q Z T C H Y,	   	LAMBDA(  (y == 0) ? c : y	   ) },
 #undef CATEGORY
 #define CATEGORY 17
-		{ CATEGORY, IF X G Y T C H Z,	   LAMBDA(  (x > y) ? c : 0	   ) }, // Conditional X and Y
-		{ CATEGORY, IF X L Y T C H Z,        LAMBDA(  (x < y) ? c : 0	   ) },
-		{ CATEGORY, IF X Q Y T C H Z,	   LAMBDA(  (x == y) ? c : 0	   ) },
-		{ CATEGORY, IF Y G X T C H Z,	   LAMBDA(  (y > x) ? c : 0	   ) },
-		{ CATEGORY, IF Y L X T C H Z,        LAMBDA(  (y < x) ? c : 0	   ) },
-		{ CATEGORY, IF X G Y T X H Z,	   LAMBDA(  (x > y) ? x : 0	   ) },
-		{ CATEGORY, IF X L Y T X H Z,        LAMBDA(  (x < y) ? x : 0	   ) },
-		{ CATEGORY, IF X Q Y T X H Z,	   LAMBDA(  (x == y) ? x : 0	   ) },
-		{ CATEGORY, IF Y G X T X H Z,	   LAMBDA(  (y > x) ? x : 0	   ) },
-		{ CATEGORY, IF Y L X T X H Z,        LAMBDA(  (y < x) ? x : 0	   ) },
-		{ CATEGORY, IF X G Y T Y H Z,	   LAMBDA(  (x > y) ? y : 0	   ) },
-		{ CATEGORY, IF X L Y T Y H Z,        LAMBDA(  (x < y) ? y : 0	   ) },
-		{ CATEGORY, IF X Q Y T Y H Z,	   LAMBDA(  (x == y) ? y : 0	   ) },
-		{ CATEGORY, IF Y G X T Y H Z,	   LAMBDA(  (y > x) ? y : 0	   ) },
-		{ CATEGORY, IF Y L X T Y H Z,        LAMBDA(  (y < x) ? y : 0	   ) },
+		{ CATEGORY, IF X G Y T C H Z,	   	LAMBDA(  (x > y) ? c : 0	   ) }, // Conditional X and Y
+		{ CATEGORY, IF X L Y T C H Z,        	LAMBDA(  (x < y) ? c : 0	   ) },
+		{ CATEGORY, IF X Q Y T C H Z,	   	LAMBDA(  (x == y) ? c : 0	   ) },
+		{ CATEGORY, IF Y G X T C H Z,	   	LAMBDA(  (y > x) ? c : 0	   ) },
+		{ CATEGORY, IF Y L X T C H Z,        	LAMBDA(  (y < x) ? c : 0	   ) },
+		{ CATEGORY, IF X G Y T X H Z,	   	LAMBDA(  (x > y) ? x : 0	   ) },
+		{ CATEGORY, IF X L Y T X H Z,        	LAMBDA(  (x < y) ? x : 0	   ) },
+		{ CATEGORY, IF X Q Y T X H Z,	   	LAMBDA(  (x == y) ? x : 0	   ) },
+		{ CATEGORY, IF Y G X T X H Z,	   	LAMBDA(  (y > x) ? x : 0	   ) },
+		{ CATEGORY, IF Y L X T X H Z,        	LAMBDA(  (y < x) ? x : 0	   ) },
+		{ CATEGORY, IF X G Y T Y H Z,	   	LAMBDA(  (x > y) ? y : 0	   ) },
+		{ CATEGORY, IF X L Y T Y H Z,        	LAMBDA(  (x < y) ? y : 0	   ) },
+		{ CATEGORY, IF X Q Y T Y H Z,	   	LAMBDA(  (x == y) ? y : 0	   ) },
+		{ CATEGORY, IF Y G X T Y H Z,	   	LAMBDA(  (y > x) ? y : 0	   ) },
+		{ CATEGORY, IF Y L X T Y H Z,        	LAMBDA(  (y < x) ? y : 0	   ) },
 #undef CATEGORY
 #define CATEGORY 18
-		{ CATEGORY, IF X G C T Y H Z,	   LAMBDA(  (x > c) ? y : 0	   ) }, // Conditional X and C
-		{ CATEGORY, IF X L C T Y H Z,        LAMBDA(  (x < c) ? y : 0	   ) },
-		{ CATEGORY, IF X Q C T Y H Z,	   LAMBDA(  (x == c) ? y : 0	   ) },
-		{ CATEGORY, IF C G X T Y H Z,	   LAMBDA(  (c > x) ? y : 0	   ) },
-		{ CATEGORY, IF C L X T Y H Z,        LAMBDA(  (c < x) ? y : 0	   ) },
-		{ CATEGORY, IF X G C T X H Z,	   LAMBDA(  (x > c) ? x : 0	   ) },
-		{ CATEGORY, IF X L C T X H Z,        LAMBDA(  (x < c) ? x : 0	   ) },
-		{ CATEGORY, IF X Q C T X H Z,	   LAMBDA(  (x == c) ? x : 0	   ) },
-		{ CATEGORY, IF C G X T X H Z,	   LAMBDA(  (c > x) ? x : 0	   ) },
-		{ CATEGORY, IF C L X T X H Z,        LAMBDA(  (c < x) ? x : 0	   ) },
-		{ CATEGORY, IF X G C T X H Y,	   LAMBDA(  (x > c) ? x : y	   ) },
-		{ CATEGORY, IF X L C T X H Y,        LAMBDA(  (x < c) ? x : y	   ) },
-		{ CATEGORY, IF X Q C T X H Y,	   LAMBDA(  (x == c) ? x : y	   ) },
-		{ CATEGORY, IF C G X T X H Y,	   LAMBDA(  (c > x) ? x : y	   ) },
-		{ CATEGORY, IF C L X T X H Y,        LAMBDA(  (c < x) ? x : y	   ) },
+		{ CATEGORY, IF X G C T Y H Z,	   	LAMBDA(  (x > c) ? y : 0	   ) }, // Conditional X and C
+		{ CATEGORY, IF X L C T Y H Z,        	LAMBDA(  (x < c) ? y : 0	   ) },
+		{ CATEGORY, IF X Q C T Y H Z,	   	LAMBDA(  (x == c) ? y : 0	   ) },
+		{ CATEGORY, IF C G X T Y H Z,	   	LAMBDA(  (c > x) ? y : 0	   ) },
+		{ CATEGORY, IF C L X T Y H Z,        	LAMBDA(  (c < x) ? y : 0	   ) },
+		{ CATEGORY, IF X G C T X H Z,	   	LAMBDA(  (x > c) ? x : 0	   ) },
+		{ CATEGORY, IF X L C T X H Z,        	LAMBDA(  (x < c) ? x : 0	   ) },
+		{ CATEGORY, IF X Q C T X H Z,	   	LAMBDA(  (x == c) ? x : 0	   ) },
+		{ CATEGORY, IF C G X T X H Z,	   	LAMBDA(  (c > x) ? x : 0	   ) },
+		{ CATEGORY, IF C L X T X H Z,        	LAMBDA(  (c < x) ? x : 0	   ) },
+		{ CATEGORY, IF X G C T X H Y,	   	LAMBDA(  (x > c) ? x : y	   ) },
+		{ CATEGORY, IF X L C T X H Y,        	LAMBDA(  (x < c) ? x : y	   ) },
+		{ CATEGORY, IF X Q C T X H Y,	   	LAMBDA(  (x == c) ? x : y	   ) },
+		{ CATEGORY, IF C G X T X H Y,	   	LAMBDA(  (c > x) ? x : y	   ) },
+		{ CATEGORY, IF C L X T X H Y,        	LAMBDA(  (c < x) ? x : y	   ) },
 #undef CATEGORY
 #define CATEGORY 19
-		{ CATEGORY, IF Y G C T X H Z,	   LAMBDA(  (y > c) ? x : 0	   ) },	// Conditional Y and C
-		{ CATEGORY, IF Y L C T X H Z,        LAMBDA(  (y < c) ? x : 0	   ) },
-		{ CATEGORY, IF Y Q C T X H Z,	   LAMBDA(  (y == c) ? x : 0	   ) },
-		{ CATEGORY, IF C G Y T X H Z,	   LAMBDA(  (c > y) ? x : 0	   ) },
-		{ CATEGORY, IF C L Y T X H Z,        LAMBDA(  (c < y) ? x : 0	   ) },
-		{ CATEGORY, IF Y G C T Y H Z,	   LAMBDA(  (y > c) ? y : 0	   ) },
-		{ CATEGORY, IF Y L C T Y H Z,        LAMBDA(  (y < c) ? y : 0	   ) },
-		{ CATEGORY, IF Y Q C T Y H Z,	   LAMBDA(  (y == c) ? y : 0	   ) },
-		{ CATEGORY, IF C G Y T Y H Z,	   LAMBDA(  (c > y) ? y : 0	   ) },
-		{ CATEGORY, IF C L Y T Y H Z,        LAMBDA(  (c < y) ? y : 0	   ) },
-		{ CATEGORY, IF Y G C T Y H X,	   LAMBDA(  (y > c) ? y : x	   ) },
-		{ CATEGORY, IF Y L C T Y H X,        LAMBDA(  (y < c) ? y : x	   ) },
-		{ CATEGORY, IF Y Q C T Y H X,	   LAMBDA(  (y == c) ? y : x	   ) },
-		{ CATEGORY, IF C G Y T Y H X,	   LAMBDA(  (c > y) ? y : x	   ) },
-		{ CATEGORY, IF C L Y T Y H X,        LAMBDA(  (c < y) ? y : x	   ) },
+		{ CATEGORY, IF Y G C T X H Z,	   	LAMBDA(  (y > c) ? x : 0	   ) },	// Conditional Y and C
+		{ CATEGORY, IF Y L C T X H Z,        	LAMBDA(  (y < c) ? x : 0	   ) },
+		{ CATEGORY, IF Y Q C T X H Z,	   	LAMBDA(  (y == c) ? x : 0	   ) },
+		{ CATEGORY, IF C G Y T X H Z,	   	LAMBDA(  (c > y) ? x : 0	   ) },
+		{ CATEGORY, IF C L Y T X H Z,        	LAMBDA(  (c < y) ? x : 0	   ) },
+		{ CATEGORY, IF Y G C T Y H Z,	   	LAMBDA(  (y > c) ? y : 0	   ) },
+		{ CATEGORY, IF Y L C T Y H Z,        	LAMBDA(  (y < c) ? y : 0	   ) },
+		{ CATEGORY, IF Y Q C T Y H Z,	   	LAMBDA(  (y == c) ? y : 0	   ) },
+		{ CATEGORY, IF C G Y T Y H Z,	   	LAMBDA(  (c > y) ? y : 0	   ) },
+		{ CATEGORY, IF C L Y T Y H Z,        	LAMBDA(  (c < y) ? y : 0	   ) },
+		{ CATEGORY, IF Y G C T Y H X,	   	LAMBDA(  (y > c) ? y : x	   ) },
+		{ CATEGORY, IF Y L C T Y H X,        	LAMBDA(  (y < c) ? y : x	   ) },
+		{ CATEGORY, IF Y Q C T Y H X,	   	LAMBDA(  (y == c) ? y : x	   ) },
+		{ CATEGORY, IF C G Y T Y H X,	   	LAMBDA(  (c > y) ? y : x	   ) },
+		{ CATEGORY, IF C L Y T Y H X,        	LAMBDA(  (c < y) ? y : x	   ) },
 
 	};	
 
@@ -365,6 +367,8 @@ namespace SubmarineAO {
 #undef H
 #undef Pi
 #undef TAU
+#undef F
+#undef LAM
 
 } // end namespace SubmarineA0
 
