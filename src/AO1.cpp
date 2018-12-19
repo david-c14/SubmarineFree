@@ -503,7 +503,7 @@ void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
 }
 
 void AlgorithmMenu::onAction(EventAction &e) {
-	widget->value = algorithm;
+	widget->setValue(algorithm);
 }
 
 
