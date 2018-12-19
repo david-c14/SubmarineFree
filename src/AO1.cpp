@@ -1,6 +1,10 @@
+#include <cmath>
 #include "SubmarineFree.hpp"
 
 namespace SubmarineAO {
+
+	static float FunctorClipboard = NAN;
+	static float CvalClipboard = NAN;
 
 	typedef float (*func_t)(float, float, float);
 
@@ -410,6 +414,7 @@ struct AOConstDisplay : Knob {
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, mtext, NULL);
 	}
+	void onMouseDown(EventMouseDown &e) override;
 };
 
 template <unsigned int x, unsigned int y>
@@ -481,10 +486,71 @@ struct CategoryMenu : MenuItem {
 	}
 };
 
+struct CCopyMenu : MenuItem {
+	AOConstDisplay *widget;
+	void onAction(EventAction &e) override {
+		SubmarineAO::CvalClipboard = widget->value; 
+	}
+};
+
+struct CPasteMenu : MenuItem {
+	AOConstDisplay *widget;
+	void onAction(EventAction &e) override {
+		if (!isnan(SubmarineAO::CvalClipboard))
+			widget->value = SubmarineAO::CvalClipboard; 
+	}
+};
+
+struct FCopyMenu : MenuItem {
+	AOFuncDisplay *widget;
+	void onAction(EventAction &e) override {
+		SubmarineAO::FunctorClipboard = widget->value; 
+	}
+};
+
+struct FPasteMenu : MenuItem {
+	AOFuncDisplay *widget;
+	void onAction(EventAction &e) override {
+		if (!isnan(SubmarineAO::FunctorClipboard))
+			widget->value = SubmarineAO::FunctorClipboard; 
+	}
+};
+
+void AOConstDisplay::onMouseDown(EventMouseDown &e) {
+	if (e.button == 1) {
+		e.consumed = true;
+		Menu *menu = gScene->createMenu();
+		CCopyMenu *cm = new CCopyMenu();
+		cm->widget = this;
+		cm->text = "Copy";
+		menu->addChild(cm);
+		if (!isnan(SubmarineAO::CvalClipboard)) {
+			CPasteMenu *pm = new CPasteMenu();
+			pm->widget = this;
+			pm->text = "Paste";
+			menu->addChild(pm);
+		}
+		return;
+	}
+	Knob::onMouseDown(e);
+}
+
 void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		e.consumed = true;
 		Menu *menu = gScene->createMenu();
+		FCopyMenu *cm = new FCopyMenu();
+		cm->widget = this;
+		cm->text = "Copy";
+		menu->addChild(cm);
+		if (!isnan(SubmarineAO::FunctorClipboard)) {
+			FPasteMenu *pm = new FPasteMenu();
+			pm->widget = this;
+			pm->text = "Paste";
+			menu->addChild(pm);
+		}
+		menu->addChild(MenuEntry::create());
+		
 		AlgorithmMenu *item = new AlgorithmMenu();
 		item->widget = this;
 		item->algorithm = 0;
@@ -495,6 +561,7 @@ void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
 			cm->widget = this;
 			cm->category = i;
 			cm->text = SubmarineAO::categories[i];
+			cm->rightText = SUBMENU;
 			menu->addChild(cm);
 		}
 		return;

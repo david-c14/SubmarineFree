@@ -183,12 +183,12 @@ void TD202::appendContextMenu(Menu *menu) {
 	menu->addChild(MenuEntry::create());
 
 	TD202_ParentItem *m = MenuItem::create<TD202_ParentItem>("Text Color");
-	m->rightText = "\xe2\x96\xb6";
+	m->rightText = SUBMENU;
 	m->widget = this;
 	menu->addChild(m);
 
 	TD202_ParentItemB *b = MenuItem::create<TD202_ParentItemB>("Background Color");
-	b->rightText = "\xe2\x96\xb6";
+	m->rightText = SUBMENU;
 	b->widget = this;
 	menu->addChild(b);
 
