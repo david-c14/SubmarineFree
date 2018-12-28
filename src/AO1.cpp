@@ -389,7 +389,7 @@ struct AOFuncDisplay : Knob {
 	void draw(NVGcontext *vg) override {
 		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, font->handle);
-		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
+		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, SubmarineAO::functions[value].name.c_str(), NULL);
 	}
@@ -410,7 +410,7 @@ struct AOConstDisplay : Knob {
 		sprintf(mtext, "C=%4.2f", ((int)value)/100.0f);
 		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, font->handle);
-		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
+		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, mtext, NULL);
 	}

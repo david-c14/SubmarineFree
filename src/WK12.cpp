@@ -327,7 +327,7 @@ struct WK_Display : TransparentWidget {
 		sprintf(dspText, "%+05.2f", val);
 		nvgFontSize(vg, 14);
 		nvgFontFaceId(vg, font->handle);
-		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
+		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 30, 13, dspText, NULL);
 	}
