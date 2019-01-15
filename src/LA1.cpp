@@ -171,7 +171,7 @@ struct LA_Display : TransparentWidget {
 			else
 				nvgLineTo(vg, x, y);
 		} 
-		nvgStrokeColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xc0));
+		nvgStrokeColor(vg, SUBLIGHTBLUETRANS);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgMiterLimit(vg, 2.0f);
 		nvgStrokeWidth(vg, 1.5f);
@@ -280,7 +280,7 @@ struct LA_Measure : TransparentWidget {
 			sprintf(measureText, "%4.1fs", width);
 		nvgFontSize(vg, 14);
 		nvgFontFaceId(vg, font->handle);
-		nvgFillColor(vg, nvgRGBA(0x28, 0xb0, 0xf3, 0xff));
+		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 27, 12, measureText, NULL);
 	}

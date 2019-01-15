@@ -12,7 +12,7 @@ void LightKnob::setRadius(int r) {
 }
 
 void LightKnob::draw(NVGcontext *vg) {
-	NVGcolor lcol = enabled?nvgRGB(0x29,0xb2,0xef):nvgRGB(0x4a,0x4a,0x4a);
+	NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
 
 	// Shadow
 	{

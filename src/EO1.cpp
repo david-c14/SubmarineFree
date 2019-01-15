@@ -287,12 +287,12 @@ struct EO_Display : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
-		NVGcolor col = nvgRGBA(0x28, 0xb0, 0xf3, 0xc0);
+		NVGcolor col = SUBLIGHTBLUETRANS;
 		for (int i = 0; i < 2; i++) {
 			if (module->inputs[EO_102::INPUT_1 + i].active) {
 				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col, module->traceMode[i]); 
 			}
-			col = nvgRGBA(0xed, 0x2c, 0x24, 0xc0);
+			col = SUBLIGHTREDTRANS;
 		}
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
 		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_2].value, 0.0f, 1.0f));
@@ -409,7 +409,7 @@ struct EO102 : ModuleWidget {
 			display->box.pos = Vec(341, 254);
 			display->box.size = Vec(62, 16);
 			display->index = 0;
-			display->col = nvgRGBA(0x28, 0xb0, 0xf3, 0xff);
+			display->col = SUBLIGHTBLUE;
 			addChild(display);
 		}
 		{
@@ -418,7 +418,7 @@ struct EO102 : ModuleWidget {
 			display->box.pos = Vec(341, 272);
 			display->box.size = Vec(62, 16);
 			display->index = 1;
-			display->col = nvgRGBA(0xed, 0x2c, 0x24, 0xff);
+			display->col = SUBLIGHTRED;
 			addChild(display);
 		}
 

@@ -29,7 +29,7 @@ struct TD_116 : Module {
 	}
 	std::string text;
 	int fontSize = 12;
-	NVGcolor fg = nvgRGB(0x28, 0xb0, 0xf3);
+	NVGcolor fg = SUBLIGHTBLUE;
 	NVGcolor bg = nvgRGB(0,0,0);
 	int isDirty = false;
 	int isDirtyC = false;
@@ -40,7 +40,7 @@ struct TDText : LedDisplayTextField {
 	NVGcolor bgColor = nvgRGB(0x00, 0x00, 0x00);
 	int fontSize = 12;
 	TDText() {
-		color = nvgRGB(0x28, 0xb0, 0xf3);
+		color = SUBLIGHTBLUE;
 	}
 	void onTextChange() override {
 		LedDisplayTextField::onTextChange();
@@ -184,7 +184,7 @@ struct TD116 : ModuleWidget {
 	void reset() override {
 		textField->fontSize = 12;
 		textField->text = "";
-		textField->color = nvgRGB(0x28, 0xb0, 0xf3);
+		textField->color = SUBLIGHTBLUE;
 		textField->bgColor = nvgRGB(0,0,0);	
 		ModuleWidget::reset();
 	}
@@ -205,7 +205,7 @@ void TD116::appendContextMenu(Menu *menu) {
 	menu->addChild(MenuEntry::create());
 	TD116_MenuItem *m = MenuItem::create<TD116_MenuItem>("Blue");
 	m->widget = this;
-	m->color = nvgRGB(0x28, 0xb0, 0xf3);
+	m->color = SUBLIGHTBLUE;
 	menu->addChild(m);
 	
 	m = MenuItem::create<TD116_MenuItem>("Yellow");

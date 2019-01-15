@@ -6,7 +6,7 @@ struct TDVText : LedDisplayTextField {
 	NVGcolor bgColor;
 	TDVText() {
 		multiline = false;
-		color = nvgRGB(0x28, 0xb0, 0xf3);
+		color = SUBLIGHTBLUE;
 		bgColor = nvgRGBA(0, 0, 0, 0);
 	}
 	void draw(NVGcontext *vg) override {
@@ -82,7 +82,7 @@ struct TD202 : ModuleWidget {
 	void reset() override {
 		textField->text = "";
 		textField->multiline = false;
-		textField->color = nvgRGB(0x28, 0xb0, 0xf3);
+		textField->color = SUBLIGHTBLUE;
 		textField->bgColor = nvgRGBA(0, 0, 0, 0);
 		ModuleWidget::reset();
 	}
@@ -113,7 +113,7 @@ struct TD202_ParentItem : MenuItem {
 
 		TD202_MenuItem *m = MenuItem::create<TD202_MenuItem>("Blue");
 		m->widget = widget;
-		m->color = nvgRGB(0x28, 0xb0, 0xf3);
+		m->color = SUBLIGHTBLUE;
 		menu->addChild(m);
 	
 		m = MenuItem::create<TD202_MenuItem>("Yellow");

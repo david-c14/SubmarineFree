@@ -1,3 +1,10 @@
+#define SUBLIGHTOFF nvgRGB(0x4a,0x4a,0x4a)
+#define SUBLIGHTBLUE nvgRGB(0x29,0xb2,0xef)
+#define SUBLIGHTRED nvgRGB(0xed,0x2c,0x24)
+
+#define SUBLIGHTBLUETRANS nvgRGBA(0x29,0xb2,0xef,0xc0)
+#define SUBLIGHTREDTRANS nvgRGBA(0xed,0x2c,0x24,0xc0)
+
 //////////////////
 // Ports
 //////////////////
@@ -12,42 +19,17 @@ struct SilverPort : Port {
 };
 
 struct RedPort : SilverPort {
-	RedPort() { col = nvgRGB(0xff, 0x20, 0x20); }
+	RedPort() { col = SUBLIGHTRED; }
 };
 
 struct BluePort : SilverPort {
-	BluePort() { col = nvgRGB(0x29, 0xb2, 0xef); }
+	BluePort() { col = SUBLIGHTBLUE; }
 };
 
 struct BlackPort : SilverPort {
 	BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
 };
-/*
-struct sub_port : SVGPort {
-	sub_port() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port.svg")));
-	}
-};
 
-struct sub_port_red : SVGPort {
-	sub_port_red() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port_red.svg")));
-	}
-};
-
-struct sub_port_blue : SVGPort {
-	sub_port_blue() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port_blue.svg")));
-	}
-};
-
-struct sub_port_black : SVGPort {
-	sub_port_black() {
-		setSVG(SVG::load(assetPlugin(plugin, "res/Components/sub_port_black.svg")));
-	}
-};
-
-*/
 //////////////////
 // Switches
 //////////////////
@@ -121,6 +103,7 @@ struct LightKnob : Knob {
 	/** Radii in standard units */
 	float radius = 19.0;
 	int enabled = 1;
+	NVGcolor color = SUBLIGHTBLUE;
 	LightKnob() {smooth = false;}
 	void draw(NVGcontext *vg) override;
 	void setEnabled(int val);
@@ -167,6 +150,13 @@ struct NarrowKnob : K {
 	NarrowKnob() {
 		K::minAngle = -0.75*M_PI;
 		K::maxAngle = 0.75*M_PI;	
+	}
+};
+
+template <class K>
+struct RedKnob : K {
+	RedKnob() {
+		K::color = SUBLIGHTRED;
 	}
 };
 
