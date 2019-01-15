@@ -119,7 +119,7 @@ struct XF104 : ModuleWidget {
 		}
 
 		addParam(ParamWidget::create<sub_btn>(Vec(90, 94.5), module, XF_104::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_btn>(Vec(90, 270.5), module, XF_104::PARAM_LINK_2, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<RedKnob<sub_btn2>>(Vec(90, 270.5), module, XF_104::PARAM_LINK_2, 0.0f, 1.0f, 0.0f));
 	}
 };
 

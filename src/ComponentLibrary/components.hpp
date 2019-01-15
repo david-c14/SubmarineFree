@@ -93,6 +93,21 @@ struct sub_btn : SVGSwitch, ToggleSwitch {
 };
 
 //////////////////
+// Buttons
+//////////////////
+
+struct sub_btn2 : ToggleSwitch {
+	NVGcolor color = SUBLIGHTBLUE;
+	sub_btn2() {
+		minValue = 0.0f;
+		maxValue = 1.0f;	
+		box.size.x = 16.0f;
+		box.size.y = 16.0f;
+	}
+	void draw(NVGcontext *vg) override;
+};
+
+//////////////////
 // Knobs
 //////////////////
 
