@@ -82,29 +82,22 @@ struct sub_sw_4h : SVGSwitch, ToggleSwitch {
 	}
 };
 
-struct sub_btn : SVGSwitch, ToggleSwitch {
-	sub_btn() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_btn.svg")));
-		addFrame(SVG::load(assetPlugin(plugin, "res/Components/sub_btn_a.svg")));
-	}
-	void step() override {
-		setValue(module->params[paramId].value);
-	}
-};
-
 //////////////////
 // Buttons
 //////////////////
 
-struct sub_btn2 : ToggleSwitch {
+struct LightButton : ToggleSwitch {
 	NVGcolor color = SUBLIGHTBLUE;
-	sub_btn2() {
+	LightButton() {
 		minValue = 0.0f;
 		maxValue = 1.0f;	
 		box.size.x = 16.0f;
 		box.size.y = 16.0f;
 	}
 	void draw(NVGcontext *vg) override;
+	void step() override {
+		setValue(module->params[paramId].value);
+	}
 };
 
 //////////////////

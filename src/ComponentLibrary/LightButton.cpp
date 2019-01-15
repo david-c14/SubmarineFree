@@ -1,14 +1,14 @@
 #include "../SubmarineFree.hpp"
 #include "util/color.hpp"
 
-void sub_btn2::draw(NVGcontext *vg) {
+void LightButton::draw(NVGcontext *vg) {
 
 	NVGcolor lcol = (value > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
 
 	// Shadow
 	{
 		nvgBeginPath(vg);
-		nvgRoundedRect(vg, 0.5f, box.size.y * 1.2f, box.size.x - 1.0f, box.size.y - 1.0f, 2.5f);
+		nvgRoundedRect(vg, 0.0f, 0.0f, box.size.x, box.size.y * 1.2f, 3.0f);
 		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.15));
 		nvgFill(vg);
 	}

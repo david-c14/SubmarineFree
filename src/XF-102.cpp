@@ -100,7 +100,7 @@ struct XF102 : ModuleWidget {
 			addChild(ModuleLightWidget::create<TinyLight<BlueRedLight>>(Vec(141, 67 + offset), module, XF_102::LIGHT_AUTO_1 + i * 2));
 		}
 
-		addParam(ParamWidget::create<sub_btn>(Vec(90, 94.5), module, XF_102::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<LightButton>(Vec(90, 94.5), module, XF_102::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
 	}
 };
 

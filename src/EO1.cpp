@@ -435,7 +435,7 @@ struct EO102 : ModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(226, 333), module, EO_102::LIGHT_TRIGGER));
 		addParam(createParamCentered<sub_sw_2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<sub_btn>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f));
+		addParam(createParamCentered<LightButton>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f));
 
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
