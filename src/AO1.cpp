@@ -497,7 +497,22 @@ struct CPasteMenu : MenuItem {
 	AOConstDisplay *widget;
 	void onAction(EventAction &e) override {
 		if (!isnan(SubmarineAO::CvalClipboard))
-			widget->value = SubmarineAO::CvalClipboard; 
+			widget->setValue(SubmarineAO::CvalClipboard);
+	}
+};
+
+struct CValMenu : MenuItem {
+	AOConstDisplay *widget;
+	float val;
+	void onAction(EventAction &e) override {
+		widget->setValue(val);
+	}
+	static CValMenu *create(AOConstDisplay * _widget, float _val, const char * _text) {
+		CValMenu *vm = new CValMenu();
+		vm->widget = _widget;
+		vm->val = _val;
+		vm->text = std::string(_text);
+		return vm;
 	}
 };
 
@@ -512,7 +527,7 @@ struct FPasteMenu : MenuItem {
 	AOFuncDisplay *widget;
 	void onAction(EventAction &e) override {
 		if (!isnan(SubmarineAO::FunctorClipboard))
-			widget->value = SubmarineAO::FunctorClipboard; 
+			widget->setValue(SubmarineAO::FunctorClipboard);
 	}
 };
 
@@ -530,6 +545,16 @@ void AOConstDisplay::onMouseDown(EventMouseDown &e) {
 			pm->text = "Paste";
 			menu->addChild(pm);
 		}
+		menu->addChild(MenuEntry::create());
+		menu->addChild(CValMenu::create(this, 10000.0f, "100.00"));
+		menu->addChild(CValMenu::create(this, 1000.0f, "10.00"));
+		menu->addChild(CValMenu::create(this, 500.0f, "5.00"));
+		menu->addChild(CValMenu::create(this, 100.0f, "1.00"));
+		menu->addChild(CValMenu::create(this, 0.0f, "0.00"));
+		menu->addChild(CValMenu::create(this, -100.0f, "-1.00"));
+		menu->addChild(CValMenu::create(this, -500.0f, "-5.00"));
+		menu->addChild(CValMenu::create(this, -1000.0f, "-10.00"));
+		menu->addChild(CValMenu::create(this, -10000.0f, "-100.00"));
 		return;
 	}
 	Knob::onMouseDown(e);
