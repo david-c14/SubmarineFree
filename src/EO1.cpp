@@ -50,6 +50,8 @@ struct EO_102 : Module {
 	SchmittTrigger trigger;
 	PulseGenerator triggerLight;
 	float runMode;
+	int setRun = 0;
+	int resetRun = 0;
 	int traceMode[2];
 	int traceStep;	
 
@@ -74,9 +76,11 @@ void EO_102::startFrame() {
 
 void EO_102::step() {
 	if (runMode > 0.5f) {
-		if (params[PARAM_RUNMODE].value < 0.5f)
-		//	runningButtonWidget->setValue(1.0f);
-			engineSetParam(this, PARAM_RUN, 1.0f);
+		if (params[PARAM_RUNMODE].value < 0.5f) {
+			//engineSetParam(this, PARAM_RUN, 1.0f);
+			params[PARAM_RUN].value = 1.0f;
+			setRun = 1;
+		}
 	}
 	runMode = params[PARAM_RUNMODE].value;
 	// Compute time
@@ -153,8 +157,11 @@ void EO_102::step() {
 		if (params[PARAM_RUN].value > 0.5f) {
 			if (triggered) {
 				startFrame();
-				if (runMode > 0.5f) // Continuous run mode
-					engineSetParam(this, PARAM_RUN, 0.0f);
+				if (runMode > 0.5f) {// Continuous run mode
+					//engineSetParam(this, PARAM_RUN, 0.0f);
+					params[PARAM_RUN].value = 0;
+					resetRun = 1;
+				}
 				return;
 			}
 		}
@@ -385,6 +392,7 @@ struct EO_Measure_Vert : EO_Measure {
 };
 
 struct EO102 : ModuleWidget {
+	LightButton *paramRun;
 	EO102(EO_102 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/EO-102.svg")));
 
@@ -435,11 +443,23 @@ struct EO102 : ModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(226, 333), module, EO_102::LIGHT_TRIGGER));
 		addParam(createParamCentered<sub_sw_2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<LightButton>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f));
+		paramRun = createParamCentered<LightButton>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
+		addParam(paramRun);
 
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.2f));
+	}
+	void step() override {
+		if (((EO_102 *)module)->setRun) {
+			((EO_102 *)module)->setRun = 0;
+			paramRun->setValue(1.0f);
+		}
+		if (((EO_102 *)module)->resetRun) {
+			((EO_102 *)module)->resetRun = 0;
+			paramRun->setValue(0.0f);
+		}
+		ModuleWidget::step();
 	}
 };
 

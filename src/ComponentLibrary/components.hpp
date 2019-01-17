@@ -95,9 +95,9 @@ struct LightButton : ToggleSwitch {
 		box.size.y = 16.0f;
 	}
 	void draw(NVGcontext *vg) override;
-	void step() override {
-		setValue(module->params[paramId].value);
-	}
+//	void step() override {
+//		setValue(module->params[paramId].value);
+//	}
 };
 
 //////////////////

@@ -55,6 +55,8 @@ struct LA_108 : DS_Module {
 
 	DS_Schmitt trigger;
 
+	int resetRunMode = 0;
+
 	LA_108() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
 	void startFrame(void);
@@ -124,7 +126,9 @@ void LA_108::step() {
 		int triggered = trigger.edge(this, gate, edge);
 
 		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
-			engineSetParam(this, PARAM_RESET, 0.0f);
+			//engineSetParam(this, PARAM_RESET, 0.0f);
+			params[PARAM_RESET].value = 0.0f;
+			resetRunMode = 1;
 			// Reset if triggered
 			float holdTime = 0.1f;
 			if (triggered) {
@@ -142,7 +146,9 @@ void LA_108::step() {
 			if (params[PARAM_RESET].value > 0.5f) {
 				if (triggered) {
 					startFrame();
-					engineSetParam(this, PARAM_RESET, 0.0f);
+					//engineSetParam(this, PARAM_RESET, 0.0f);
+					params[PARAM_RESET].value = 0.0f;
+					resetRunMode = 1;
 					return;
 				}
 			}
@@ -288,6 +294,7 @@ struct LA_Measure : TransparentWidget {
 
 
 struct LA108 : ModuleWidget {
+	LightButton *resetButton;
 	LA108(LA_108 *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/LA-108.svg")));
 
@@ -317,7 +324,8 @@ struct LA108 : ModuleWidget {
 		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(39, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(82, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<LightButton>(Vec(151, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f));
+		resetButton = ParamWidget::create<LightButton>(Vec(151, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
+		addParam(resetButton);
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(171, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(214, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
 		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(242, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
@@ -325,6 +333,13 @@ struct LA108 : ModuleWidget {
 	}
 	void appendContextMenu(Menu *menu) override {
 		((DS_Module *)module)->appendContextMenu(menu);
+	}
+	void step() override {
+		if (((LA_108 *)module)->resetRunMode) {
+			((LA_108 *)module)->resetRunMode = 0;
+			resetButton->setValue(0.0f);
+		}
+		ModuleWidget::step();
 	}
 };
 
