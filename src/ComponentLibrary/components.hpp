@@ -82,6 +82,52 @@ struct sub_sw_4h : SVGSwitch, ToggleSwitch {
 	}
 };
 
+struct SubSwitch : ToggleSwitch {
+	float length = 25.0f;
+	int horz = 0;
+	SubSwitch() {
+		//minValue = 0.0f;
+		//maxValue = 1.0f;
+		SetSize();
+	}
+	void SetSize() {
+		if (horz) {
+			box.size.x = length;
+			box.size.y = 14;
+		}
+		else {
+			box.size.x = 14;
+			box.size.y = length;
+		}
+	}
+	void draw(NVGcontext *vg) override;
+};
+
+template <class k>
+struct SubSwitch2 : k {
+	SubSwitch2() {
+		k::length = 25.0f;
+		k::SetSize();
+	}
+};
+
+template <class k>
+struct SubSwitch3 : k {
+	SubSwitch3() {
+		k::length = 30.0f;
+		k::SetSize();
+	}
+};
+
+template <class k>
+struct SubSwitchHorz : k {
+	SubSwitchHorz() {
+		k::horz = 1;
+		k::SetSize();
+	}
+};
+
+
 //////////////////
 // Buttons
 //////////////////
@@ -89,8 +135,8 @@ struct sub_sw_4h : SVGSwitch, ToggleSwitch {
 struct LightButton : ToggleSwitch {
 	NVGcolor color = SUBLIGHTBLUE;
 	LightButton() {
-		minValue = 0.0f;
-		maxValue = 1.0f;	
+		//minValue = 0.0f;
+		//maxValue = 1.0f;	
 		box.size.x = 16.0f;
 		box.size.y = 16.0f;
 	}
