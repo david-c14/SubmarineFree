@@ -322,8 +322,8 @@ struct LA108 : ModuleWidget {
 		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, LA_108::LIGHT_EXT));
 
 		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(39, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
-		addParam(ParamWidget::create<sub_sw_2>(Vec(82, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<sub_sw_2>(Vec(108, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<SubSwitch2>(Vec(82, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
+		addParam(ParamWidget::create<SubSwitch2>(Vec(108, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
 		resetButton = ParamWidget::create<LightButton>(Vec(151, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
 		addParam(resetButton);
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(171, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));

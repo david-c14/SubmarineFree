@@ -70,8 +70,8 @@ struct XF201 : ModuleWidget {
 			addOutput(Port::create<SilverPort>(Vec(92,93 + offset), Port::OUTPUT, module, XF_201::OUTPUT_1 + i));
 			addOutput(Port::create<RedPort>(Vec(92,120 + offset), Port::OUTPUT, module, XF_201::OUTPUTR_1 + i));
 
-			addParam(ParamWidget::create<sub_sw_2>(Vec(28, 154.5 + offset), module, XF_201::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
-			addParam(ParamWidget::create<sub_sw_3>(Vec(65, 152 + offset), module, XF_201::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
+			addParam(ParamWidget::create<SubSwitch2>(Vec(28, 154.5 + offset), module, XF_201::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
+			addParam(ParamWidget::create<SubSwitch3>(Vec(65, 152 + offset), module, XF_201::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
 			fader = ParamWidget::create<XF_LightKnob>(Vec(33, 51 + offset), module, XF_201::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
 			fader->cv = XF_201::INPUT_CV_1 + i;
 			fader->link = 0;

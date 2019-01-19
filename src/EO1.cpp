@@ -432,7 +432,7 @@ struct EO102 : ModuleWidget {
 
 		for (int i = 0; i < 2; i++) {
 			addInput(createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i));
-			addParam(createParamCentered<sub_sw_2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f));
+			addParam(createParamCentered<SubSwitch2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f));
 			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 320), module, EO_102::PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f));
 			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f));
 		}
@@ -442,7 +442,7 @@ struct EO102 : ModuleWidget {
 		addInput(createInputCentered<BluePort>(Vec(211.5, 326.5), module, EO_102::INPUT_EXT));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(226, 333), module, EO_102::LIGHT_TRIGGER));
-		addParam(createParamCentered<sub_sw_2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<SubSwitch2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
 		paramRun = createParamCentered<LightButton>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
 		addParam(paramRun);
 
