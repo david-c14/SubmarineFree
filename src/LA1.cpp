@@ -126,7 +126,6 @@ void LA_108::step() {
 		int triggered = trigger.edge(this, gate, edge);
 
 		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
-			//engineSetParam(this, PARAM_RESET, 0.0f);
 			params[PARAM_RESET].value = 0.0f;
 			resetRunMode = 1;
 			// Reset if triggered
@@ -146,7 +145,6 @@ void LA_108::step() {
 			if (params[PARAM_RESET].value > 0.5f) {
 				if (triggered) {
 					startFrame();
-					//engineSetParam(this, PARAM_RESET, 0.0f);
 					params[PARAM_RESET].value = 0.0f;
 					resetRunMode = 1;
 					return;

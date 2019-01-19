@@ -77,7 +77,6 @@ void EO_102::startFrame() {
 void EO_102::step() {
 	if (runMode > 0.5f) {
 		if (params[PARAM_RUNMODE].value < 0.5f) {
-			//engineSetParam(this, PARAM_RUN, 1.0f);
 			params[PARAM_RUN].value = 1.0f;
 			setRun = 1;
 		}
@@ -158,7 +157,6 @@ void EO_102::step() {
 			if (triggered) {
 				startFrame();
 				if (runMode > 0.5f) {// Continuous run mode
-					//engineSetParam(this, PARAM_RUN, 0.0f);
 					params[PARAM_RUN].value = 0;
 					resetRun = 1;
 				}
