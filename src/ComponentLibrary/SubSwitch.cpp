@@ -6,7 +6,7 @@ void SubSwitch2::draw(NVGcontext *vg) {
 	float cy = 7.0f + (box.size.y - 14.0f) * value / (maxValue - minValue);
 
 	// Shadow
-	{
+	if (!gScheme.isFlat) {
 		nvgBeginPath(vg);
 		nvgRoundedRect(vg, 0, cy - 7.0f, 14.0f, 17.0f, 7.0f);
 		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.15));
@@ -20,9 +20,14 @@ void SubSwitch2::draw(NVGcontext *vg) {
 		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 7.0f);
 		nvgTranslate(vg, box.size.x / 2.0f, box.size.y / 2.0f);
 		nvgScale(vg, box.size.x / 14.0f, box.size.y / 14.0f);
-		NVGpaint paint;
-		paint = nvgRadialGradient(vg, 0, 0, 0, 7.0f, nvgRGB(0,0,0), nvgRGB(0x22,0x22,0x22));
-		nvgFillPaint(vg, paint);
+		if (gScheme.isFlat) {
+			nvgFillColor(vg, nvgRGB(0x10, 0x10, 0x10));
+		}
+		else {
+			NVGpaint paint;
+			paint = nvgRadialGradient(vg, 0, 0, 0, 7.0f, nvgRGB(0,0,0), nvgRGB(0x22,0x22,0x22));
+			nvgFillPaint(vg, paint);
+		}
 		nvgFill(vg);	
 		nvgRestore(vg);
 	}
@@ -31,9 +36,15 @@ void SubSwitch2::draw(NVGcontext *vg) {
 	{
 		nvgBeginPath(vg);
 		nvgCircle(vg, cx, cy, 5.0f);
-		nvgFillPaint(vg, nvgLinearGradient(vg, cx, cy - 7.0f, cx, cy + 7.0f, nvgRGB(0x33, 0x33, 0x33), nvgRGB(0x11, 0x11, 0x11)));
+		if (gScheme.isFlat) {
+			nvgFillColor(vg, nvgRGB(0x20, 0x20, 0x20));
+			nvgStrokeColor(vg, nvgRGB(0xe0, 0xe0, 0xe0));
+		}
+		else {
+			nvgFillPaint(vg, nvgLinearGradient(vg, cx, cy - 7.0f, cx, cy + 7.0f, nvgRGB(0x33, 0x33, 0x33), nvgRGB(0x11, 0x11, 0x11)));
+			nvgStrokePaint(vg, nvgLinearGradient(vg, cx, cy - 7.0f, cx, cy + 7.0f, nvgRGB(0xee, 0xee, 0xee), nvgRGB(0xcc, 0xcc, 0xcc)));
+		}
 		nvgFill(vg);
-		nvgStrokePaint(vg, nvgLinearGradient(vg, cx, cy - 7.0f, cx, cy + 7.0f, nvgRGB(0xee, 0xee, 0xee), nvgRGB(0xcc, 0xcc, 0xcc)));
 		nvgStrokeWidth(vg, 2.0f);
 		nvgStroke(vg);
 	}

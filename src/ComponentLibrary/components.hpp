@@ -162,3 +162,14 @@ struct BlueRedLight : GrayModuleLightWidget {
 		addBaseColor(COLOR_RED);
 	}
 };
+
+//////////////////
+// Scheme
+//////////////////
+
+struct Scheme {
+	Scheme();
+	bool isFlat = false;
+};
+
+extern Scheme gScheme;
