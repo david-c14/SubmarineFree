@@ -173,3 +173,18 @@ struct Scheme {
 };
 
 extern Scheme gScheme;
+
+struct SchemeCanvasWidget; 
+
+struct SchemePanel : FramebufferWidget {
+	bool isFlat;
+	SchemePanel();
+	SchemePanel(Vec size);
+	void step() override;
+	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
+};
+
+struct SchemeCanvasWidget : VirtualWidget {
+	SchemePanel *panel;
+	void draw(NVGcontext *vg) override;
+};
