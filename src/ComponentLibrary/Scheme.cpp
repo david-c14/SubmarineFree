@@ -43,7 +43,7 @@ void SchemePanel::step() {
 		dirty = true;
 	}
 	isFlat = gScheme.isFlat;
-	oversample = 2.0;
+//	oversample = 2.0;
 	FramebufferWidget::step();
 }
 
@@ -64,6 +64,7 @@ void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 	nvgBezierTo(vg, 12.391180, 7.740785, 12.626017, 7.632964, 12.870864, 7.633019);
 	nvgBezierTo(vg, 12.870832, 7.633019, 12.870802, 7.633020, 12.870770, 7.633020);
 	nvgClosePath(vg);
+	nvgPathWinding(vg, NVG_HOLE);
 	nvgMoveTo(vg, 9.861490, 7.244100);
 	nvgBezierTo(vg, 10.204232, 7.244098, 10.532936, 7.395082, 10.775291, 7.663837);
 	nvgBezierTo(vg, 11.017647, 7.932592, 11.153801, 8.297103, 11.153800, 8.677180);
@@ -73,6 +74,7 @@ void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 	nvgBezierTo(vg, 8.569189, 7.885711, 9.147773, 7.244101, 9.861492, 7.244100);
 	nvgBezierTo(vg, 9.861491, 7.244100, 9.861491, 7.244100, 9.861490, 7.244100);
 	nvgClosePath(vg);
+	nvgPathWinding(vg, NVG_HOLE);
 	nvgMoveTo(vg, 6.076840, 6.834610); 
 	nvgBezierTo(vg, 6.517518, 6.834602, 6.940148, 7.028727, 7.251753, 7.374278);
 	nvgBezierTo(vg, 7.563358, 7.719829, 7.738410, 8.188498, 7.738400, 8.677179);
@@ -82,6 +84,7 @@ void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 	nvgBezierTo(vg, 4.415391, 7.659558, 5.159257, 6.834639, 6.076879, 6.834610);
 	nvgBezierTo(vg, 6.076866, 6.834610, 6.076853, 6.834610, 6.076840, 6.834610);
 	nvgClosePath(vg);
+	nvgPathWinding(vg, NVG_HOLE);
 	nvgMoveTo(vg, 9.353910, 1.000000); 
 	nvgBezierTo(vg, 8.257845, 0.999974, 7.369288, 2.008191, 7.369260, 3.251920);
 	nvgBezierTo(vg, 7.370142, 3.431143, 7.389879, 3.609628, 7.428055, 3.783565);
@@ -102,7 +105,7 @@ void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 	nvgBezierTo(vg, 9.353911, 1.000000, 9.353910, 1.000000, 9.353910, 1.000000);
 	nvgClosePath(vg);
 	nvgFillColor(vg, nvgRGB(0x71, 0x9f, 0xcf));
-	nvgPathWinding(vg, NVG_HOLE);
+	nvgPathWinding(vg, NVG_SOLID);
 	nvgShapeAntiAlias(vg, true);
 	nvgFill(vg);
 }
@@ -110,5 +113,12 @@ void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 
 void SchemeCanvasWidget::draw(NVGcontext *vg) {
 	panel->render(vg, this);
+	// Standard Panel Border
+	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
+	nvgBeginPath(vg);
+	nvgRect(vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
+	nvgStrokeColor(vg, borderColor);
+	nvgStrokeWidth(vg, 1.0);
+	nvgStroke(vg);
 	Widget::draw(vg);
 }
