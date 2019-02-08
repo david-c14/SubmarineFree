@@ -7,8 +7,8 @@ struct BP1 : ModuleWidget {
 	}
 };
 
-struct BP104 : ModuleWidget {
-	BP104(Module *module) : ModuleWidget(module) {
+struct BP104 : SchemeModuleWidget {
+	BP104(Module *module) : SchemeModuleWidget(module) {
 		SchemePanel *panel = new SchemePanel(Vec(60, 380));
 		addChild(panel);
 		this->box.size = Vec(60, 380);

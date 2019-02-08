@@ -20,6 +20,20 @@ Scheme::Scheme() {
 	json_decref(rootJ);
 }
 
+void Scheme::save() {
+	json_t *settings = json_object();
+	json_object_set_new(settings, "flat", json_real(isFlat?1:0));
+
+	systemCreateDirectory(assetLocal("SubmarineFree"));
+	std::string settingsFilename = assetLocal("SubmarineFree/Settings.json");
+	FILE *file = fopen(settingsFilename.c_str(), "w");
+	if (file) {
+		json_dumpf(settings, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+		fclose(file);
+	}
+	json_decref(settings);
+}
+
 Scheme gScheme;
 
 SchemePanel::SchemePanel() {
@@ -122,3 +136,21 @@ void SchemeCanvasWidget::draw(NVGcontext *vg) {
 	nvgStroke(vg);
 	Widget::draw(vg);
 }
+
+struct SchemeModuleWidgetFlatMenuItem : MenuItem {
+	void onAction(EventAction &e) override {
+		gScheme.isFlat = !gScheme.isFlat;
+		gScheme.save();
+	}
+	void step() override {
+		rightText = CHECKMARK(gScheme.isFlat);
+	}
+};
+
+void SchemeModuleWidget::appendContextMenu(Menu * menu) {
+	menu->addChild(MenuEntry::create());
+	SchemeModuleWidgetFlatMenuItem *m = MenuItem::create<SchemeModuleWidgetFlatMenuItem>("Flat visuals");
+	menu->addChild(m);
+}
+
+

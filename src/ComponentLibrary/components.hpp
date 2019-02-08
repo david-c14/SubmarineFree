@@ -169,7 +169,13 @@ struct BlueRedLight : GrayModuleLightWidget {
 
 struct Scheme {
 	Scheme();
+	void save();
 	bool isFlat = false;
+	NVGcolor background = nvgRGB(0x29, 0x4f, 0x77);
+	NVGcolor alternative = nvgRGB(0x71, 0x9f, 0xcf);
+	NVGcolor contrast = nvgRGB(0xff, 0xff, 0xff);
+	NVGcolor highlight = nvgRGB(0x3a, 0x6e, 0xa5);
+	NVGcolor shadow = nvgRGB(0x18, 0x2d, 0x44);
 };
 
 extern Scheme gScheme;
@@ -187,4 +193,9 @@ struct SchemePanel : FramebufferWidget {
 struct SchemeCanvasWidget : VirtualWidget {
 	SchemePanel *panel;
 	void draw(NVGcontext *vg) override;
+};
+
+struct SchemeModuleWidget : ModuleWidget {
+	SchemeModuleWidget(Module *module): ModuleWidget(module) {}
+	void appendContextMenu(Menu *menu) override;
 };
