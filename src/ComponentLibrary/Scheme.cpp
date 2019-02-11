@@ -17,12 +17,18 @@ Scheme::Scheme() {
 	if (h1) {
 		isFlat = (json_number_value(h1) != 0);
 	}
+	json_t *c1 = json_object_get(rootJ, "scheme");
+	if (c1) {
+		scheme = json_number_value(c1);
+		setColors();
+	}
 	json_decref(rootJ);
 }
 
 void Scheme::save() {
 	json_t *settings = json_object();
 	json_object_set_new(settings, "flat", json_real(isFlat?1:0));
+	json_object_set_new(settings, "scheme", json_real(scheme));
 
 	systemCreateDirectory(assetLocal("SubmarineFree"));
 	std::string settingsFilename = assetLocal("SubmarineFree/Settings.json");
@@ -32,6 +38,33 @@ void Scheme::save() {
 		fclose(file);
 	}
 	json_decref(settings);
+}
+
+void Scheme::setColors() {
+	switch (scheme) {
+		case Dark:
+			background = nvgRGB(0x00, 0x00, 0x00);
+			alternative = nvgRGB(0x71, 0x9f, 0xcf);
+			contrast = nvgRGB(0xff, 0xff, 0xff);
+			highlight = nvgRGB(0x22, 0x22, 0x22);
+			shadow = nvgRGB(0x00, 0x00, 0x00);
+			break;
+		case Light:
+			background = nvgRGB(0xff, 0xff, 0xff);
+			alternative = nvgRGB(0x71, 0x9f, 0xcf);
+			contrast = nvgRGB(0x00, 0x00, 0x00);
+			highlight = nvgRGB(0xff, 0xff, 0xff);
+			shadow = nvgRGB(0xdd, 0xdd, 0xdd);
+			break;
+		default:
+			background = nvgRGB(0x29, 0x4f, 0x77);
+			alternative = nvgRGB(0x71, 0x9f, 0xcf);
+			contrast = nvgRGB(0xff, 0xff, 0xff);
+			highlight = nvgRGB(0x3a, 0x6e, 0xa5);
+			shadow = nvgRGB(0x18, 0x2d, 0x44);
+			break;
+	}
+	
 }
 	
 std::shared_ptr<Font> Scheme::font() {
@@ -46,6 +79,7 @@ Scheme gScheme;
 
 SchemePanel::SchemePanel() {
 	isFlat = gScheme.isFlat;
+	scheme = gScheme.scheme;
 	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
 	canvas->panel = this;
 	addChild(canvas);
@@ -53,6 +87,7 @@ SchemePanel::SchemePanel() {
 
 SchemePanel::SchemePanel(Vec size) {
 	isFlat = gScheme.isFlat;
+	scheme = gScheme.scheme;
 	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
 	canvas->panel = this;
 	addChild(canvas);
@@ -65,16 +100,22 @@ void SchemePanel::step() {
 		dirty = true;
 	}
 	isFlat = gScheme.isFlat;
+	if (scheme != gScheme.scheme) {
+		dirty = true;
+	}
+	scheme = gScheme.scheme;
 //	oversample = 2.0;
 	FramebufferWidget::step();
 }
 
-void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
+void SchemePanel::drawBackground(NVGcontext *vg) {
 	nvgBeginPath(vg);
 	nvgRect(vg, 0, 0, box.size.x, box.size.y);
-	nvgFillColor(vg, nvgRGB(0x29, 0x4f, 0x77));
+	nvgFillColor(vg, gScheme.background);
 	nvgFill(vg);	
+}
 
+void SchemePanel::drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate) {
 	nvgBeginPath(vg);
 	nvgMoveTo(vg, 12.870770, 7.633020);
 	nvgBezierTo(vg, 13.115595, 7.633030, 13.350389, 7.740895, 13.523494, 7.932883);
@@ -132,6 +173,10 @@ void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 	nvgFill(vg);
 }
 
+void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
+	drawBackground(vg);
+	drawLogo(vg, 0, 0, 1, 0);
+}
 
 void SchemeCanvasWidget::draw(NVGcontext *vg) {
 	panel->render(vg, this);
@@ -145,6 +190,19 @@ void SchemeCanvasWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 }
 
+struct SchemeModuleWidgetSchemeMenuItem : MenuItem {
+	int scheme;
+	void onAction(EventAction &e) override {
+		gScheme.scheme = scheme;
+		gScheme.setColors();
+		gScheme.save();
+	}
+	void step() override {
+		rightText = CHECKMARK(scheme == gScheme.scheme);
+		MenuItem::step();
+	}
+};
+
 struct SchemeModuleWidgetFlatMenuItem : MenuItem {
 	void onAction(EventAction &e) override {
 		gScheme.isFlat = !gScheme.isFlat;
@@ -152,12 +210,33 @@ struct SchemeModuleWidgetFlatMenuItem : MenuItem {
 	}
 	void step() override {
 		rightText = CHECKMARK(gScheme.isFlat);
+		MenuItem::step();
+	}
+};
+
+struct SchemeModuleWidgetVisualMenuItem : MenuItem {
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
+		SchemeModuleWidgetFlatMenuItem *fmi = MenuItem::create<SchemeModuleWidgetFlatMenuItem>("Flat");
+		menu->addChild(fmi);
+		menu->addChild(MenuSeparator::create<MenuSeparator>());
+		SchemeModuleWidgetSchemeMenuItem *vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Blue");
+		vmi->scheme = 0;
+		menu->addChild(vmi);
+		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Dark");
+		vmi->scheme = 1;
+		menu->addChild(vmi);
+		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Light");
+		vmi->scheme = 2;
+		menu->addChild(vmi);
+		return menu;
 	}
 };
 
 void SchemeModuleWidget::appendContextMenu(Menu * menu) {
 	menu->addChild(MenuEntry::create());
-	SchemeModuleWidgetFlatMenuItem *m = MenuItem::create<SchemeModuleWidgetFlatMenuItem>("Flat visuals");
+	SchemeModuleWidgetVisualMenuItem *m = MenuItem::create<SchemeModuleWidgetVisualMenuItem>("Visuals");
+	m->rightText = SUBMENU;
 	menu->addChild(m);
 }
 

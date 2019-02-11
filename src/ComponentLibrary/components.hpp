@@ -168,10 +168,17 @@ struct BlueRedLight : GrayModuleLightWidget {
 //////////////////
 
 struct Scheme {
+	enum enumScheme {
+		Blue,
+		Dark,
+		Light
+	};
 	Scheme();
+	void setColors();
 	void save();
 	std::shared_ptr<Font> font();
 	bool isFlat = false;
+	int scheme = Blue;
 	NVGcolor background = nvgRGB(0x29, 0x4f, 0x77);
 	NVGcolor alternative = nvgRGB(0x71, 0x9f, 0xcf);
 	NVGcolor contrast = nvgRGB(0xff, 0xff, 0xff);
@@ -187,9 +194,12 @@ struct SchemeCanvasWidget;
 
 struct SchemePanel : FramebufferWidget {
 	bool isFlat;
+	int scheme;
 	SchemePanel();
 	SchemePanel(Vec size);
 	void step() override;
+	void drawBackground(NVGcontext *vg);
+	void drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate);
 	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
 };
 
