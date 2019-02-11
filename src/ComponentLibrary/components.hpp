@@ -170,12 +170,15 @@ struct BlueRedLight : GrayModuleLightWidget {
 struct Scheme {
 	Scheme();
 	void save();
+	std::shared_ptr<Font> font();
 	bool isFlat = false;
 	NVGcolor background = nvgRGB(0x29, 0x4f, 0x77);
 	NVGcolor alternative = nvgRGB(0x71, 0x9f, 0xcf);
 	NVGcolor contrast = nvgRGB(0xff, 0xff, 0xff);
 	NVGcolor highlight = nvgRGB(0x3a, 0x6e, 0xa5);
 	NVGcolor shadow = nvgRGB(0x18, 0x2d, 0x44);
+	std::shared_ptr<Font> _font = NULL;
+	bool _fontLoaded = false;
 };
 
 extern Scheme gScheme;

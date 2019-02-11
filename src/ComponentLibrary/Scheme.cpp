@@ -33,6 +33,14 @@ void Scheme::save() {
 	}
 	json_decref(settings);
 }
+	
+std::shared_ptr<Font> Scheme::font() {
+	if (!_fontLoaded) {
+		_fontLoaded = true;
+		_font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));	
+	}
+	return _font;
+}
 
 Scheme gScheme;
 

@@ -312,14 +312,9 @@ struct EO_Display : TransparentWidget {
 };
 
 struct EO_Measure : TransparentWidget {
-	std::shared_ptr<Font> font;
 	EO_102 *module;
 	char measureText[41];
 	NVGcolor col;
-
-	EO_Measure() {
-		font = Font::load(assetGlobal( "res/fonts/DejaVuSans.ttf"));
-	}
 
 	virtual void updateText() {
 	} 
@@ -327,7 +322,7 @@ struct EO_Measure : TransparentWidget {
 	void draw(NVGcontext *vg) override {
 		updateText();
 		nvgFontSize(vg, 14);
-		nvgFontFaceId(vg, font->handle);
+		nvgFontFaceId(vg, gScheme.font()->handle);
 		nvgFillColor(vg, col);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, box.size.x / 2, 12, measureText, NULL);

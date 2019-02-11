@@ -250,13 +250,8 @@ struct LA_Display : TransparentWidget {
 };
 
 struct LA_Measure : TransparentWidget {
-	std::shared_ptr<Font> font;
 	LA_108 *module;
 	char measureText[41];
-
-	LA_Measure() {
-		font = Font::load(assetGlobal( "res/fonts/DejaVuSans.ttf"));
-	}
 
 	void draw(NVGcontext *vg) override {
 		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].value);
@@ -283,7 +278,7 @@ struct LA_Measure : TransparentWidget {
 		else
 			sprintf(measureText, "%4.1fs", width);
 		nvgFontSize(vg, 14);
-		nvgFontFaceId(vg, font->handle);
+		nvgFontFaceId(vg, gScheme.font()->handle);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 27, 12, measureText, NULL);

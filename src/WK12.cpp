@@ -313,20 +313,15 @@ void WK101_InputPort::received(std::string pluginName, std::string moduleName, j
 }
 
 struct WK_Display : TransparentWidget {
-	std::shared_ptr<Font> font;
 	WK_101 *module;
 	int index;
 	char dspText[20];
 	
-	WK_Display() {
-		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
-	}
-
 	void draw(NVGcontext *vg) override {
 		float val = module->tunings[index];
 		sprintf(dspText, "%+05.2f", val);
 		nvgFontSize(vg, 14);
-		nvgFontFaceId(vg, font->handle);
+		nvgFontFaceId(vg, gScheme.font()->handle);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 30, 13, dspText, NULL);

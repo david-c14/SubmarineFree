@@ -377,18 +377,16 @@ namespace SubmarineAO {
 } // end namespace SubmarineA0
 
 struct AOFuncDisplay : Knob {
-	std::shared_ptr<Font> font;
 	AOFuncDisplay() {
 		box.size.x = 80;
 		box.size.y = 15;
 		snap = true;
 		smooth = false;
 		speed = 0.5f;
-		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	}
 	void draw(NVGcontext *vg) override {
 		nvgFontSize(vg, 16);
-		nvgFontFaceId(vg, font->handle);
+		nvgFontFaceId(vg, gScheme.font()->handle);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, SubmarineAO::functions[value].name.c_str(), NULL);
@@ -397,19 +395,17 @@ struct AOFuncDisplay : Knob {
 };
 
 struct AOConstDisplay : Knob {
-	std::shared_ptr<Font> font;
 	AOConstDisplay() {
 		box.size.x = 80;
 		box.size.y = 15;
 		snap = true;
 		speed = 0.005;
-		font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));
 	}
 	void draw(NVGcontext *vg) override {
 		char mtext[41];
 		sprintf(mtext, "C=%4.2f", ((int)value)/100.0f);
 		nvgFontSize(vg, 16);
-		nvgFontFaceId(vg, font->handle);
+		nvgFontFaceId(vg, gScheme.font()->handle);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, mtext, NULL);
