@@ -116,6 +116,10 @@ void SchemePanel::drawBackground(NVGcontext *vg) {
 }
 
 void SchemePanel::drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate) {
+	nvgSave(vg);
+	nvgTranslate(vg, left, top);
+	nvgRotate(vg, rotate);
+	nvgScale(vg, scale, scale);
 	nvgBeginPath(vg);
 	nvgMoveTo(vg, 12.870770, 7.633020);
 	nvgBezierTo(vg, 13.115595, 7.633030, 13.350389, 7.740895, 13.523494, 7.932883);
@@ -167,15 +171,19 @@ void SchemePanel::drawLogo(NVGcontext *vg, float left, float top, float scale, f
 	nvgBezierTo(vg, 9.446276, 1.001906, 9.400099, 1.000038, 9.353911, 1.000000);
 	nvgBezierTo(vg, 9.353911, 1.000000, 9.353910, 1.000000, 9.353910, 1.000000);
 	nvgClosePath(vg);
-	nvgFillColor(vg, nvgRGB(0x71, 0x9f, 0xcf));
+	nvgFillColor(vg, gScheme.alternative);
 	nvgPathWinding(vg, NVG_SOLID);
 	nvgShapeAntiAlias(vg, true);
 	nvgFill(vg);
+	nvgRestore(vg);
 }
 
 void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 	drawBackground(vg);
 	drawLogo(vg, 0, 0, 1, 0);
+	drawLogo(vg, 40, 40, 1, 0);
+	drawLogo(vg, 40, 40, 1, M_PI / 2.0);
+	drawLogo(vg, 40, 60, 2, 0);
 }
 
 void SchemeCanvasWidget::draw(NVGcontext *vg) {
