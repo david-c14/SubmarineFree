@@ -109,10 +109,32 @@ void SchemePanel::step() {
 }
 
 void SchemePanel::drawBackground(NVGcontext *vg) {
-	nvgBeginPath(vg);
-	nvgRect(vg, 0, 0, box.size.x, box.size.y);
-	nvgFillColor(vg, gScheme.background);
-	nvgFill(vg);	
+	if (gScheme.isFlat) {
+		nvgBeginPath(vg);
+		nvgRect(vg, 0, 0, box.size.x, box.size.y);
+		nvgFillColor(vg, gScheme.background);
+		nvgFill(vg);	
+	}
+	else {
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 0, 0);
+		nvgLineTo(vg, box.size.x, 0);
+		nvgLineTo(vg, 0, box.size.y);
+		nvgClosePath(vg);
+		nvgFillColor(vg, gScheme.highlight);
+		nvgFill(vg);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, box.size.x, 0);
+		nvgLineTo(vg, box.size.x, box.size.y);
+		nvgLineTo(vg, 0, box.size.y);
+		nvgClosePath(vg);
+		nvgFillColor(vg, gScheme.shadow);
+		nvgFill(vg);
+		nvgBeginPath(vg);
+		nvgRect(vg, 1, 1, box.size.x - 2, box.size.y - 2);
+		nvgFillColor(vg, gScheme.background);
+		nvgFill(vg);	
+	}
 }
 
 void SchemePanel::drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate) {
