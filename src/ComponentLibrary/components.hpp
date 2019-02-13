@@ -198,17 +198,16 @@ struct SchemePanel : FramebufferWidget {
 	SchemePanel();
 	SchemePanel(Vec size);
 	void step() override;
-	void drawBackground(NVGcontext *vg);
-	void drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate);
-	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
 };
 
 struct SchemeCanvasWidget : VirtualWidget {
-	SchemePanel *panel;
 	void draw(NVGcontext *vg) override;
 };
 
 struct SchemeModuleWidget : ModuleWidget {
 	SchemeModuleWidget(Module *module): ModuleWidget(module) {}
 	void appendContextMenu(Menu *menu) override;
+	void drawBackground(NVGcontext *vg);
+	void drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate);
+	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
 };

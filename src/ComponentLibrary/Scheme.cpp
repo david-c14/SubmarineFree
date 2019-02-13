@@ -81,7 +81,6 @@ SchemePanel::SchemePanel() {
 	isFlat = gScheme.isFlat;
 	scheme = gScheme.scheme;
 	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
-	canvas->panel = this;
 	addChild(canvas);
 }
 
@@ -89,7 +88,6 @@ SchemePanel::SchemePanel(Vec size) {
 	isFlat = gScheme.isFlat;
 	scheme = gScheme.scheme;
 	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
-	canvas->panel = this;
 	addChild(canvas);
 	canvas->box.size = size;
 	box.size = size;
@@ -108,7 +106,63 @@ void SchemePanel::step() {
 	FramebufferWidget::step();
 }
 
-void SchemePanel::drawBackground(NVGcontext *vg) {
+void SchemeCanvasWidget::draw(NVGcontext *vg) {
+	SchemeModuleWidget *smw = dynamic_cast<SchemeModuleWidget *>(parent->parent);
+	smw->render(vg, this);
+	// Standard Panel Border
+	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
+	nvgBeginPath(vg);
+	nvgRect(vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
+	nvgStrokeColor(vg, borderColor);
+	nvgStrokeWidth(vg, 1.0);
+	nvgStroke(vg);
+	Widget::draw(vg);
+}
+
+struct SchemeModuleWidgetSchemeMenuItem : MenuItem {
+	int scheme;
+	void onAction(EventAction &e) override {
+		gScheme.scheme = scheme;
+		gScheme.setColors();
+		gScheme.save();
+	}
+	void step() override {
+		rightText = CHECKMARK(scheme == gScheme.scheme);
+		MenuItem::step();
+	}
+};
+
+struct SchemeModuleWidgetFlatMenuItem : MenuItem {
+	void onAction(EventAction &e) override {
+		gScheme.isFlat = !gScheme.isFlat;
+		gScheme.save();
+	}
+	void step() override {
+		rightText = CHECKMARK(gScheme.isFlat);
+		MenuItem::step();
+	}
+};
+
+struct SchemeModuleWidgetVisualMenuItem : MenuItem {
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
+		SchemeModuleWidgetFlatMenuItem *fmi = MenuItem::create<SchemeModuleWidgetFlatMenuItem>("Flat");
+		menu->addChild(fmi);
+		menu->addChild(MenuSeparator::create<MenuSeparator>());
+		SchemeModuleWidgetSchemeMenuItem *vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Blue");
+		vmi->scheme = 0;
+		menu->addChild(vmi);
+		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Dark");
+		vmi->scheme = 1;
+		menu->addChild(vmi);
+		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Light");
+		vmi->scheme = 2;
+		menu->addChild(vmi);
+		return menu;
+	}
+};
+
+void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 	if (gScheme.isFlat) {
 		nvgBeginPath(vg);
 		nvgRect(vg, 0, 0, box.size.x, box.size.y);
@@ -137,7 +191,7 @@ void SchemePanel::drawBackground(NVGcontext *vg) {
 	}
 }
 
-void SchemePanel::drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate) {
+void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate) {
 	nvgSave(vg);
 	nvgTranslate(vg, left, top);
 	nvgRotate(vg, rotate);
@@ -200,68 +254,9 @@ void SchemePanel::drawLogo(NVGcontext *vg, float left, float top, float scale, f
 	nvgRestore(vg);
 }
 
-void SchemePanel::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
+void SchemeModuleWidget::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 	drawBackground(vg);
-	drawLogo(vg, 0, 0, 1, 0);
-	drawLogo(vg, 40, 40, 1, 0);
-	drawLogo(vg, 40, 40, 1, M_PI / 2.0);
-	drawLogo(vg, 40, 60, 2, 0);
 }
-
-void SchemeCanvasWidget::draw(NVGcontext *vg) {
-	panel->render(vg, this);
-	// Standard Panel Border
-	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
-	nvgBeginPath(vg);
-	nvgRect(vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
-	nvgStrokeColor(vg, borderColor);
-	nvgStrokeWidth(vg, 1.0);
-	nvgStroke(vg);
-	Widget::draw(vg);
-}
-
-struct SchemeModuleWidgetSchemeMenuItem : MenuItem {
-	int scheme;
-	void onAction(EventAction &e) override {
-		gScheme.scheme = scheme;
-		gScheme.setColors();
-		gScheme.save();
-	}
-	void step() override {
-		rightText = CHECKMARK(scheme == gScheme.scheme);
-		MenuItem::step();
-	}
-};
-
-struct SchemeModuleWidgetFlatMenuItem : MenuItem {
-	void onAction(EventAction &e) override {
-		gScheme.isFlat = !gScheme.isFlat;
-		gScheme.save();
-	}
-	void step() override {
-		rightText = CHECKMARK(gScheme.isFlat);
-		MenuItem::step();
-	}
-};
-
-struct SchemeModuleWidgetVisualMenuItem : MenuItem {
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-		SchemeModuleWidgetFlatMenuItem *fmi = MenuItem::create<SchemeModuleWidgetFlatMenuItem>("Flat");
-		menu->addChild(fmi);
-		menu->addChild(MenuSeparator::create<MenuSeparator>());
-		SchemeModuleWidgetSchemeMenuItem *vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Blue");
-		vmi->scheme = 0;
-		menu->addChild(vmi);
-		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Dark");
-		vmi->scheme = 1;
-		menu->addChild(vmi);
-		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Light");
-		vmi->scheme = 2;
-		menu->addChild(vmi);
-		return menu;
-	}
-};
 
 void SchemeModuleWidget::appendContextMenu(Menu * menu) {
 	menu->addChild(MenuEntry::create());
@@ -269,5 +264,3 @@ void SchemeModuleWidget::appendContextMenu(Menu * menu) {
 	m->rightText = SUBMENU;
 	menu->addChild(m);
 }
-
-
