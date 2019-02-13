@@ -75,6 +75,15 @@ std::shared_ptr<Font> Scheme::font() {
 	return _font;
 }
 
+int Scheme::font(NVGcontext *vg) {
+	int ret = nvgFindFont(vg, "subDejaVu");
+	if (ret != -1) {
+		return ret;
+	}
+	info("Loading font for subDejaVu");
+	return nvgCreateFont(vg, "subDejaVu", assetGlobal("res/fonts/DejaVuSans.ttf").c_str());
+}
+
 Scheme gScheme;
 
 SchemePanel::SchemePanel() {
@@ -252,6 +261,14 @@ void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float s
 	nvgShapeAntiAlias(vg, true);
 	nvgFill(vg);
 	nvgRestore(vg);
+}
+
+void SchemeModuleWidget::drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt) {
+	nvgFontFaceId(vg, gScheme.font(vg));
+	nvgFontSize(vg, size * 90 / SVG_DPI);
+	nvgTextAlign(vg, align);
+	nvgFillColor(vg, col);
+	nvgText(vg, x, y, txt, NULL);
 }
 
 void SchemeModuleWidget::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {

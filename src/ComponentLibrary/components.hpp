@@ -177,6 +177,7 @@ struct Scheme {
 	void setColors();
 	void save();
 	std::shared_ptr<Font> font();
+	int font(NVGcontext *vg);
 	bool isFlat = false;
 	int scheme = Blue;
 	NVGcolor background = nvgRGB(0x29, 0x4f, 0x77);
@@ -209,5 +210,6 @@ struct SchemeModuleWidget : ModuleWidget {
 	void appendContextMenu(Menu *menu) override;
 	void drawBackground(NVGcontext *vg);
 	void drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate);
+	void drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt);
 	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
 };

@@ -17,6 +17,7 @@ struct BP1 : SchemeModuleWidget {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBackground(vg);
 		drawLogo(vg, box.size.x - 20, 365, 1, 0);
+		drawText(vg, 3, 377, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 12, gScheme.alternative, "submarine");
 	}
 };
 
