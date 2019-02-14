@@ -1,3 +1,10 @@
+/**************************************************************
+*
+* The graphical styles and images encoded in this source file 
+* are copyright © 2018 David O'Rourke
+*
+**************************************************************/
+
 #include "../SubmarineFree.hpp"
 
 Scheme::Scheme() {
@@ -43,14 +50,14 @@ void Scheme::save() {
 void Scheme::setColors() {
 	switch (scheme) {
 		case Dark:
-			background = nvgRGB(0x00, 0x00, 0x00);
+			background = nvgRGB(0x11, 0x11, 0x11);
 			alternative = nvgRGB(0x71, 0x9f, 0xcf);
 			contrast = nvgRGB(0xff, 0xff, 0xff);
 			highlight = nvgRGB(0x22, 0x22, 0x22);
 			shadow = nvgRGB(0x00, 0x00, 0x00);
 			break;
 		case Light:
-			background = nvgRGB(0xff, 0xff, 0xff);
+			background = nvgRGB(0xee, 0xee, 0xee);
 			alternative = nvgRGB(0x71, 0x9f, 0xcf);
 			contrast = nvgRGB(0x00, 0x00, 0x00);
 			highlight = nvgRGB(0xff, 0xff, 0xff);
@@ -269,6 +276,23 @@ void SchemeModuleWidget::drawText(NVGcontext *vg, float x, float y, int align, f
 	nvgTextAlign(vg, align);
 	nvgFillColor(vg, col);
 	nvgText(vg, x, y, txt, NULL);
+}
+
+void SchemeModuleWidget::drawBase(NVGcontext *vg, const char *txt) {
+	drawBackground(vg);
+	if (box.size.x < 90) {
+		drawLogo(vg, (box.size.x - 20) / 2.0f, box.size.y - 15, 1, 0);
+	}
+	else {
+		drawLogo(vg, box.size.x - 20, box.size.y - 15, 1, 0);
+		drawText(vg, 3, 378, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 12, gScheme.alternative, "submarine");
+	}
+	if (box.size.x <= 30) {
+		drawText(vg, box.size.x / 2.0f, 12, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 12, gScheme.alternative, txt);
+	}
+	else {
+		drawText(vg, box.size.x / 2.0f, 10, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.alternative, txt);
+	}
 }
 
 void SchemeModuleWidget::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {

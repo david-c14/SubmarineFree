@@ -1,3 +1,10 @@
+/**************************************************************
+*
+* The graphical styles and images encoded in this source file 
+* are copyright © 2018 David O'Rourke
+*
+**************************************************************/
+
 #include "../SubmarineFree.hpp"
 #include "util/color.hpp"
 

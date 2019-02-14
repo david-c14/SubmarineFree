@@ -1,3 +1,10 @@
+/**************************************************************
+*
+* The graphical styles and images encoded in this source file 
+* are copyright © 2018 David O'Rourke
+*
+**************************************************************/
+
 #define SUBLIGHTOFF nvgRGB(0x4a,0x4a,0x4a)
 #define SUBLIGHTBLUE nvgRGB(0x29,0xb2,0xef)
 #define SUBLIGHTRED nvgRGB(0xed,0x2c,0x24)
@@ -211,5 +218,6 @@ struct SchemeModuleWidget : ModuleWidget {
 	void drawBackground(NVGcontext *vg);
 	void drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate);
 	void drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt);
+	void drawBase(NVGcontext *vg, const char *txt);
 	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
 };
