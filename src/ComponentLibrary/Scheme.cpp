@@ -118,7 +118,7 @@ void SchemePanel::step() {
 		dirty = true;
 	}
 	scheme = gScheme.scheme;
-//	oversample = 2.0;
+	oversample = 2.0;
 	FramebufferWidget::step();
 }
 
@@ -287,7 +287,7 @@ void SchemeModuleWidget::drawBase(NVGcontext *vg, const char *txt) {
 		drawLogo(vg, box.size.x - 20, box.size.y - 15, 1, 0);
 		drawText(vg, 3, 378, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 12, gScheme.alternative, "submarine");
 	}
-	if (box.size.x <= 30) {
+	if (box.size.x > 30) {
 		drawText(vg, box.size.x / 2.0f, 12, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 12, gScheme.alternative, txt);
 	}
 	else {

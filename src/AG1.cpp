@@ -1,3 +1,5 @@
+//SubTag DS TM W2 W6
+
 #include "DS.hpp"
 
 template <int x>
@@ -46,37 +48,93 @@ struct AG_1 : DS_Module {
 	}
 };
 
-struct AG104 : ModuleWidget {
-	AG104(AG_1<4> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/AG-104.svg")));
+struct AG104 : SchemeModuleWidget {
+	AG104(AG_1<4> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < 4; i++) {
 			int offset = 87 * i;
-			addInput(Port::create<BluePort>(Vec(2.5,19 + offset), Port::INPUT, module, AG_1<4>::INPUT_A_1 + i));
-			addInput(Port::create<BluePort>(Vec(2.5,47 + offset), Port::INPUT, module, AG_1<4>::INPUT_B_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,31.5 + offset), module, AG_1<4>::INPUT_A_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,59.5 + offset), module, AG_1<4>::INPUT_B_1 + i));
 
-			addOutput(Port::create<BluePort>(Vec(2.5,75 + offset), Port::OUTPUT, module, AG_1<4>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(15,87.5 + offset), module, AG_1<4>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
 		((DS_Module *)module)->appendContextMenu(menu);
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "AG-104");
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 15, 31.5);
+		nvgLineTo(vg, 15, 348.5);
+		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeWidth(vg, 1);
+		nvgStroke(vg);
+		nvgStrokeColor(vg, gScheme.contrast);
+		for (int i = 0; i < 4; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 15, 31.5 + i * 87);
+			nvgLineTo(vg, 15, 87.5 + i * 87);
+			nvgStroke(vg);
+		}
 	}
 };
 
-struct AG106 : ModuleWidget {
-	AG106(AG_1<6> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/AG-106.svg")));
+struct AG106 : SchemeModuleWidget {
+	AG106(AG_1<6> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(90, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < 6; i++) {
 			int offset = 58 * i;
-			addInput(Port::create<BluePort>(Vec(4,19 + offset), Port::INPUT, module, AG_1<6>::INPUT_A_1 + i));
-			addInput(Port::create<BluePort>(Vec(4,47 + offset), Port::INPUT, module, AG_1<6>::INPUT_B_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(16.5,31.5 + offset), module, AG_1<6>::INPUT_A_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(16.5,59.5 + offset), module, AG_1<6>::INPUT_B_1 + i));
 
-			addOutput(Port::create<BluePort>(Vec(62,33 + offset), Port::OUTPUT, module, AG_1<6>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(74.5,45.5 + offset), module, AG_1<6>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
 		((DS_Module *)module)->appendContextMenu(menu);
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "AG-106");
+		nvgStrokeWidth(vg, 1);
+		nvgStrokeColor(vg, gScheme.alternative);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		for (int i = 0; i < 5; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 74.5, 45.5 + i * 58);
+			nvgLineTo(vg, 74.5, 74.5 + i * 58);
+			nvgLineTo(vg, 29.5, 74.5 + i * 58);
+			nvgLineTo(vg, 29.5, 103.5 + i * 58);
+			nvgLineTo(vg, 38.5, 103.5 + i * 58);	
+			nvgStroke(vg);
+		}
+		nvgStrokeColor(vg, gScheme.contrast);
+		for (int i = 0; i < 6; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 16, 31.5 + i * 58);
+			nvgLineTo(vg, 34, 31.5 + i * 58);
+			nvgLineTo(vg, 34, 42.5 + i * 58);
+			nvgLineTo(vg, 39, 42.5 + i * 58);
+			nvgMoveTo(vg, 16, 59.5 + i * 58);
+			nvgLineTo(vg, 34, 59.5 + i * 58);
+			nvgLineTo(vg, 34, 48.5 + i * 58);
+			nvgLineTo(vg, 39, 48.5 + i * 58);
+			nvgMoveTo(vg, 55, 45.5 + i * 58);
+			nvgLineTo(vg, 74, 45.5 + i * 58);
+			nvgMoveTo(vg, 39, 34.5 + i * 58);
+			nvgLineTo(vg, 39, 56.5 + i * 58);
+			nvgLineTo(vg, 43.5, 56.5 + i * 58);
+			nvgArc(vg, 43.5, 45.5 + i * 58, 11, M_PI / 2.0f, -M_PI / 2.0f, NVG_CCW);
+			nvgClosePath(vg);
+			nvgStroke(vg);
+		}
 	}
 };
 

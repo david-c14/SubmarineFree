@@ -48,15 +48,15 @@ void SilverPort::draw(NVGcontext *vg) {
 	// Outer rim
 	{
 		nvgBeginPath(vg);
-		nvgMoveTo(vg, 0.66556777, 9.9934984);
+//		nvgMoveTo(vg, 0.66556777, 9.9934984);
 		nvgArc(vg, radius, radius, radius - 1, M_PI + 0.2076, -0.2076, NVG_CW); 
 		nvgArc(vg, 24.5, 12.5, 2.5, 1.467 - M_PI, M_PI - 1.467, NVG_CCW);
 		nvgArc(vg, radius, radius, radius - 1, 0.2076, M_PI - 0.2076, NVG_CW);
 		nvgArc(vg, 0.5, 12.5, 2.5, 1.467, -1.467, NVG_CCW);
+		nvgPathWinding(vg, NVG_HOLE);
 		nvgClosePath(vg);
 		nvgCircle(vg, radius, radius, 8.0);
-		nvgPathWinding(vg, NVG_HOLE);
-		nvgStrokeColor(vg, nvgRGB(0x66,0x66,0x66));
+		nvgPathWinding(vg, NVG_SOLID);
 		nvgStrokeWidth(vg, 0.80645);
 		if (type == Port::OUTPUT) {
 			if (gScheme.isFlat) {
