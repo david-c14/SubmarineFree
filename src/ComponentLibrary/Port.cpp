@@ -9,6 +9,7 @@
 #include "util/color.hpp"
 
 void SilverPort::draw(NVGcontext *vg) {
+	nvgSave(vg);
 	float radius = box.size.x / 2.0f;
 
 	// Shadow
@@ -31,6 +32,7 @@ void SilverPort::draw(NVGcontext *vg) {
 		nvgFill(vg);
 	}
 
+	nvgLineJoin(vg, NVG_BEVEL);
 	// Port body
 	{
 		nvgBeginPath(vg);
@@ -79,5 +81,5 @@ void SilverPort::draw(NVGcontext *vg) {
 		nvgFill(vg);
 		nvgStroke(vg); 
 	}
-
+	nvgRestore(vg);
 }
