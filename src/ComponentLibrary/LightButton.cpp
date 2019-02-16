@@ -10,6 +10,7 @@
 
 void LightButton::draw(NVGcontext *vg) {
 
+	nvgSave(vg);
 	NVGcolor lcol = (value > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
 
 	// Shadow
@@ -69,4 +70,5 @@ void LightButton::draw(NVGcontext *vg) {
 		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 		nvgFill(vg);	
 	}
+	nvgRestore(vg);
 }

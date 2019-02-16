@@ -124,7 +124,9 @@ void SchemePanel::step() {
 
 void SchemeCanvasWidget::draw(NVGcontext *vg) {
 	SchemeModuleWidget *smw = dynamic_cast<SchemeModuleWidget *>(parent->parent);
+	nvgSave(vg);
 	smw->render(vg, this);
+	nvgRestore(vg);
 	// Standard Panel Border
 	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
 	nvgBeginPath(vg);
