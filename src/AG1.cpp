@@ -63,7 +63,10 @@ struct AG104 : SchemeModuleWidget {
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
-		((DS_Module *)module)->appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "AG-104");
@@ -98,7 +101,10 @@ struct AG106 : SchemeModuleWidget {
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
-		((DS_Module *)module)->appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "AG-106");
