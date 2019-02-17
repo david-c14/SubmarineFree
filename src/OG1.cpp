@@ -83,10 +83,10 @@ struct OG106 : SchemeModuleWidget {
 
 		for (int i = 0; i < 6; i++) {
 			int offset = 58 * i;
-			addInput(Port::create<BluePort>(Vec(4,19 + offset), Port::INPUT, module, OG_1<6>::INPUT_A_1 + i));
-			addInput(Port::create<BluePort>(Vec(4,47 + offset), Port::INPUT, module, OG_1<6>::INPUT_B_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(16.5,31.5 + offset), module, OG_1<6>::INPUT_A_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(16.5,59.5 + offset), module, OG_1<6>::INPUT_B_1 + i));
 
-			addOutput(Port::create<BluePort>(Vec(62,33 + offset), Port::OUTPUT, module, OG_1<6>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(74.5,45.5 + offset), module, OG_1<6>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
