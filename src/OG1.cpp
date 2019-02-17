@@ -1,3 +1,5 @@
+//SubTag DS TM W2 W6
+
 #include "DS.hpp"
 
 template <int x>
@@ -36,26 +38,48 @@ struct OG_1 : DS_Module {
 	}
 };
 
-struct OG104 : ModuleWidget {
-	OG104(OG_1<4> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/OG-104.svg")));
+struct OG104 : SchemeModuleWidget {
+	OG104(OG_1<4> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < 4; i++) {
 			int offset = 87 * i;
-			addInput(Port::create<BluePort>(Vec(2.5,19 + offset), Port::INPUT, module, OG_1<4>::INPUT_A_1 + i));
-			addInput(Port::create<BluePort>(Vec(2.5,47 + offset), Port::INPUT, module, OG_1<4>::INPUT_B_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,31.5 + offset), module, OG_1<4>::INPUT_A_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,59.5 + offset), module, OG_1<4>::INPUT_B_1 + i));
 
-			addOutput(Port::create<BluePort>(Vec(2.5,75 + offset), Port::OUTPUT, module, OG_1<4>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(15,87.5 + offset), module, OG_1<4>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "OG-104");
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 15, 31.5);
+		nvgLineTo(vg, 15, 348.5);
+		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeWidth(vg, 1);
+		nvgStroke(vg);
+		nvgStrokeColor(vg, gScheme.contrast);
+		for (int i = 0; i < 4; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 15, 31.5 + i * 87);
+			nvgLineTo(vg, 15, 87.5 + i * 87);
+			nvgStroke(vg);
+		}
 	}
 };
 
-struct OG106 : ModuleWidget {
-	OG106(OG_1<6> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/OG-106.svg")));
+struct OG106 : SchemeModuleWidget {
+	OG106(OG_1<6> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(90, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < 6; i++) {
 			int offset = 58 * i;
@@ -66,7 +90,46 @@ struct OG106 : ModuleWidget {
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "OG-106");
+		nvgStrokeWidth(vg, 1);
+		nvgStrokeColor(vg, gScheme.alternative);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		for (int i = 0; i < 5; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 74.5, 45.5 + i * 58);
+			nvgLineTo(vg, 74.5, 74.5 + i * 58);
+			nvgLineTo(vg, 29.5, 74.5 + i * 58);
+			nvgLineTo(vg, 29.5, 103.5 + i * 58);
+			nvgLineTo(vg, 38.5, 103.5 + i * 58);
+			nvgStroke(vg);
+		}
+		nvgStrokeColor(vg, gScheme.contrast);
+		for (int i = 0; i < 6; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 16, 31.5 + i * 58);
+			nvgLineTo(vg, 32, 31.5 + i * 58);
+			nvgLineTo(vg, 32, 42.5 + i * 58);
+			nvgLineTo(vg, 39, 42.5 + i * 58);
+			nvgMoveTo(vg, 16, 59.5 + i * 58);
+			nvgLineTo(vg, 32, 59.5 + i * 58);
+			nvgLineTo(vg, 32, 48.5 + i * 58);
+			nvgLineTo(vg, 39, 48.5 + i * 58);
+			nvgMoveTo(vg, 55.5, 45.5 + i * 58);
+			nvgLineTo(vg, 74, 45.5 + i * 58);
+			nvgMoveTo(vg, 35.5, 34.5 + i * 58);
+			nvgQuadTo(vg, 43, 45.5 + i * 58, 35.5, 56.5 + i * 58);
+			nvgQuadTo(vg, 50.5, 55.5 + i * 58, 55.5, 45.5 + i * 58);
+			nvgQuadTo(vg, 50.5, 35.5 + i * 58, 35.5, 34.5 + i * 58);
+			nvgStroke(vg);
+		}
 	}
 };
 
