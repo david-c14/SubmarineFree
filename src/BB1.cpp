@@ -1,3 +1,5 @@
+//SubTag DS TM W4
+
 #include "DS.hpp"
 #include <random>
 #include <chrono>
@@ -74,22 +76,44 @@ struct BB_1 : DS_Module {
 	}
 };
 
-struct BB120 : ModuleWidget {
-	BB120(BB_1<20> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/BB-120.svg")));
+struct BB120 : SchemeModuleWidget {
+	BB120(BB_1<20> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(60, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<BluePort>(Vec(4.5,19), Port::INPUT, module, BB_1<20>::INPUT_CLK));
-		addInput(Port::create<SilverPort>(Vec(31.5,34), Port::INPUT, module, BB_1<20>::INPUT_CV));
+		addInput(createInputCentered<BluePort>(Vec(17,31.5), module, BB_1<20>::INPUT_CLK));
+		addInput(createInputCentered<SilverPort>(Vec(44,46.5), module, BB_1<20>::INPUT_CV));
 
 		for (int i = 0; i < 20; i+=2) {
 			int offset = 15 * i;
 
-			addOutput(Port::create<SilverPort>(Vec(4,53 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i));
-			addOutput(Port::create<SilverPort>(Vec(31,68 + offset), Port::OUTPUT, module, BB_1<20>::OUTPUT_1 + i + 1));
+			addOutput(createOutputCentered<SilverPort>(Vec(16.5,65.5 + offset), module, BB_1<20>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<SilverPort>(Vec(43.5,80.5 + offset), module, BB_1<20>::OUTPUT_1 + i + 1));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "BB-120");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 43.5, 46.5);
+		nvgLineTo(vg, 16.5, 65.5);
+		nvgLineTo(vg, 43.5, 80.5);
+		for (int i = 0; i < 9; i++) {
+			nvgLineTo(vg, 16.5, 95.5 + i * 30);
+			nvgLineTo(vg, 43.5, 110.5 + i * 30);
+		}
+		nvgStroke(vg);
+		drawText(vg, 43.5, 32, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "IN");
+		drawText(vg, 16.5, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CLK");
 	}
 };
 
