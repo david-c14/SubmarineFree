@@ -1,3 +1,5 @@
+//SubTag TM TW W11 W17 W23 W29 W41
+
 #include <cmath>
 #include "SubmarineFree.hpp"
 
@@ -596,22 +598,44 @@ void AlgorithmMenu::onAction(EventAction &e) {
 
 
 template <unsigned int x, unsigned int y>
-struct AOWidget : ModuleWidget {
-	AOWidget(AO1<x,y> *module) : ModuleWidget(module) {
-		setPanel(SubHelper::LoadPanel(plugin, "AO-1", x*y));
+struct AOWidget : SchemeModuleWidget {
+	AOWidget(AO1<x,y> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(x * 90 + 75, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (unsigned int ix = 0; ix < x; ix++) {
-			addInput(Port::create<SilverPort>(Vec(4, 61 + ix * 46), Port::INPUT, module, AO1<x,y>::INPUT_X_1 + ix));
-			addOutput(Port::create<SilverPort>(Vec(46 + y * 90, 61 + ix * 46), Port::OUTPUT, module, AO1<x,y>::OUTPUT_X_1 + ix));
+			addInput(createInputCentered<SilverPort>(Vec(16.5, 73.5 + ix * 46), module, AO1<x,y>::INPUT_X_1 + ix));
+			addOutput(createOutputCentered<SilverPort>(Vec(58.5 + y * 90, 73.5 + ix * 46), module, AO1<x,y>::OUTPUT_X_1 + ix));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			addInput(Port::create<SilverPort>(Vec(70 + 90 * iy, 19), Port::INPUT, module, AO1<x,y>::INPUT_Y_1 + iy));
-			addOutput(Port::create<SilverPort>(Vec(70 + 90 * iy, 335), Port::OUTPUT, module, AO1<x,y>::OUTPUT_Y_1 + iy));
+			addInput(createInputCentered<SilverPort>(Vec(82.5 + 90 * iy, 31.5), module, AO1<x,y>::INPUT_Y_1 + iy));
+			addOutput(createOutputCentered<SilverPort>(Vec(82.5 + 90 * iy, 347.5), module, AO1<x,y>::OUTPUT_Y_1 + iy));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < x; ix++) {
 				addParam(ParamWidget::create<AOFuncDisplay>(Vec(42.5 + 90 * iy, 59 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
 				addParam(ParamWidget::create<AOConstDisplay>(Vec(42.5 + 90 * iy, 78 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f));
 			}
+		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		int tx = (canvas->box.size.x - 75) / 90;
+		char workingSpace[10];
+		snprintf(workingSpace, 10, "AG-1%02d", tx * 6);
+		drawBase(vg, workingSpace);
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		for (int iy = 0; iy < 7; iy++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 37.5, 51.5 + iy * 46);
+			for (int ix = 0; ix < tx; ix++) {
+				nvgLineTo(vg, 77.5 + ix * 90, 51.5 + iy * 46);
+				nvgLineTo(vg, 82.5 + ix * 90, 55.5 + iy * 46);
+				nvgLineTo(vg, 87.5 + ix * 90, 51.5 + iy * 46);
+				nvgLineTo(vg, 127.5 + ix * 90, 51.5 + iy * 46);
+			}
+			nvgStroke(vg);
 		}
 	}
 };
