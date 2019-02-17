@@ -80,6 +80,23 @@ struct NG112 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "NG-112");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);	
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		for (int i = 0; i < 12; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 16, 31.5 + i * 29);
+			nvgLineTo(vg, 39, 31.5 + i * 29);
+			nvgMoveTo(vg, 59, 31.5 + i * 29);
+			nvgLineTo(vg, 74, 31.5 + i * 29);
+			nvgMoveTo(vg, 39, 20 + i * 29);
+			nvgLineTo(vg, 55, 31.5 + i * 29);
+			nvgLineTo(vg, 39, 43 + i * 29);
+			nvgClosePath(vg);
+			nvgCircle(vg, 57, 31.5 + i * 29, 2);
+			nvgStroke(vg);
+		}
 	}
 };
 
