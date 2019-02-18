@@ -389,6 +389,10 @@ struct AOFuncDisplay : Knob {
 	void draw(NVGcontext *vg) override {
 		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, gScheme.font()->handle);
+		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 2);
+		nvgFill(vg);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, SubmarineAO::functions[value].name.c_str(), NULL);
@@ -408,6 +412,10 @@ struct AOConstDisplay : Knob {
 		sprintf(mtext, "C=%4.2f", ((int)value)/100.0f);
 		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, gScheme.font()->handle);
+		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 2);
+		nvgFill(vg);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, mtext, NULL);
@@ -600,7 +608,7 @@ void AlgorithmMenu::onAction(EventAction &e) {
 template <unsigned int x, unsigned int y>
 struct AOWidget : SchemeModuleWidget {
 	AOWidget(AO1<x,y> *module) : SchemeModuleWidget(module) {
-		this->box.size = Vec(x * 90 + 75, 380);
+		this->box.size = Vec(y * 90 + 75, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (unsigned int ix = 0; ix < x; ix++) {
 			addInput(createInputCentered<SilverPort>(Vec(16.5, 73.5 + ix * 46), module, AO1<x,y>::INPUT_X_1 + ix));
@@ -618,22 +626,32 @@ struct AOWidget : SchemeModuleWidget {
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
-		int tx = (canvas->box.size.x - 75) / 90;
 		char workingSpace[10];
-		snprintf(workingSpace, 10, "AG-1%02d", tx * 6);
+		snprintf(workingSpace, 10, "AO-1%02d", x * y);
 		drawBase(vg, workingSpace);
 		nvgStrokeColor(vg, gScheme.contrast);
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);
-		for (int iy = 0; iy < 7; iy++) {
+		for (unsigned int iy = 0; iy < 7; iy++) {
 			nvgBeginPath(vg);
 			nvgMoveTo(vg, 37.5, 51.5 + iy * 46);
-			for (int ix = 0; ix < tx; ix++) {
+			for (unsigned int ix = 0; ix < y; ix++) {
 				nvgLineTo(vg, 77.5 + ix * 90, 51.5 + iy * 46);
 				nvgLineTo(vg, 82.5 + ix * 90, 55.5 + iy * 46);
 				nvgLineTo(vg, 87.5 + ix * 90, 51.5 + iy * 46);
 				nvgLineTo(vg, 127.5 + ix * 90, 51.5 + iy * 46);
+			}
+			nvgStroke(vg);
+		}
+		for (unsigned int ix = 0; ix < y + 1; ix++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 37.5 + ix * 90, 51.5);
+			for (unsigned int iy = 0; iy < x; iy++) {
+				nvgLineTo(vg, 37.5 + ix * 90, 69.5 + iy * 46);
+				nvgLineTo(vg, 41.5 + ix * 90, 74.5 + iy * 46);
+				nvgLineTo(vg, 37.5 + ix * 90, 79.5 + iy * 46);
+				nvgLineTo(vg, 37.5 + ix * 90, 97.5 + iy * 46);
 			}
 			nvgStroke(vg);
 		}
