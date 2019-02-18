@@ -31,13 +31,62 @@ struct LD_1 : DS_Module {
 	}
 };
 
-struct LD103 : SchemeModuleWidget {
+struct LD1Base {
+	ParamWidget **cutoffWidgets;
+	ParamWidget **widthWidgets;
+	void appendContextMenu(Menu *menu, unsigned int count);
+};
+
+struct LDMenuItem: MenuItem {
+	LD1Base *ld;
+	unsigned int deviceCount;
+	float cutoff;
+	float width;
+	void onAction(EventAction &e) override {
+		for (unsigned int i = 0; i < deviceCount; i++) {
+			ld->cutoffWidgets[i]->setValue(cutoff);
+			ld->widthWidgets[i]->setValue(width);
+		}
+	}
+};
+
+void LD1Base::appendContextMenu(Menu *menu, unsigned int count) {
+		menu->addChild(MenuEntry::create());
+		LDMenuItem *menuItem = MenuItem::create<LDMenuItem>("Cutoff 5V");
+		menuItem->ld = this;
+		menuItem->deviceCount = count;
+		menuItem->cutoff = 5.0f;
+		menuItem->width = 1.0f;
+		menu->addChild(menuItem);
+		menuItem = MenuItem::create<LDMenuItem>("Cutoff 0V");
+		menuItem->ld = this;
+		menuItem->deviceCount = count;
+		menuItem->cutoff = 0.0f;
+		menuItem->width = 0.0f;
+		menu->addChild(menuItem);
+		menuItem = MenuItem::create<LDMenuItem>("Cutoff 2.5V");
+		menuItem->ld = this;
+		menuItem->deviceCount = count;
+		menuItem->cutoff = 2.5f;
+		menuItem->width = 0.5f;
+		menu->addChild(menuItem);
+		menuItem = MenuItem::create<LDMenuItem>("TTL Levels");
+		menuItem->ld = this;
+		menuItem->deviceCount = count;
+		menuItem->cutoff = 1.4f;
+		menuItem->width = 0.6f;
+		menu->addChild(menuItem);
+}
+
+struct LD103 : SchemeModuleWidget, LD1Base {
 	static const int deviceCount = 3;	
-	ParamWidget *cutoffWidgets[deviceCount];
-	ParamWidget *widthWidgets[deviceCount];
+	ParamWidget *cw[deviceCount];
+	ParamWidget *ww[deviceCount];
 	LD103(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
+		cutoffWidgets = cw;
+		widthWidgets = ww;
 
 		for (int i = 0; i < deviceCount; i++) {
 			int offset = 116 * i;
@@ -51,7 +100,14 @@ struct LD103 : SchemeModuleWidget {
 			addParam(widthWidgets[i]);
 		}
 	}
-	void appendContextMenu(Menu *menu) override;
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		LD1Base::appendContextMenu(menu, deviceCount);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "LD-103");
 		nvgStrokeColor(vg, gScheme.contrast);
@@ -70,56 +126,15 @@ struct LD103 : SchemeModuleWidget {
 	}
 };
 
-struct LDMenuItem3: MenuItem {
-	LD103 *ld103;
-	float cutoff;
-	float width;
-	void onAction(EventAction &e) override {
-		for (int i = 0; i < LD103::deviceCount; i++) {
-			ld103->cutoffWidgets[i]->setValue(cutoff);
-			ld103->widthWidgets[i]->setValue(width);
-		}
-	}
-};
-
-void LD103::appendContextMenu(Menu *menu) {
-	SchemeModuleWidget::appendContextMenu(menu);
-	menu->addChild(MenuEntry::create());
-	LD103 *ld103 = dynamic_cast<LD103*>(this);
-	assert(ld103);
-	LDMenuItem3 *menuItem = MenuItem::create<LDMenuItem3>("Cutoff 5V");
-	menuItem->ld103 = ld103;
-	menuItem->cutoff = 5.0f;
-	menuItem->width = 1.0f;
-	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem3>("Cutoff 0V");
-	menuItem->ld103 = ld103;
-	menuItem->cutoff = 0.0f;
-	menuItem->width = 0.0f;
-	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem3>("Cutoff 2.5V");
-	menuItem->ld103 = ld103;
-	menuItem->cutoff = 2.5f;
-	menuItem->width = 0.5f;
-	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem3>("TTL Levels");
-	menuItem->ld103 = ld103;
-	menuItem->cutoff = 1.4f;
-	menuItem->width = 0.6f;
-	menu->addChild(menuItem);
-	DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
-	if (dsMod) {
-		dsMod->appendContextMenu(menu);
-	}
-}
-
-struct LD106 : SchemeModuleWidget {
+struct LD106 : SchemeModuleWidget, LD1Base {
 	static const int deviceCount = 6;	
-	ParamWidget *cutoffWidgets[deviceCount];
-	ParamWidget *widthWidgets[deviceCount];
+	ParamWidget *cw[deviceCount];
+	ParamWidget *ww[deviceCount];
 	LD106(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(90, 380);
 		addChild(new SchemePanel(this->box.size));
+		cutoffWidgets = cw;
+		widthWidgets = ww;
 
 		for (int i = 0; i < deviceCount; i++) {
 			int offset = 58 * i;
@@ -133,7 +148,14 @@ struct LD106 : SchemeModuleWidget {
 			addParam(widthWidgets[i]);
 		}
 	}
-	void appendContextMenu(Menu *menu) override;
+	void appendContextMenu(Menu *menu) override{
+		SchemeModuleWidget::appendContextMenu(menu);
+		LD1Base::appendContextMenu(menu, deviceCount);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "LD-106");
 		nvgStrokeColor(vg, gScheme.contrast);
@@ -160,49 +182,6 @@ struct LD106 : SchemeModuleWidget {
 		}
 	}
 };
-
-struct LDMenuItem: MenuItem {
-	LD106 *ld106;
-	float cutoff;
-	float width;
-	void onAction(EventAction &e) override {
-		for (int i = 0; i < LD106::deviceCount; i++) {
-			ld106->cutoffWidgets[i]->setValue(cutoff);
-			ld106->widthWidgets[i]->setValue(width);
-		}
-	}
-};
-
-void LD106::appendContextMenu(Menu *menu) {
-	SchemeModuleWidget::appendContextMenu(menu);
-	menu->addChild(MenuEntry::create());
-	LD106 *ld106 = dynamic_cast<LD106*>(this);
-	assert(ld106);
-	LDMenuItem *menuItem = MenuItem::create<LDMenuItem>("Cutoff 5V");
-	menuItem->ld106 = ld106;
-	menuItem->cutoff = 5.0f;
-	menuItem->width = 1.0f;
-	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem>("Cutoff 0V");
-	menuItem->ld106 = ld106;
-	menuItem->cutoff = 0.0f;
-	menuItem->width = 0.0f;
-	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem>("Cutoff 2.5V");
-	menuItem->ld106 = ld106;
-	menuItem->cutoff = 2.5f;
-	menuItem->width = 0.5f;
-	menu->addChild(menuItem);
-	menuItem = MenuItem::create<LDMenuItem>("TTL Levels");
-	menuItem->ld106 = ld106;
-	menuItem->cutoff = 1.4f;
-	menuItem->width = 0.6f;
-	menu->addChild(menuItem);
-	DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
-	if (dsMod) {
-		dsMod->appendContextMenu(menu);
-	}
-}
 
 Model *modelLD103 = Model::create<LD_1<3>, LD103>("Submarine (Free)", "LD-103", "LD-103 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
 Model *modelLD106 = Model::create<LD_1<6>, LD106>("Submarine (Free)", "LD-106", "LD-106 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
