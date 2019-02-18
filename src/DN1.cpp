@@ -1,3 +1,5 @@
+//SubTag DS TM W2
+
 #include "DS.hpp"
 #include <random>
 #include <chrono>
@@ -41,16 +43,24 @@ struct DN_1 : DS_Module {
 	}
 };
 
-struct DN112 : ModuleWidget {
-	DN112(DN_1<12> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/DN-112.svg")));
+struct DN112 : SchemeModuleWidget {
+	DN112(DN_1<12> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < 12; i++) {
-			addOutput(Port::create<BluePort>(Vec(2.5,19 + 29 * i), Port::OUTPUT, module, DN_1<12>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(15,31.5 + 29 * i), module, DN_1<12>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "DN-112");
 	}
 };
 
