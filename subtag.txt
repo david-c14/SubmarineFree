@@ -1,0 +1,5 @@
+DS	Digital Suite
+TM	Templated Modules
+TW	Templated Widgets
+AM	Additional Menus
+Wx	Module width is x HP

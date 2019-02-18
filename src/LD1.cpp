@@ -1,3 +1,5 @@
+//SubTag TM DS W2 W6 AM
+
 #include "DS.hpp"
 
 template <int x>
@@ -29,26 +31,43 @@ struct LD_1 : DS_Module {
 	}
 };
 
-struct LD103 : ModuleWidget {
+struct LD103 : SchemeModuleWidget {
 	static const int deviceCount = 3;	
 	ParamWidget *cutoffWidgets[deviceCount];
 	ParamWidget *widthWidgets[deviceCount];
-	LD103(LD_1<deviceCount> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/LD-103.svg")));
+	LD103(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < deviceCount; i++) {
 			int offset = 116 * i;
-			addInput(Port::create<SilverPort>(Vec(2.5,19 + offset), Port::INPUT, module, LD_1<3>::INPUT_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(15,31.5 + offset), module, LD_1<3>::INPUT_1 + i));
 
-			addOutput(Port::create<BluePort>(Vec(2.5,103 + offset), Port::OUTPUT, module, LD_1<3>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(15,115.5 + offset), module, LD_1<3>::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = ParamWidget::create<TinyKnob<LightKnob>>(Vec(6, 48.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+			cutoffWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
 			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = ParamWidget::create<TinyKnob<LightKnob>>(Vec(6, 80.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			widthWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
 			addParam(widthWidgets[i]);
 		}
 	}
 	void appendContextMenu(Menu *menu) override;
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "LD-103");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 2);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		for (int i = 0; i < 3; i++) {
+			nvgMoveTo(vg, 15, 31.5 + i * 116);
+			nvgLineTo(vg, 15, 115.5 + i * 116);
+		}
+		nvgStroke(vg);
+		for (int i = 0; i < 3; i++) {
+			drawText(vg, 22, 72 + i * 116, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "C");
+			drawText(vg, 3, 80 + i * 116, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "W");
+		}
+	}
 };
 
 struct LDMenuItem3: MenuItem {
@@ -64,6 +83,7 @@ struct LDMenuItem3: MenuItem {
 };
 
 void LD103::appendContextMenu(Menu *menu) {
+	SchemeModuleWidget::appendContextMenu(menu);
 	menu->addChild(MenuEntry::create());
 	LD103 *ld103 = dynamic_cast<LD103*>(this);
 	assert(ld103);
@@ -87,29 +107,58 @@ void LD103::appendContextMenu(Menu *menu) {
 	menuItem->cutoff = 1.4f;
 	menuItem->width = 0.6f;
 	menu->addChild(menuItem);
-	((DS_Module *)module)->appendContextMenu(menu);
+	DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+	if (dsMod) {
+		dsMod->appendContextMenu(menu);
+	}
 }
 
-struct LD106 : ModuleWidget {
+struct LD106 : SchemeModuleWidget {
 	static const int deviceCount = 6;	
 	ParamWidget *cutoffWidgets[deviceCount];
 	ParamWidget *widthWidgets[deviceCount];
-	LD106(LD_1<deviceCount> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/LD-106.svg")));
+	LD106(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(90, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < deviceCount; i++) {
 			int offset = 58 * i;
-			addInput(Port::create<SilverPort>(Vec(4,19 + offset), Port::INPUT, module, LD_1<6>::INPUT_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(16.5,31.5 + offset), module, LD_1<6>::INPUT_1 + i));
 
-			addOutput(Port::create<BluePort>(Vec(62,19 + offset), Port::OUTPUT, module, LD_1<6>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(74.5,31.5 + offset), module, LD_1<6>::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = ParamWidget::create<SmallKnob<LightKnob>>(Vec(4, 47 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+			cutoffWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
 			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = ParamWidget::create<SmallKnob<LightKnob>>(Vec(62, 47 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			widthWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
 			addParam(widthWidgets[i]);
 		}
 	}
 	void appendContextMenu(Menu *menu) override;
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "LD-106");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineJoin(vg, NVG_ROUND);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		for (int i = 0; i < 6; i++) {
+			nvgMoveTo(vg, 3, 73.5 + i * 58);
+			nvgLineTo(vg, 87, 73.5 + i * 58);
+			nvgMoveTo(vg, 16, 89.5 + i * 58);
+			nvgLineTo(vg, 39, 89.5 + i * 58);
+			nvgMoveTo(vg, 55, 89.5 + i * 58);
+			nvgLineTo(vg, 74, 89.5 + i * 58);
+			nvgMoveTo(vg, 39.5, 78 + i * 58);
+			nvgLineTo(vg, 55.5, 89.5 + i * 58);
+			nvgLineTo(vg, 39.5, 101 + i * 58);
+			nvgClosePath(vg);
+		}
+		nvgStroke(vg);
+		for (int i = 0; i < 6; i++) {
+			drawText(vg, 28, 58 + i * 58, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CUTOFF");
+			drawText(vg, 62, 65 + i * 58, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "WIDTH");
+		}
+	}
 };
 
 struct LDMenuItem: MenuItem {
@@ -125,6 +174,7 @@ struct LDMenuItem: MenuItem {
 };
 
 void LD106::appendContextMenu(Menu *menu) {
+	SchemeModuleWidget::appendContextMenu(menu);
 	menu->addChild(MenuEntry::create());
 	LD106 *ld106 = dynamic_cast<LD106*>(this);
 	assert(ld106);
@@ -148,7 +198,10 @@ void LD106::appendContextMenu(Menu *menu) {
 	menuItem->cutoff = 1.4f;
 	menuItem->width = 0.6f;
 	menu->addChild(menuItem);
-	((DS_Module *)module)->appendContextMenu(menu);
+	DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+	if (dsMod) {
+		dsMod->appendContextMenu(menu);
+	}
 }
 
 Model *modelLD103 = Model::create<LD_1<3>, LD103>("Submarine (Free)", "LD-103", "LD-103 Schmitt Trigger Line Drivers", LOGIC_TAG, MULTIPLE_TAG);
