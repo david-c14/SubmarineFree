@@ -1,3 +1,5 @@
+//SubTag DS TM W2 W4
+
 #include "DS.hpp"
 #include <random>
 #include <chrono>
@@ -80,38 +82,74 @@ struct FF_1 : DS_Module {
 	}
 };
 
-struct FF110 : ModuleWidget {
-	FF110(FF_1<10> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/FF-110.svg")));
+struct FF110 : SchemeModuleWidget {
+	FF110(FF_1<10> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<BluePort>(Vec(2.5,19), Port::INPUT, module, FF_1<10>::INPUT));
+		addInput(createInputCentered<BluePort>(Vec(15,31.5), module, FF_1<10>::INPUT));
 
 		for (int i = 0; i < 10; i++) {
 			int offset = 29 * i;
 
-			addOutput(Port::create<BluePort>(Vec(2.5,77 + offset), Port::OUTPUT, module, FF_1<10>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(15,89.5 + offset), module, FF_1<10>::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override{
+		drawBase(vg, "FF-110");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 15, 89.5);
+		nvgLineTo(vg, 15, 350.5);
+		nvgStroke(vg);
+		drawText(vg, 15, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CLOCK");
 	}
 };
 
-struct FF120 : ModuleWidget {
-	FF120(FF_1<20> *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/FF-120.svg")));
+struct FF120 : SchemeModuleWidget {
+	FF120(FF_1<20> *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(60, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<BluePort>(Vec(17.5,19), Port::INPUT, module, FF_1<20>::INPUT));
+		addInput(createInputCentered<BluePort>(Vec(30,31.5), module, FF_1<20>::INPUT));
 
 		for (int i = 0; i < 20; i+=2) {
 			int offset = 15 * i;
 
-			addOutput(Port::create<BluePort>(Vec(4,53 + offset), Port::OUTPUT, module, FF_1<20>::OUTPUT_1 + i));
-			addOutput(Port::create<BluePort>(Vec(31,68 + offset), Port::OUTPUT, module, FF_1<20>::OUTPUT_1 + i + 1));
+			addOutput(createOutputCentered<BluePort>(Vec(16.5,65.5 + offset), module, FF_1<20>::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(43.5,80.5 + offset), module, FF_1<20>::OUTPUT_1 + i + 1));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "FF-120");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 16.5, 65.5);
+		nvgLineTo(vg, 43.5, 80.5);
+		for (int i = 0; i < 9; i++) {
+			nvgLineTo(vg, 16.5, 95.5 + i * 30);
+			nvgLineTo(vg, 43.5, 110.0 + i * 30);
+		}
+		nvgStroke(vg);
+		drawText(vg, 30, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CLOCK");
 	}
 };
 
