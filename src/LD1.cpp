@@ -162,23 +162,35 @@ struct LD106 : SchemeModuleWidget, LD1Base {
 		nvgStrokeWidth(vg, 1);
 		nvgLineJoin(vg, NVG_ROUND);
 		nvgLineCap(vg, NVG_ROUND);
+		nvgStrokeColor(vg, gScheme.alternative);
 		nvgBeginPath(vg);
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 5; i++) {
 			nvgMoveTo(vg, 3, 73.5 + i * 58);
 			nvgLineTo(vg, 87, 73.5 + i * 58);
-			nvgMoveTo(vg, 16, 89.5 + i * 58);
-			nvgLineTo(vg, 39, 89.5 + i * 58);
-			nvgMoveTo(vg, 55, 89.5 + i * 58);
-			nvgLineTo(vg, 74, 89.5 + i * 58);
-			nvgMoveTo(vg, 39.5, 78 + i * 58);
-			nvgLineTo(vg, 55.5, 89.5 + i * 58);
-			nvgLineTo(vg, 39.5, 101 + i * 58);
+		}
+		nvgStroke(vg);
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgBeginPath(vg);
+		for (int i = 0; i < 6; i++) {
+			nvgMoveTo(vg, 16, 31.5 + i * 58);
+			nvgLineTo(vg, 39, 31.5 + i * 58);
+			nvgMoveTo(vg, 55, 31.5 + i * 58);
+			nvgLineTo(vg, 74, 31.5 + i * 58);
+			nvgMoveTo(vg, 39.5, 20 + i * 58);
+			nvgLineTo(vg, 55.5, 31.5 + i * 58);
+			nvgLineTo(vg, 39.5, 43 + i * 58);
 			nvgClosePath(vg);
+			nvgMoveTo(vg, 41.5, 34.5 + i * 58);
+			nvgLineTo(vg, 46.5, 34.5 + i * 58);
+			nvgLineTo(vg, 46.5, 29.5 + i * 58);
+			nvgMoveTo(vg, 48.5, 29.5 + i * 58);
+			nvgLineTo(vg, 43.5, 29.5 + i * 58);
+			nvgLineTo(vg, 43.5, 34.5 + i * 58);
 		}
 		nvgStroke(vg);
 		for (int i = 0; i < 6; i++) {
-			drawText(vg, 28, 58 + i * 58, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CUTOFF");
-			drawText(vg, 62, 65 + i * 58, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "WIDTH");
+			drawText(vg, 28, 58 + i * 58, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 6, gScheme.contrast, "CUTOFF");
+			drawText(vg, 62, 65 + i * 58, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 6, gScheme.contrast, "WIDTH");
 		}
 	}
 };
