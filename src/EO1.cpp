@@ -1,3 +1,5 @@
+//SubTag W27
+
 /* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright 2017 by Andrew Belt */
 #include <string.h>
 #include "SubmarineFree.hpp"
@@ -292,6 +294,9 @@ struct EO_Display : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
+		if (!module) {
+			return;
+		}
 		NVGcolor col = SUBLIGHTBLUETRANS;
 		for (int i = 0; i < 2; i++) {
 			if (module->inputs[EO_102::INPUT_1 + i].active) {
@@ -331,6 +336,9 @@ struct EO_Measure : TransparentWidget {
 
 struct EO_Measure_Horz : EO_Measure {
 	void updateText() override {
+		if (!module) {
+			return;
+		} 
 		float deltaTime = powf(2.0f, module->params[EO_102::PARAM_TIME].value);
 		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
 		frameCount *= BUFFER_SIZE;
@@ -360,6 +368,9 @@ struct EO_Measure_Horz : EO_Measure {
 struct EO_Measure_Vert : EO_Measure {
 	int index = 0;
 	void updateText() override {
+		if (!module) {
+			return; 
+		}
 		float height = ((module->params[EO_102::PARAM_INDEX_3].value - 0.2f) * 20.0f - module->params[EO_102::PARAM_OFFSET_1 + index].value) / powf(2, module->params[EO_102::PARAM_SCALE_1 + index].value);
 		
 		float ah = fabs(height);
@@ -384,10 +395,11 @@ struct EO_Measure_Vert : EO_Measure {
 	}
 };
 
-struct EO102 : ModuleWidget {
+struct EO102 : SchemeModuleWidget {
 	LightButton *paramRun;
-	EO102(EO_102 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/EO-102.svg")));
+	EO102(EO_102 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(405, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		{
 			EO_Display * display = new EO_Display();
@@ -444,15 +456,64 @@ struct EO102 : ModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.2f));
 	}
 	void step() override {
-		if (((EO_102 *)module)->setRun) {
-			((EO_102 *)module)->setRun = 0;
-			paramRun->setValue(1.0f);
-		}
-		if (((EO_102 *)module)->resetRun) {
-			((EO_102 *)module)->resetRun = 0;
-			paramRun->setValue(0.0f);
+		EO_102 *eoMod = dynamic_cast<EO_102 *>(module);
+		if (eoMod) {
+			if (eoMod->setRun) {
+				eoMod->setRun = 0;
+				paramRun->setValue(1.0f);
+			}
+			if (eoMod->resetRun) {
+				eoMod->resetRun = 0;
+				paramRun->setValue(0.0f);
+			}
 		}
 		ModuleWidget::step();
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "EO-102");
+
+		// Display panels
+		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 2.5, 14, 400, 236, 2);
+		nvgRoundedRect(vg, 284, 272, 54, 16, 2);
+		nvgRoundedRect(vg, 341, 254, 62, 16, 2);
+		nvgRoundedRect(vg, 341, 272, 62, 16, 2);
+		nvgFill(vg);
+		
+		// Rounded backgrounds for labels
+		nvgFillColor(vg, gScheme.contrast);
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 5, 355, 65, 10, 5);
+		nvgRoundedRect(vg, 80, 355, 65, 10, 5);
+		nvgRoundedRect(vg, 155, 355, 35, 10, 5);
+		nvgRoundedRect(vg, 200, 355, 65, 10, 5);
+		nvgRoundedRect(vg, 275, 355, 125, 10, 5);
+		nvgFill(vg);
+
+		// Text
+		drawText(vg, 37.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, SUBLIGHTBLUE, "CHANNEL A");
+		drawText(vg, 112.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, SUBLIGHTRED, "CHANNEL B");
+		drawText(vg, 172.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.background, "TIME");
+		drawText(vg, 232.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.background, "TRIGGER");
+		drawText(vg, 337.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.background, "INDICES");
+		drawText(vg, 16.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CV");
+		drawText(vg, 16.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 11, gScheme.contrast, "\xe2\x99\xaa");
+		drawText(vg, 50, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SCALE");
+		drawText(vg, 50, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OFFSET");
+		drawText(vg, 91.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CV");
+		drawText(vg, 91.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 11, gScheme.contrast, "\xe2\x99\xaa");
+		drawText(vg, 125, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SCALE");
+		drawText(vg, 125, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OFFSET");
+		drawText(vg, 172.5, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "PRE");
+		drawText(vg, 172.5, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "TIME");
+		drawText(vg, 211.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CONT.");
+		drawText(vg, 211.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "ONCE");
+		drawText(vg, 245, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "RUN");
+		drawText(vg, 245, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LEVEL");
+		drawText(vg, 290, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LEFT");
+		drawText(vg, 332, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "RIGHT");
+		drawText(vg, 376, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "HORZ");
 	}
 };
 
