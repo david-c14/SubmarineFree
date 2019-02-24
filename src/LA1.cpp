@@ -1,3 +1,5 @@
+//SubTag DS W20
+
 /* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright © 2016 by Andrew Belt */
 #include <string.h>
 #include "DS.hpp"
@@ -237,6 +239,9 @@ struct LA_Display : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
+		if (!module) {
+			return;
+		}
 		for (int i = 0; i < 8; i++) {
 			if (module->inputs[LA_108::INPUT_1 + i].active) {
 				drawTrace(vg, module->buffer[i], 32.5f + 35 * i); 
@@ -254,6 +259,9 @@ struct LA_Measure : TransparentWidget {
 	char measureText[41];
 
 	void draw(NVGcontext *vg) override {
+		if (!module) {
+			return;
+		}
 		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].value);
 		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
 		frameCount *= BUFFER_SIZE;
@@ -286,10 +294,11 @@ struct LA_Measure : TransparentWidget {
 };
 
 
-struct LA108 : ModuleWidget {
+struct LA108 : SchemeModuleWidget {
 	LightButton *resetButton;
-	LA108(LA_108 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/LA-108.svg")));
+	LA108(LA_108 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(300, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		{
 			LA_Display * display = new LA_Display();
@@ -307,32 +316,90 @@ struct LA108 : ModuleWidget {
 		}
 
 		for (int i = 0; i < 8; i++) {
-			addInput(Port::create<BluePort>(Vec(4, 20 + 35 * i), Port::INPUT, module, LA_108::INPUT_1 + i));
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 22 + 35 * i), module, LA_108::LIGHT_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(16.5, 32.5 + 35 * i), module, LA_108::INPUT_1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(31.5, 23.5 + 35 * i), module, LA_108::LIGHT_1 + i));
 		}
 
-		addInput(Port::create<BluePort>(Vec(4, 310), Port::INPUT, module, LA_108::INPUT_EXT));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(30, 312), module, LA_108::LIGHT_EXT));
+		addInput(createInputCentered<BluePort>(Vec(16.5, 322.5), module, LA_108::INPUT_EXT));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(31.5, 313.5), module, LA_108::LIGHT_EXT));
 
-		addParam(ParamWidget::create<SnapKnob<MedKnob<LightKnob>>>(Vec(39, 301), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
-		addParam(ParamWidget::create<SubSwitch2>(Vec(82, 308), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<SubSwitch2>(Vec(108, 308), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
-		resetButton = ParamWidget::create<LightButton>(Vec(151, 312), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
+		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(58, 320), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
+		addParam(createParamCentered<SubSwitch2>(Vec(89, 320.5), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<SubSwitch2>(Vec(115, 320.5), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
+		resetButton = createParamCentered<LightButton>(Vec(159, 320), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
 		addParam(resetButton);
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(171, 301), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(214, 315), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(242, 315), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
-		addParam(ParamWidget::create<SnapKnob<SmallKnob<LightKnob>>>(Vec(271, 315), module, LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
+		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f));
 	}
 	void appendContextMenu(Menu *menu) override {
-		((DS_Module *)module)->appendContextMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
 	}
 	void step() override {
-		if (((LA_108 *)module)->resetRunMode) {
-			((LA_108 *)module)->resetRunMode = 0;
-			resetButton->setValue(0.0f);
+		LA_108 *laMod = dynamic_cast<LA_108 *>(module);
+		if (laMod) {
+			if (laMod->resetRunMode) {
+				laMod->resetRunMode = 0;
+				resetButton->setValue(0.0f);
+			}
 		}
 		ModuleWidget::step();
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "LA_108");
+		
+		//Scope
+		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 42, 15, 256, 280, 2);
+		nvgRoundedRect(vg, 213, 297, 54, 16, 2);
+		nvgFill(vg);
+
+		//Grid
+		nvgStrokeColor(vg, nvgRGB(0x33, 0x33, 0x33));
+		nvgStrokeWidth(vg, 1);
+		nvgBeginPath(vg);
+		for (int i = 0; i < 8; i++) {
+			nvgMoveTo(vg, 42, 18.5 + 35 * i);
+			nvgLineTo(vg, 298, 18.5 + 35 * i);
+			nvgMoveTo(vg, 42, 47.5 + 35 * i);
+			nvgLineTo(vg, 298, 47 + 35 * i);
+		}
+		nvgStroke(vg);
+		
+		//Silkscreen
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgBeginPath(vg);
+		for (int i = 0; i < 8; i++) {
+			nvgMoveTo(vg, 16.5, 32.5 + 35 * i);
+			nvgLineTo(vg, 42, 32.5 + 35 * i);
+		}
+		nvgMoveTo(vg, 98.5, 316.5);
+		nvgLineTo(vg, 101.5, 316.5);
+		nvgLineTo(vg, 101.5, 310.5);
+		nvgLineTo(vg, 104.5, 310.5);
+		nvgMoveTo(vg, 98.5, 323.5);
+		nvgLineTo(vg, 101.5, 323.5);
+		nvgLineTo(vg, 101.5, 329.5);
+		nvgLineTo(vg, 104.5, 329.5);
+		nvgStroke(vg);
+
+		drawText(vg, 16.5, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "EXT.TR"); 
+		drawText(vg, 58, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "TRIGGER"); 
+		drawText(vg, 93, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "EDGE"); 
+		drawText(vg, 128, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "MODE"); 
+		drawText(vg, 125, 318, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CONT"); 
+		drawText(vg, 125, 330, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "ONCE"); 
+		drawText(vg, 158, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "RESET"); 
+		drawText(vg, 190, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "TIME"); 
+		drawText(vg, 240, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "L INDEX R"); 
+		drawText(vg, 283, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "PRE."); 
+
 	}
 };
 
