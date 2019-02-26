@@ -1,3 +1,5 @@
+//SubTag W12 W10
+
 #include "SubmarineFree.hpp"
 #include "dsp/functions.hpp"
 
@@ -418,72 +420,247 @@ void PO_204::step() {
 	}
 }
 
-struct PO_Layout : ModuleWidget {
-	PO_Layout(PO_101 *module) : ModuleWidget(module) {}
+struct PO_Layout : SchemeModuleWidget {
+	PO_Layout(PO_101 *module) : SchemeModuleWidget(module) {}
 	void Layout() {
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(66, 39), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
-		addParam(ParamWidget::create<NarrowKnob<SnapKnob<MedKnob<LightKnob>>>>(Vec(121, 39), module, PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(85, 58), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+		addParam(createParamCentered<NarrowKnob<SnapKnob<MedKnob<LightKnob>>>>(Vec(140, 58), module, PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f));
 
-		addInput(Port::create<SilverPort>(Vec(45,19), Port::INPUT, module, PO_101::INPUT_NOTE_CV));
+		addInput(createInputCentered<SilverPort>(Vec(57.5,31.5), module, PO_101::INPUT_NOTE_CV));
 
-		addOutput(Port::create<SilverPort>(Vec(77.5,100), Port::OUTPUT, module, PO_101::OUTPUT_1));
-		addOutput(Port::create<SilverPort>(Vec(110,109), Port::OUTPUT, module, PO_101::OUTPUT_2));
-		addOutput(Port::create<SilverPort>(Vec(142.5,100), Port::OUTPUT, module, PO_101::OUTPUT_3));
-		addOutput(Port::create<SilverPort>(Vec(133.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_4));
-		addOutput(Port::create<SilverPort>(Vec(142.5,165), Port::OUTPUT, module, PO_101::OUTPUT_5));
-		addOutput(Port::create<SilverPort>(Vec(133.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_6));
-		addOutput(Port::create<SilverPort>(Vec(142.5,230), Port::OUTPUT, module, PO_101::OUTPUT_7));
-		addOutput(Port::create<SilverPort>(Vec(110,221), Port::OUTPUT, module, PO_101::OUTPUT_8));
-		addOutput(Port::create<SilverPort>(Vec(77.5,230), Port::OUTPUT, module, PO_101::OUTPUT_9));
-		addOutput(Port::create<SilverPort>(Vec(45,221), Port::OUTPUT, module, PO_101::OUTPUT_10));
-		addOutput(Port::create<SilverPort>(Vec(12.5,230), Port::OUTPUT, module, PO_101::OUTPUT_11));
-		addOutput(Port::create<SilverPort>(Vec(21.5,197.5), Port::OUTPUT, module, PO_101::OUTPUT_12));
-		addOutput(Port::create<SilverPort>(Vec(12.5,165), Port::OUTPUT, module, PO_101::OUTPUT_13));
-		addOutput(Port::create<SilverPort>(Vec(21.5,132.5), Port::OUTPUT, module, PO_101::OUTPUT_14));
-		addOutput(Port::create<SilverPort>(Vec(12.5,100), Port::OUTPUT, module, PO_101::OUTPUT_15));
-		addOutput(Port::create<SilverPort>(Vec(45,109), Port::OUTPUT, module, PO_101::OUTPUT_16));
+		addOutput(createOutputCentered<SilverPort>(Vec(90,112.5), module, PO_101::OUTPUT_1));
+		addOutput(createOutputCentered<SilverPort>(Vec(122.5,121.5), module, PO_101::OUTPUT_2));
+		addOutput(createOutputCentered<SilverPort>(Vec(155,112.5), module, PO_101::OUTPUT_3));
+		addOutput(createOutputCentered<SilverPort>(Vec(146,145), module, PO_101::OUTPUT_4));
+		addOutput(createOutputCentered<SilverPort>(Vec(155,177.5), module, PO_101::OUTPUT_5));
+		addOutput(createOutputCentered<SilverPort>(Vec(146,210), module, PO_101::OUTPUT_6));
+		addOutput(createOutputCentered<SilverPort>(Vec(155,242.5), module, PO_101::OUTPUT_7));
+		addOutput(createOutputCentered<SilverPort>(Vec(122.5,233.5), module, PO_101::OUTPUT_8));
+		addOutput(createOutputCentered<SilverPort>(Vec(90,242.5), module, PO_101::OUTPUT_9));
+		addOutput(createOutputCentered<SilverPort>(Vec(57.5,233.5), module, PO_101::OUTPUT_10));
+		addOutput(createOutputCentered<SilverPort>(Vec(25,242.5), module, PO_101::OUTPUT_11));
+		addOutput(createOutputCentered<SilverPort>(Vec(34,210), module, PO_101::OUTPUT_12));
+		addOutput(createOutputCentered<SilverPort>(Vec(25,177.5), module, PO_101::OUTPUT_13));
+		addOutput(createOutputCentered<SilverPort>(Vec(34,145), module, PO_101::OUTPUT_14));
+		addOutput(createOutputCentered<SilverPort>(Vec(25,112.5), module, PO_101::OUTPUT_15));
+		addOutput(createOutputCentered<SilverPort>(Vec(57.5,121.5), module, PO_101::OUTPUT_16));
 
 		for (int i = 0; i < 4; i++) {
-			addInput(Port::create<SilverPort>(Vec(10 + 45 * i,260), Port::INPUT, module, PO_101::INPUT_PHASE_1 + i));
-			addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(3.5 + 45 * i, 290), module, PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
-			addOutput(Port::create<SilverPort>(Vec(10 + 45 * i,333), Port::OUTPUT, module, PO_101::OUTPUT_17 + i));
+			addInput(createInputCentered<SilverPort>(Vec(22.5 + 45 * i,272.5), module, PO_101::INPUT_PHASE_1 + i));
+			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(22.5 + 45 * i, 309), module, PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
+			addOutput(createOutputCentered<SilverPort>(Vec(22.5 + 45 * i,345.5), module, PO_101::OUTPUT_17 + i));
 		}
+	}
+	void LayoutScreen(NVGcontext *vg) {
+		nvgFillColor(vg, gScheme.background);
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		for (unsigned int i = 0; i < 4; i++) {
+			nvgMoveTo(vg, 22.5 + 45 * i, 272.5);
+			nvgLineTo(vg, 22.5 + 45 * i, 345.5);
+		}
+		nvgMoveTo(vg, 155, 112.5);
+		nvgLineTo(vg, 25, 242.5);
+		nvgMoveTo(vg, 25, 112.5);
+		nvgLineTo(vg, 155, 242.5);
+		nvgMoveTo(vg, 115, 78);
+		nvgBezierTo(vg, 115, 75, 120, 75, 120, 78);
+		nvgBezierTo(vg, 120, 81, 125, 81, 125, 78);
+		nvgMoveTo(vg, 109, 47);
+		nvgLineTo(vg, 111.5, 44.5);
+		nvgLineTo(vg, 116.5, 49.5);
+		nvgLineTo(vg, 119, 47);
+		nvgMoveTo(vg, 135, 29.5);
+		nvgLineTo(vg, 135, 32);
+		nvgLineTo(vg, 145, 27);
+		nvgLineTo(vg, 145, 29.5);
+		nvgMoveTo(vg, 161, 47);
+		nvgLineTo(vg, 161, 44.5);
+		nvgLineTo(vg, 166, 44.5);
+		nvgLineTo(vg, 166, 49.5);
+		nvgLineTo(vg, 171, 49.5);
+		nvgLineTo(vg, 171, 47);
+		nvgMoveTo(vg, 155, 80.5);
+		nvgBezierTo(vg, 155, 74.5, 160, 74.5, 160, 80.5);
+		nvgBezierTo(vg, 160, 74.5, 165, 74.5, 165, 80.5);
+		nvgStroke(vg);
+		nvgBeginPath(vg);
+		nvgCircle(vg, 90, 177.5, 65);
+		nvgFill(vg);
+		nvgStroke(vg);
+
+		drawText(vg, 30, 89, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "TUNE");
+		drawText(vg, 85, 89, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "FINE");
+		drawText(vg, 90, 177, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "PHASED");
+		drawText(vg, 90, 187, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "OUTPUT");
+		drawText(vg, 90, 135, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "0");
+		drawText(vg, 90, 229, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x80");
+		drawText(vg, 38, 182, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "3\xcf\x80/2");
+		drawText(vg, 142, 182, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x80/2");
 	}
 };
 
 struct PO101 : PO_Layout {
 	PO101(PO_101 *module) : PO_Layout(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/PO-101.svg")));
+		this->box.size = Vec(180, 380);
+		addChild(new SchemePanel(this->box.size));
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
 		Layout();
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "PO-101");
+		LayoutScreen(vg);
 	}
 };
 
 struct PO102 : PO_Layout {
 	PO102(PO_101 *module) : PO_Layout(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/PO-102.svg")));
+		this->box.size = Vec(180, 380);
+		addChild(new SchemePanel(this->box.size));
 		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f));
 		module->baseFreq = 1.0f;
 		Layout();
 	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "PO-102");
+		LayoutScreen(vg);
+	}
 };
 
-struct PO204 : ModuleWidget {
-	PO204(PO_204 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/PO-204.svg")));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(60, 19), module, PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(105, 19), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
-		addInput(Port::create<SilverPort>(Vec(17.5, 25.5), Port::INPUT, module, PO_204::INPUT_TUNE));
+struct PO204 : SchemeModuleWidget {
+	PO204(PO_204 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(150, 380);
+		addChild(new SchemePanel(this->box.size));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(79, 38), module, PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(124, 38), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+		addInput(createInputCentered<SilverPort>(Vec(30, 38), module, PO_204::INPUT_TUNE));
 
 		for (int i = 0; i < 4; i++) {
-			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(5, 89 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
-			addParam(ParamWidget::create<SmallKnob<LightKnob>>(Vec(45, 89 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
-			addParam(ParamWidget::create<SnapKnob<SmallKnob<LightKnob>>>(Vec(85, 89 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
-			addInput(Port::create<SilverPort>(Vec(4.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_WAVE_1 + i));
-			addInput(Port::create<SilverPort>(Vec(44.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_PHASE_1 + i));
-			addInput(Port::create<SilverPort>(Vec(84.5, 125 + 70 * i), Port::INPUT, module, PO_204::INPUT_MULT_1 + i));
-			addOutput(Port::create<SilverPort>(Vec(120.5, 125 + 70 * i), Port::OUTPUT, module, PO_204::OUTPUT_1 + i));
+			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(17, 101 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
+			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(57, 101 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
+			addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(97, 101 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
+			addInput(createInputCentered<SilverPort>(Vec(17, 137.5 + 70 * i), module, PO_204::INPUT_WAVE_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(57, 137.5 + 70 * i), module, PO_204::INPUT_PHASE_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(97, 137.5 + 70 * i), module, PO_204::INPUT_MULT_1 + i));
+			addOutput(createOutputCentered<SilverPort>(Vec(133, 137.5 + 70 * i), module, PO_204::OUTPUT_1 + i));
 		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "PO-204");
+		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+
+		nvgMoveTo(vg, 14.5, 79.5);
+		nvgLineTo(vg, 17.5, 79.5);
+
+		nvgMoveTo(vg, 27.5, 79.5);
+		nvgLineTo(vg, 30.5, 79.5);
+
+		nvgMoveTo(vg, 40.5, 79.5);
+		nvgLineTo(vg, 43.5, 79.5);
+
+		nvgMoveTo(vg, 53.5, 79.5);
+		nvgLineTo(vg, 56.5, 79.5);
+
+		nvgMoveTo(vg, 66.5, 79.5);
+		nvgLineTo(vg, 70, 79.5);
+
+		nvgMoveTo(vg, 80, 79.5);
+		nvgLineTo(vg, 83.5, 79.5);
+
+		nvgMoveTo(vg, 93.5, 79.5);
+		nvgLineTo(vg, 96.5, 79.5);
+
+		nvgMoveTo(vg, 106.5, 79.5);
+		nvgLineTo(vg, 109.5, 79.5);
+
+		nvgMoveTo(vg, 119.5, 79.5);
+		nvgLineTo(vg, 122.5, 79.5);
+
+		nvgMoveTo(vg, 132.5, 79.5);
+		nvgLineTo(vg, 135.5, 79.5);
+
+		nvgStroke(vg);
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgBeginPath(vg);
+
+		nvgMoveTo(vg, 4.5, 79.5);
+		nvgBezierTo(vg, 4.5, 75.5, 9.5, 75.5, 9.5, 79.5);
+		nvgBezierTo(vg, 9.5, 83.5, 14.5, 83.5, 14.5, 79.5);
+
+		nvgMoveTo(vg, 17.5, 79.5);
+		nvgLineTo(vg, 22.5, 76.5);
+		nvgLineTo(vg, 22.5, 82.5);
+		nvgLineTo(vg, 27.5, 79.5);
+
+		nvgMoveTo(vg, 30.5, 79.5);
+		nvgBezierTo(vg, 30.5, 75.5, 35.5, 77.5, 35.5, 83.5);
+		nvgBezierTo(vg, 35.5, 77.5, 40.5, 75.5, 40.5, 79.5);
+
+		nvgMoveTo(vg, 43.5, 79.5);
+		nvgLineTo(vg, 46, 76.5);
+		nvgLineTo(vg, 51, 82.5);
+		nvgLineTo(vg, 53.5, 79.5);
+
+		nvgMoveTo(vg, 56.5, 79.5);
+		nvgLineTo(vg, 56.5, 76.5);
+		nvgLineTo(vg, 61.5, 76.5);
+		nvgLineTo(vg, 61.5, 82.5);
+		nvgLineTo(vg, 66.5, 82.5);
+		nvgLineTo(vg, 66.5, 79.5);
+
+		nvgMoveTo(vg, 70, 79.5);
+		nvgBezierTo(vg, 70, 75.5, 75, 75.5, 75, 79.5);
+		nvgBezierTo(vg, 75, 83.5, 80, 83.5, 80, 79.5);
+
+		nvgMoveTo(vg, 83.5, 79.5);
+		nvgLineTo(vg, 86, 76.5);
+		nvgLineTo(vg, 91, 82.5);
+		nvgLineTo(vg, 93.5, 79.5);
+
+		nvgMoveTo(vg, 96.5, 79.5);
+		nvgLineTo(vg, 101.5, 76.5);
+		nvgLineTo(vg, 101.5, 82.5);
+		nvgLineTo(vg, 106.5, 79.5);
+
+		nvgMoveTo(vg, 109.5, 79.5);
+		nvgLineTo(vg, 109.5, 76.5);
+		nvgLineTo(vg, 114.5, 76.5);
+		nvgLineTo(vg, 114.5, 82.5);
+		nvgLineTo(vg, 119.5, 82.5);
+		nvgLineTo(vg, 119.5, 79.5);
+
+		nvgMoveTo(vg, 122.5, 79.5);
+		nvgBezierTo(vg, 122.5, 75.5, 127.5, 77.5, 127.5, 83.5);
+		nvgBezierTo(vg, 127.5, 77.5, 132.5, 75.5, 132.5, 79.5);
+
+		nvgMoveTo(vg, 135.5, 79.5);
+		nvgBezierTo(vg, 135.5, 75.5, 140.5, 75.5, 140.5, 79.5);
+		nvgBezierTo(vg, 140.5, 83.5, 145.5, 83.5, 145.5, 79.5);
+
+		for (unsigned int i = 0; i < 3; i++) {
+			nvgMoveTo(vg, 3, 154.5 + 70 * i);
+			nvgLineTo(vg, 147, 154.5 + 70 * i);
+		}
+
+		nvgStroke(vg);
+		
+		drawText(vg, 30.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "V/Oct");
+		drawText(vg, 79.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "TUNE");
+		drawText(vg, 124.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "FINE");
+		for (unsigned int i = 0; i < 4; i++) {
+			drawText(vg, 17, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "WAVE");
+			drawText(vg, 57, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "PHASE");
+			drawText(vg, 97, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "MULT");
+			drawText(vg, 133, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "OUT");
+		}
+
 	}
 };
 
