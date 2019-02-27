@@ -1,6 +1,7 @@
+//SubTag W2
+
 #include "SubmarineFree.hpp"
 #include "window.hpp"
-#include "torpedo.hpp"
 
 struct TDVText : LedDisplayTextField {
 	NVGcolor bgColor;
@@ -36,11 +37,12 @@ struct TDVText : LedDisplayTextField {
 	}
 };
 
-struct TD202 : ModuleWidget {
+struct TD202 : SchemeModuleWidget {
 	TDVText *textField;
 
-	TD202(Module *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/TD-202.svg")));
+	TD202(Module *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 
 		textField = Widget::create<TDVText>(Vec(2, 15));
 		textField->box.size = Vec(26, 350);
@@ -88,6 +90,9 @@ struct TD202 : ModuleWidget {
 	}
 	
 	void appendContextMenu(Menu *menu) override;
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "TD-202");
+	}
 };
 
 struct TD202_MenuItem : MenuItem {
@@ -180,6 +185,7 @@ struct TD202_ParentItemB : MenuItem {
 };
 
 void TD202::appendContextMenu(Menu *menu) {
+	SchemeModuleWidget::appendContextMenu(menu);
 	menu->addChild(MenuEntry::create());
 
 	TD202_ParentItem *m = MenuItem::create<TD202_ParentItem>("Text Color");
