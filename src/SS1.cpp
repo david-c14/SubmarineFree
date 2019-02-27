@@ -1,3 +1,5 @@
+//SubTag W2 W5 W20
+
 #include "SubmarineFree.hpp"
 
 struct SS_112 : Module {
@@ -5,12 +7,17 @@ struct SS_112 : Module {
 	SS_112() : Module(0, deviceCount, 0, 0) {}
 };
 
-struct SS112 : ModuleWidget {
-	SS112(SS_112 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/SS-112.svg")));
+struct SS112 : SchemeModuleWidget {
+	SS112(SS_112 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_112::deviceCount; i++) {
-			addInput(Port::create<SilverPort>(Vec(2.5,19 + i * 29), Port::INPUT, module, i));
+			addInput(createInputCentered<SilverPort>(Vec(15,31.5 + i * 29), module, i));
 		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "SS-112");
+
 	}
 };
 
@@ -28,12 +35,24 @@ struct SS_208 : Module {
 	}
 };
 
-struct SS208 : ModuleWidget {
-	SS208(SS_208 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/SS-208.svg")));
+struct SS208 : SchemeModuleWidget {
+	SS208(SS_208 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_208::deviceCount; i++) {
-			addOutput(Port::create<SilverPort>(Vec(2.5,19 + 43 * i), Port::OUTPUT, module, i));
+			addOutput(createOutputCentered<SilverPort>(Vec(15,31.5 + 43 * i), module, i));
 		}
+	}
+	void render (NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "SS-208");
+		drawText(vg, 15, 54, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x80");
+		drawText(vg, 15, 97, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x84");
+		drawText(vg, 15, 140, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x84\xaf");
+		drawText(vg, 15, 183, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a\xc2\xbd");
+		drawText(vg, 15, 226, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "2");
+		drawText(vg, 15, 269, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "3");
+		drawText(vg, 15, 312, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "5");
+		drawText(vg, 15, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "7");
 	}
 };
 
@@ -64,15 +83,28 @@ struct SS_212 : Module {
 	}
 };
 
-struct SS212 : ModuleWidget {
-	SS212(SS_212 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/SS-212.svg")));
+struct SS212 : SchemeModuleWidget {
+	SS212(SS_212 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_212::deviceCount; i++) {
-			addOutput(Port::create<SilverPort>(Vec(2.5,19 + i * 29), Port::OUTPUT, module, i));
+			addOutput(createOutputCentered<SilverPort>(Vec(15,31.5 + i * 29), module, i));
 		}
 	}
-
 	void appendContextMenu(Menu *menu) override;
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "SS-212");
+		nvgFillColor(vg, gScheme.alternative);
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 2, 17, 26, 28, 2);
+		nvgRoundedRect(vg, 2, 75, 26, 28, 2);
+		nvgRoundedRect(vg, 2, 133, 26, 28, 2);
+		nvgRoundedRect(vg, 2, 162, 26, 28, 2);
+		nvgRoundedRect(vg, 2, 220, 26, 28, 2);
+		nvgRoundedRect(vg, 2, 278, 26, 28, 2);
+		nvgRoundedRect(vg, 2, 336, 26, 28, 2);
+		nvgFill(vg);
+	}
 };
 
 struct SSMenuItem : MenuItem {
@@ -88,16 +120,18 @@ struct SSMenuItem : MenuItem {
 };
 
 void SS212::appendContextMenu(Menu *menu) {
+	SchemeModuleWidget::appendContextMenu(menu);
 	char label[20];
-	menu->addChild(MenuEntry::create());
 	SS_212 *ss_212 = dynamic_cast<SS_212*>(this->module);
-        assert(ss_212);
-	for (int i = -5; i < 5; i++) {
-		sprintf(label, "Octave %d", i);
-		SSMenuItem *menuItem = MenuItem::create<SSMenuItem>(label);
-		menuItem->ss_212 = ss_212;
-		menuItem->v = i;
-		menu->addChild(menuItem);
+	if (ss_212) {
+		menu->addChild(MenuEntry::create());
+		for (int i = -5; i < 5; i++) {
+			sprintf(label, "Octave %d", i);
+			SSMenuItem *menuItem = MenuItem::create<SSMenuItem>(label);
+			menuItem->ss_212 = ss_212;
+			menuItem->v = i;
+			menu->addChild(menuItem);
+		}
 	}
 }
 
@@ -110,12 +144,37 @@ struct SS_221 : Module {
 	}
 };
 
-struct SS221 : ModuleWidget {
-	SS221(SS_221 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/SS-221.svg")));
+struct SS221 : SchemeModuleWidget {
+	SS221(SS_221 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(75, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_221::deviceCount; i++) {
-			addOutput(Port::create<SilverPort>(Vec(2.5 + 45 * (i % 2),19 + i * 16), Port::OUTPUT, module, i));
+			addOutput(createOutputCentered<SilverPort>(Vec(15 + 45 * (i % 2),31.5 + i * 16), module, i));
 		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "SS-221");
+		drawText(vg, 37.5, 34, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "10V");
+		drawText(vg, 37.5, 50, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "9V");
+		drawText(vg, 37.5, 66, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "8V");
+		drawText(vg, 37.5, 82, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "7V");
+		drawText(vg, 37.5, 98, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "6V");
+		drawText(vg, 37.5, 114, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "5V");
+		drawText(vg, 37.5, 130, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "4V");
+		drawText(vg, 37.5, 146, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "3V");
+		drawText(vg, 37.5, 162, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "2V");
+		drawText(vg, 37.5, 178, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "1V");
+		drawText(vg, 37.5, 194, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "0V");
+		drawText(vg, 37.5, 210, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-1V");
+		drawText(vg, 37.5, 226, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-2V");
+		drawText(vg, 37.5, 242, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-3V");
+		drawText(vg, 37.5, 258, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-4V");
+		drawText(vg, 37.5, 274, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-5V");
+		drawText(vg, 37.5, 290, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-6V");
+		drawText(vg, 37.5, 306, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-7V");
+		drawText(vg, 37.5, 322, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-8V");
+		drawText(vg, 37.5, 338, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-9V");
+		drawText(vg, 37.5, 354, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-10");
 	}
 };
 
@@ -131,14 +190,33 @@ struct SS_220 : Module {
 	}
 };
 
-struct SS220 : ModuleWidget {
-	SS220(SS_220 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/SS-220.svg")));
+struct SS220 : SchemeModuleWidget {
+	SS220(SS_220 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(300, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (int j = 0; j < SS_220::deviceSetCount; j++) {
 			for (int i = 0; i < SS_220::deviceCount; i++) {
-				addOutput(Port::create<SilverPort>(Vec(2.5 + 30 * j, 19 + i * 29), Port::OUTPUT, module, j * SS_220::deviceCount + i));
+				addOutput(createOutputCentered<SilverPort>(Vec(15 + 30 * j, 31.5 + i * 29), module, j * SS_220::deviceCount + i));
 			}
 		}
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "SS-220");
+		nvgFillColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 2, 17, 296, 28, 2);
+		nvgRoundedRect(vg, 2, 75, 296, 28, 2);
+		nvgRoundedRect(vg, 2, 133, 296, 28, 2);
+		nvgRoundedRect(vg, 2, 162, 296, 28, 2);
+		nvgRoundedRect(vg, 2, 220, 296, 28, 2);
+		nvgRoundedRect(vg, 2, 278, 296, 28, 2);
+		nvgRoundedRect(vg, 2, 336, 296, 28, 2);
+		nvgFill(vg);
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 150.5, 14.5, 29, 352, 2);
+		nvgStroke(vg);
 	}
 };
 
