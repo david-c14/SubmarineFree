@@ -1,3 +1,5 @@
+//SubTag W12
+
 #include "XF.hpp"
 
 struct XF_102 : XF {
@@ -76,31 +78,74 @@ void XF_102::step() {
 	}
 }
 
-struct XF102 : ModuleWidget {
-	XF102(XF_102 *module) : ModuleWidget(module) {
+struct XF102 : SchemeModuleWidget {
+	XF102(XF_102 *module) : SchemeModuleWidget(module) {
 		XF_LightKnob *fader;
-		setPanel(SVG::load(assetPlugin(plugin, "res/XF-102.svg")));
+		this->box.size = Vec(180, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < XF_102::deviceCount; i++) {
 			int offset = 88 * i;
-			addInput(Port::create<SilverPort>(Vec(27.5,18 + offset), Port::INPUT, module, XF_102::INPUT_A_1 + i));
-			addInput(Port::create<SilverPort>(Vec(127.5,18 + offset), Port::INPUT, module, XF_102::INPUT_B_1 + i));
-			addInput(Port::create<SilverPort>(Vec(27.5,74 + offset), Port::INPUT, module, XF_102::INPUT_CV_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(40,30.5 + offset), module, XF_102::INPUT_A_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(140,30.5 + offset), module, XF_102::INPUT_B_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(40,86.5 + offset), module, XF_102::INPUT_CV_1 + i));
 
-			addOutput(Port::create<SilverPort>(Vec(127.5,74 + offset), Port::OUTPUT, module, XF_102::OUTPUT_1 + i));
+			addOutput(createOutputCentered<SilverPort>(Vec(140,86.5 + offset), module, XF_102::OUTPUT_1 + i));
 
-			addParam(ParamWidget::create<SubSwitch2>(Vec(41, 46 + offset), module, XF_102::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
-			addParam(ParamWidget::create<SubSwitch3>(Vec(125, 43.5 + offset), module, XF_102::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
-			fader = ParamWidget::create<XF_LightKnob>(Vec(63, 31 + offset), module, XF_102::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
+			addParam(createParamCentered<SubSwitch2>(Vec(48, 58.5 + offset), module, XF_102::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
+			addParam(createParamCentered<SubSwitch3>(Vec(132, 58.5 + offset), module, XF_102::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
+			fader = createParamCentered<XF_LightKnob>(Vec(90, 58 + offset), module, XF_102::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
 			fader->cv = XF_102::INPUT_CV_1 + i;
 			fader->link = i?XF_102::PARAM_LINK_1:0;
 			addParam(fader);
 
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 47 + offset), module, XF_102::LIGHT_LIN_1 + i));
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 57 + offset), module, XF_102::LIGHT_LOG_1 + i));
-			addChild(ModuleLightWidget::create<TinyLight<BlueRedLight>>(Vec(141, 67 + offset), module, XF_102::LIGHT_AUTO_1 + i * 2));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 48.5 + offset), module, XF_102::LIGHT_LIN_1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 58.5 + offset), module, XF_102::LIGHT_LOG_1 + i));
+			addChild(createLightCentered<TinyLight<BlueRedLight>>(Vec(142.5, 68.5 + offset), module, XF_102::LIGHT_AUTO_1 + i * 2));
 		}
 
-		addParam(ParamWidget::create<LightButton>(Vec(90, 94.5), module, XF_102::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<LightButton>(Vec(98, 102.5), module, XF_102::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "XF-102");
+		
+		// Dividers
+		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 3, 102.5);
+		nvgLineTo(vg, 67, 102.5);
+		nvgMoveTo(vg, 109, 102.5);
+		nvgLineTo(vg, 177, 102.5);
+		nvgStroke(vg);
+
+		nvgStrokeColor(vg, gScheme.contrast);
+	
+		for (unsigned int i = 0; i < 2; i++) {
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, 65.000000, 83.500000 + 88 * i);
+			nvgBezierTo(vg, 66.333336, 82.166664 + 88 * i, 67.666664, 80.833336 + 88 * i, 69.000000, 79.500000 + 88 * i);
+			nvgBezierTo(vg, 60.295670, 70.968048 + 88 * i, 57.618584, 58.017834 + 88 * i, 62.226555, 46.733948 + 88 * i);
+			nvgBezierTo(vg, 66.834526, 35.450062 + 88 * i, 77.811501, 28.075714 + 88 * i, 90.000000, 28.075714 + 88 * i);
+			nvgBezierTo(vg, 102.188499, 28.075714 + 88 * i, 113.165482, 35.450069 + 88 * i, 117.773453, 46.733955 + 88 * i);
+			nvgBezierTo(vg, 122.381424, 58.017841 + 88 * i, 119.704330, 70.968056 + 88 * i, 111.000000, 79.500000 + 88 * i);
+			nvgBezierTo(vg, 112.333336, 80.833336 + 88 * i, 113.666664, 82.166664 + 88 * i, 115.000000, 83.500000 + 88 * i);
+			nvgStroke(vg);
+
+			drawText(vg, 57, 87 + 88 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "A");
+			drawText(vg, 116, 87 + 88 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "B");
+			drawText(vg, 39, 55 + 88 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "UNI");
+			drawText(vg, 39, 67 + 88 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "BI");
+			drawText(vg, 25, 36 + 88 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "A");
+			drawText(vg, 27, 92 + 88 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "CV");
+			drawText(vg, 155, 36 + 88 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "B");
+			drawText(vg, 155, 92 + 88 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 18, gScheme.contrast, "\xe2\x86\xa6");
+			drawText(vg, 146, 52 + 88 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LIN");
+			drawText(vg, 146, 61 + 88 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LOG");
+			drawText(vg, 146, 70 + 88 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "AUTO");
+		}
+		drawText(vg, 88, 105, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LINK");
 	}
 };
 

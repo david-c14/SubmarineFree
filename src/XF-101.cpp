@@ -1,3 +1,5 @@
+//SubTag W12
+
 #include "XF.hpp"
 
 struct XF_101 : XF {
@@ -52,27 +54,58 @@ void XF_101::step() {
 	crossFade(&controls[0]);
 }
 
-struct XF101 : ModuleWidget {
-	XF101(XF_101 *module) : ModuleWidget(module) {
+struct XF101 : SchemeModuleWidget {
+	XF101(XF_101 *module) : SchemeModuleWidget(module) {
 		XF_LightKnob *fader;
-		setPanel(SVG::load(assetPlugin(plugin, "res/XF-101.svg")));
+		this->box.size = Vec(180, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<SilverPort>(Vec(27.5,18), Port::INPUT, module, XF_101::INPUT_A_1));
-		addInput(Port::create<SilverPort>(Vec(127.5,18), Port::INPUT, module, XF_101::INPUT_B_1));
-		addInput(Port::create<SilverPort>(Vec(27.5,74), Port::INPUT, module, XF_101::INPUT_CV_1));
+		addInput(createInputCentered<SilverPort>(Vec(40,30.5), module, XF_101::INPUT_A_1));
+		addInput(createInputCentered<SilverPort>(Vec(140,30.5), module, XF_101::INPUT_B_1));
+		addInput(createInputCentered<SilverPort>(Vec(40,86.5), module, XF_101::INPUT_CV_1));
 
-		addOutput(Port::create<SilverPort>(Vec(127.5,74), Port::OUTPUT, module, XF_101::OUTPUT_1));
+		addOutput(createOutputCentered<SilverPort>(Vec(140,86.5), module, XF_101::OUTPUT_1));
 
-		addParam(ParamWidget::create<SubSwitch2>(Vec(41, 46), module, XF_101::PARAM_CV_1, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<SubSwitch3>(Vec(125, 43.5), module, XF_101::PARAM_MODE_1, 0.0f, 2.0f, 0.0f));
-		fader = ParamWidget::create<XF_LightKnob>(Vec(63, 31), module, XF_101::PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
+		addParam(createParamCentered<SubSwitch2>(Vec(48, 58.5), module, XF_101::PARAM_CV_1, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<SubSwitch3>(Vec(132, 58.5), module, XF_101::PARAM_MODE_1, 0.0f, 2.0f, 0.0f));
+		fader = createParamCentered<XF_LightKnob>(Vec(90, 58), module, XF_101::PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
 		fader->cv = XF_101::INPUT_CV_1;
 		fader->link = 0;
 		addParam(fader);
 
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 47), module, XF_101::LIGHT_LIN_1));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(141, 57), module, XF_101::LIGHT_LOG_1));
-		addChild(ModuleLightWidget::create<TinyLight<BlueRedLight>>(Vec(141, 67), module, XF_101::LIGHT_AUTO_1));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 48.5), module, XF_101::LIGHT_LIN_1));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 58.5), module, XF_101::LIGHT_LOG_1));
+		addChild(createLightCentered<TinyLight<BlueRedLight>>(Vec(142.5, 68.5), module, XF_101::LIGHT_AUTO_1));
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "XF-101");
+		
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+	
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 65.000000, 83.500000);
+		nvgBezierTo(vg, 66.333336, 82.166664, 67.666664, 80.833336, 69.000000, 79.500000);
+		nvgBezierTo(vg, 60.295670, 70.968048, 57.618584, 58.017834, 62.226555, 46.733948);
+		nvgBezierTo(vg, 66.834526, 35.450062, 77.811501, 28.075714, 90.000000, 28.075714);
+		nvgBezierTo(vg, 102.188499, 28.075714, 113.165482, 35.450069, 117.773453, 46.733955);
+		nvgBezierTo(vg, 122.381424, 58.017841, 119.704330, 70.968056, 111.000000, 79.500000);
+		nvgBezierTo(vg, 112.333336, 80.833336, 113.666664, 82.166664, 115.000000, 83.500000);
+		nvgStroke(vg);
+
+		drawText(vg, 57, 87, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "A");
+		drawText(vg, 116, 87, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "B");
+		drawText(vg, 39, 55, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "UNI");
+		drawText(vg, 39, 67, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "BI");
+		drawText(vg, 25, 36, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "A");
+		drawText(vg, 27, 92, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "CV");
+		drawText(vg, 155, 36, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "B");
+		drawText(vg, 155, 92, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 18, gScheme.contrast, "\xe2\x86\xa6");
+		drawText(vg, 146, 52, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LIN");
+		drawText(vg, 146, 61, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LOG");
+		drawText(vg, 146, 70, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "AUTO");
 	}
 };
 
