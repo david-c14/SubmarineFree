@@ -1,3 +1,5 @@
+//SubTag W2
+
 #include "SubmarineFree.hpp"
 #include "torpedo.hpp"
 #include "dsp/digital.hpp"
@@ -108,20 +110,26 @@ void TM_105::step() {
 	outPort.process();
 }
 
-struct TM105 : ModuleWidget {
-	TM105(TM_105 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/TM-105.svg")));
+struct TM105 : SchemeModuleWidget {
+	TM105(TM_105 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 		for (unsigned int i = 0; i < 5; i++) {
-			addInput(Port::create<BlackPort>(Vec(2.5,29 + 32 * i), Port::INPUT, module, TM_105::INPUT_1 + i));
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(2.5, 53 + 32 * i), module, TM_105::LIGHT_M_1 + i));
-			addChild(ModuleLightWidget::create<TinyLight<RedLight>>(Vec(24.5, 53 + 32 * i), module, TM_105::LIGHT_E_1 + i));
+			addInput(createInputCentered<BlackPort>(Vec(15,41.5 + 32 * i), module, TM_105::INPUT_1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(4, 54.5 + 32 * i), module, TM_105::LIGHT_M_1 + i));
+			addChild(createLightCentered<TinyLight<RedLight>>(Vec(26, 54.5 + 32 * i), module, TM_105::LIGHT_E_1 + i));
 		}
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(13.5, 260), module, TM_105::LIGHT_Q_1));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(13.5, 265), module, TM_105::LIGHT_Q_2));
-		addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(13.5, 270), module, TM_105::LIGHT_Q_3));
-		addChild(ModuleLightWidget::create<TinyLight<RedLight>>(Vec(13.5, 275), module, TM_105::LIGHT_Q_4));
-		addChild(ModuleLightWidget::create<TinyLight<RedLight>>(Vec(13.5, 280), module, TM_105::LIGHT_Q_5));
-		addOutput(Port::create<BlackPort>(Vec(2.5,232), Port::OUTPUT, module, TM_105::OUTPUT_TOR));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(15, 261.5), module, TM_105::LIGHT_Q_1));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(15, 266.5), module, TM_105::LIGHT_Q_2));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(15, 271.5), module, TM_105::LIGHT_Q_3));
+		addChild(createLightCentered<TinyLight<RedLight>>(Vec(15, 276.5), module, TM_105::LIGHT_Q_4));
+		addChild(createLightCentered<TinyLight<RedLight>>(Vec(15, 281.5), module, TM_105::LIGHT_Q_5));
+		addOutput(createOutputCentered<BlackPort>(Vec(15,244.5), module, TM_105::OUTPUT_TOR));
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "TM-105");
+		drawText(vg, 15, 27, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "IN");
+		drawText(vg, 15, 227, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OUT");
 	}
 };
 
