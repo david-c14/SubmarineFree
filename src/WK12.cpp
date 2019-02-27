@@ -1,5 +1,7 @@
+//SubTag W2 W10
+
 #include "SubmarineFree.hpp"
-#include <mutex>
+//#include <mutex>
 #include "torpedo.hpp"
 #include <fstream>
 #include <cctype>
@@ -190,7 +192,6 @@ void WK_Tunings::loadScalaFile(std::string path) {
 		tunings[index].name = tuning.name;
 		for (int i = 0; i < 12; i++)
 			tunings[index].offsets[i] = tuning.offsets[i];
-		info("SubmarineFree WK: Loaded Scala file %s", tuning.name.c_str());
 	}
 
 }
@@ -318,6 +319,9 @@ struct WK_Display : TransparentWidget {
 	char dspText[20];
 	
 	void draw(NVGcontext *vg) override {
+		if (!module) {
+			return;
+		}
 		float val = module->tunings[index];
 		sprintf(dspText, "%+05.2f", val);
 		nvgFontSize(vg, 14);
@@ -332,6 +336,9 @@ struct WK101_MenuItem : MenuItem {
 	WK_101 *module;
 	int index;
 	void onAction(EventAction &e) override {
+		if (!module) {
+			return;
+		}
 		for (int i = 0; i < 12; i++)
 			module->tunings[i] = tunings[index].offsets[i];
 		module->PrepareUpdate();
@@ -344,20 +351,23 @@ struct WK_Param : MedKnob<LightKnob> {
 	void onChange(EventChange &e) override {
 		MedKnob<LightKnob>::onChange(e);
 		WK_101 *module = dynamic_cast<WK_101 *>(this->module);
-		module->tunings[paramId - WK_101::PARAM_1] = value;
-		module->toSend = true;
+		if (module) {
+			module->tunings[paramId - WK_101::PARAM_1] = value;
+			module->toSend = true;
+		}
 	}
 };
 
-struct WK101 : ModuleWidget {
+struct WK101 : SchemeModuleWidget {
 	WK_Param *widgets[12];
-	WK101(WK_101 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/WK-101.svg")));
+	WK101(WK_101 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(150, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<SilverPort>(Vec(4,29), Port::INPUT, module, WK_101::INPUT_CV));
-		addOutput(Port::create<SilverPort>(Vec(43,29), Port::OUTPUT, module, WK_101::OUTPUT_CV));
-		addInput(Port::create<BlackPort>(Vec(82,29), Port::INPUT, module, WK_101::INPUT_TOR));
-		addOutput(Port::create<BlackPort>(Vec(121,29), Port::OUTPUT, module, WK_101::OUTPUT_TOR));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,41.5), module, WK_101::INPUT_CV));
+		addOutput(createOutputCentered<SilverPort>(Vec(55.5,41.5), module, WK_101::OUTPUT_CV));
+		addInput(createInputCentered<BlackPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
+		addOutput(createOutputCentered<BlackPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_TOR));
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -367,7 +377,7 @@ struct WK101 : ModuleWidget {
 			display->box.pos = Vec(45, 79 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			widgets[i] = ParamWidget::create<WK_Param>(Vec(4 + 104 * (i%2),70 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+			widgets[i] = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
 			addParam(widgets[i]);
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(21.5 + 104 * (i%2), 87.5 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
@@ -379,7 +389,7 @@ struct WK101 : ModuleWidget {
 			display->box.pos = Vec(45, 100 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			widgets[i] = ParamWidget::create<WK_Param>(Vec(108 - 104 * (i%2),91 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+			widgets[i] = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
 			addParam(widgets[i]);
 			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(125.5 - 104 * (i%2), 108.5 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
@@ -387,16 +397,180 @@ struct WK101 : ModuleWidget {
 	}
 	void appendContextMenu(Menu *menu) override;
 	void step() override;
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "WK-101");
+		nvgFillColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, 1);
+		nvgLineJoin(vg, 1);
+		nvgBeginPath(vg);
+
+		nvgMoveTo(vg, 3.500000, 360.500000);
+		nvgBezierTo(vg, 51.166668, 360.500000, 98.833328, 360.500000, 146.500000, 360.500000);
+		nvgBezierTo(vg, 146.500000, 353.833344, 146.500000, 347.166656, 146.500000, 340.500000);
+		nvgBezierTo(vg, 133.166672, 340.500000, 119.833336, 340.500000, 106.500000, 340.500000);
+		nvgBezierTo(vg, 106.234787, 340.500000, 105.980431, 340.394623, 105.792892, 340.207092);
+		nvgBezierTo(vg, 105.605354, 340.019562, 105.500000, 339.765228, 105.500000, 339.500000);
+		nvgBezierTo(vg, 105.500000, 336.500000, 105.500000, 333.500000, 105.500000, 330.500000);
+		nvgBezierTo(vg, 85.166664, 330.500000, 64.833336, 330.500000, 44.500000, 330.500000);
+		nvgBezierTo(vg, 44.234783, 330.500000, 43.980431, 330.394623, 43.792892, 330.207092);
+		nvgBezierTo(vg, 43.605354, 330.019562, 43.500000, 329.765228, 43.500000, 329.500000);
+		nvgBezierTo(vg, 43.500000, 326.500000, 43.500000, 323.500000, 43.500000, 320.500000);
+		nvgBezierTo(vg, 30.166668, 320.500000, 16.833332, 320.500000, 3.500000, 320.500000);
+		nvgBezierTo(vg, 3.500000, 333.833344, 3.500000, 347.166656, 3.500000, 360.500000);
+		nvgClosePath(vg);
+		
+		nvgMoveTo(vg, 3.500000, 318.500000);
+		nvgBezierTo(vg, 16.833332, 318.500000, 30.166668, 318.500000, 43.500000, 318.500000);
+		nvgBezierTo(vg, 43.500000, 315.500000, 43.500000, 312.500000, 43.500000, 309.500000);
+		nvgBezierTo(vg, 43.500000, 309.234772, 43.605354, 308.980438, 43.792892, 308.792908);
+		nvgBezierTo(vg, 43.980431, 308.605377, 44.234783, 308.500000, 44.500000, 308.500000);
+		nvgBezierTo(vg, 64.833336, 308.500000, 85.166664, 308.500000, 105.500000, 308.500000);
+		nvgBezierTo(vg, 105.500000, 305.500000, 105.500000, 302.500000, 105.500000, 299.500000);
+		nvgBezierTo(vg, 105.500000, 299.234772, 105.605354, 298.980438, 105.792892, 298.792908);
+		nvgBezierTo(vg, 105.980431, 298.605377, 106.234787, 298.500000, 106.500000, 298.500000);
+		nvgBezierTo(vg, 119.833336, 298.500000, 133.166672, 298.500000, 146.500000, 298.500000);
+		nvgBezierTo(vg, 133.166672, 298.500000, 119.833336, 298.500000, 106.500000, 298.500000);
+		nvgBezierTo(vg, 106.234787, 298.500000, 105.980431, 298.394623, 105.792892, 298.207092);
+		nvgBezierTo(vg, 105.605354, 298.019562, 105.500000, 297.765228, 105.500000, 297.500000);
+		nvgBezierTo(vg, 105.500000, 294.500000, 105.500000, 291.500000, 105.500000, 288.500000);
+		nvgBezierTo(vg, 85.166664, 288.500000, 64.833336, 288.500000, 44.500000, 288.500000);
+		nvgBezierTo(vg, 44.234783, 288.500000, 43.980431, 288.394623, 43.792892, 288.207092);
+		nvgBezierTo(vg, 43.605354, 288.019562, 43.500000, 287.765228, 43.500000, 287.500000);
+		nvgBezierTo(vg, 43.500000, 284.500000, 43.500000, 281.500000, 43.500000, 278.500000);
+		nvgBezierTo(vg, 30.166668, 278.500000, 16.833332, 278.500000, 3.500000, 278.500000);
+		nvgBezierTo(vg, 3.500000, 291.833344, 3.500000, 305.166656, 3.500000, 318.500000);
+		nvgClosePath(vg);
+		
+		nvgMoveTo(vg, 3.500000, 276.500000);
+		nvgBezierTo(vg, 16.833332, 276.500000, 30.166668, 276.500000, 43.500000, 276.500000);
+		nvgBezierTo(vg, 43.500000, 273.500000, 43.500000, 270.500000, 43.500000, 267.500000);
+		nvgBezierTo(vg, 43.500000, 267.234772, 43.605354, 266.980438, 43.792892, 266.792908);
+		nvgBezierTo(vg, 43.980431, 266.605377, 44.234783, 266.500000, 44.500000, 266.500000);
+		nvgBezierTo(vg, 64.833336, 266.500000, 85.166664, 266.500000, 105.500000, 266.500000);
+		nvgBezierTo(vg, 105.500000, 263.500000, 105.500000, 260.500000, 105.500000, 257.500000);
+		nvgBezierTo(vg, 105.500000, 257.234772, 105.605354, 256.980438, 105.792892, 256.792908);
+		nvgBezierTo(vg, 105.980431, 256.605377, 106.234787, 256.500000, 106.500000, 256.500000);
+		nvgBezierTo(vg, 119.833336, 256.500000, 133.166672, 256.500000, 146.500000, 256.500000);
+		nvgBezierTo(vg, 133.166672, 256.500000, 119.833336, 256.500000, 106.500000, 256.500000);
+		nvgBezierTo(vg, 106.234787, 256.500000, 105.980431, 256.394623, 105.792892, 256.207092);
+		nvgBezierTo(vg, 105.605354, 256.019562, 105.500000, 255.765213, 105.500000, 255.500000);
+		nvgBezierTo(vg, 105.500000, 252.500000, 105.500000, 249.500000, 105.500000, 246.500000);
+		nvgBezierTo(vg, 85.166664, 246.500000, 64.833336, 246.500000, 44.500000, 246.500000);
+		nvgBezierTo(vg, 44.234783, 246.500000, 43.980431, 246.394638, 43.792892, 246.207108);
+		nvgBezierTo(vg, 43.605354, 246.019577, 43.500000, 245.765213, 43.500000, 245.500000);
+		nvgBezierTo(vg, 43.500000, 242.500000, 43.500000, 239.500000, 43.500000, 236.500000);
+		nvgBezierTo(vg, 30.166668, 236.500000, 16.833332, 236.500000, 3.500000, 236.500000);
+		nvgBezierTo(vg, 3.500000, 249.833328, 3.500000, 263.166656, 3.500000, 276.500000);
+		nvgClosePath(vg);
+		
+		nvgMoveTo(vg, 3.500000, 234.500000);
+		nvgBezierTo(vg, 16.833332, 234.500000, 30.166668, 234.500000, 43.500000, 234.500000);
+		nvgBezierTo(vg, 43.500000, 231.500000, 43.500000, 228.500000, 43.500000, 225.500000);
+		nvgBezierTo(vg, 43.500000, 225.234787, 43.605354, 224.980423, 43.792892, 224.792892);
+		nvgBezierTo(vg, 43.980431, 224.605362, 44.234783, 224.500000, 44.500000, 224.500000);
+		nvgBezierTo(vg, 64.833336, 224.500000, 85.166664, 224.500000, 105.500000, 224.500000);
+		nvgBezierTo(vg, 105.500000, 221.500000, 105.500000, 218.500000, 105.500000, 215.500000);
+		nvgBezierTo(vg, 105.500000, 215.234787, 105.605354, 214.980423, 105.792892, 214.792892);
+		nvgBezierTo(vg, 105.980431, 214.605362, 106.234787, 214.500000, 106.500000, 214.500000);
+		nvgBezierTo(vg, 119.833336, 214.500000, 133.166672, 214.500000, 146.500000, 214.500000);
+		nvgBezierTo(vg, 146.500000, 207.833328, 146.500000, 201.166672, 146.500000, 194.500000);
+		nvgBezierTo(vg, 98.833328, 194.500000, 51.166668, 194.500000, 3.500000, 194.500000);
+		nvgBezierTo(vg, 3.500000, 207.833328, 3.500000, 221.166672, 3.500000, 234.500000);
+		nvgClosePath(vg);
+		
+		nvgMoveTo(vg, 3.500000, 192.500000);
+		nvgBezierTo(vg, 51.166668, 192.500000, 98.833328, 192.500000, 146.500000, 192.500000);
+		nvgBezierTo(vg, 146.500000, 185.833328, 146.500000, 179.166672, 146.500000, 172.500000);
+		nvgBezierTo(vg, 133.166672, 172.500000, 119.833336, 172.500000, 106.500000, 172.500000);
+		nvgBezierTo(vg, 106.234787, 172.500000, 105.980431, 172.394638, 105.792892, 172.207108);
+		nvgBezierTo(vg, 105.605354, 172.019577, 105.500000, 171.765213, 105.500000, 171.500000);
+		nvgBezierTo(vg, 105.500000, 168.500000, 105.500000, 165.500000, 105.500000, 162.500000);
+		nvgBezierTo(vg, 85.166664, 162.500000, 64.833336, 162.500000, 44.500000, 162.500000);
+		nvgBezierTo(vg, 44.234783, 162.500000, 43.980431, 162.394638, 43.792892, 162.207108);
+		nvgBezierTo(vg, 43.605354, 162.019577, 43.500000, 161.765213, 43.500000, 161.500000);
+		nvgBezierTo(vg, 43.500000, 158.500000, 43.500000, 155.500000, 43.500000, 152.500000);
+		nvgBezierTo(vg, 30.166668, 152.500000, 16.833332, 152.500000, 3.500000, 152.500000);
+		nvgBezierTo(vg, 3.500000, 165.833328, 3.500000, 179.166672, 3.500000, 192.500000);
+		nvgClosePath(vg);
+		
+		nvgMoveTo(vg, 3.500000, 150.500000);
+		nvgBezierTo(vg, 16.833332, 150.500000, 30.166668, 150.500000, 43.500000, 150.500000);
+		nvgBezierTo(vg, 43.500000, 147.500000, 43.500000, 144.500000, 43.500000, 141.500000);
+		nvgBezierTo(vg, 43.500000, 141.234787, 43.605354, 140.980423, 43.792892, 140.792892);
+		nvgBezierTo(vg, 43.980431, 140.605362, 44.234783, 140.500000, 44.500000, 140.500000);
+		nvgBezierTo(vg, 64.833336, 140.500000, 85.166664, 140.500000, 105.500000, 140.500000);
+		nvgBezierTo(vg, 105.500000, 137.500000, 105.500000, 134.500000, 105.500000, 131.500000);
+		nvgBezierTo(vg, 105.500000, 131.234787, 105.605354, 130.980423, 105.792892, 130.792892);
+		nvgBezierTo(vg, 105.980431, 130.605362, 106.234787, 130.500000, 106.500000, 130.500000);
+		nvgBezierTo(vg, 119.833336, 130.500000, 133.166672, 130.500000, 146.500000, 130.500000);
+		nvgBezierTo(vg, 133.166672, 130.500000, 119.833336, 130.500000, 106.500000, 130.500000);
+		nvgBezierTo(vg, 106.234787, 130.500000, 105.980431, 130.394638, 105.792892, 130.207108);
+		nvgBezierTo(vg, 105.605354, 130.019577, 105.500000, 129.765213, 105.500000, 129.500000);
+		nvgBezierTo(vg, 105.500000, 126.500000, 105.500000, 123.500000, 105.500000, 120.500000);
+		nvgBezierTo(vg, 85.166664, 120.500000, 64.833336, 120.500000, 44.500000, 120.500000);
+		nvgBezierTo(vg, 44.234783, 120.500000, 43.980431, 120.394646, 43.792892, 120.207108);
+		nvgBezierTo(vg, 43.605354, 120.019569, 43.500000, 119.765213, 43.500000, 119.500000);
+		nvgBezierTo(vg, 43.500000, 116.500000, 43.500000, 113.500000, 43.500000, 110.500000);
+		nvgBezierTo(vg, 30.166668, 110.500000, 16.833332, 110.500000, 3.500000, 110.500000);
+		nvgBezierTo(vg, 3.500000, 123.833336, 3.500000, 137.166672, 3.500000, 150.500000);
+		nvgClosePath(vg);
+		
+		nvgMoveTo(vg, 3.500000, 108.500000);
+		nvgBezierTo(vg, 16.833332, 108.500000, 30.166668, 108.500000, 43.500000, 108.500000);
+		nvgBezierTo(vg, 43.500000, 105.500000, 43.500000, 102.500000, 43.500000, 99.500000);
+		nvgBezierTo(vg, 43.500000, 99.234787, 43.605354, 98.980431, 43.792892, 98.792892);
+		nvgBezierTo(vg, 43.980431, 98.605354, 44.234783, 98.500000, 44.500000, 98.500000);
+		nvgBezierTo(vg, 64.833336, 98.500000, 85.166664, 98.500000, 105.500000, 98.500000);
+		nvgBezierTo(vg, 105.500000, 95.500000, 105.500000, 92.500000, 105.500000, 89.500000);
+		nvgBezierTo(vg, 105.500000, 89.234787, 105.605354, 88.980431, 105.792892, 88.792892);
+		nvgBezierTo(vg, 105.980431, 88.605354, 106.234787, 88.500000, 106.500000, 88.500000);
+		nvgBezierTo(vg, 119.833336, 88.500000, 133.166672, 88.500000, 146.500000, 88.500000);
+		nvgBezierTo(vg, 146.500000, 81.833336, 146.500000, 75.166664, 146.500000, 68.500000);
+		nvgBezierTo(vg, 98.833328, 68.500000, 51.166668, 68.500000, 3.500000, 68.500000);
+		nvgBezierTo(vg, 3.500000, 81.833336, 3.500000, 95.166664, 3.500000, 108.500000);
+		nvgClosePath(vg);
+		
+		nvgFill(vg);
+		nvgStroke(vg);
+
+		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
+		nvgBeginPath(vg);
+		nvgRoundedRect(vg, 50, 80, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 101, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 122, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 143, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 164, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 206, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 227, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 248, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 269, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 290, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 311, 50, 17, 4);
+		nvgRoundedRect(vg, 50, 332, 50, 17, 4);
+		nvgFill(vg);
+
+		drawText(vg, 36, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "V/OCT");
+		drawText(vg, 114, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC");
+		drawText(vg, 16.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "IN");
+		drawText(vg, 55.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OUT");
+		drawText(vg, 94.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "IN");
+		drawText(vg, 133.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OUT");
+	}
 };
 
 void WK101::appendContextMenu(Menu *menu) {
+	SchemeModuleWidget::appendContextMenu(menu);
 	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
-	menu->addChild(MenuEntry::create());
-	for (unsigned int i = 0; i < tunings.size(); i++) { 
-		WK101_MenuItem *m = MenuItem::create<WK101_MenuItem>(tunings[i].name.c_str());
-		m->module = module;
-		m->index = i;
-		menu->addChild(m);
+	if (module) {
+		menu->addChild(MenuEntry::create());
+		for (unsigned int i = 0; i < tunings.size(); i++) { 
+			WK101_MenuItem *m = MenuItem::create<WK101_MenuItem>(tunings[i].name.c_str());
+			m->module = module;
+			m->index = i;
+			menu->addChild(m);
+		}
 	}
 }
 
@@ -404,8 +578,10 @@ void WK101::step() {
 	float tunings[12];
 	int isDirty = 0;
 	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
+	if (!module) {
+		return;
+	}
 	{
-		//std::lock_guard<std::mutex> guard(module->mtx);
 		WK_Update *upd  = module->updateRing.fg();
 		if (upd->isDirty) {
 			for (int i = 0; i < 12; i++)
@@ -508,36 +684,60 @@ struct WK205_MenuItem : MenuItem {
 	WK_205 *module;
 	int index;
 	void onAction(EventAction &e) override {
+		if (!module) {
+			return;
+		}
 		for (int i = 0; i < 12; i++)
 			module->tunings[i] = tunings[index].offsets[i];
 	}
 };
 
-struct WK205 : ModuleWidget {
-	WK205(WK_205 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/WK-205.svg")));
+struct WK205 : SchemeModuleWidget {
+	WK205(WK_205 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<BlackPort>(Vec(2.5,19), Port::INPUT, module, WK_205::INPUT_TOR));
+		addInput(createInputCentered<BlackPort>(Vec(15,31.5), module, WK_205::INPUT_TOR));
 		for (int i = 0; i < WK_205::deviceCount; i++) {
-			addInput(Port::create<SilverPort>(Vec(2.5,63 + i * 60), Port::INPUT, module, WK_205::INPUT_CV_1 + i));
-			addOutput(Port::create<SilverPort>(Vec(2.5,92 + i * 60), Port::OUTPUT, module, WK_205::OUTPUT_CV_1 + i));
+			addInput(createInputCentered<SilverPort>(Vec(15,75.5 + i * 60), module, WK_205::INPUT_CV_1 + i));
+			addOutput(createOutputCentered<SilverPort>(Vec(15,104.5 + i * 60), module, WK_205::OUTPUT_CV_1 + i));
 		}
 
 		WK_Tunings::loadTunings(plugin);
 	}
-	void appendContextMenu(Menu *menu) override;
-};
-
-void WK205::appendContextMenu(Menu *menu) {
-	WK_205 *module = dynamic_cast<WK_205 *>(this->module);
-	menu->addChild(MenuEntry::create());
-	for (unsigned int i = 0; i < tunings.size(); i++) { 
-		WK205_MenuItem *m = MenuItem::create<WK205_MenuItem>(tunings[i].name.c_str());
-		m->module = module;
-		m->index = i;
-		menu->addChild(m);
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		WK_205 *module = dynamic_cast<WK_205 *>(this->module);
+		if (module) {
+			menu->addChild(MenuEntry::create());
+			for (unsigned int i = 0; i < tunings.size(); i++) { 
+				WK205_MenuItem *m = MenuItem::create<WK205_MenuItem>(tunings[i].name.c_str());
+				m->module = module;
+				m->index = i;
+				menu->addChild(m);
+			}
+		}
 	}
-}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "WK-205");
+		drawText(vg, 15, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, 15, 75.5);
+		nvgLineTo(vg, 15, 104.5);
+		nvgMoveTo(vg, 15, 135.5);
+		nvgLineTo(vg, 15, 164.5);
+		nvgMoveTo(vg, 15, 195.5);
+		nvgLineTo(vg, 15, 224.5);
+		nvgMoveTo(vg, 15, 255.5);
+		nvgLineTo(vg, 15, 284.5);
+		nvgMoveTo(vg, 15, 315.5);
+		nvgLineTo(vg, 15, 344.5);
+		nvgStroke(vg);
+	}
+};
 
 Model *modelWK101 = Model::create<WK_101, WK101>("Submarine (Free)", "WK-101", "WK-101 Das Wohltemperierte Klavier", QUANTIZER_TAG, TUNER_TAG);
 Model *modelWK205 = Model::create<WK_205, WK205>("Submarine (Free)", "WK-205", "WK-205 Das Wohltemperierte Klavier Nano", QUANTIZER_TAG, TUNER_TAG, MULTIPLE_TAG);
