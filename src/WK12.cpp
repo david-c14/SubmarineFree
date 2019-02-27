@@ -379,7 +379,7 @@ struct WK101 : SchemeModuleWidget {
 			addChild(display);
 			widgets[i] = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
 			addParam(widgets[i]);
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(21.5 + 104 * (i%2), 87.5 + 21 * i), module, WK_101::LIGHT_1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(23 + 104 * (i%2), 89 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
 		for (int i = 5; i < 12; i++)
 		{
@@ -391,7 +391,7 @@ struct WK101 : SchemeModuleWidget {
 			addChild(display);
 			widgets[i] = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
 			addParam(widgets[i]);
-			addChild(ModuleLightWidget::create<TinyLight<BlueLight>>(Vec(125.5 - 104 * (i%2), 108.5 + 21 * i), module, WK_101::LIGHT_1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(127 - 104 * (i%2), 110 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
 		WK_Tunings::loadTunings(plugin);
 	}
