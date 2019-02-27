@@ -1,3 +1,5 @@
+//SubTag W16
+
 #include "SubmarineFree.hpp"
 #include "window.hpp"
 #include "torpedo.hpp"
@@ -44,7 +46,9 @@ struct TDText : LedDisplayTextField {
 	}
 	void onTextChange() override {
 		LedDisplayTextField::onTextChange();
-		tdModule->sendText(text);
+		if (tdModule) {
+			tdModule->sendText(text);
+		}
 	}
 	int getTextPosition(Vec mousePos) override {
 	    bndSetFont(font->handle);
@@ -114,14 +118,15 @@ void TDInput::received(std::string pluginName, std::string moduleName, json_t *r
 	}	
 }
 
-struct TD116 : ModuleWidget {
+struct TD116 : SchemeModuleWidget {
 	TDText *textField;
 
-	TD116(TD_116 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/TD-116.svg")));
+	TD116(TD_116 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(240, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<BlackPort>(Vec(4,19), Port::INPUT, module, 0));
-		addOutput(Port::create<BlackPort>(Vec(211,19), Port::OUTPUT, module, 0));	
+		addInput(createInputCentered<BlackPort>(Vec(16.5,31.5), module, 0));
+		addOutput(createOutputCentered<BlackPort>(Vec(223.5,31.5), module, 0));	
 
 		textField = Widget::create<TDText>(mm2px(Vec(3.39962, 15.8373)));
 		textField->box.size = mm2px(Vec(74.480, 102.753));
@@ -168,6 +173,9 @@ struct TD116 : ModuleWidget {
 
 	void step() override {
 		TD_116 *tdModule = dynamic_cast<TD_116 *>(module);
+		if (!tdModule) {
+			return;
+		}
 		if (tdModule->isDirty) {
 			textField->text = tdModule->text;
 			tdModule->isDirty = false;
@@ -190,18 +198,26 @@ struct TD116 : ModuleWidget {
 	}
 
 	void appendContextMenu(Menu *menu) override;
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "TD-116");
+		drawText(vg, 30, 36, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC IN");
+		drawText(vg, 210, 36, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC OUT");
+	}
 };
 
 struct TD116_MenuItem : MenuItem {
 	TD116 *widget;
 	NVGcolor color;
 	void onAction(EventAction &e) override {
-		widget->textField->tdModule->fg = color;
+		if (widget->textField->tdModule) {
+			widget->textField->tdModule->fg = color;
+		}
 		widget->textField->color = color;
 	}
 };
 
 void TD116::appendContextMenu(Menu *menu) {
+	SchemeModuleWidget::appendContextMenu(menu);
 	menu->addChild(MenuEntry::create());
 	TD116_MenuItem *m = MenuItem::create<TD116_MenuItem>("Blue");
 	m->widget = this;
