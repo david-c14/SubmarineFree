@@ -389,10 +389,6 @@ struct AOFuncDisplay : Knob {
 	void draw(NVGcontext *vg) override {
 		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, gScheme.font()->handle);
-		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 2);
-		nvgFill(vg);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, SubmarineAO::functions[value].name.c_str(), NULL);
@@ -412,10 +408,6 @@ struct AOConstDisplay : Knob {
 		sprintf(mtext, "C=%4.2f", ((int)value)/100.0f);
 		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, gScheme.font()->handle);
-		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 2);
-		nvgFill(vg);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, mtext, NULL);
@@ -669,6 +661,15 @@ struct AOWidget : SchemeModuleWidget {
 			drawText(vg, 97, 34, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "Y IN");
 			drawText(vg, 97, 351, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "Y OUT");
 		}
+		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
+		nvgBeginPath(vg);
+		for (unsigned int iy = 0; iy < 6; iy++) {
+			for (unsigned int ix = 0; ix < x; ix++) {
+				nvgRoundedRect(vg, 42.5 + 90 * ix, 59 + 46 * iy, 83, 16, 2);
+				nvgRoundedRect(vg, 42.5 + 90 * ix, 78 + 46 * iy, 83, 16, 2);
+			}
+		}
+		nvgFill(vg);
 	}
 };
 
