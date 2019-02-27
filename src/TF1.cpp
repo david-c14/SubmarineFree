@@ -1,3 +1,5 @@
+//SubTag W6
+
 #include "SubmarineFree.hpp"
 #include "torpedo.hpp"
 
@@ -94,30 +96,56 @@ struct WhiteLight : GrayModuleLightWidget {
 };
 
 
-struct TF101 : ModuleWidget {
-	TF101(TF_101 *module) : ModuleWidget(module) {
-		setPanel(SVG::load(assetPlugin(plugin, "res/TF-101.svg")));
+struct TF101 : SchemeModuleWidget {
+	TF101(TF_101 *module) : SchemeModuleWidget(module) {
+		this->box.size = Vec(90, 380);
+		addChild(new SchemePanel(this->box.size));
 
-		addInput(Port::create<SilverPort>(Vec(4,66.5), Port::INPUT, module, TF_101::INPUT_FG_RED));
-		addInput(Port::create<SilverPort>(Vec(4,106.5), Port::INPUT, module, TF_101::INPUT_FG_GREEN));
-		addInput(Port::create<SilverPort>(Vec(4,146.5), Port::INPUT, module, TF_101::INPUT_FG_BLUE));
-		addInput(Port::create<SilverPort>(Vec(4,200.5), Port::INPUT, module, TF_101::INPUT_BG_RED));
-		addInput(Port::create<SilverPort>(Vec(4,240.5), Port::INPUT, module, TF_101::INPUT_BG_GREEN));
-		addInput(Port::create<SilverPort>(Vec(4,280.5), Port::INPUT, module, TF_101::INPUT_BG_BLUE));
-		addInput(Port::create<SilverPort>(Vec(4,334.5), Port::INPUT, module, TF_101::INPUT_FONT_SIZE));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,79), module, TF_101::INPUT_FG_RED));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,119), module, TF_101::INPUT_FG_GREEN));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,159), module, TF_101::INPUT_FG_BLUE));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,213), module, TF_101::INPUT_BG_RED));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,253), module, TF_101::INPUT_BG_GREEN));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,293), module, TF_101::INPUT_BG_BLUE));
+		addInput(createInputCentered<SilverPort>(Vec(16.5,347), module, TF_101::INPUT_FONT_SIZE));
 
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 60), module, TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 100), module, TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 140), module, TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 194), module, TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 234), module, TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 274), module, TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(46, 328), module, TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 79), module, TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 119), module, TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 159), module, TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 213), module, TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 253), module, TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 293), module, TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 347), module, TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f));
 
-		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(10, 51), module, TF_101::LIGHT_FG_RED));
-		addChild(ModuleLightWidget::create<MediumLight<WhiteLight>>(Vec(10, 185), module, TF_101::LIGHT_BG_RED));
+		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 55.5), module, TF_101::LIGHT_FG_RED));
+		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 189.5), module, TF_101::LIGHT_BG_RED));
 
-		addOutput(Port::create<BlackPort>(Vec(61,19), Port::OUTPUT, module, TF_101::OUTPUT_TOR));
+		addOutput(createOutputCentered<BlackPort>(Vec(73.5,31.5), module, TF_101::OUTPUT_TOR));
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "TF-101");
+		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeWidth(vg, 1);
+		nvgLineCap(vg, NVG_ROUND);
+		nvgLineJoin(vg, NVG_ROUND);
+		nvgBeginPath(vg);		
+		nvgMoveTo(vg, 4, 47.5);
+		nvgLineTo(vg, 86, 47.5);
+		nvgMoveTo(vg, 4, 181.5);
+		nvgLineTo(vg, 86, 181.5);
+		nvgMoveTo(vg, 4, 315.5);
+		nvgLineTo(vg, 86, 315.5);
+		nvgStroke(vg);
+		drawText(vg, 59, 35, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OUT");
+		drawText(vg, 55, 57, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "FOREGROUND");
+		drawText(vg, 55, 191, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "BACKGROUND");
+		drawText(vg, 55, 325, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "TEXT-SIZE");
+		drawText(vg, 38, 82, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "R");
+		drawText(vg, 38, 122, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "G");
+		drawText(vg, 38, 162, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "B");
+		drawText(vg, 38, 216, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "R");
+		drawText(vg, 38, 256, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "G");
+		drawText(vg, 38, 296, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "B");
 	}
 };
 
