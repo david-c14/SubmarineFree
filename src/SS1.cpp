@@ -116,15 +116,15 @@ struct SSMenuItem : MenuItem {
 	}
 	void step() override {
 		rightText = CHECKMARK(ss_212->v == v);
+		MenuItem::step();
 	}
 };
 
-void SS212::appendContextMenu(Menu *menu) {
-	SchemeModuleWidget::appendContextMenu(menu);
+struct SSParentMenuItem : MenuItem {
+	SS_212 *ss_212;
 	char label[20];
-	SS_212 *ss_212 = dynamic_cast<SS_212*>(this->module);
-	if (ss_212) {
-		menu->addChild(MenuEntry::create());
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
 		for (int i = -5; i < 5; i++) {
 			sprintf(label, "Octave %d", i);
 			SSMenuItem *menuItem = MenuItem::create<SSMenuItem>(label);
@@ -132,6 +132,18 @@ void SS212::appendContextMenu(Menu *menu) {
 			menuItem->v = i;
 			menu->addChild(menuItem);
 		}
+		return menu;
+	}
+};
+
+void SS212::appendContextMenu(Menu *menu) {
+	SchemeModuleWidget::appendContextMenu(menu);
+	SS_212 *ss_212 = dynamic_cast<SS_212*>(this->module);
+	if (ss_212) {
+		SSParentMenuItem *menuItem = MenuItem::create<SSParentMenuItem>("Octave");
+		menuItem->ss_212 = ss_212;
+		menuItem->rightText = SUBMENU;
+		menu->addChild(menuItem);
 	}
 }
 

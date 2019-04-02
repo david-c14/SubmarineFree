@@ -186,7 +186,6 @@ struct TD202_ParentItemB : MenuItem {
 
 void TD202::appendContextMenu(Menu *menu) {
 	SchemeModuleWidget::appendContextMenu(menu);
-	menu->addChild(MenuEntry::create());
 
 	TD202_ParentItem *m = MenuItem::create<TD202_ParentItem>("Text Color");
 	m->rightText = SUBMENU;

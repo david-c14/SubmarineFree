@@ -218,7 +218,6 @@ struct TD116_MenuItem : MenuItem {
 
 void TD116::appendContextMenu(Menu *menu) {
 	SchemeModuleWidget::appendContextMenu(menu);
-	menu->addChild(MenuEntry::create());
 	TD116_MenuItem *m = MenuItem::create<TD116_MenuItem>("Blue");
 	m->widget = this;
 	m->color = SUBLIGHTBLUE;
