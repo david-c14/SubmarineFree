@@ -664,7 +664,7 @@ struct AOWidget : SchemeModuleWidget {
 		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
 		nvgBeginPath(vg);
 		for (unsigned int iy = 0; iy < 6; iy++) {
-			for (unsigned int ix = 0; ix < x; ix++) {
+			for (unsigned int ix = 0; ix < y; ix++) {
 				nvgRoundedRect(vg, 42.5 + 90 * ix, 59 + 46 * iy, 83, 16, 2);
 				nvgRoundedRect(vg, 42.5 + 90 * ix, 78 + 46 * iy, 83, 16, 2);
 			}
