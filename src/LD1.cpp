@@ -50,31 +50,45 @@ struct LDMenuItem: MenuItem {
 	}
 };
 
-void LD1Base::appendContextMenu(Menu *menu, unsigned int count) {
-		menu->addChild(MenuEntry::create());
+struct LDParentMenuItem : MenuItem {
+	LD1Base *ld;
+	unsigned int count;
+	Menu *createChildMenu() override {
+		Menu *menu = new Menu();
 		LDMenuItem *menuItem = MenuItem::create<LDMenuItem>("Cutoff 5V");
-		menuItem->ld = this;
+		menuItem->ld = ld;
 		menuItem->deviceCount = count;
 		menuItem->cutoff = 5.0f;
 		menuItem->width = 1.0f;
 		menu->addChild(menuItem);
 		menuItem = MenuItem::create<LDMenuItem>("Cutoff 0V");
-		menuItem->ld = this;
+		menuItem->ld = ld;
 		menuItem->deviceCount = count;
 		menuItem->cutoff = 0.0f;
 		menuItem->width = 0.0f;
 		menu->addChild(menuItem);
 		menuItem = MenuItem::create<LDMenuItem>("Cutoff 2.5V");
-		menuItem->ld = this;
+		menuItem->ld = ld;
 		menuItem->deviceCount = count;
 		menuItem->cutoff = 2.5f;
 		menuItem->width = 0.5f;
 		menu->addChild(menuItem);
 		menuItem = MenuItem::create<LDMenuItem>("TTL Levels");
-		menuItem->ld = this;
+		menuItem->ld = ld;
 		menuItem->deviceCount = count;
 		menuItem->cutoff = 1.4f;
 		menuItem->width = 0.6f;
+		menu->addChild(menuItem);
+		
+		return menu;
+	}
+};
+
+void LD1Base::appendContextMenu(Menu *menu, unsigned int count) {
+		LDParentMenuItem *menuItem = MenuItem::create<LDParentMenuItem>("Input Range");
+		menuItem->ld = this;
+		menuItem->count = count;
+		menuItem->rightText = SUBMENU;
 		menu->addChild(menuItem);
 }
 
