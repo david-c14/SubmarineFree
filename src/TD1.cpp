@@ -37,10 +37,8 @@ struct TD_116 : Module {
 	int isDirtyC = false;
 };
 
-struct TDText : LedDisplayTextField {
+struct TDText : SubText {
 	TD_116 *tdModule;
-	NVGcolor bgColor = nvgRGB(0x00, 0x00, 0x00);
-	int fontSize = 12;
 	TDText() {
 		color = SUBLIGHTBLUE;
 	}
@@ -50,36 +48,9 @@ struct TDText : LedDisplayTextField {
 			tdModule->sendText(text);
 		}
 	}
-	int getTextPosition(Vec mousePos) override {
-	    bndSetFont(font->handle);
-	    int textPos = bndIconLabelTextPosition(gVg, textOffset.x, textOffset.y,
-	      box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-	      -1, fontSize, text.c_str(), mousePos.x, mousePos.y);
-	    bndSetFont(gGuiFont->handle);
-	    return textPos;
-	}
-	void draw(NVGcontext *vg) override {
-		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
-		//Background
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 5.0);
-		nvgFillColor(vg, bgColor);
-		nvgFill(vg);
-
-		//Text
-		if (font->handle >= 0) {
-			bndSetFont(font->handle);
-			
-			NVGcolor highlightColor = color;
-			highlightColor.a = 0.5;
-			int begin = min(cursor, selection);
-			int end = (this == gFocusedWidget) ? max(cursor, selection) : -1;
-			bndIconLabelCaret(vg, textOffset.x, textOffset.y,
-				box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-				-1, color, fontSize, text.c_str(), highlightColor, begin, end);
-		}
-		nvgResetScissor(vg);
-		bndSetFont(gGuiFont->handle);
+	void foregroundMenu(Menu *menu) override {
+		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
+		SubText::foregroundMenu(menu);
 	}
 };
 
@@ -197,7 +168,11 @@ struct TD116 : SchemeModuleWidget {
 		ModuleWidget::reset();
 	}
 
-	void appendContextMenu(Menu *menu) override;
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		textField->appendContextMenu(menu);
+	}
+
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TD-116");
 		drawText(vg, 30, 36, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC IN");
@@ -205,55 +180,6 @@ struct TD116 : SchemeModuleWidget {
 	}
 };
 
-struct TD116_MenuItem : MenuItem {
-	TD116 *widget;
-	NVGcolor color;
-	void onAction(EventAction &e) override {
-		if (widget->textField->tdModule) {
-			widget->textField->tdModule->fg = color;
-		}
-		widget->textField->color = color;
-	}
-};
-
-void TD116::appendContextMenu(Menu *menu) {
-	SchemeModuleWidget::appendContextMenu(menu);
-	TD116_MenuItem *m = MenuItem::create<TD116_MenuItem>("Blue");
-	m->widget = this;
-	m->color = SUBLIGHTBLUE;
-	menu->addChild(m);
-	
-	m = MenuItem::create<TD116_MenuItem>("Yellow");
-	m->widget = this;
-	m->color = nvgRGB(0xc9, 0xb7, 0x0e);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD116_MenuItem>("Red");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0x13, 0x13);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD116_MenuItem>("Green");
-	m->widget = this;
-	m->color = nvgRGB(0x0a, 0xff, 0x13);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD116_MenuItem>("Orange");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0xa5, 0x2d);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD116_MenuItem>("Pink");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0x7d, 0xec);
-	menu->addChild(m);
-
-	m = MenuItem::create<TD116_MenuItem>("White");
-	m->widget = this;
-	m->color = nvgRGB(0xff, 0xff, 0xff);
-	menu->addChild(m);
-
-}
 
 
 

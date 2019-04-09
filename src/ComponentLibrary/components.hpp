@@ -221,3 +221,49 @@ struct SchemeModuleWidget : ModuleWidget {
 	void drawBase(NVGcontext *vg, const char *txt);
 	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
 };
+
+//////////////////
+// SubText
+//////////////////
+
+struct SubTextForegroundMenu;
+struct SubTextBackgroundMenu;
+
+struct SubText : LedDisplayTextField {
+	NVGcolor bgColor = nvgRGB(0x00, 0x00, 0x00);
+	int fontSize = 12;
+	SubText() {
+		color = SUBLIGHTBLUE;
+	}
+	int getTextPosition(Vec mousePos) override; 
+	void draw(NVGcontext *vg) override;
+	void appendContextMenu(Menu *menu);
+	SubTextForegroundMenu *createForegroundMenuItem(std::string label, NVGcolor color);
+	SubTextBackgroundMenu *createBackgroundMenuItem(std::string label, NVGcolor color);
+	virtual void foregroundMenu(Menu *menu);
+	virtual void backgroundMenu(Menu *menu);
+};
+
+struct SubTextForegroundParent : MenuItem {
+	SubText *subText;
+	Menu *createChildMenu() override;
+};
+
+struct SubTextForegroundMenu : MenuItem {
+	SubText *subText;
+	NVGcolor color;
+	void onAction(EventAction &e) override;
+	void step() override; 
+};
+
+struct SubTextBackgroundParent : MenuItem {
+	SubText *subText;
+	Menu *createChildMenu() override;
+};
+
+struct SubTextBackgroundMenu : MenuItem {
+	SubText *subText;
+	NVGcolor color;
+	void onAction(EventAction &e) override;
+	void step() override;
+};
