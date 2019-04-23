@@ -3,37 +3,68 @@
 #include "SubmarineFree.hpp"
 #include "window.hpp"
 
-struct TDVText : LedDisplayTextField {
-	NVGcolor bgColor;
+struct TDVText : SubText {
 	TDVText() {
 		multiline = false;
 		color = SUBLIGHTBLUE;
 		bgColor = nvgRGBA(0, 0, 0, 0);
+		fontSize = 28;
 	}
-	void draw(NVGcontext *vg) override {
-		nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+};
 
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 2);
-		nvgFillColor(vg, bgColor);
-		nvgFill(vg);
+#define TRANSFORM_POSITION { \
+	Vec pos = e.pos; \
+	Vec newPos = pos; \
+	float t[6]; \
+	if (nvgTransformInverse(t, transform)) \
+		nvgTransformPoint(&newPos.x, &newPos.y, t, newPos.x, newPos.y); 
 
-		nvgTranslate(vg, 24, 0);
-		nvgRotate(vg, M_PI / 2.0f);
-		//Text
-		if (font->handle >= 0) {
-			bndSetFont(font->handle);
-			
-			NVGcolor highlightColor = color;
-			highlightColor.a = 0.5;
-			int begin = min(cursor, selection);
-			int end = (this == gFocusedWidget) ? max(cursor, selection) : -1;
-			bndIconLabelCaret(vg, textOffset.y, textOffset.x,
-				box.size.y - 2*textOffset.y, box.size.x - 2*textOffset.x,
-				-1, color, 28, text.c_str(), highlightColor, begin, end);
-		}
-		nvgResetScissor(vg);
-		bndSetFont(gGuiFont->handle);
+#define TRANSFORM_REL(_rel) \
+	t[4] = t[5] = 0.0f; \
+	nvgTransformPoint(&e._rel.x, &e._rel.y, t, e._rel.x, e._rel.y);
+
+#define RECURSE_EVENT_POSITION(_method) \
+	for (auto it = children.rbegin(); it != children.rend(); it++) { \
+		Widget *child = *it; \
+		if (!child->visible) \
+			continue; \
+		if (child->box.contains(newPos)) { \
+			e.pos = newPos.minus(child->box.pos); \
+			child->_method(e); \
+			if (e.consumed) \
+				break; \
+		} \
+	} \
+	e.pos = pos; \
+}
+
+struct TDTW : TransformWidget {
+	TDTW() {};
+	void onMouseDown(EventMouseDown &e) override {
+		TRANSFORM_POSITION
+		RECURSE_EVENT_POSITION(onMouseDown);
+	}
+	void onMouseUp(EventMouseUp &e) override {
+		TRANSFORM_POSITION
+		RECURSE_EVENT_POSITION(onMouseUp);
+	}
+	void onMouseMove(EventMouseMove &e) override {
+		TRANSFORM_POSITION
+		TRANSFORM_REL(mouseRel);
+		RECURSE_EVENT_POSITION(onMouseMove);
+	}
+	void onHoverKey(EventHoverKey &e) override {
+		TRANSFORM_POSITION
+		RECURSE_EVENT_POSITION(onHoverKey);
+	}
+	void onScroll(EventScroll &e) override {
+		TRANSFORM_POSITION
+		TRANSFORM_REL(scrollRel);
+		RECURSE_EVENT_POSITION(onScroll);
+	}
+	void onPathDrop(EventPathDrop &e) override {
+		TRANSFORM_POSITION
+		RECURSE_EVENT_POSITION(onPathDrop);
 	}
 };
 
@@ -43,10 +74,14 @@ struct TD202 : SchemeModuleWidget {
 	TD202(Module *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
+	
+		TDTW *tw = Widget::create<TDTW>(Vec(2, 15));
+		tw->rotate(M_PI / 2.0f);
+		addChild(tw);
 
-		textField = Widget::create<TDVText>(Vec(2, 15));
-		textField->box.size = Vec(26, 350);
-		addChild(textField);
+		textField = Widget::create<TDVText>(Vec(0, -26));
+		textField->box.size = Vec(350, 26);
+		tw->addChild(textField);
 	}
 
 	json_t *toJson() override {
@@ -89,115 +124,13 @@ struct TD202 : SchemeModuleWidget {
 		ModuleWidget::reset();
 	}
 	
-	void appendContextMenu(Menu *menu) override;
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		textField->appendContextMenu(menu);
+	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TD-202");
 	}
 };
-
-struct TD202_MenuItem : MenuItem {
-	TD202 *widget;
-	NVGcolor color;
-	void onAction(EventAction &e) override {
-		widget->textField->color = color;
-	}
-};
-
-struct TD202_MenuItemB : MenuItem {
-	TD202 *widget;
-	NVGcolor color;
-	void onAction(EventAction &e) override {
-		widget->textField->bgColor = color;
-	}
-};
-
-struct TD202_ParentItem : MenuItem {
-	TD202 *widget;
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-
-		TD202_MenuItem *m = MenuItem::create<TD202_MenuItem>("Blue");
-		m->widget = widget;
-		m->color = SUBLIGHTBLUE;
-		menu->addChild(m);
-	
-		m = MenuItem::create<TD202_MenuItem>("Yellow");
-		m->widget = widget;
-		m->color = nvgRGB(0xc9, 0xb7, 0x0e);
-		menu->addChild(m);
-
-		m = MenuItem::create<TD202_MenuItem>("Red");
-		m->widget = widget;
-		m->color = nvgRGB(0xff, 0x13, 0x13);
-		menu->addChild(m);
-
-		m = MenuItem::create<TD202_MenuItem>("Green");
-		m->widget = widget;
-		m->color = nvgRGB(0x0a, 0xff, 0x13);
-		menu->addChild(m);
-
-		m = MenuItem::create<TD202_MenuItem>("Orange");
-		m->widget = widget;
-		m->color = nvgRGB(0xff, 0xa5, 0x2d);
-		menu->addChild(m);
-
-		m = MenuItem::create<TD202_MenuItem>("Pink");
-		m->widget = widget;
-		m->color = nvgRGB(0xff, 0x7d, 0xec);
-		menu->addChild(m);
-
-		m = MenuItem::create<TD202_MenuItem>("White");
-		m->widget = widget;
-		m->color = nvgRGB(0xff, 0xff, 0xff);
-		menu->addChild(m);
-
-		m = MenuItem::create<TD202_MenuItem>("Black");
-		m->widget = widget;
-		m->color = nvgRGB(0x00, 0x00, 0x00);
-		menu->addChild(m);
-
-		return menu;
-	}
-};
-
-struct TD202_ParentItemB : MenuItem {
-	TD202 *widget;
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-
-		TD202_MenuItemB *b = MenuItem::create<TD202_MenuItemB>("None");
-		b->widget = widget;
-		b->color = nvgRGBA(0, 0, 0, 0);
-		menu->addChild(b);
-
-		b = MenuItem::create<TD202_MenuItemB>("Black");
-		b->widget = widget;
-		b->color = nvgRGB(0, 0, 0);
-		menu->addChild(b);
-
-		b = MenuItem::create<TD202_MenuItemB>("White");
-		b->widget = widget;
-		b->color = nvgRGB(0xff, 0xff, 0xff);
-		menu->addChild(b);
-		
-		return menu;
-	}
-};
-
-void TD202::appendContextMenu(Menu *menu) {
-	SchemeModuleWidget::appendContextMenu(menu);
-
-	TD202_ParentItem *m = MenuItem::create<TD202_ParentItem>("Text Color");
-	m->rightText = SUBMENU;
-	m->widget = this;
-	menu->addChild(m);
-
-	TD202_ParentItemB *b = MenuItem::create<TD202_ParentItemB>("Background Color");
-	m->rightText = SUBMENU;
-	b->widget = this;
-	menu->addChild(b);
-
-}
-
 
 Model *modelTD202 = Model::create<Module, TD202>("Submarine (Free)", "TD-202", "TD-202 Vertical Text Display", VISUAL_TAG);
