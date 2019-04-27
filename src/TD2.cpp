@@ -2,6 +2,7 @@
 
 #include "SubmarineFree.hpp"
 #include "window.hpp"
+#include <cstring>
 
 struct TDVText : SubText {
 	TDVText() {
@@ -12,59 +13,108 @@ struct TDVText : SubText {
 	}
 };
 
-#define TRANSFORM_POSITION { \
-	Vec pos = e.pos; \
-	Vec newPos = pos; \
-	float t[6]; \
-	if (nvgTransformInverse(t, transform)) \
-		nvgTransformPoint(&newPos.x, &newPos.y, t, newPos.x, newPos.y); 
-
-#define TRANSFORM_REL(_rel) \
-	t[4] = t[5] = 0.0f; \
-	nvgTransformPoint(&e._rel.x, &e._rel.y, t, e._rel.x, e._rel.y);
-
-#define RECURSE_EVENT_POSITION(_method) \
-	for (auto it = children.rbegin(); it != children.rend(); it++) { \
-		Widget *child = *it; \
-		if (!child->visible) \
-			continue; \
-		if (child->box.contains(newPos)) { \
-			e.pos = newPos.minus(child->box.pos); \
-			child->_method(e); \
-			if (e.consumed) \
-				break; \
-		} \
-	} \
-	e.pos = pos; \
-}
-
-struct TDTW : TransformWidget {
-	TDTW() {};
+struct MouseTransformWidget:VirtualWidget {
+	float transform[6];
+	float inverse[6];
+	float invLinear[6];
+	int hasInverse;
+	MouseTransformWidget() {
+		identity();
+	}
+	Rect getChildrenBoundingBox() override {
+		Rect bound = Widget::getChildrenBoundingBox();
+		Vec topLeft = bound.pos;
+		Vec bottomRight = bound.getBottomRight();
+		nvgTransformPoint(&topLeft.x, &topLeft.y, transform, topLeft.x, topLeft.y);
+		nvgTransformPoint(&bottomRight.x, &bottomRight.y, transform, bottomRight.x, bottomRight.y);
+		return Rect(topLeft, bottomRight.minus(topLeft));
+	}
+	void identity() {
+		nvgTransformIdentity(transform);
+		nvgTransformIdentity(inverse);
+		std::memcpy(invLinear, inverse, 4 * sizeof(float));
+		invLinear[4] = invLinear[5] = 0.0;
+		hasInverse = true;
+	}
+	void translate(Vec delta) {
+		float t[6];
+		nvgTransformTranslate(t, delta.x, delta.y);
+		nvgTransformPremultiply(transform, t);
+		hasInverse = nvgTransformInverse(inverse, transform);
+		std::memcpy(invLinear, inverse, 4 * sizeof(float));
+	}
+	void rotate(float angle) {
+		float t[6];
+		nvgTransformRotate(t, angle);
+		nvgTransformPremultiply(transform, t);
+		hasInverse = nvgTransformInverse(inverse, transform);
+		std::memcpy(invLinear, inverse, 4 * sizeof(float));
+	}
+	void scale(Vec s) {
+		float t[6];
+		nvgTransformScale(t, s.x, s.y);
+		nvgTransformPremultiply(transform, t);
+		hasInverse = nvgTransformInverse(inverse, transform);
+		std::memcpy(invLinear, inverse, 4 * sizeof(float));
+	}
+	void draw(NVGcontext *vg) override {
+		// No need to save the state because that is done in the parent
+		nvgTransform(vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
+		Widget::draw(vg);
+	}
 	void onMouseDown(EventMouseDown &e) override {
-		TRANSFORM_POSITION
-		RECURSE_EVENT_POSITION(onMouseDown);
+		Vec pos = e.pos;
+		if (hasInverse) {
+			nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+		}
+		Widget::onMouseDown(e);
+		e.pos = pos;
 	}
 	void onMouseUp(EventMouseUp &e) override {
-		TRANSFORM_POSITION
-		RECURSE_EVENT_POSITION(onMouseUp);
+		Vec pos = e.pos;
+		if (hasInverse) {
+			nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+		}
+		Widget::onMouseUp(e);
+		e.pos = pos;
 	}
 	void onMouseMove(EventMouseMove &e) override {
-		TRANSFORM_POSITION
-		TRANSFORM_REL(mouseRel);
-		RECURSE_EVENT_POSITION(onMouseMove);
+		Vec pos = e.pos;
+		Vec mouseRel = e.mouseRel;
+		if (hasInverse) {
+			nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+			nvgTransformPoint(&e.mouseRel.x, &e.mouseRel.y, invLinear, e.mouseRel.x, e.mouseRel.y);
+		}
+		Widget::onMouseMove(e);
+		e.pos = pos;
+		e.mouseRel = mouseRel;
 	}
 	void onHoverKey(EventHoverKey &e) override {
-		TRANSFORM_POSITION
-		RECURSE_EVENT_POSITION(onHoverKey);
+		Vec pos = e.pos;
+		if (hasInverse) {
+			nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+		}
+		Widget::onHoverKey(e);
+		e.pos = pos;
 	}
 	void onScroll(EventScroll &e) override {
-		TRANSFORM_POSITION
-		TRANSFORM_REL(scrollRel);
-		RECURSE_EVENT_POSITION(onScroll);
+		Vec pos = e.pos;
+		Vec scrollRel = e.scrollRel;
+		if (hasInverse) {
+			nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+			nvgTransformPoint(&e.scrollRel.x, &e.scrollRel.y, invLinear, e.scrollRel.x, e.scrollRel.y);
+		}
+		Widget::onScroll(e);
+		e.pos = pos;
+		e.scrollRel = scrollRel;
 	}
 	void onPathDrop(EventPathDrop &e) override {
-		TRANSFORM_POSITION
-		RECURSE_EVENT_POSITION(onPathDrop);
+		Vec pos = e.pos;
+		if (hasInverse) {
+			nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+		}
+		Widget::onPathDrop(e);
+		e.pos = pos;
 	}
 };
 
@@ -75,7 +125,7 @@ struct TD202 : SchemeModuleWidget {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 	
-		TDTW *tw = Widget::create<TDTW>(Vec(2, 15));
+		MouseTransformWidget *tw = Widget::create<MouseTransformWidget>(Vec(2, 15));
 		tw->rotate(M_PI / 2.0f);
 		addChild(tw);
 
