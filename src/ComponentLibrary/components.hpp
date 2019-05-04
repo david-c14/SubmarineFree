@@ -267,3 +267,27 @@ struct SubTextBackgroundMenu : MenuItem {
 	void onAction(EventAction &e) override;
 	void step() override;
 };
+
+//////////////////
+// MouseTransformWidget
+//////////////////
+
+struct MouseTransformWidget:VirtualWidget {
+	float transform[6];
+	float inverse[6];
+	float invLinear[6];
+	int hasInverse;
+	MouseTransformWidget();
+	Rect getChildrenBoundingBox() override;
+	void identity(void);
+	void translate(Vec delta);
+	void rotate(float angle);
+	void scale(Vec s);
+	void draw(NVGcontext *vg) override;
+	void onMouseDown(EventMouseDown &e) override;
+	void onMouseUp(EventMouseUp &e) override;
+	void onMouseMove(EventMouseMove &e) override;
+	void onHoverKey(EventHoverKey &e) override;
+	void onScroll(EventScroll &e) override;
+	void onPathDrop(EventPathDrop &e) override;
+};
