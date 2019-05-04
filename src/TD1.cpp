@@ -52,6 +52,16 @@ struct TDText : SubText {
 		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
 		SubText::foregroundMenu(menu);
 	}
+	void onMouseDown(EventMouseDown &e) override {
+		if (e.button == 1) {
+			e.consumed = true;
+			Menu *menu = gScene->createMenu();
+			appendContextMenu(menu);
+		}
+		else {
+			SubText::onMouseDown(e);
+		}
+	}
 };
 
 NVGcolor TDInput::decodeColor(std::string colorStr) {

@@ -10,6 +10,16 @@ struct TDVText : SubText {
 		bgColor = nvgRGBA(0, 0, 0, 0);
 		fontSize = 28;
 	}
+	void onMouseDown(EventMouseDown &e) override {
+		if (e.button == 1) {
+			e.consumed = true;
+			Menu *menu = gScene->createMenu();
+			appendContextMenu(menu);
+		}
+		else {
+			SubText::onMouseDown(e);
+		}
+	}
 };
 
 struct TD202 : SchemeModuleWidget {
