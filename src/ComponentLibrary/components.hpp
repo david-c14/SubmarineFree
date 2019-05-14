@@ -159,6 +159,12 @@ struct RedKnob : K {
 	}
 };
 
+struct LightSlider : LightKnob {
+	void draw(NVGcontext *vg) override;
+	void onDragMove(EventDragMove &e) override;
+};
+
+struct SubLogo : SVGWidget{};
 //////////////////
 // Lights
 //////////////////
