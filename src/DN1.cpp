@@ -64,4 +64,4 @@ struct DN112 : SchemeModuleWidget {
 	}
 };
 
-Model *modelDN112 = Model::create<DN_1<12>, DN112>("Submarine (Free)", "DN-112", "DN-112 Digital Noise", DIGITAL_TAG, NOISE_TAG, MULTIPLE_TAG);
+Model *modelDN112 = Model::create<DN_1<12>, DN112>("DN-112");

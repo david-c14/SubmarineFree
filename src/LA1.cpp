@@ -403,4 +403,4 @@ struct LA108 : SchemeModuleWidget {
 	}
 };
 
-Model *modelLA108 = Model::create<LA_108, LA108>("Submarine (Free)", "LA-108", "LA-108 Logic Analyser", LOGIC_TAG, VISUAL_TAG);
+Model *modelLA108 = Model::create<LA_108, LA108>("LA-108");

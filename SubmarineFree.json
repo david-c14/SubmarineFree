@@ -5,7 +5,7 @@
 	"license": "BSD-3",
 	"authorUrl": "https://vcvrack.submarine.org.uk",
 	"sourceUrl": "https://github.com/david-c14/SubmarineFree",
-	"version": "0.6.8",
+	"version": "1.0.0",
 	"modules": {
 		"AG-104": {
 			"name":"AG-104",

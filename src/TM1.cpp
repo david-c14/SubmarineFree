@@ -133,4 +133,4 @@ struct TM105 : SchemeModuleWidget {
 	}
 };
 
-Model *modelTM105 = Model::create<TM_105, TM105>("Submarine (Free)", "TM-105", "TM-105 Torpedo Message Merge", UTILITY_TAG);
+Model *modelTM105 = Model::create<TM_105, TM105>("TM-105");

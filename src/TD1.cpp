@@ -193,4 +193,4 @@ struct TD116 : SchemeModuleWidget {
 
 
 
-Model *modelTD116 = Model::create<TD_116, TD116>("Submarine (Free)", "TD-116", "TD-116 Text Display", VISUAL_TAG);
+Model *modelTD116 = Model::create<TD_116, TD116>("TD-116");

@@ -673,8 +673,8 @@ struct AOWidget : SchemeModuleWidget {
 	}
 };
 
-Model *modelAO106 = Model::create<AO1<6,1>, AOWidget<6,1>>("Submarine (Free)", "A0-106", "A0-106 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
-Model *modelAO112 = Model::create<AO1<6,2>, AOWidget<6,2>>("Submarine (Free)", "A0-112", "A0-112 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
-Model *modelAO118 = Model::create<AO1<6,3>, AOWidget<6,3>>("Submarine (Free)", "A0-118", "A0-118 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
-Model *modelAO124 = Model::create<AO1<6,4>, AOWidget<6,4>>("Submarine (Free)", "A0-124", "A0-124 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
-Model *modelAO136 = Model::create<AO1<6,6>, AOWidget<6,6>>("Submarine (Free)", "A0-136", "A0-136 Arithmetic Operators", UTILITY_TAG, MULTIPLE_TAG);
+Model *modelAO106 = Model::create<AO1<6,1>, AOWidget<6,1>>("A0-106");
+Model *modelAO112 = Model::create<AO1<6,2>, AOWidget<6,2>>("A0-112");
+Model *modelAO118 = Model::create<AO1<6,3>, AOWidget<6,3>>("A0-118");
+Model *modelAO124 = Model::create<AO1<6,4>, AOWidget<6,4>>("A0-124");
+Model *modelAO136 = Model::create<AO1<6,6>, AOWidget<6,6>>("A0-136");

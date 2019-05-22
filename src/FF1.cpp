@@ -153,5 +153,5 @@ struct FF120 : SchemeModuleWidget {
 	}
 };
 
-Model *modelFF110 = Model::create<FF_1<10>, FF110>("Submarine (Free)", "FF-110", "FF-110 10-Stage Flip-Flop Counter", LOGIC_TAG, MULTIPLE_TAG);
-Model *modelFF120 = Model::create<FF_1<20>, FF120>("Submarine (Free)", "FF-120", "FF-120 20-Stage Flip-Flop Counter", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelFF110 = Model::create<FF_1<10>, FF110>("FF-110");
+Model *modelFF120 = Model::create<FF_1<20>, FF120>("FF-120");

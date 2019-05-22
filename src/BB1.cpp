@@ -117,4 +117,4 @@ struct BB120 : SchemeModuleWidget {
 	}
 };
 
-Model *modelBB120 = Model::create<BB_1<20>, BB120>("Submarine (Free)", "BB-120", "BB-120 20-Stage Bucket Brigade Sample and Hold", LOGIC_TAG, DELAY_TAG, SAMPLE_AND_HOLD_TAG, MULTIPLE_TAG);
+Model *modelBB120 = Model::create<BB_1<20>, BB120>("BB-120");

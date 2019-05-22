@@ -87,4 +87,4 @@ struct TD202 : SchemeModuleWidget {
 	}
 };
 
-Model *modelTD202 = Model::create<Module, TD202>("Submarine (Free)", "TD-202", "TD-202 Vertical Text Display", VISUAL_TAG);
+Model *modelTD202 = Model::create<Module, TD202>("TD-202");

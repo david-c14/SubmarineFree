@@ -149,4 +149,4 @@ struct TF101 : SchemeModuleWidget {
 	}
 };
 
-Model *modelTF101 = Model::create<TF_101, TF101>("Submarine (Free)", "TF-101", "TF-101 Text Display Format Control", VISUAL_TAG);
+Model *modelTF101 = Model::create<TF_101, TF101>("TF-101");

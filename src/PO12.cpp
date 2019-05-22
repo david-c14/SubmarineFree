@@ -664,6 +664,6 @@ struct PO204 : SchemeModuleWidget {
 	}
 };
 
-Model *modelPO101 = Model::create<PO_101, PO101>("Submarine (Free)", "PO-101", "PO-101 Phased VCO", OSCILLATOR_TAG, MULTIPLE_TAG, DIGITAL_TAG);
-Model *modelPO102 = Model::create<PO_101, PO102>("Submarine (Free)", "PO-102", "PO-102 Phased LFO", OSCILLATOR_TAG, MULTIPLE_TAG, DIGITAL_TAG);
-Model *modelPO204 = Model::create<PO_204, PO204>("Submarine (Free)", "PO-204", "PO-204 Phase Modulation Engine", OSCILLATOR_TAG, QUAD_TAG, DIGITAL_TAG);
+Model *modelPO101 = Model::create<PO_101, PO101>("PO-101");
+Model *modelPO102 = Model::create<PO_101, PO102>("PO-102");
+Model *modelPO204 = Model::create<PO_204, PO204>("PO-204");

@@ -177,4 +177,4 @@ struct XF104 : SchemeModuleWidget {
 	}
 };
 
-Model *modelXF104 = Model::create<XF_104, XF104>("Submarine (Free)", "XF-104", "XF-104 Quad Mono Cross Fader", MIXER_TAG, QUAD_TAG);
+Model *modelXF104 = Model::create<XF_104, XF104>("XF-104");

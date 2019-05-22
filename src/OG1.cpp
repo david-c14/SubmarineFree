@@ -133,5 +133,5 @@ struct OG106 : SchemeModuleWidget {
 	}
 };
 
-Model *modelOG104 = Model::create<OG_1<4>, OG104>("Submarine (Free)", "OG-104", "OG-104 OR Gates", LOGIC_TAG, MULTIPLE_TAG);
-Model *modelOG106 = Model::create<OG_1<6>, OG106>("Submarine (Free)", "OG-106", "OG-106 OR Gates", LOGIC_TAG, MULTIPLE_TAG);
+Model *modelOG104 = Model::create<OG_1<4>, OG104>("OG-104");
+Model *modelOG106 = Model::create<OG_1<6>, OG106>("OG-106");
