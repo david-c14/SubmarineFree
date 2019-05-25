@@ -3,7 +3,6 @@
 /* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright 2017 by Andrew Belt */
 #include <string.h>
 #include "SubmarineFree.hpp"
-#include "dsp/digital.hpp"
 
 #define BUFFER_SIZE 800
 #define PRE_SIZE 100

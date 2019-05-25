@@ -1,7 +1,6 @@
 //SubTag DS TM W2 W8
 
 #include "DS.hpp"
-#include "dsp/digital.hpp"
 
 template <int x>
 struct PG_1 : DS_Module {
