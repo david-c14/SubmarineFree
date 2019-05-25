@@ -38,8 +38,8 @@ struct TD202 : SchemeModuleWidget {
 		tw->addChild(textField);
 	}
 
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
+	json_t *dataToJson() override {
+		json_t *rootJ = ModuleWidget::dataToJson();
 
 		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
 		json_object_set_new(rootJ, "fg", json_string(colorToHexString(textField->color).c_str()));
@@ -48,8 +48,8 @@ struct TD202 : SchemeModuleWidget {
 		return rootJ;
 	}
 
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
+	void dataFromJson(json_t *rootJ) override {
+		ModuleWidget::dataFromJson(rootJ);
 
 		json_t *textJ = json_object_get(rootJ, "text");
 		if (textJ)

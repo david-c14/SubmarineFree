@@ -638,13 +638,13 @@ struct WK_205 : Module {
 
 	WK_205() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
-	json_t *toJson(void) override {
+	json_t *dataToJson(void) override {
 		json_t *rootJ = json_array();
 		for (int i = 0; i < 12; i++)
 			json_array_append_new(rootJ, json_real(tunings[i]));
 		return rootJ;
 	}
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		int size = json_array_size(rootJ);
 		if (!size) return;
 		if (size > 12)
