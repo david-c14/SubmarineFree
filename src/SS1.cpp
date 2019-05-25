@@ -127,7 +127,7 @@ struct SSParentMenuItem : MenuItem {
 		Menu *menu = new Menu();
 		for (int i = -5; i < 5; i++) {
 			sprintf(label, "Octave %d", i);
-			SSMenuItem *menuItem = MenuItem::create<SSMenuItem>(label);
+			SSMenuItem *menuItem = createMenuItem<SSMenuItem>(label);
 			menuItem->ss_212 = ss_212;
 			menuItem->v = i;
 			menu->addChild(menuItem);
@@ -140,7 +140,7 @@ void SS212::appendContextMenu(Menu *menu) {
 	SchemeModuleWidget::appendContextMenu(menu);
 	SS_212 *ss_212 = dynamic_cast<SS_212*>(this->module);
 	if (ss_212) {
-		SSParentMenuItem *menuItem = MenuItem::create<SSParentMenuItem>("Octave");
+		SSParentMenuItem *menuItem = createMenuItem<SSParentMenuItem>("Octave");
 		menuItem->ss_212 = ss_212;
 		menuItem->rightText = SUBMENU;
 		menu->addChild(menuItem);

@@ -29,11 +29,11 @@ struct TD202 : SchemeModuleWidget {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 	
-		MouseTransformWidget *tw = Widget::create<MouseTransformWidget>(Vec(2, 15));
+		MouseTransformWidget *tw = createWidget<MouseTransformWidget>(Vec(2, 15));
 		tw->rotate(M_PI / 2.0f);
 		addChild(tw);
 
-		textField = Widget::create<TDVText>(Vec(0, -25));
+		textField = createWidget<TDVText>(Vec(0, -25));
 		textField->box.size = Vec(350, 25);
 		tw->addChild(textField);
 	}

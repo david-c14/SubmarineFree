@@ -564,9 +564,9 @@ void WK101::appendContextMenu(Menu *menu) {
 	SchemeModuleWidget::appendContextMenu(menu);
 	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
 	if (module) {
-		menu->addChild(MenuEntry::create());
+		menu->addChild(new MenuEntry);
 		for (unsigned int i = 0; i < tunings.size(); i++) { 
-			WK101_MenuItem *m = MenuItem::create<WK101_MenuItem>(tunings[i].name.c_str());
+			WK101_MenuItem *m = createMenuItem<WK101_MenuItem>(tunings[i].name.c_str());
 			m->module = module;
 			m->index = i;
 			menu->addChild(m);
@@ -709,9 +709,9 @@ struct WK205 : SchemeModuleWidget {
 		SchemeModuleWidget::appendContextMenu(menu);
 		WK_205 *module = dynamic_cast<WK_205 *>(this->module);
 		if (module) {
-			menu->addChild(MenuEntry::create());
+			menu->addChild(new MenuEntry);
 			for (unsigned int i = 0; i < tunings.size(); i++) { 
-				WK205_MenuItem *m = MenuItem::create<WK205_MenuItem>(tunings[i].name.c_str());
+				WK205_MenuItem *m = createMenuItem<WK205_MenuItem>(tunings[i].name.c_str());
 				m->module = module;
 				m->index = i;
 				menu->addChild(m);

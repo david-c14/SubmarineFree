@@ -109,7 +109,7 @@ struct TD116 : SchemeModuleWidget {
 		addInput(createInputCentered<BlackPort>(Vec(16.5,31.5), module, 0));
 		addOutput(createOutputCentered<BlackPort>(Vec(223.5,31.5), module, 0));	
 
-		textField = Widget::create<TDText>(mm2px(Vec(3.39962, 15.8373)));
+		textField = createWidget<TDText>(mm2px(Vec(3.39962, 15.8373)));
 		textField->box.size = mm2px(Vec(74.480, 102.753));
 		textField->multiline = true;
 		textField->tdModule = module;

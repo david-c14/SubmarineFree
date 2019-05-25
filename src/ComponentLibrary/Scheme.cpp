@@ -164,16 +164,16 @@ struct SchemeModuleWidgetFlatMenuItem : MenuItem {
 struct SchemeModuleWidgetVisualMenuItem : MenuItem {
 	Menu *createChildMenu() override {
 		Menu *menu = new Menu();
-		SchemeModuleWidgetFlatMenuItem *fmi = MenuItem::create<SchemeModuleWidgetFlatMenuItem>("Flat");
+		SchemeModuleWidgetFlatMenuItem *fmi = createMenuItem<SchemeModuleWidgetFlatMenuItem>("Flat");
 		menu->addChild(fmi);
 		menu->addChild(MenuSeparator::create<MenuSeparator>());
-		SchemeModuleWidgetSchemeMenuItem *vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Blue");
+		SchemeModuleWidgetSchemeMenuItem *vmi = createMenuItem<SchemeModuleWidgetSchemeMenuItem>("Blue");
 		vmi->scheme = 0;
 		menu->addChild(vmi);
-		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Dark");
+		vmi = createMenuItem<SchemeModuleWidgetSchemeMenuItem>("Dark");
 		vmi->scheme = 1;
 		menu->addChild(vmi);
-		vmi = MenuItem::create<SchemeModuleWidgetSchemeMenuItem>("Light");
+		vmi = createMenuItem<SchemeModuleWidgetSchemeMenuItem>("Light");
 		vmi->scheme = 2;
 		menu->addChild(vmi);
 		return menu;
@@ -302,8 +302,8 @@ void SchemeModuleWidget::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 }
 
 void SchemeModuleWidget::appendContextMenu(Menu * menu) {
-	menu->addChild(MenuEntry::create());
-	SchemeModuleWidgetVisualMenuItem *m = MenuItem::create<SchemeModuleWidgetVisualMenuItem>("Visuals");
+	menu->addChild(new MenuEntry);
+	SchemeModuleWidgetVisualMenuItem *m = createMenuItem<SchemeModuleWidgetVisualMenuItem>("Visuals");
 	m->rightText = SUBMENU;
 	menu->addChild(m);
 }

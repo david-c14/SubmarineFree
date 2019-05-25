@@ -543,7 +543,7 @@ void AOConstDisplay::onMouseDown(EventMouseDown &e) {
 			pm->text = "Paste";
 			menu->addChild(pm);
 		}
-		menu->addChild(MenuEntry::create());
+		menu->addChild(new MenuEntry);
 		menu->addChild(CValMenu::create(this, 10000.0f, "100.00"));
 		menu->addChild(CValMenu::create(this, 1000.0f, "10.00"));
 		menu->addChild(CValMenu::create(this, 500.0f, "5.00"));
@@ -572,7 +572,7 @@ void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
 			pm->text = "Paste";
 			menu->addChild(pm);
 		}
-		menu->addChild(MenuEntry::create());
+		menu->addChild(new MenuEntry);
 		
 		AlgorithmMenu *item = new AlgorithmMenu();
 		item->widget = this;

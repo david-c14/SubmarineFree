@@ -33,27 +33,27 @@ struct DS_ParentMenuItem : MenuItem {
 	DS_Module *module;
 	Menu *createChildMenu() override {
 		Menu *menu = new Menu();
-		DS_MenuItem *m = MenuItem::create<DS_MenuItem>("0V - 1V");
+		DS_MenuItem *m = createMenuItem<DS_MenuItem>("0V - 1V");
 		m->module = module;
 		m->vl = 0.0f;
 		m->vh = 1.0f;
 		menu->addChild(m);
-		m = MenuItem::create<DS_MenuItem>("0V - 5V");
+		m = createMenuItem<DS_MenuItem>("0V - 5V");
 		m->module = module;
 		m->vl = 0.0f;
 		m->vh = 5.0f;
 		menu->addChild(m);
-		m = MenuItem::create<DS_MenuItem>("0V - 10V");
+		m = createMenuItem<DS_MenuItem>("0V - 10V");
 		m->module = module;
 		m->vl = 0.0f;
 		m->vh = 10.0f;
 		menu->addChild(m);
-		m = MenuItem::create<DS_MenuItem>("-5V - 5V");
+		m = createMenuItem<DS_MenuItem>("-5V - 5V");
 		m->module = module;
 		m->vl = -5.0f;
 		m->vh = 5.0f;
 		menu->addChild(m);
-		m = MenuItem::create<DS_MenuItem>("-10V - 10V");
+		m = createMenuItem<DS_MenuItem>("-10V - 10V");
 		m->module = module;
 		m->vl = -10.0f;
 		m->vh = 10.0f;
@@ -63,7 +63,7 @@ struct DS_ParentMenuItem : MenuItem {
 };
 
 void DS_Module::appendContextMenu(Menu *menu) {
-	DS_ParentMenuItem *m = MenuItem::create<DS_ParentMenuItem>("Digital Voltage Range");
+	DS_ParentMenuItem *m = createMenuItem<DS_ParentMenuItem>("Digital Voltage Range");
 	m->module = this;
 	m->rightText = SUBMENU;
 	menu->addChild(m);

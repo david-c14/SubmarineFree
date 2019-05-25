@@ -67,25 +67,25 @@ void SubText::draw(NVGcontext *vg) {
 }
 
 void SubText::appendContextMenu(Menu *menu) {
-	SubTextForegroundParent *fp = MenuItem::create<SubTextForegroundParent>("Foreground");
+	SubTextForegroundParent *fp = createMenuItem<SubTextForegroundParent>("Foreground");
 	fp->subText = this;
 	fp->rightText = SUBMENU; 	
 	menu->addChild(fp);
-	SubTextBackgroundParent *bp = MenuItem::create<SubTextBackgroundParent>("Background");
+	SubTextBackgroundParent *bp = createMenuItem<SubTextBackgroundParent>("Background");
 	bp->subText = this;
 	bp->rightText = SUBMENU;
 	menu->addChild(bp);
 }
 
 SubTextForegroundMenu *SubText::createForegroundMenuItem(std::string label, NVGcolor color) {
-	SubTextForegroundMenu *menu = MenuItem::create<SubTextForegroundMenu>(label);
+	SubTextForegroundMenu *menu = createMenuItem<SubTextForegroundMenu>(label);
 	menu->subText = this;
 	menu->color = color;
 	return menu;
 }
 
 SubTextBackgroundMenu *SubText::createBackgroundMenuItem(std::string label, NVGcolor color) {
-	SubTextBackgroundMenu *menu = MenuItem::create<SubTextBackgroundMenu>(label);
+	SubTextBackgroundMenu *menu = createMenuItem<SubTextBackgroundMenu>(label);
 	menu->subText = this;
 	menu->color = color;
 	return menu;
