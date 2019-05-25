@@ -3,7 +3,7 @@
 using namespace rack;
 
 // Forward-declare the Plugin, defined in Template.cpp
-extern Plugin *plugin;
+extern Plugin *pluginInstance;
 
 // Forward-declare each Model, defined in each module source file
 extern Model *modelAG104;
@@ -82,10 +82,10 @@ extern Model *modelXG106;
 #include "ComponentLibrary/components.hpp"
 
 struct SubHelper {
-	static std::shared_ptr<SVG> LoadPanel(Plugin *plugin, const char *str, int num) {
+	static std::shared_ptr<SVG> LoadPanel(Plugin *pluginInstance, const char *str, int num) {
 		char workingSpace[100];
 		snprintf(workingSpace, 100, "res/%s%02d.svg", str, num);
-		return SVG::load(assetPlugin(plugin, workingSpace));
+		return SVG::load(assetPlugin(pluginInstance, workingSpace));
 	}
 };
 

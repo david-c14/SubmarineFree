@@ -324,7 +324,7 @@ void QueuedOutputPort::size(unsigned int s) {
 
 void MessageOutputPort::send(std::string pluginName, std::string moduleName, std::string message) {
 	json_t *rootJ = json_object();
-	json_object_set_new(rootJ, "plugin", json_string(pluginName.c_str()));
+	json_object_set_new(rootJ, "pluginInstance", json_string(pluginName.c_str()));
 	json_object_set_new(rootJ, "module", json_string(moduleName.c_str()));
 	json_object_set_new(rootJ, "message", json_string(message.c_str()));
 	char *msg = json_dumps(rootJ, 0);
@@ -347,7 +347,7 @@ void MessageInputPort::received(std::string appId, std::string message) {
 		debug("Torpedo MESG Error: %s", error.text);
 		return;
 	} 
-	json_t *jp = json_object_get(rootJ, "plugin");
+	json_t *jp = json_object_get(rootJ, "pluginInstance");
 	if (json_is_string(jp)) 
 		pluginName.assign(json_string_value(jp));
 	json_t *jm = json_object_get(rootJ, "module");
@@ -362,7 +362,7 @@ void MessageInputPort::received(std::string appId, std::string message) {
 
 void PatchOutputPort::send(std::string pluginName, std::string moduleName, json_t *rootJ) {
 	json_t *wrapper = json_object();
-	json_object_set_new(wrapper, "plugin", json_string(pluginName.c_str()));
+	json_object_set_new(wrapper, "pluginInstance", json_string(pluginName.c_str()));
 	json_object_set_new(wrapper, "module", json_string(moduleName.c_str()));
 	json_object_set_new(wrapper, "patch", rootJ);
 	char *msg = json_dumps(wrapper, 0);
@@ -384,7 +384,7 @@ void PatchInputPort::received(std::string appId, std::string message) {
 		debug("Torpedo MESG Error: %s", error.text);
 		return;
 	} 
-	json_t *jp = json_object_get(rootJ, "plugin");
+	json_t *jp = json_object_get(rootJ, "pluginInstance");
 	if (json_is_string(jp)) 
 		pluginName.assign(json_string_value(jp));
 	json_t *jm = json_object_get(rootJ, "module");

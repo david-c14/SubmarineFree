@@ -1,13 +1,13 @@
 #include "SubmarineFree.hpp"
 
 
-Plugin *plugin;
+Plugin *pluginInstance;
 
 
 void init(rack::Plugin *p) {
-	plugin = p;
+	pluginInstance = p;
 
-	// Add all Models defined throughout the plugin
+	// Add all Models defined throughout the pluginInstance
 	p->addModel(modelAG104);
 	p->addModel(modelAG106);
 	p->addModel(modelAO106);
@@ -70,6 +70,6 @@ void init(rack::Plugin *p) {
 	p->addModel(modelBP124);
 	p->addModel(modelBP132);
 
-	// Any other plugin initialization may go here.
+	// Any other pluginInstance initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
 }

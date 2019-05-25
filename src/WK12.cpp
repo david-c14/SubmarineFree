@@ -23,14 +23,14 @@ int tuningsLoaded = false;
 
 struct WK_Tunings {
 	static void loadTuningsFromWK(const char *path);
-	static void loadTuningsFromScala(Plugin *plugin);
+	static void loadTuningsFromScala(Plugin *pluginInstance);
 	static void loadScalaFile(std::string path);
-	static void loadTunings(Plugin *plugin) {
+	static void loadTunings(Plugin *pluginInstance) {
 		if (tuningsLoaded)
 			return;
 		tuningsLoaded = true;
-		loadTuningsFromWK(assetPlugin(plugin, "WK_Custom.tunings").c_str());
-		loadTuningsFromScala(plugin);
+		loadTuningsFromWK(assetPlugin(pluginInstance, "WK_Custom.tunings").c_str());
+		loadTuningsFromScala(pluginInstance);
 	}
 };
 
@@ -196,8 +196,8 @@ void WK_Tunings::loadScalaFile(std::string path) {
 
 }
 
-void WK_Tunings::loadTuningsFromScala(Plugin *plugin) {
-	std::vector<std::string> dirList = systemListEntries(assetPlugin(plugin, "Scala"));
+void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
+	std::vector<std::string> dirList = systemListEntries(assetPlugin(pluginInstance, "Scala"));
 	for (auto entry : dirList) {
 		if (systemIsDirectory(entry)) continue;
 		if (stringExtension(entry).compare("scl")) continue;
@@ -393,7 +393,7 @@ struct WK101 : SchemeModuleWidget {
 			addParam(widgets[i]);
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(127 - 104 * (i%2), 110 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
-		WK_Tunings::loadTunings(plugin);
+		WK_Tunings::loadTunings(pluginInstance);
 	}
 	void appendContextMenu(Menu *menu) override;
 	void step() override;
@@ -703,7 +703,7 @@ struct WK205 : SchemeModuleWidget {
 			addOutput(createOutputCentered<SilverPort>(Vec(15,104.5 + i * 60), module, WK_205::OUTPUT_CV_1 + i));
 		}
 
-		WK_Tunings::loadTunings(plugin);
+		WK_Tunings::loadTunings(pluginInstance);
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);

@@ -3,7 +3,7 @@
 template <int x>
 struct BP1x : ModuleWidget {
 	BP1x(Module *module) : ModuleWidget(module) {
-		setPanel(SubHelper::LoadPanel(plugin, "BP-1", x));
+		setPanel(SubHelper::LoadPanel(pluginInstance, "BP-1", x));
 	}
 };
 
