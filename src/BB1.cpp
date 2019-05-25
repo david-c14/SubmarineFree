@@ -117,4 +117,4 @@ struct BB120 : SchemeModuleWidget {
 	}
 };
 
-Model *modelBB120 = Model::create<BB_1<20>, BB120>("BB-120");
+Model *modelBB120 = createModel<BB_1<20>, BB120>("BB-120");

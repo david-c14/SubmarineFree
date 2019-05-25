@@ -114,5 +114,5 @@ struct PG112 : SchemeModuleWidget {
 	}
 };
 
-Model *modelPG104 = Model::create<PG_1<4>, PG104>("PG-104");
-Model *modelPG112 = Model::create<PG_1<12>, PG112>("PG-112");
+Model *modelPG104 = createModel<PG_1<4>, PG104>("PG-104");
+Model *modelPG112 = createModel<PG_1<12>, PG112>("PG-112");

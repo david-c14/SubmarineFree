@@ -64,4 +64,4 @@ struct DN112 : SchemeModuleWidget {
 	}
 };
 
-Model *modelDN112 = Model::create<DN_1<12>, DN112>("DN-112");
+Model *modelDN112 = createModel<DN_1<12>, DN112>("DN-112");

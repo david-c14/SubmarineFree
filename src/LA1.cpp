@@ -403,4 +403,4 @@ struct LA108 : SchemeModuleWidget {
 	}
 };
 
-Model *modelLA108 = Model::create<LA_108, LA108>("LA-108");
+Model *modelLA108 = createModel<LA_108, LA108>("LA-108");

@@ -133,5 +133,5 @@ struct OG106 : SchemeModuleWidget {
 	}
 };
 
-Model *modelOG104 = Model::create<OG_1<4>, OG104>("OG-104");
-Model *modelOG106 = Model::create<OG_1<6>, OG106>("OG-106");
+Model *modelOG104 = createModel<OG_1<4>, OG104>("OG-104");
+Model *modelOG106 = createModel<OG_1<6>, OG106>("OG-106");

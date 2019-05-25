@@ -87,4 +87,4 @@ struct TD202 : SchemeModuleWidget {
 	}
 };
 
-Model *modelTD202 = Model::create<Module, TD202>("TD-202");
+Model *modelTD202 = createModel<Module, TD202>("TD-202");

@@ -109,4 +109,4 @@ struct XF101 : SchemeModuleWidget {
 	}
 };
 
-Model *modelXF101 = Model::create<XF_101, XF101>("XF-101");
+Model *modelXF101 = createModel<XF_101, XF101>("XF-101");

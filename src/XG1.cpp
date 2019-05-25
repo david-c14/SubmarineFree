@@ -135,5 +135,5 @@ struct XG106 : SchemeModuleWidget {
 	}
 };
 
-Model *modelXG104 = Model::create<XG_1<4>, XG104>("XG-104");
-Model *modelXG106 = Model::create<XG_1<6>, XG106>("XG-106");
+Model *modelXG104 = createModel<XG_1<4>, XG104>("XG-104");
+Model *modelXG106 = createModel<XG_1<6>, XG106>("XG-106");

@@ -128,4 +128,4 @@ struct XF202 : SchemeModuleWidget {
 	}
 };
 
-Model *modelXF202 = Model::create<XF_202, XF202>("XF-202");
+Model *modelXF202 = createModel<XF_202, XF202>("XF-202");

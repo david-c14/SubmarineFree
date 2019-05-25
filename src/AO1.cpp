@@ -612,8 +612,8 @@ struct AOWidget : SchemeModuleWidget {
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < x; ix++) {
-				addParam(ParamWidget::create<AOFuncDisplay>(Vec(42.5 + 90 * iy, 59 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
-				addParam(ParamWidget::create<AOConstDisplay>(Vec(42.5 + 90 * iy, 78 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f));
+				addParam(createParam<AOFuncDisplay>(Vec(42.5 + 90 * iy, 59 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
+				addParam(createParam<AOConstDisplay>(Vec(42.5 + 90 * iy, 78 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f));
 			}
 		}
 	}
@@ -673,8 +673,8 @@ struct AOWidget : SchemeModuleWidget {
 	}
 };
 
-Model *modelAO106 = Model::create<AO1<6,1>, AOWidget<6,1>>("A0-106");
-Model *modelAO112 = Model::create<AO1<6,2>, AOWidget<6,2>>("A0-112");
-Model *modelAO118 = Model::create<AO1<6,3>, AOWidget<6,3>>("A0-118");
-Model *modelAO124 = Model::create<AO1<6,4>, AOWidget<6,4>>("A0-124");
-Model *modelAO136 = Model::create<AO1<6,6>, AOWidget<6,6>>("A0-136");
+Model *modelAO106 = createModel<AO1<6,1>, AOWidget<6,1>>("A0-106");
+Model *modelAO112 = createModel<AO1<6,2>, AOWidget<6,2>>("A0-112");
+Model *modelAO118 = createModel<AO1<6,3>, AOWidget<6,3>>("A0-118");
+Model *modelAO124 = createModel<AO1<6,4>, AOWidget<6,4>>("A0-124");
+Model *modelAO136 = createModel<AO1<6,6>, AOWidget<6,6>>("A0-136");

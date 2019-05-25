@@ -209,5 +209,5 @@ struct LD106 : SchemeModuleWidget, LD1Base {
 	}
 };
 
-Model *modelLD103 = Model::create<LD_1<3>, LD103>("LD-103");
-Model *modelLD106 = Model::create<LD_1<6>, LD106>("LD-106");
+Model *modelLD103 = createModel<LD_1<3>, LD103>("LD-103");
+Model *modelLD106 = createModel<LD_1<6>, LD106>("LD-106");

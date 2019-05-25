@@ -133,4 +133,4 @@ struct TM105 : SchemeModuleWidget {
 	}
 };
 
-Model *modelTM105 = Model::create<TM_105, TM105>("TM-105");
+Model *modelTM105 = createModel<TM_105, TM105>("TM-105");

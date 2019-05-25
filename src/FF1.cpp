@@ -153,5 +153,5 @@ struct FF120 : SchemeModuleWidget {
 	}
 };
 
-Model *modelFF110 = Model::create<FF_1<10>, FF110>("FF-110");
-Model *modelFF120 = Model::create<FF_1<20>, FF120>("FF-120");
+Model *modelFF110 = createModel<FF_1<10>, FF110>("FF-110");
+Model *modelFF120 = createModel<FF_1<20>, FF120>("FF-120");

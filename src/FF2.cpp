@@ -179,5 +179,5 @@ struct FF212 : SchemeModuleWidget {
 	}
 };
 
-Model *modelFF206 = Model::create<FF_2<6>, FF206>("FF-206");
-Model *modelFF212 = Model::create<FF_2<12>, FF212>("FF-212");
+Model *modelFF206 = createModel<FF_2<6>, FF206>("FF-206");
+Model *modelFF212 = createModel<FF_2<12>, FF212>("FF-212");

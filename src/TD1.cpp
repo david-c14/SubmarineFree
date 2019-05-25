@@ -193,4 +193,4 @@ struct TD116 : SchemeModuleWidget {
 
 
 
-Model *modelTD116 = Model::create<TD_116, TD116>("TD-116");
+Model *modelTD116 = createModel<TD_116, TD116>("TD-116");

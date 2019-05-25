@@ -59,13 +59,13 @@ struct BP1_20 : BP1<20> {
 	}
 };
 
-Model *modelBP101 = Model::create<Module, BP1_1>("BP-101");
-Model *modelBP102 = Model::create<Module, BP1_2>("BP-102");
-Model *modelBP104 = Model::create<Module, BP1_4>("BP-104");
-Model *modelBP108 = Model::create<Module, BP1<8>>("BP-108");
-Model *modelBP110 = Model::create<Module, BP1<10>>("BP-110");
-Model *modelBP112 = Model::create<Module, BP1<12>>("BP-112");
-Model *modelBP116 = Model::create<Module, BP1<16>>("BP-116");
-Model *modelBP120 = Model::create<Module, BP1_20>("BP-120");
-Model *modelBP124 = Model::create<Module, BP1<24>>("BP-124");
-Model *modelBP132 = Model::create<Module, BP1<32>>("BP-132");
+Model *modelBP101 = createModel<Module, BP1_1>("BP-101");
+Model *modelBP102 = createModel<Module, BP1_2>("BP-102");
+Model *modelBP104 = createModel<Module, BP1_4>("BP-104");
+Model *modelBP108 = createModel<Module, BP1<8>>("BP-108");
+Model *modelBP110 = createModel<Module, BP1<10>>("BP-110");
+Model *modelBP112 = createModel<Module, BP1<12>>("BP-112");
+Model *modelBP116 = createModel<Module, BP1<16>>("BP-116");
+Model *modelBP120 = createModel<Module, BP1_20>("BP-120");
+Model *modelBP124 = createModel<Module, BP1<24>>("BP-124");
+Model *modelBP132 = createModel<Module, BP1<32>>("BP-132");

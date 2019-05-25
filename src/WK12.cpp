@@ -739,5 +739,5 @@ struct WK205 : SchemeModuleWidget {
 	}
 };
 
-Model *modelWK101 = Model::create<WK_101, WK101>("WK-101");
-Model *modelWK205 = Model::create<WK_205, WK205>("WK-205");
+Model *modelWK101 = createModel<WK_101, WK101>("WK-101");
+Model *modelWK205 = createModel<WK_205, WK205>("WK-205");

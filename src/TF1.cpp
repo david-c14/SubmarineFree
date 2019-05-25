@@ -149,4 +149,4 @@ struct TF101 : SchemeModuleWidget {
 	}
 };
 
-Model *modelTF101 = Model::create<TF_101, TF101>("TF-101");
+Model *modelTF101 = createModel<TF_101, TF101>("TF-101");

@@ -507,7 +507,7 @@ struct PO101 : PO_Layout {
 	PO101(PO_101 *module) : PO_Layout(module) {
 		this->box.size = Vec(180, 380);
 		addChild(new SchemePanel(this->box.size));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
 		Layout();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
@@ -520,7 +520,7 @@ struct PO102 : PO_Layout {
 	PO102(PO_101 *module) : PO_Layout(module) {
 		this->box.size = Vec(180, 380);
 		addChild(new SchemePanel(this->box.size));
-		addParam(ParamWidget::create<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f));
+		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f));
 		module->baseFreq = 1.0f;
 		Layout();
 	}
@@ -664,6 +664,6 @@ struct PO204 : SchemeModuleWidget {
 	}
 };
 
-Model *modelPO101 = Model::create<PO_101, PO101>("PO-101");
-Model *modelPO102 = Model::create<PO_101, PO102>("PO-102");
-Model *modelPO204 = Model::create<PO_204, PO204>("PO-204");
+Model *modelPO101 = createModel<PO_101, PO101>("PO-101");
+Model *modelPO102 = createModel<PO_101, PO102>("PO-102");
+Model *modelPO204 = createModel<PO_204, PO204>("PO-204");

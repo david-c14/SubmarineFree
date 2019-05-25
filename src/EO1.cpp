@@ -517,4 +517,4 @@ struct EO102 : SchemeModuleWidget {
 	}
 };
 
-Model *modelEO102 = Model::create<EO_102, EO102>("EO-102");
+Model *modelEO102 = createModel<EO_102, EO102>("EO-102");

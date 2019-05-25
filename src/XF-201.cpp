@@ -194,5 +194,5 @@ struct XF301 : SchemeModuleWidget {
 	}
 };
 
-Model *modelXF201 = Model::create<XF_201, XF201>("XF-201");
-Model *modelXF301 = Model::create<XF_201, XF301>("XF-301");
+Model *modelXF201 = createModel<XF_201, XF201>("XF-201");
+Model *modelXF301 = createModel<XF_201, XF301>("XF-301");

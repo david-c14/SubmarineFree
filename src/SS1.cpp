@@ -232,8 +232,8 @@ struct SS220 : SchemeModuleWidget {
 	}
 };
 
-Model *modelSS112 = Model::create<SS_112, SS112>("SS-112");
-Model *modelSS208 = Model::create<SS_208, SS208>("SS-208");
-Model *modelSS212 = Model::create<SS_212, SS212>("SS-212");
-Model *modelSS220 = Model::create<SS_220, SS220>("SS-220");
-Model *modelSS221 = Model::create<SS_221, SS221>("SS-221");
+Model *modelSS112 = createModel<SS_112, SS112>("SS-112");
+Model *modelSS208 = createModel<SS_208, SS208>("SS-208");
+Model *modelSS212 = createModel<SS_212, SS212>("SS-212");
+Model *modelSS220 = createModel<SS_220, SS220>("SS-220");
+Model *modelSS221 = createModel<SS_221, SS221>("SS-221");
