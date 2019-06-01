@@ -42,6 +42,8 @@ struct XF_LightKnob : LargeKnob<NarrowKnob<LightKnob>> {
 };
 
 struct XF : Module {
-	XF(int p, int i, int o, int l) : Module(p, i, o, l) {}
+	XF(int p, int i, int o, int l) : Module() {
+		config(p, i, o, l);
+	}
 	void crossFade(XF_Controls *controls);
 };

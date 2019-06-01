@@ -52,37 +52,40 @@ void MouseTransformWidget::draw(NVGcontext *vg) {
 	Widget::draw(vg);
 };
 
-void MouseTransformWidget::onMouseDown(EventMouseDown &e) {
+void MouseTransformWidget::onButton(const event::Button &e) {
 	Vec pos = e.pos;
 	if (hasInverse) {
 		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
 	}
-	Widget::onMouseDown(e);
+	Widget::onButton(e);
 	e.pos = pos;
 };
 
-void MouseTransformWidget::onMouseUp(EventMouseUp &e) {
+void MouseTransformWidget::onHover(const event::Hover &e) {
 	Vec pos = e.pos;
+	Vec mouseDelta = e.mouseDelta;
 	if (hasInverse) {
 		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+		nvgTransformPoint(&e.mouseDelta.x, &e.mouseDelta.y, invLinear, e.mouseDelta.x, e.mouseDelta.y);
 	}
-	Widget::onMouseUp(e);
+	Widget::onHover(e);
 	e.pos = pos;
+	e.mouseDelta = mouseDelta;
 };
 
-void MouseTransformWidget::onMouseMove(EventMouseMove &e) {
+void MouseTransformWidget::onDragHover(const event::DragHover &e) {
 	Vec pos = e.pos;
-	Vec mouseRel = e.mouseRel;
+	Vec mouseDelta = e.mouseDelta;
 	if (hasInverse) {
 		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
-		nvgTransformPoint(&e.mouseRel.x, &e.mouseRel.y, invLinear, e.mouseRel.x, e.mouseRel.y);
+		nvgTransformPoint(&e.mouseDelta.x, &e.mouseDelta.y, invLinear, e.mouseDelta.x, e.mouseDelta.y);
 	}
-	Widget::onMouseMove(e);
+	Widget::onDragHover(e);
 	e.pos = pos;
-	e.mouseRel = mouseRel;
+	e.mouseDelta = mouseDelta;
 };
 
-void MouseTransformWidget::onHoverKey(EventHoverKey &e) {
+void MouseTransformWidget::onHoverKey(const event::HoverKey &e) {
 	Vec pos = e.pos;
 	if (hasInverse) {
 		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
@@ -91,19 +94,28 @@ void MouseTransformWidget::onHoverKey(EventHoverKey &e) {
 	e.pos = pos;
 };
 
-void MouseTransformWidget::onScroll(EventScroll &e) {
+void MouseTransformWidget::onHoverText(const event::HoverText &e) {
 	Vec pos = e.pos;
-	Vec scrollRel = e.scrollRel;
 	if (hasInverse) {
 		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
-		nvgTransformPoint(&e.scrollRel.x, &e.scrollRel.y, invLinear, e.scrollRel.x, e.scrollRel.y);
 	}
-	Widget::onScroll(e);
+	Widget::onHoverText(e);
 	e.pos = pos;
-	e.scrollRel = scrollRel;
 };
 
-void MouseTransformWidget::onPathDrop(EventPathDrop &e) {
+void MouseTransformWidget::onHoverScroll(const event::HoverScroll &e) {
+	Vec pos = e.pos;
+	Vec scrollDelta = e.scrollDelta;
+	if (hasInverse) {
+		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
+		nvgTransformPoint(&e.scrollDelta.x, &e.scrollDelta.y, invLinear, e.scrollDelta.x, e.scrollDelta.y);
+	}
+	Widget::onHoverScroll(e);
+	e.pos = pos;
+	e.scrollDelta = scrollDelta;
+};
+
+void MouseTransformWidget::onPathDrop(const event::PathDrop &e) {
 	Vec pos = e.pos;
 	if (hasInverse) {
 		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 

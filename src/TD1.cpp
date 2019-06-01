@@ -16,7 +16,10 @@ struct TDInput : Torpedo::PatchInputPort {
 struct TD_116 : Module {
 	TDInput inPort = TDInput(this, 0);
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, 0);
-	TD_116() : Module (0, 1, 1, 0) {outPort.size(1);}
+	TD_116() : Module () {
+		config(0, 1, 1, 0);
+		outPort.size(1);
+	}
 	void step() override {
 		inPort.process();
 		outPort.process();
@@ -42,8 +45,8 @@ struct TDText : SubText {
 	TDText() {
 		color = SUBLIGHTBLUE;
 	}
-	void onTextChange() override {
-		LedDisplayTextField::onTextChange();
+	void onChange(const event::Change &e) override {
+		LedDisplayTextField::onChange(e);
 		if (tdModule) {
 			tdModule->sendText(text);
 		}
@@ -52,14 +55,14 @@ struct TDText : SubText {
 		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
 		SubText::foregroundMenu(menu);
 	}
-	void onMouseDown(EventMouseDown &e) override {
-		if (e.button == 1) {
-			e.consumed = true;
+	void onButton(const event::Button &e) override {
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			e.consume(this);
 			Menu *menu = gScene->createMenu();
 			appendContextMenu(menu);
 		}
 		else {
-			SubText::onMouseDown(e);
+			SubText::onButton(e);
 		}
 	}
 };

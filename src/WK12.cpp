@@ -29,7 +29,7 @@ struct WK_Tunings {
 		if (tuningsLoaded)
 			return;
 		tuningsLoaded = true;
-		loadTuningsFromWK(assetPlugin(pluginInstance, "WK_Custom.tunings").c_str());
+		loadTuningsFromWK(asset::plugin(pluginInstance, "WK_Custom.tunings").c_str());
 		loadTuningsFromScala(pluginInstance);
 	}
 };
@@ -197,7 +197,7 @@ void WK_Tunings::loadScalaFile(std::string path) {
 }
 
 void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
-	std::vector<std::string> dirList = systemListEntries(assetPlugin(pluginInstance, "Scala"));
+	std::vector<std::string> dirList = systemListEntries(asset::plugin(pluginInstance, "Scala"));
 	for (auto entry : dirList) {
 		if (systemIsDirectory(entry)) continue;
 		if (stringExtension(entry).compare("scl")) continue;

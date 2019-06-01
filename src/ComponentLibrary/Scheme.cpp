@@ -9,7 +9,7 @@
 
 Scheme::Scheme() {
 	json_error_t error;
-	FILE *file = fopen(assetLocal("SubmarineFree/Settings.json").c_str(), "r");
+	FILE *file = fopen(asset::user("SubmarineFree/Settings.json").c_str(), "r");
 	if (!file) {
 		return;
 	}
@@ -37,8 +37,8 @@ void Scheme::save() {
 	json_object_set_new(settings, "flat", json_real(isFlat?1:0));
 	json_object_set_new(settings, "scheme", json_real(scheme));
 
-	systemCreateDirectory(assetLocal("SubmarineFree"));
-	std::string settingsFilename = assetLocal("SubmarineFree/Settings.json");
+	systemCreateDirectory(asset::user("SubmarineFree"));
+	std::string settingsFilename = asset::user("SubmarineFree/Settings.json");
 	FILE *file = fopen(settingsFilename.c_str(), "w");
 	if (file) {
 		json_dumpf(settings, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
@@ -77,7 +77,7 @@ void Scheme::setColors() {
 std::shared_ptr<Font> Scheme::font() {
 	if (!_fontLoaded) {
 		_fontLoaded = true;
-		_font = Font::load(assetGlobal("res/fonts/DejaVuSans.ttf"));	
+		_font = Font::load(asset::system("res/fonts/DejaVuSans.ttf"));	
 	}
 	return _font;
 }
@@ -88,7 +88,7 @@ int Scheme::font(NVGcontext *vg) {
 		return ret;
 	}
 	info("Loading font for subDejaVu");
-	return nvgCreateFont(vg, "subDejaVu", assetGlobal("res/fonts/DejaVuSans.ttf").c_str());
+	return nvgCreateFont(vg, "subDejaVu", asset::system("res/fonts/DejaVuSans.ttf").c_str());
 }
 
 Scheme gScheme;

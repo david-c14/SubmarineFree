@@ -292,10 +292,11 @@ struct MouseTransformWidget:Widget {
 	void rotate(float angle);
 	void scale(Vec s);
 	void draw(NVGcontext *vg) override;
-	void onMouseDown(const event::MouseDown &e) override;
-	void onMouseUp(const event::MouseUp &e) override;
-	void onMouseMove(const event::MouseMove &e) override;
+	void onButton(const event::Button &e) override;
+	void onHover(const event::Hover &e) override;
 	void onHoverKey(const event::HoverKey &e) override;
-	void onScroll(const event::Scroll &e) override;
+	void onHoverText(const event::HoverText &e) override;
+	void onHoverScroll(const event::HoverScroll &e) override;
+	void onDragHover(const event::DragHover &e) override;
 	void onPathDrop(const event::PathDrop &e) override;
 };

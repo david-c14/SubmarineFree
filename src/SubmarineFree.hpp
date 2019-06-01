@@ -82,10 +82,10 @@ extern Model *modelXG106;
 #include "ComponentLibrary/components.hpp"
 
 struct SubHelper {
-	static std::shared_ptr<SVG> LoadPanel(Plugin *pluginInstance, const char *str, int num) {
+	static std::shared_ptr<Svg> LoadPanel(Plugin *pluginInstance, const char *str, int num) {
 		char workingSpace[100];
 		snprintf(workingSpace, 100, "res/%s%02d.svg", str, num);
-		return SVG::load(assetPlugin(pluginInstance, workingSpace));
+		return APP->window->loadSvg(asset::plugin(pluginInstance, workingSpace));
 	}
 };
 
