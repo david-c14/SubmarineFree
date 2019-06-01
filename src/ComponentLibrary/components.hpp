@@ -16,7 +16,7 @@
 // Ports
 //////////////////
 
-struct SilverPort : Port {
+struct SilverPort : PortWidget {
 	NVGcolor col = nvgRGB(0xf0, 0xf0, 0xf0);
 	SilverPort() {
 		box.size.x = 25;
@@ -41,7 +41,7 @@ struct BlackPort : SilverPort {
 // Switches
 //////////////////
 
-struct SubSwitch2 : ToggleSwitch {
+struct SubSwitch2 : app::Switch {
 	float length = 25.0f;
 	int horz = 0;
 	SubSwitch2() {
@@ -80,7 +80,7 @@ struct SubSwitchHorz : k {
 // Buttons
 //////////////////
 
-struct LightButton : ToggleSwitch {
+struct LightButton : app::Switch {
 	NVGcolor color = SUBLIGHTBLUE;
 	LightButton() {
 		//minValue = 0.0f;
@@ -161,7 +161,7 @@ struct RedKnob : K {
 
 struct LightSlider : LightKnob {
 	void draw(NVGcontext *vg) override;
-	void onDragMove(EventDragMove &e) override;
+	void onDragMove(const event::DragMove &e) override;
 };
 
 struct SubLogo : SVGWidget{};
@@ -171,8 +171,8 @@ struct SubLogo : SVGWidget{};
 
 struct BlueRedLight : GrayModuleLightWidget {
 	BlueRedLight() {
-		addBaseColor(COLOR_BLUE);
-		addBaseColor(COLOR_RED);
+		addBaseColor(componentlibrary::SCHEME_BLUE);
+		addBaseColor(componentlibrary::SCHEME_RED);
 	}
 };
 
@@ -214,12 +214,14 @@ struct SchemePanel : FramebufferWidget {
 	void step() override;
 };
 
-struct SchemeCanvasWidget : VirtualWidget {
+struct SchemeCanvasWidget : Widget {
 	void draw(NVGcontext *vg) override;
 };
 
-struct SchemeModuleWidget : ModuleWidget {
-	SchemeModuleWidget(Module *module): ModuleWidget(module) {}
+struct SchemeModuleWidget : app::ModuleWidget {
+	SchemeModuleWidget(Module *module): ModuleWidget() {
+		setModule(module);
+	}
 	void appendContextMenu(Menu *menu) override;
 	void drawBackground(NVGcontext *vg);
 	void drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate);
@@ -258,7 +260,7 @@ struct SubTextForegroundParent : MenuItem {
 struct SubTextForegroundMenu : MenuItem {
 	SubText *subText;
 	NVGcolor color;
-	void onAction(EventAction &e) override;
+	void onAction(const event::Action &e) override;
 	void step() override; 
 };
 
@@ -270,7 +272,7 @@ struct SubTextBackgroundParent : MenuItem {
 struct SubTextBackgroundMenu : MenuItem {
 	SubText *subText;
 	NVGcolor color;
-	void onAction(EventAction &e) override;
+	void onAction(const event::Action &e) override;
 	void step() override;
 };
 
@@ -278,7 +280,7 @@ struct SubTextBackgroundMenu : MenuItem {
 // MouseTransformWidget
 //////////////////
 
-struct MouseTransformWidget:VirtualWidget {
+struct MouseTransformWidget:Widget {
 	float transform[6];
 	float inverse[6];
 	float invLinear[6];
@@ -290,10 +292,10 @@ struct MouseTransformWidget:VirtualWidget {
 	void rotate(float angle);
 	void scale(Vec s);
 	void draw(NVGcontext *vg) override;
-	void onMouseDown(EventMouseDown &e) override;
-	void onMouseUp(EventMouseUp &e) override;
-	void onMouseMove(EventMouseMove &e) override;
-	void onHoverKey(EventHoverKey &e) override;
-	void onScroll(EventScroll &e) override;
-	void onPathDrop(EventPathDrop &e) override;
+	void onMouseDown(const event::MouseDown &e) override;
+	void onMouseUp(const event::MouseUp &e) override;
+	void onMouseMove(const event::MouseMove &e) override;
+	void onHoverKey(const event::HoverKey &e) override;
+	void onScroll(const event::Scroll &e) override;
+	void onPathDrop(const event::PathDrop &e) override;
 };
