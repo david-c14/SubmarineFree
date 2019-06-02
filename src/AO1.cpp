@@ -532,7 +532,7 @@ struct FPasteMenu : MenuItem {
 void AOConstDisplay::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		e.consumed = true;
-		Menu *menu = gScene->createMenu();
+		Menu *menu = App->scene->createMenu();
 		CCopyMenu *cm = new CCopyMenu();
 		cm->widget = this;
 		cm->text = "Copy";
@@ -561,7 +561,7 @@ void AOConstDisplay::onMouseDown(EventMouseDown &e) {
 void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
 	if (e.button == 1) {
 		e.consumed = true;
-		Menu *menu = gScene->createMenu();
+		Menu *menu = App->scene->createMenu();
 		FCopyMenu *cm = new FCopyMenu();
 		cm->widget = this;
 		cm->text = "Copy";

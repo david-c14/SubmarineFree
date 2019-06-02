@@ -58,7 +58,7 @@ struct TDText : SubText {
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
 			e.consume(this);
-			Menu *menu = gScene->createMenu();
+			Menu *menu = APP->scene->createMenu();
 			appendContextMenu(menu);
 		}
 		else {
