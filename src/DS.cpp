@@ -4,14 +4,14 @@ float DS_Module::midpoint() {
 	return (voltage0 * 0.5f + voltage1 * 0.5f);
 }
 
-json_t *DS_Module::dataToJson() {
+json_t *DS_Module::toJson() {
 	json_t *rootJ = json_object();
 	json_object_set_new(rootJ, "voltage0", json_real(voltage0));
 	json_object_set_new(rootJ, "voltage1", json_real(voltage1));
 	return rootJ;
 }
 
-void DS_Module::dataFromJson(json_t *rootJ) {
+void DS_Module::fromJson(json_t *rootJ) {
 	json_t *j0 = json_object_get(rootJ, "voltage0");
 	if (j0)
 		voltage0 = json_number_value(j0);

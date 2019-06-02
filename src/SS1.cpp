@@ -69,13 +69,13 @@ struct SS_212 : Module {
 		setValues();
 	}
 
-	json_t *dataToJson() override {
+	json_t *toJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "octave", json_integer(v));
 		return rootJ;
 	}
 
-	void dataFromJson(json_t *rootJ) override {
+	void fromJson(json_t *rootJ) override {
 		json_t *intJ = json_object_get(rootJ, "octave");
 		if (intJ)
 			v = json_integer_value(intJ);
