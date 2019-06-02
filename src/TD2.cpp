@@ -13,7 +13,7 @@ struct TDVText : SubText {
 	void onMouseDown(EventMouseDown &e) override {
 		if (e.button == 1) {
 			e.consumed = true;
-			Menu *menu = APP->scene->createMenu();
+			Menu *menu = createMenu();
 			appendContextMenu(menu);
 		}
 		else {
