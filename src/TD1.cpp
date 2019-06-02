@@ -124,8 +124,8 @@ struct TD116 : SchemeModuleWidget {
 
 		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
 		json_object_set_new(rootJ, "size", json_real(textField->fontSize));
-		json_object_set_new(rootJ, "fg", json_string(colorToHexString(textField->color).c_str()));
-		json_object_set_new(rootJ, "bg", json_string(colorToHexString(textField->bgColor).c_str()));
+		json_object_set_new(rootJ, "fg", json_string(color::toHexString(textField->color).c_str()));
+		json_object_set_new(rootJ, "bg", json_string(color::toHexString(textField->bgColor).c_str()));
 
 		return rootJ;
 	}
@@ -141,17 +141,11 @@ struct TD116 : SchemeModuleWidget {
 			textField->fontSize = json_number_value(sizeJ);
 		json_t *fgJ = json_object_get(rootJ, "fg");
 		if (fgJ) {
-			if (json_is_object(fgJ)) 
-				textField->color = jsonToColor(fgJ);
-			else
-				textField->color = colorFromHexString(json_string_value(fgJ));
+			textField->color = color::fromHexString(json_string_value(fgJ));
 		}
 		json_t *bgJ = json_object_get(rootJ, "bg");
 		if (bgJ) {
-			if (json_is_object(bgJ))
-				textField->bgColor = jsonToColor(bgJ);
-			else
-				textField->bgColor = colorFromHexString(json_string_value(bgJ));
+			textField->bgColor = color::fromHexString(json_string_value(bgJ));
 		}
 	}
 
@@ -173,12 +167,12 @@ struct TD116 : SchemeModuleWidget {
 		ModuleWidget::step();
 	}
 
-	void reset() override {
+	void onReset() override {
 		textField->fontSize = 12;
 		textField->text = "";
 		textField->color = SUBLIGHTBLUE;
 		textField->bgColor = nvgRGB(0,0,0);	
-		ModuleWidget::reset();
+		ModuleWidget::onReset();
 	}
 
 	void appendContextMenu(Menu *menu) override {
