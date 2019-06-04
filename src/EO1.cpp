@@ -476,11 +476,11 @@ struct EO102 : SchemeModuleWidget {
 		if (eoMod) {
 			if (eoMod->setRun) {
 				eoMod->setRun = 0;
-				paramRun->setValue(1.0f);
+				APP->engine->setParam(eoMod, EO_102::PARAM_RUNMODE, 1.0f);
 			}
 			if (eoMod->resetRun) {
 				eoMod->resetRun = 0;
-				paramRun->setValue(0.0f);
+				APP->engine->setParam(eoMod, EO_102::PARAM_RUNMODE, 0.0f);
 			}
 		}
 		ModuleWidget::step();
