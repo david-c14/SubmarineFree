@@ -104,8 +104,8 @@ void TM_105::step() {
 	}
 	for(unsigned int i = 0; i < 5; i++) {
 		lights[LIGHT_Q_1 + i].value = count > i;
-		lights[LIGHT_M_1 + i].value = msgPulses[i].process(engineGetSampleTime()); 
-		lights[LIGHT_E_1 + i].value = errPulses[i].process(engineGetSampleTime()); 
+		lights[LIGHT_M_1 + i].value = msgPulses[i].process(APP->engine->getSampleTime()); 
+		lights[LIGHT_E_1 + i].value = errPulses[i].process(APP->engine->getSampleTime()); 
 	}
 	outPort.process();
 }

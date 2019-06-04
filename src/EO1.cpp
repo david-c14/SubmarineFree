@@ -87,8 +87,8 @@ void EO_102::step() {
 	runMode = params[PARAM_RUNMODE].value;
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
-	int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
-	lights[LIGHT_TRIGGER].value = triggerLight.process(engineGetSampleTime());
+	int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
+	lights[LIGHT_TRIGGER].value = triggerLight.process(APP->engine->getSampleTime());
 	
 	// Add frame to preBuffer
 	for (int i = 0; i < 2; i++) {
@@ -341,9 +341,9 @@ struct EO_Measure_Horz : EO_Measure {
 			return;
 		} 
 		float deltaTime = powf(2.0f, module->params[EO_102::PARAM_TIME].value);
-		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
+		int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
 		frameCount *= BUFFER_SIZE;
-		float width = (float)frameCount * fabs(module->params[EO_102::PARAM_INDEX_1].value - module->params[EO_102::PARAM_INDEX_2].value) / engineGetSampleRate(); 
+		float width = (float)frameCount * fabs(module->params[EO_102::PARAM_INDEX_1].value - module->params[EO_102::PARAM_INDEX_2].value) / APP->engine->getSampleRate(); 
 		
 		if (width < 0.00000995f)
 			sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
@@ -440,7 +440,7 @@ struct EO102 : SchemeModuleWidget {
 			addInput(createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i));
 			addParam(createParamCentered<SubSwitch2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i));
 			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 320), module, EO_102::PARAM_OFFSET_1 + i));
-			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + if));
+			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + i));
 			if (module) {
 				module->configParam(EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f);
 				module->configParam(EO_102::PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f);

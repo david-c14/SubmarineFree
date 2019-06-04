@@ -87,7 +87,7 @@ void LA_108::step() {
 		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
-	int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
+	int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
 	
 	// Add frame to preBuffer
 	if (++preFrameIndex >= frameCount) {
@@ -140,7 +140,7 @@ void LA_108::step() {
 			}
 
 			// Reset if we've waited too long
-			if (frameIndex >= engineGetSampleRate() * holdTime) {
+			if (frameIndex >= APP->engine->getSampleRate() * holdTime) {
 				startFrame();
 				return;
 			}
@@ -265,9 +265,9 @@ struct LA_Measure : TransparentWidget {
 			return;
 		}
 		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].value);
-		int frameCount = (int)ceilf(deltaTime * engineGetSampleRate());
+		int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
 		frameCount *= BUFFER_SIZE;
-		float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].value - module->params[LA_108::PARAM_INDEX_2].value) / engineGetSampleRate(); 
+		float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].value - module->params[LA_108::PARAM_INDEX_2].value) / APP->engine->getSampleRate(); 
 		
 		if (width < 0.00000995f)
 			sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
