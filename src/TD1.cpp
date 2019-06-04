@@ -32,7 +32,12 @@ struct TD_116 : Module {
 
 		outPort.send("SubmarineFree", "TDNotesText", rootJ); 
 	}
+	void onReset() override {
+		reset = 1;
+		Module::onReset();
+	}
 	std::string text;
+	int reset = 0;
 	int fontSize = 12;
 	NVGcolor fg = SUBLIGHTBLUE;
 	NVGcolor bg = nvgRGB(0,0,0);
@@ -164,15 +169,14 @@ struct TD116 : SchemeModuleWidget {
 			textField->bgColor = tdModule->bg;
 			tdModule->isDirtyC = false;
 		}
+		if (tdModule->reset) {
+			textField->fontSize = 12;
+			textField->text = "";
+			textField->color = SUBLIGHTBLUE;
+			textField->bgColor = nvgRGB(0,0,0);	
+			tdModule->reset = 0;
+		}
 		ModuleWidget::step();
-	}
-
-	void onReset() override {
-		textField->fontSize = 12;
-		textField->text = "";
-		textField->color = SUBLIGHTBLUE;
-		textField->bgColor = nvgRGB(0,0,0);	
-		ModuleWidget::onReset();
 	}
 
 	void appendContextMenu(Menu *menu) override {

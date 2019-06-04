@@ -22,10 +22,21 @@ struct TDVText : SubText {
 	}
 };
 
+struct TD_202 : Module {
+	TD_202() : Module() {
+		config(0, 0, 0, 0);
+	}
+	int reset = 0;
+	void onReset() override {
+		reset = 1;
+		Module::onReset();
+	}
+}
+
 struct TD202 : SchemeModuleWidget {
 	TDVText *textField;
 
-	TD202(Module *module) : SchemeModuleWidget(module) {
+	TD202(TD_202 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 	
@@ -64,14 +75,20 @@ struct TD202 : SchemeModuleWidget {
 		}
 	}
 
-	void onReset() override {
-		textField->text = "";
-		textField->multiline = false;
-		textField->color = SUBLIGHTBLUE;
-		textField->bgColor = nvgRGBA(0, 0, 0, 0);
-		ModuleWidget::onReset();
+	void step() override {
+		TD_202 *tdModule = dynamic_cast<TD_202 *>(module);
+		if (!tdModule) {
+			return;
+		}
+		if (tdModule->reset) {
+			textField->text = "";
+			textField->multiline = false;
+			textField->color = SUBLIGHTBLUE;
+			textField->bgColor = nvgRGBA(0, 0, 0, 0);
+			tdModule->reset = 0;
+		}
 	}
-	
+
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
 		textField->appendContextMenu(menu);

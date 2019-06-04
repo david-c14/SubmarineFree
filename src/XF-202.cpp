@@ -74,12 +74,17 @@ struct XF202 : SchemeModuleWidget {
 			addOutput(createOutputCentered<SilverPort>(Vec(104.5,105.5 + offset), module, XF_202::OUTPUT_1 + i));
 			addOutput(createOutputCentered<RedPort>(Vec(104.5,132.5 + offset), module, XF_202::OUTPUTR_1 + i));
 
-			addParam(createParamCentered<SubSwitch2>(Vec(35, 167 + offset), module, XF_202::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
-			addParam(createParamCentered<SubSwitch3>(Vec(72.5, 167 + offset), module, XF_202::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
-			fader = createParamCentered<XF_LightKnob>(Vec(60, 78 + offset), module, XF_202::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
+			addParam(createParamCentered<SubSwitch2>(Vec(35, 167 + offset), module, XF_202::PARAM_CV_1 + i));
+			addParam(createParamCentered<SubSwitch3>(Vec(72.5, 167 + offset), module, XF_202::PARAM_MODE_1 + i));
+			fader = createParamCentered<XF_LightKnob>(Vec(60, 78 + offset), module, XF_202::PARAM_FADE_1 + i);
 			fader->cv = XF_202::INPUT_CV_1 + i;
 			fader->link = 0;
 			addParam(fader);
+			if (module) {
+				module->configParam(XF_202::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f);
+				module->configParam(XF_202::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f);
+				module->configParam(XF_202::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
+			}
 
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 157.5 + offset), module, XF_202::LIGHT_LIN_1 + i));
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 167.5 + offset), module, XF_202::LIGHT_LOG_1 + i));

@@ -73,12 +73,17 @@ struct XF201 : SchemeModuleWidget {
 			addOutput(createOutputCentered<SilverPort>(Vec(104.5,105.5 + offset), module, XF_201::OUTPUT_1 + i));
 			addOutput(createOutputCentered<RedPort>(Vec(104.5,132.5 + offset), module, XF_201::OUTPUTR_1 + i));
 
-			addParam(createParamCentered<SubSwitch2>(Vec(35, 167 + offset), module, XF_201::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
-			addParam(createParamCentered<SubSwitch3>(Vec(72, 167 + offset), module, XF_201::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
-			fader = createParamCentered<XF_LightKnob>(Vec(60, 78 + offset), module, XF_201::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
+			addParam(createParamCentered<SubSwitch2>(Vec(35, 167 + offset), module, XF_201::PARAM_CV_1 + i));
+			addParam(createParamCentered<SubSwitch3>(Vec(72, 167 + offset), module, XF_201::PARAM_MODE_1 + i));
+			fader = createParamCentered<XF_LightKnob>(Vec(60, 78 + offset), module, XF_201::PARAM_FADE_1 + i);
 			fader->cv = XF_201::INPUT_CV_1 + i;
 			fader->link = 0;
 			addParam(fader);
+			if (module) {
+				module->configParam(XF_201::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f);
+				module->configParam(XF_201::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f);
+				module->configParam(XF_201::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
+			}
 
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 157.5 + offset), module, XF_201::LIGHT_LIN_1 + i));
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 167.5 + offset), module, XF_201::LIGHT_LOG_1 + i));
@@ -118,22 +123,9 @@ struct XF201 : SchemeModuleWidget {
 	}
 };
 
-struct XF_LightSlider : LightSlider {
-	int cv;
-	XF_LightSlider() {
-		this->box.size = Vec(26, 120);
-	}
-	void step() override {
-		if (module) {
-			setEnabled(!module->inputs[cv].active);
-		}
-		LightSlider::step();
-	}
-};
-
 struct XF301 : SchemeModuleWidget {
 	XF301(XF_201 *module) : SchemeModuleWidget(module) {
-		XF_LightSlider *fader;
+		XF_LightKnob *fader;
 		this->box.size = Vec(120, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < XF_201::deviceCount; i++) {
@@ -147,14 +139,16 @@ struct XF301 : SchemeModuleWidget {
 			addOutput(createOutputCentered<SilverPort>(Vec(104.5,105.5 + offset), module, XF_201::OUTPUT_1 + i));
 			addOutput(createOutputCentered<RedPort>(Vec(104.5,132.5 + offset), module, XF_201::OUTPUTR_1 + i));
 
-			addParam(createParamCentered<SubSwitch2>(Vec(35, 167 + offset), module, XF_201::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f));
-			addParam(createParamCentered<SubSwitch3>(Vec(72, 167 + offset), module, XF_201::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f));
-			//fader = createParamCentered<XF_LightKnob>(Vec(60, 78 + offset), module, XF_201::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
-			fader = createParam<XF_LightSlider>(Vec(60, 78 + offset), module, XF_201::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
-			fader->box.size.x = 24.0;
-			fader->box.size.y = 40.0;
+			addParam(createParamCentered<SubSwitch2>(Vec(35, 167 + offset), module, XF_201::PARAM_CV_1 + i));
+			addParam(createParamCentered<SubSwitch3>(Vec(72, 167 + offset), module, XF_201::PARAM_MODE_1 + i));
+			fader = createParamCentered<XF_LightKnob>(Vec(60, 78 + offset), module, XF_201::PARAM_FADE_1 + i);
 			fader->cv = XF_201::INPUT_CV_1 + i;
 			addParam(fader);
+			if (module) {
+				module->configParam(XF_201::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f);
+				module->configParam(XF_201::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f);
+				module->configParam(XF_201::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
+			}
 
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 157.5 + offset), module, XF_201::LIGHT_LIN_1 + i));
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 167.5 + offset), module, XF_201::LIGHT_LOG_1 + i));
