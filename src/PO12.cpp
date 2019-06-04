@@ -111,7 +111,9 @@ struct PO_101 : Module, PO_Util {
 		NUM_LIGHTS
 	};
 
-	PO_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	PO_101() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override;
 	void sin(float phase);
 	void tri(float phase);
@@ -346,7 +348,9 @@ struct PO_204 : Module, PO_Util {
 		NUM_LIGHTS
 	};
 
-	PO_204() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	PO_204() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override;
 	float phase = 0.0f;
 	float baseFreq = 261.626f;

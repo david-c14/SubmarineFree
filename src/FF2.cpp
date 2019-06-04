@@ -26,7 +26,9 @@ struct FF_2 : DS_Module {
 	int state[x] = {};	
 	DS_Schmitt schmittTrigger[x];
 
-	FF_2() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	FF_2() : DS_Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override {
 		if (doResetFlag) doReset();
 		if (doRandomFlag) doRandomize();

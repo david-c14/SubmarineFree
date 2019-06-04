@@ -26,7 +26,9 @@ struct FF_1 : DS_Module {
 	int state[deviceCount] = {};	
 	DS_Schmitt schmittTrigger[deviceCount];
 
-	FF_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	FF_1() : DS_Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 
 	void step() override {
 		if (doResetFlag) doReset();

@@ -23,7 +23,8 @@ struct DN_1 : DS_Module {
 	};
 	uint32_t lfsr[x];
 
-	DN_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	DN_1() : DS_Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		std::uniform_int_distribution<int> distribution(1, 0xffffffffu);
 		for (unsigned int i = 0; i < x; i++) {
 			lfsr[i] = distribution(generator);

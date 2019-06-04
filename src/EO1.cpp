@@ -56,7 +56,9 @@ struct EO_102 : Module {
 	int traceMode[2];
 	int traceStep;	
 
-	EO_102() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	EO_102() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override;
 	void startFrame(void);
 };

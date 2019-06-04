@@ -41,7 +41,8 @@ struct TF_101 : Module  {
 	float prevValues[7];
 	int isDirty = false;
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);	
-	TF_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	TF_101() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		prevValues[0] = 0.1569f;
 		prevValues[1] = 0.6902f;
 		prevValues[2] = 0.9529f;

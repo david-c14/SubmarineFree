@@ -22,7 +22,9 @@ struct PG_1 : DS_Module {
 	DS_Schmitt schmitt[x];
 	PulseGenerator pulse[x];
 
-	PG_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	PG_1() : DS_Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override {
 		float deltaTime = 1.0f / engineGetSampleRate();
 		for (int i = 0; i < x; i++) {

@@ -63,7 +63,8 @@ struct TM_105 : Module  {
 	PulseGenerator msgPulses[5];
 	PulseGenerator errPulses[5];
 	Torpedo::RawOutputPort outPort = Torpedo::RawOutputPort(this, OUTPUT_TOR);	
-	TM_105() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+	TM_105() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < 5; i++) {
 			queue.push_back(TM_Msg());
 		}

@@ -59,7 +59,9 @@ struct LA_108 : DS_Module {
 
 	int resetRunMode = 0;
 
-	LA_108() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	LA_108() : DS_Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override;
 	void startFrame(void);
 };

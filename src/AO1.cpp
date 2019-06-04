@@ -436,7 +436,9 @@ struct AO1 : Module {
 		NUM_LIGHTS
 	};
 
-	AO1() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	AO1() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override {
 		float vx[x];
 		for (unsigned int ix = 0; ix < x; ix++) {

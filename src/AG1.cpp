@@ -20,7 +20,9 @@ struct AG_1 : DS_Module {
 		NUM_LIGHTS
 	};
 
-	AG_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	AG_1() : DS_Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 
 	void step() override {
 		int connCount = 0;

@@ -5,7 +5,7 @@ struct DS_Module : Module {
 	float voltage1 = 10.0f;
 	float midpoint();
 	float output(int);
-	DS_Module(int p, int i, int o, int l) : Module(p, i, o, l) {}
+	DS_Module() : Module() {}
 	json_t *toJson() override;
 	void fromJson(json_t *) override;
 	void onReset() override;

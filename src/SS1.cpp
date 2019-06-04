@@ -4,7 +4,9 @@
 
 struct SS_112 : Module {
 	static constexpr int deviceCount = 12;
-	SS_112() : Module(0, deviceCount, 0, 0) {}
+	SS_112() : Module() {
+		config(0, deviceCount, 0, 0);
+	}
 };
 
 struct SS112 : SchemeModuleWidget {
@@ -23,7 +25,8 @@ struct SS112 : SchemeModuleWidget {
 
 struct SS_208 : Module {
 	static constexpr int deviceCount = 8;
-	SS_208() : Module(0, 0, deviceCount, 0) {
+	SS_208() : Module() {
+		config(0, 0, deviceCount, 0);
 		outputs[0].value = M_PI;
 		outputs[1].value = 2 * M_PI;
 		outputs[2].value = M_E;
@@ -65,7 +68,8 @@ struct SS_212 : Module {
 		}
 	}
 
-	SS_212() : Module(0, 0, deviceCount, 0) {
+	SS_212() : Module() {
+		config(0, 0, deviceCount, 0);
 		setValues();
 	}
 
@@ -149,7 +153,8 @@ void SS212::appendContextMenu(Menu *menu) {
 
 struct SS_221 : Module {
 	static constexpr int deviceCount = 21;
-	SS_221() : Module(0, 0, deviceCount, 0) {
+	SS_221() : Module() {
+		config(0, 0, deviceCount, 0);
 		for (int i = 0; i < deviceCount; i++) {
 			outputs[i].value = 10.0f - i;
 		}
@@ -193,7 +198,8 @@ struct SS221 : SchemeModuleWidget {
 struct SS_220 : Module {
 	static constexpr int deviceCount = 12;
 	static constexpr int deviceSetCount = 10;
-	SS_220() : Module(0, 0, deviceCount * deviceSetCount, 0) {
+	SS_220() : Module() {
+		config(0, 0, deviceCount * deviceSetCount, 0);
 		for (int j = 0; j < deviceSetCount; j++) {
 			for (int i = 0; i < deviceCount; i++) {
 				outputs[j * deviceCount + i].value = (j - 5.0f) + 1.0f * i / 12.0f;

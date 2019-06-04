@@ -260,7 +260,10 @@ struct WK_101 : Module {
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
 	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
 
-	WK_101() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {outPort.size(5);}
+	WK_101() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		outPort.size(5);
+	}
 	void step() override;
 	void PrepareUpdate() {
 		WK_Update *upd = updateRing.bg();
@@ -642,7 +645,9 @@ struct WK_205 : Module {
 	float tunings[12];
 	WK205_InputPort inPort = WK205_InputPort(this, INPUT_TOR);
 
-	WK_205() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	WK_205() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override;
 	json_t *toJson(void) override {
 		json_t *rootJ = json_array();

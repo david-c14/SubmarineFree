@@ -27,7 +27,9 @@ struct BB_1 : DS_Module {
 	float sample[x] = {};	
 	DS_Schmitt schmittTrigger;
 
-	BB_1() : DS_Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	BB_1() : DS_Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+	}
 	void step() override {
 		if (doResetFlag) doReset();
 		if (doRandomFlag) doRandomize();
