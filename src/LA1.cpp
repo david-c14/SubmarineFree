@@ -323,15 +323,25 @@ struct LA108 : SchemeModuleWidget {
 		addInput(createInputCentered<BluePort>(Vec(16.5, 322.5), module, LA_108::INPUT_EXT));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(31.5, 313.5), module, LA_108::LIGHT_EXT));
 
-		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(58, 320), module, LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f));
-		addParam(createParamCentered<SubSwitch2>(Vec(89, 320.5), module, LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<SubSwitch2>(Vec(115, 320.5), module, LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f));
-		resetButton = createParamCentered<LightButton>(Vec(159, 320), module, LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
+		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(58, 320), module, LA_108::PARAM_TRIGGER));
+		addParam(createParamCentered<SubSwitch2>(Vec(89, 320.5), module, LA_108::PARAM_EDGE));
+		addParam(createParamCentered<SubSwitch2>(Vec(115, 320.5), module, LA_108::PARAM_RUN));
+		resetButton = createParamCentered<LightButton>(Vec(159, 320), module, LA_108::PARAM_RESET);
 		addParam(resetButton);
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
-		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2f));
+		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE));
+		if (module) {
+			module->configParam(LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f);
+			module->configParam(LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f);
+			module->configParam(LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f);
+			module->configParam(LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
+			module->configParam(LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f);
+			module->configParam(LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f);
+			module->configParam(LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f);
+			module->configParam(LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f);
+		}
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);

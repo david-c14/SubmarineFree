@@ -377,8 +377,11 @@ struct WK101 : SchemeModuleWidget {
 			display->box.pos = Vec(45, 79 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			widgets[i] = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+			widgets[i] = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i);
 			addParam(widgets[i]);
+			if (module) {
+				module->configParam(WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+			}
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(23 + 104 * (i%2), 89 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
 		for (int i = 5; i < 12; i++)
@@ -389,8 +392,11 @@ struct WK101 : SchemeModuleWidget {
 			display->box.pos = Vec(45, 100 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			widgets[i] = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+			widgets[i] = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i);
 			addParam(widgets[i]);
+			if (module) {
+				module->configParam(WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+			}
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(127 - 104 * (i%2), 110 + 21 * i), module, WK_101::LIGHT_1 + i));
 		}
 		WK_Tunings::loadTunings(pluginInstance);

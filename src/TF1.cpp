@@ -109,13 +109,23 @@ struct TF101 : SchemeModuleWidget {
 		addInput(createInputCentered<SilverPort>(Vec(16.5,293), module, TF_101::INPUT_BG_BLUE));
 		addInput(createInputCentered<SilverPort>(Vec(16.5,347), module, TF_101::INPUT_FONT_SIZE));
 
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 79), module, TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 119), module, TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 159), module, TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 213), module, TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 253), module, TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 293), module, TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 347), module, TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 79), module, TF_101::PARAM_FG_RED));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 119), module, TF_101::PARAM_FG_GREEN));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 159), module, TF_101::PARAM_FG_BLUE));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 213), module, TF_101::PARAM_BG_RED));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 253), module, TF_101::PARAM_BG_GREEN));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 293), module, TF_101::PARAM_BG_BLUE));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 347), module, TF_101::PARAM_FONT_SIZE));
+
+		if (module) {
+			module->configParam(TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f);
+			module->configParam(TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f);
+			module->configParam(TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f);
+			module->configParam(TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f);
+			module->configParam(TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f);
+			module->configParam(TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f);
+			module->configParam(TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f);
+		}
 
 		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 55.5), module, TF_101::LIGHT_FG_RED));
 		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 189.5), module, TF_101::LIGHT_BG_RED));

@@ -436,23 +436,38 @@ struct EO102 : SchemeModuleWidget {
 
 		for (int i = 0; i < 2; i++) {
 			addInput(createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i));
-			addParam(createParamCentered<SubSwitch2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f));
-			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 320), module, EO_102::PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f));
-			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f));
+			addParam(createParamCentered<SubSwitch2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i));
+			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 320), module, EO_102::PARAM_OFFSET_1 + i));
+			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + if));
+			if (module) {
+				module->configParam(EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f);
+				module->configParam(EO_102::PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f);
+				module->configParam(EO_102::PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f);
+			}
 		}
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(172.5, 320), module, EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f));
-		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(172.5, 320), module, EO_102::PARAM_TIME));
+		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE));
 
 		addInput(createInputCentered<BluePort>(Vec(211.5, 326.5), module, EO_102::INPUT_EXT));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(226, 333), module, EO_102::LIGHT_TRIGGER));
-		addParam(createParamCentered<SubSwitch2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f));
-		paramRun = createParamCentered<LightButton>(Vec(245, 280), module, EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
+		addParam(createParamCentered<SubSwitch2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE));
+		paramRun = createParamCentered<LightButton>(Vec(245, 280), module, EO_102::PARAM_RUN);
 		addParam(paramRun);
 
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.2f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3));
+		if (module) {
+			module->configParam(EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f);
+			module->configParam(EO_102::PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f);
+			module->configParam(EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f);
+			module->configParam(EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f);
+			module->configParam(EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
+			module->configParam(EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f);
+			module->configParam(EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f);
+			module->configParam(EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.2f);
+		}
 	}
 	void step() override {
 		EO_102 *eoMod = dynamic_cast<EO_102 *>(module);

@@ -422,8 +422,12 @@ void PO_204::step() {
 struct PO_Layout : SchemeModuleWidget {
 	PO_Layout(PO_101 *module) : SchemeModuleWidget(module) {}
 	void Layout() {
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(85, 58), module, PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f));
-		addParam(createParamCentered<NarrowKnob<SnapKnob<MedKnob<LightKnob>>>>(Vec(140, 58), module, PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(85, 58), module, PO_101::PARAM_FINE));
+		addParam(createParamCentered<NarrowKnob<SnapKnob<MedKnob<LightKnob>>>>(Vec(140, 58), module, PO_101::PARAM_WAVE));
+		if (module) {
+			module->configParam(PO_101::PARAM_FINE, -1.0f, +1.0f, 0.0f);
+			module->configParam(PO_101::PARAM_WAVE, 0.0f, +4.0f, 0.0f);
+		}
 
 		addInput(createInputCentered<SilverPort>(Vec(57.5,31.5), module, PO_101::INPUT_NOTE_CV));
 
@@ -446,7 +450,10 @@ struct PO_Layout : SchemeModuleWidget {
 
 		for (int i = 0; i < 4; i++) {
 			addInput(createInputCentered<SilverPort>(Vec(22.5 + 45 * i,272.5), module, PO_101::INPUT_PHASE_1 + i));
-			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(22.5 + 45 * i, 309), module, PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
+			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(22.5 + 45 * i, 309), module, PO_101::PARAM_PHASE_1 + i));
+			if (module) {
+				module->configParam(PO_101::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f);
+			}
 			addOutput(createOutputCentered<SilverPort>(Vec(22.5 + 45 * i,345.5), module, PO_101::OUTPUT_17 + i));
 		}
 	}
@@ -506,7 +513,10 @@ struct PO101 : PO_Layout {
 	PO101(PO_101 *module) : PO_Layout(module) {
 		this->box.size = Vec(180, 380);
 		addChild(new SchemePanel(this->box.size));
-		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f));
+		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE));
+		if (module) {
+			module->configParam(PO_101::PARAM_TUNE, -54.0f, +54.0f, 0.0f);
+		}
 		Layout();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
@@ -519,7 +529,10 @@ struct PO102 : PO_Layout {
 	PO102(PO_101 *module) : PO_Layout(module) {
 		this->box.size = Vec(180, 380);
 		addChild(new SchemePanel(this->box.size));
-		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f));
+		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE));
+		if (module) {
+			module->configParam(PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f);
+		}
 		module->baseFreq = 1.0f;
 		Layout();
 	}
@@ -533,18 +546,27 @@ struct PO204 : SchemeModuleWidget {
 	PO204(PO_204 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(79, 38), module, PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f));
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(124, 38), module, PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(79, 38), module, PO_204::PARAM_TUNE));
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(124, 38), module, PO_204::PARAM_FINE));
 		addInput(createInputCentered<SilverPort>(Vec(30, 38), module, PO_204::INPUT_TUNE));
+		if (module) {
+			module->configParam(PO_204::PARAM_TUNE, -90.0f, +54.0f, 0.0f);
+			module->configParam(PO_204::PARAM_FINE, -1.0f, +1.0f, 0.0f);
+		}
 
 		for (int i = 0; i < 4; i++) {
-			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(17, 101 + 70 * i), module, PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f));
-			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(57, 101 + 70 * i), module, PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f));
-			addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(97, 101 + 70 * i), module, PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f));
+			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(17, 101 + 70 * i), module, PO_204::PARAM_WAVE_1 + i));
+			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(57, 101 + 70 * i), module, PO_204::PARAM_PHASE_1 + i));
+			addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(97, 101 + 70 * i), module, PO_204::PARAM_MULT_1 + i));
 			addInput(createInputCentered<SilverPort>(Vec(17, 137.5 + 70 * i), module, PO_204::INPUT_WAVE_1 + i));
 			addInput(createInputCentered<SilverPort>(Vec(57, 137.5 + 70 * i), module, PO_204::INPUT_PHASE_1 + i));
 			addInput(createInputCentered<SilverPort>(Vec(97, 137.5 + 70 * i), module, PO_204::INPUT_MULT_1 + i));
 			addOutput(createOutputCentered<SilverPort>(Vec(133, 137.5 + 70 * i), module, PO_204::OUTPUT_1 + i));
+			if (module) {
+				module->configParam(PO_204::PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f);
+				module->configParam(PO_204::PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f);
+				module->configParam(PO_204::PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f);
+			}
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {

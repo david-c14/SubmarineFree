@@ -108,10 +108,14 @@ struct LD103 : SchemeModuleWidget, LD1Base {
 
 			addOutput(createOutputCentered<BluePort>(Vec(15,115.5 + offset), module, LD_1<3>::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+			cutoffWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i);
 			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			widthWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i);
 			addParam(widthWidgets[i]);
+			if (module) {
+				module->configParam(LD_1<3>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+				module->configParam(LD_1<3>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			}
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -156,10 +160,14 @@ struct LD106 : SchemeModuleWidget, LD1Base {
 
 			addOutput(createOutputCentered<BluePort>(Vec(74.5,31.5 + offset), module, LD_1<6>::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+			cutoffWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i);
 			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			widthWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i);
 			addParam(widthWidgets[i]);
+			if (module) {
+				module->configParam(LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+				module->configParam(LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			}
 		}
 	}
 	void appendContextMenu(Menu *menu) override{
