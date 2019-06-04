@@ -114,7 +114,7 @@ struct SS212 : SchemeModuleWidget {
 struct SSMenuItem : MenuItem {
 	SS_212 *ss_212;
 	int v;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		ss_212->v = v;
 		ss_212->setValues();
 	}
