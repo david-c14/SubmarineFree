@@ -465,7 +465,7 @@ struct AO1 : Module {
 struct AlgorithmMenu : MenuItem {
 	AOFuncDisplay *widget;
 	unsigned int algorithm;
-	void onAction(EventAction &e) override;
+	void onAction(const event::Action &e) override;
 };
 
 struct CategoryMenu : MenuItem {
@@ -488,14 +488,14 @@ struct CategoryMenu : MenuItem {
 
 struct CCopyMenu : MenuItem {
 	AOConstDisplay *widget;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		SubmarineAO::CvalClipboard = widget->value; 
 	}
 };
 
 struct CPasteMenu : MenuItem {
 	AOConstDisplay *widget;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		if (!isnan(SubmarineAO::CvalClipboard))
 			widget->setValue(SubmarineAO::CvalClipboard);
 	}
@@ -504,7 +504,7 @@ struct CPasteMenu : MenuItem {
 struct CValMenu : MenuItem {
 	AOConstDisplay *widget;
 	float val;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		widget->setValue(val);
 	}
 	static CValMenu *create(AOConstDisplay * _widget, float _val, const char * _text) {
@@ -518,14 +518,14 @@ struct CValMenu : MenuItem {
 
 struct FCopyMenu : MenuItem {
 	AOFuncDisplay *widget;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		SubmarineAO::FunctorClipboard = widget->value; 
 	}
 };
 
 struct FPasteMenu : MenuItem {
 	AOFuncDisplay *widget;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		if (!isnan(SubmarineAO::FunctorClipboard))
 			widget->setValue(SubmarineAO::FunctorClipboard);
 	}
@@ -594,7 +594,7 @@ void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
 	Knob::onMouseDown(e);
 }
 
-void AlgorithmMenu::onAction(EventAction &e) {
+void AlgorithmMenu::onAction(const event::Action &e) {
 	widget->setValue(algorithm);
 }
 

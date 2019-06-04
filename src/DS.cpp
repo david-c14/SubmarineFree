@@ -69,7 +69,7 @@ void DS_Module::appendContextMenu(Menu *menu) {
 	menu->addChild(m);
 }
 
-void DS_MenuItem::onAction(EventAction &e) {
+void DS_MenuItem::onAction(const event::Action &e) {
 	module->voltage0 = vl;
 	module->voltage1 = vh;
 }

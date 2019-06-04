@@ -338,7 +338,7 @@ struct WK_Display : TransparentWidget {
 struct WK101_MenuItem : MenuItem {
 	WK_101 *module;
 	int index;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		if (!module) {
 			return;
 		}
@@ -694,7 +694,7 @@ void WK205_InputPort::received(std::string pluginName, std::string moduleName, j
 struct WK205_MenuItem : MenuItem {
 	WK_205 *module;
 	int index;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		if (!module) {
 			return;
 		}

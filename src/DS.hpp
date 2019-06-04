@@ -16,7 +16,7 @@ struct DS_MenuItem : MenuItem {
 	DS_Module *module;
 	float vh;
 	float vl;
-	void onAction(EventAction &e) override;
+	void onAction(const event::Action &e) override;
 	void step() override;
 };
 
