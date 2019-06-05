@@ -332,7 +332,7 @@ struct LA108 : SchemeModuleWidget {
 		addParam(resetButton);
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2f));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2));
 		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE));
 		if (module) {
 			module->configParam(LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f);
@@ -357,7 +357,7 @@ struct LA108 : SchemeModuleWidget {
 		if (laMod) {
 			if (laMod->resetRunMode) {
 				laMod->resetRunMode = 0;
-				resetButton->setValue(0.0f);
+				APP->engine->setParam(laMod, LA_108::PARAM_RESET, 0.0f); 
 			}
 		}
 		ModuleWidget::step();

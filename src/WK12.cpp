@@ -602,7 +602,7 @@ void WK101::step() {
 	if (isDirty) {
 		for (int i = 0; i < 12; i++) {
 			if (widgets[i]->value != tunings[i])
-				widgets[i]->setValue(tunings[i]);	
+				APP->engine->setParam(module, WK_101::PARAM_1 + i, tunings[i]);
 		}
 	}
 

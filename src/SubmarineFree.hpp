@@ -89,4 +89,12 @@ struct SubHelper {
 	}
 };
 
+void setWidgetValue(ParamWidget *widget, float value) {
+	if (widget->paramQuantity) {
+		if (widget->paramQuantity->module) {
+			APP->engine->setParam(widget->paramQuantity->module, widget->paramQuantity->paramId, value);
+		}
+	}
+}
+
 #define SUBMENU "\xe2\x96\xb6"

@@ -46,8 +46,8 @@ struct LDMenuItem: MenuItem {
 	float width;
 	void onAction(const event::Action &e) override {
 		for (unsigned int i = 0; i < deviceCount; i++) {
-			ld->cutoffWidgets[i]->setValue(cutoff);
-			ld->widthWidgets[i]->setValue(width);
+			SetWidgetValue(ld->cutoffWidgets[i], cutoff);
+			SetWidgetValue(ld->widthWidgets[i], width);
 		}
 	}
 };

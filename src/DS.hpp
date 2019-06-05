@@ -6,8 +6,8 @@ struct DS_Module : Module {
 	float midpoint();
 	float output(int);
 	DS_Module() : Module() {}
-	json_t *toJson() override;
-	void fromJson(json_t *) override;
+	json_t *dataToJson() override;
+	void dataFromJson(json_t *) override;
 	void onReset() override;
 	void appendContextMenu(Menu *);
 };
