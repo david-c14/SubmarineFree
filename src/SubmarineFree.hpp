@@ -97,4 +97,8 @@ void setWidgetValue(ParamWidget *widget, float value) {
 	}
 }
 
+float getWidgetValue(ParamWidget *widget) {
+	return APP->engine->getParam(widget->paramQuantity->module, widget->paramQuantity->paramId);
+}
+
 #define SUBMENU "\xe2\x96\xb6"

@@ -391,9 +391,9 @@ struct AOFuncDisplay : Knob {
 		nvgFontFaceId(vg, gScheme.font()->handle);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 41.5, 13, SubmarineAO::functions[value].name.c_str(), NULL);
+		nvgText(vg, 41.5, 13, SubmarineAO::functions[getWidgetValue(this)].name.c_str(), NULL);
 	}
-	void onMouseDown(EventMouseDown &e) override;
+	void onButton(const event::Button &e) override;
 };
 
 struct AOConstDisplay : Knob {
@@ -405,14 +405,14 @@ struct AOConstDisplay : Knob {
 	}
 	void draw(NVGcontext *vg) override {
 		char mtext[41];
-		sprintf(mtext, "C=%4.2f", ((int)value)/100.0f);
+		sprintf(mtext, "C=%4.2f", ((int)getWidgetValue(this))/100.0f);
 		nvgFontSize(vg, 16);
 		nvgFontFaceId(vg, gScheme.font()->handle);
 		nvgFillColor(vg, SUBLIGHTBLUE);
 		nvgTextAlign(vg, NVG_ALIGN_CENTER);
 		nvgText(vg, 41.5, 13, mtext, NULL);
 	}
-	void onMouseDown(EventMouseDown &e) override;
+	void onButton(const event::Button &e) override;
 };
 
 template <unsigned int x, unsigned int y>
@@ -489,7 +489,7 @@ struct CategoryMenu : MenuItem {
 struct CCopyMenu : MenuItem {
 	AOConstDisplay *widget;
 	void onAction(const event::Action &e) override {
-		SubmarineAO::CvalClipboard = widget->value; 
+		SubmarineAO::CvalClipboard = getWidgetValue(widget); 
 	}
 };
 
@@ -497,7 +497,7 @@ struct CPasteMenu : MenuItem {
 	AOConstDisplay *widget;
 	void onAction(const event::Action &e) override {
 		if (!isnan(SubmarineAO::CvalClipboard))
-			SetWidgetValue(widget, SubmarineAO::CvalClipboard);
+			setWidgetValue(widget, SubmarineAO::CvalClipboard);
 	}
 };
 
@@ -505,7 +505,7 @@ struct CValMenu : MenuItem {
 	AOConstDisplay *widget;
 	float val;
 	void onAction(const event::Action &e) override {
-		SetWidgetValue(widget, val);
+		setWidgetValue(widget, val);
 	}
 	static CValMenu *create(AOConstDisplay * _widget, float _val, const char * _text) {
 		CValMenu *vm = new CValMenu();
@@ -519,7 +519,7 @@ struct CValMenu : MenuItem {
 struct FCopyMenu : MenuItem {
 	AOFuncDisplay *widget;
 	void onAction(const event::Action &e) override {
-		SubmarineAO::FunctorClipboard = widget->value; 
+		SubmarineAO::FunctorClipboard = getWidgetValue(widget); 
 	}
 };
 
@@ -527,13 +527,13 @@ struct FPasteMenu : MenuItem {
 	AOFuncDisplay *widget;
 	void onAction(const event::Action &e) override {
 		if (!isnan(SubmarineAO::FunctorClipboard))
-			SetWidgetValue(widget, SubmarineAO::FunctorClipboard);
+			setWidgetValue(widget, SubmarineAO::FunctorClipboard);
 	}
 };
 
-void AOConstDisplay::onMouseDown(EventMouseDown &e) {
-	if (e.button == 1) {
-		e.consumed = true;
+void AOConstDisplay::onButton(const event::Button &e) {
+	if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+		e.consume(this);
 		Menu *menu = createMenu();
 		CCopyMenu *cm = new CCopyMenu();
 		cm->widget = this;
@@ -557,12 +557,12 @@ void AOConstDisplay::onMouseDown(EventMouseDown &e) {
 		menu->addChild(CValMenu::create(this, -10000.0f, "-100.00"));
 		return;
 	}
-	Knob::onMouseDown(e);
+	Knob::onButton(e);
 }
 
-void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
-	if (e.button == 1) {
-		e.consumed = true;
+void AOFuncDisplay::onButton(const event::Button &e) {
+	if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+		e.consume(this);
 		Menu *menu = createMenu();
 		FCopyMenu *cm = new FCopyMenu();
 		cm->widget = this;
@@ -591,11 +591,11 @@ void AOFuncDisplay::onMouseDown(EventMouseDown &e) {
 		}
 		return;
 	}
-	Knob::onMouseDown(e);
+	Knob::onButton(e);
 }
 
 void AlgorithmMenu::onAction(const event::Action &e) {
-	SetWidgetValue(widget, algorithm);
+	setWidgetValue(widget, algorithm);
 }
 
 

@@ -61,7 +61,7 @@ struct TDText : SubText {
 		SubText::foregroundMenu(menu);
 	}
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
 			e.consume(this);
 			Menu *menu = createMenu();
 			appendContextMenu(menu);

@@ -10,14 +10,14 @@ struct TDVText : SubText {
 		bgColor = nvgRGBA(0, 0, 0, 0);
 		fontSize = 28;
 	}
-	void onMouseDown(EventMouseDown &e) override {
-		if (e.button == 1) {
-			e.consumed = true;
+	void onButton(const event::Button &e) override {
+		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action = GLFW_PRESS) {
+			e.consume(this);
 			Menu *menu = createMenu();
 			appendContextMenu(menu);
 		}
 		else {
-			SubText::onMouseDown(e);
+			SubText::onButton(e);
 		}
 	}
 };
