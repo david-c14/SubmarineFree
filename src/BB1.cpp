@@ -59,7 +59,7 @@ struct BB_1 : DS_Module {
 			outputs[OUTPUT_1 + i].value = sample[i] = 0.0f;
 	}
 	void onRandomize() override {
-		if (gPaused) {
+		if (APP->engine->isPaused()) {
 			doRandomize();
 		}
 		else {
@@ -68,7 +68,7 @@ struct BB_1 : DS_Module {
 		}
 	}
 	void onReset() override {
-		if (gPaused) {
+		if (APP->engine->isPaused()) {
 			doReset();
 		}
 		else {

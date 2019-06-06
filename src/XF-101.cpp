@@ -66,8 +66,8 @@ struct XF101 : SchemeModuleWidget {
 
 		addOutput(createOutputCentered<SilverPort>(Vec(140,86.5), module, XF_101::OUTPUT_1));
 
-		addParam(createParamCentered<SubSwitch2>(Vec(48, 58.5), module, XF_101::PARAM_CV_1);
-		addParam(createParamCentered<SubSwitch3>(Vec(132, 58.5), module, XF_101::PARAM_MODE_1);
+		addParam(createParamCentered<SubSwitch2>(Vec(48, 58.5), module, XF_101::PARAM_CV_1));
+		addParam(createParamCentered<SubSwitch3>(Vec(132, 58.5), module, XF_101::PARAM_MODE_1));
 		fader = createParamCentered<XF_LightKnob>(Vec(90, 58), module, XF_101::PARAM_FADE_1);
 		fader->cv = XF_101::INPUT_CV_1;
 		fader->link = 0;

@@ -65,7 +65,7 @@ struct FF_1 : DS_Module {
 		}
 	}
 	void onRandomize() override {
-		if (gPaused) {
+		if (APP->engine->isPaused()) {
 			doRandomize();
 		}
 		else {
@@ -74,7 +74,7 @@ struct FF_1 : DS_Module {
 		}
 	}
 	void onReset() override {
-		if (gPaused) {
+		if (APP->engine->isPaused()) {
 			doReset();
 		}
 		else {

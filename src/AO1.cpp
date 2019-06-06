@@ -496,7 +496,7 @@ struct CCopyMenu : MenuItem {
 struct CPasteMenu : MenuItem {
 	AOConstDisplay *widget;
 	void onAction(const event::Action &e) override {
-		if (!isnan(SubmarineAO::CvalClipboard))
+		if (!std::isnan(SubmarineAO::CvalClipboard))
 			setWidgetValue(widget, SubmarineAO::CvalClipboard);
 	}
 };
@@ -526,7 +526,7 @@ struct FCopyMenu : MenuItem {
 struct FPasteMenu : MenuItem {
 	AOFuncDisplay *widget;
 	void onAction(const event::Action &e) override {
-		if (!isnan(SubmarineAO::FunctorClipboard))
+		if (!std::isnan(SubmarineAO::FunctorClipboard))
 			setWidgetValue(widget, SubmarineAO::FunctorClipboard);
 	}
 };
@@ -539,7 +539,7 @@ void AOConstDisplay::onButton(const event::Button &e) {
 		cm->widget = this;
 		cm->text = "Copy";
 		menu->addChild(cm);
-		if (!isnan(SubmarineAO::CvalClipboard)) {
+		if (!std::isnan(SubmarineAO::CvalClipboard)) {
 			CPasteMenu *pm = new CPasteMenu();
 			pm->widget = this;
 			pm->text = "Paste";
@@ -568,7 +568,7 @@ void AOFuncDisplay::onButton(const event::Button &e) {
 		cm->widget = this;
 		cm->text = "Copy";
 		menu->addChild(cm);
-		if (!isnan(SubmarineAO::FunctorClipboard)) {
+		if (!std::isnan(SubmarineAO::FunctorClipboard)) {
 			FPasteMenu *pm = new FPasteMenu();
 			pm->widget = this;
 			pm->text = "Paste";
@@ -617,8 +617,8 @@ struct AOWidget : SchemeModuleWidget {
 				addParam(createParam<AOFuncDisplay>(Vec(42.5 + 90 * iy, 59 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x));
 				addParam(createParam<AOConstDisplay>(Vec(42.5 + 90 * iy, 78 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x));
 				if (module) {
-					module->configParam(AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f ));
-					module->configParam(AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f));
+					module->configParam(AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f );
+					module->configParam(AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f);
 				}
 			}
 		}

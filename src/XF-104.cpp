@@ -126,8 +126,12 @@ struct XF104 : SchemeModuleWidget {
 			addChild(createLightCentered<TinyLight<BlueRedLight>>(Vec(142.5, 68.5 + offset), module, XF_104::LIGHT_AUTO_1 + i * 2));
 		}
 
-		addParam(createParamCentered<LightButton>(Vec(98, 102.5), module, XF_104::PARAM_LINK_1, 0.0f, 1.0f, 0.0f));
-		addParam(createParamCentered<LightButton>(Vec(98, 278.5), module, XF_104::PARAM_LINK_2, 0.0f, 1.0f, 0.0f));
+		addParam(createParamCentered<LightButton>(Vec(98, 102.5), module, XF_104::PARAM_LINK_1));
+		addParam(createParamCentered<LightButton>(Vec(98, 278.5), module, XF_104::PARAM_LINK_2));
+		if (module) {
+			module->configParam(XF_104::PARAM_LINK_1, 0.0f, 1.0f, 0.0f);
+			module->configParam(XF_104::PARAM_LINK_2, 0.0f, 1.0f, 0.0f);
+		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "XF-104");

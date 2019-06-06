@@ -117,7 +117,7 @@ void WK_Tunings::loadScalaFile(std::string path) {
 				line.append(1,c);
 				strings[i].erase(0,1);
 				if (!std::isdigit(c) && (c != '/') && (c != '.')) {
-					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+					warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 					return;
 				}
 				if (c == '.')
@@ -125,7 +125,7 @@ void WK_Tunings::loadScalaFile(std::string path) {
 				if (c == '/' && !ratio)
 					ratio = line.size();
 				if (decimal && ratio) {
-					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+					warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 					return;
 				}
 			}
@@ -134,13 +134,13 @@ void WK_Tunings::loadScalaFile(std::string path) {
 					float d = std::stof(line, nullptr);
 					d -= (i-1) * 100.0;
 					if ((d < -50.0) || (d > 50.0)) {
-						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+						warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 						return;
 					}
 					tuning.offsets[(i-1)%12] = d;
 				}
 				catch (std::exception &err) {
-					warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+					warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 					return;
 				}
 			}
@@ -152,20 +152,20 @@ void WK_Tunings::loadScalaFile(std::string path) {
 						int inum = std::stoi(num,nullptr);
 						int idenom = std::stoi(denom, nullptr);
 						if (!idenom) {
-							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+							warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 							return;
 						}
 						float r = (1.0f * inum / idenom);  
 						float d = 1200.0 * log2(r);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
-							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+							warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 							return;
 						}
 						tuning.offsets[(i-1)%12] = d;
 					}
 					catch (std::exception &err) {
-						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+						warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 						return;
 					}
 				}
@@ -175,13 +175,13 @@ void WK_Tunings::loadScalaFile(std::string path) {
 						float d = 1200.0 * log2(inum);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
-							warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+							warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 							return;
 						}
 						tuning.offsets[(i-1)%12] = d;
 					}
 					catch (std::exception &err) {
-						warn("SubmarineFree WK: Scala file format error in %s", stringFilename(path).c_str());
+						warn("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 						return;
 					}
 				}
@@ -197,10 +197,10 @@ void WK_Tunings::loadScalaFile(std::string path) {
 }
 
 void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
-	std::vector<std::string> dirList = systemListEntries(asset::plugin(pluginInstance, "Scala"));
+	std::vector<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
 	for (auto entry : dirList) {
-		if (systemIsDirectory(entry)) continue;
-		if (stringExtension(entry).compare("scl")) continue;
+		if (system::isDirectory(entry)) continue;
+		if (string::fileExtension(entry).compare("scl")) continue;
 		loadScalaFile(entry);
 	}
 }
@@ -353,9 +353,9 @@ struct WK_Param : MedKnob<LightKnob> {
 	
 	void onChange(EventChange &e) override {
 		MedKnob<LightKnob>::onChange(e);
-		WK_101 *module = dynamic_cast<WK_101 *>(this->module);
+		WK_101 *module = dynamic_cast<WK_101 *>(this->paramQuantity->module);
 		if (module) {
-			module->tunings[paramId - WK_101::PARAM_1] = value;
+			module->tunings[this->paramQuantity->paramId - WK_101::PARAM_1] = getWidgetValue(this);
 			module->toSend = true;
 		}
 	}
@@ -601,7 +601,7 @@ void WK101::step() {
 	}
 	if (isDirty) {
 		for (int i = 0; i < 12; i++) {
-			if (widgets[i]->value != tunings[i])
+			if (getWidgetValue(widgets[i]) != tunings[i])
 				APP->engine->setParam(module, WK_101::PARAM_1 + i, tunings[i]);
 		}
 	}
@@ -649,13 +649,13 @@ struct WK_205 : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
 	void step() override;
-	json_t *toJson(void) override {
+	json_t *dataToJson(void) override {
 		json_t *rootJ = json_array();
 		for (int i = 0; i < 12; i++)
 			json_array_append_new(rootJ, json_real(tunings[i]));
 		return rootJ;
 	}
-	void fromJson(json_t *rootJ) override {
+	void dataFromJson(json_t *rootJ) override {
 		int size = json_array_size(rootJ);
 		if (!size) return;
 		if (size > 12)
