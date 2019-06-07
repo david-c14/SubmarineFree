@@ -6,7 +6,7 @@
 **************************************************************/
 
 #include "../SubmarineFree.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 void LightKnob::setEnabled(int val) {
 	enabled = val;
@@ -52,11 +52,11 @@ void LightKnob::draw(NVGcontext *vg) {
 	}
 
 	float angle;
-	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
-		angle = rescale(value, minValue, maxValue, minAngle, maxAngle);
+	if (std::isfinite(paramQuantity->getMinValue()) && std::isfinite(paramQuantity->getMaxValue())) {
+		angle = rescale(paramQuantity->getValue(), paramQuantity->getMinValue(), paramQuantity->getMaxValue(), minAngle, maxAngle);
 	}
 	else {
-		angle = rescale(value, -1.0, 1.0, minAngle, maxAngle);
+		angle = rescale(paramQuantity->getValue(), -1.0, 1.0, minAngle, maxAngle);
 		angle = fmodf(angle, 2*M_PI);
 	}
 	float cx = (1.0f + sinf(angle) * 0.7f) * radius;
@@ -76,7 +76,7 @@ void LightKnob::draw(NVGcontext *vg) {
 		}
 		else {
 			NVGpaint paint;
-			NVGcolor ocol = colorMult(lcol, 0.1);
+			NVGcolor ocol = color::mult(lcol, 0.1);
 			paint = nvgRadialGradient(vg, 0, radius * -0.7, radius * 0.05, radius * 0.2, lcol, ocol);
 			nvgFillPaint(vg, paint);
 		}
@@ -89,7 +89,7 @@ void LightKnob::draw(NVGcontext *vg) {
 		nvgBeginPath(vg);
 		nvgRect(vg, cx - oradius, cy - oradius, 2 * oradius, 2 * oradius);
 		NVGpaint paint;
-		NVGcolor icol = colorMult(lcol, 0.08);
+		NVGcolor icol = color::mult(lcol, 0.08);
 		NVGcolor ocol = nvgRGB(0, 0, 0);
 		paint = nvgRadialGradient(vg, cx, cy, lradius, oradius, icol, ocol);
 		nvgFillPaint(vg, paint);

@@ -11,7 +11,7 @@ struct TDVText : SubText {
 		fontSize = 28;
 	}
 	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action = GLFW_PRESS) {
+		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
 			e.consume(this);
 			Menu *menu = createMenu();
 			appendContextMenu(menu);
@@ -31,7 +31,7 @@ struct TD_202 : Module {
 		reset = 1;
 		Module::onReset();
 	}
-}
+};
 
 struct TD202 : SchemeModuleWidget {
 	TDVText *textField;
@@ -98,4 +98,4 @@ struct TD202 : SchemeModuleWidget {
 	}
 };
 
-Model *modelTD202 = createModel<Module, TD202>("TD-202");
+Model *modelTD202 = createModel<TD_202, TD202>("TD-202");

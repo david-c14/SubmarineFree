@@ -197,10 +197,10 @@ void WK_Tunings::loadScalaFile(std::string path) {
 }
 
 void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
-	std::vector<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
+	std::list<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
 	for (auto entry : dirList) {
 		if (system::isDirectory(entry)) continue;
-		if (string::fileExtension(entry).compare("scl")) continue;
+		if (string::filenameExtension(entry).compare("scl")) continue;
 		loadScalaFile(entry);
 	}
 }
@@ -351,7 +351,7 @@ struct WK101_MenuItem : MenuItem {
 
 struct WK_Param : MedKnob<LightKnob> {
 	
-	void onChange(EventChange &e) override {
+	void onChange(const event::Change &e) override {
 		MedKnob<LightKnob>::onChange(e);
 		WK_101 *module = dynamic_cast<WK_101 *>(this->paramQuantity->module);
 		if (module) {

@@ -6,10 +6,10 @@
 **************************************************************/
 
 #include "../SubmarineFree.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 	void LightSlider::draw(NVGcontext *vg) {
-		float offset = rescale(value, minValue, maxValue, 0, box.size.y - 12);
-	NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
+		float offset = rescale(paramQuantity->getValue(), paramQuantity->getMinValue(), paramQuantity->getMaxValue(), 0, box.size.y - 12);
+		NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
 		
 		nvgFillColor(vg, nvgRGB(0, 0, 0));	
 		nvgStrokeColor(vg, nvgRGB(0xff, 0xff, 0xff));
@@ -29,7 +29,7 @@
 		}
 		else {
 			NVGpaint paint;
-			NVGcolor ocol = colorMult(lcol, 0.1);
+			NVGcolor ocol = color::mult(lcol, 0.1);
 			paint = nvgRadialGradient(vg, box.size.x / 2, offset + 6, 2, 8, lcol, ocol);
 			nvgFillPaint(vg, paint);
 		}
@@ -41,7 +41,7 @@
 		nvgBeginPath(vg);
 		nvgRect(vg, box.size.x / 2 - 20, offset - 4, 40, 20);
 		NVGpaint paint;
-		NVGcolor icol = colorMult(lcol, 0.08);
+		NVGcolor icol = color::mult(lcol, 0.08);
 		NVGcolor ocol = nvgRGB(0, 0, 0);
 		paint = nvgRadialGradient(vg, box.size.x / 2, offset + 6, 4, 20, icol, ocol);
 		nvgFillPaint(vg, paint);
@@ -50,8 +50,8 @@
 	}
 	}
 
-	void LightSlider::onDragMove(EventDragMove &e) {
-		EventDragMove e2 = e;
-		e2.mouseRel = Vec(e.mouseRel.x, -e.mouseRel.y);
+	void LightSlider::onDragMove(const event::DragMove &e) {
+		event::DragMove e2 = e;
+		e2.mouseDelta = Vec(e.mouseDelta.x, -e.mouseDelta.y);
 		LightKnob::onDragMove(e2);
 	}
