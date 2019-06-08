@@ -6,12 +6,12 @@
 **************************************************************/
 
 #include "../SubmarineFree.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 void LightButton::draw(NVGcontext *vg) {
 
 	nvgSave(vg);
-	NVGcolor lcol = (value > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
+	NVGcolor lcol = (paramQuantity->getValue() > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
 
 	// Shadow
 	if (!gScheme.isFlat) {
@@ -49,7 +49,7 @@ void LightButton::draw(NVGcontext *vg) {
 		}
 		else {
 			NVGpaint paint;
-			NVGcolor ocol = colorMult(lcol, 0.1);
+			NVGcolor ocol = color::mult(lcol, 0.1);
 			paint = nvgRadialGradient(vg, box.size.x / 2.0f, box.size.y * 0.375f, 1.0f, 4.0f, lcol, ocol);
 			nvgFillPaint(vg, paint);
 		}
@@ -63,7 +63,7 @@ void LightButton::draw(NVGcontext *vg) {
 		nvgBeginPath(vg);
 		nvgRect(vg, box.size.x / 2.0 - oradius, box.size.y * 0.375f - oradius, 2 * oradius, 2 * oradius);
 		NVGpaint paint;
-		NVGcolor icol = colorMult(lcol, 0.08);
+		NVGcolor icol = color::mult(lcol, 0.08);
 		NVGcolor ocol = nvgRGB(0, 0, 0);
 		paint = nvgRadialGradient(vg, box.size.x / 2.0, box.size.y * 0.375f, lradius, oradius, icol, ocol);
 		nvgFillPaint(vg, paint);

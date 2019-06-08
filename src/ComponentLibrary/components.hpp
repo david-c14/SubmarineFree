@@ -215,7 +215,7 @@ struct SchemePanel : FramebufferWidget {
 };
 
 struct SchemeCanvasWidget : Widget {
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 };
 
 struct SchemeModuleWidget : app::ModuleWidget {

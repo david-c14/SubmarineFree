@@ -62,23 +62,28 @@ void MouseTransformWidget::onButton(const event::Button &e) {
 };
 
 void MouseTransformWidget::onHover(const event::Hover &e) {
-	Vec pos = e.pos;
-	Vec mouseDelta = e.mouseDelta;
+	event::Hover e2;
+	e2.pos.x = e.pos.x;
+	e2.pos.y = e.pos.y;
+	e2.mouseDelta.x = e.mouseDelta.x;
+	e2.mouseDelta.y = e.mouseDelta.y;
 	if (hasInverse) {
-		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
-		nvgTransformPoint(&e.mouseDelta.x, &e.mouseDelta.y, invLinear, e.mouseDelta.x, e.mouseDelta.y);
+		nvgTransformPoint(&e2.pos.x, &e2.pos.y, inverse, e2.pos.x, e2.pos.y); 
+		nvgTransformPoint(&e2.mouseDelta.x, &e2.mouseDelta.y, invLinear, e2.mouseDelta.x, e2.mouseDelta.y);
 	}
-	Widget::onHover(e);
-	e.pos = pos;
-	e.mouseDelta = mouseDelta;
+	Widget::onHover(e2);
 };
 
 void MouseTransformWidget::onDragHover(const event::DragHover &e) {
 	Vec pos = e.pos;
 	Vec mouseDelta = e.mouseDelta;
 	if (hasInverse) {
-		nvgTransformPoint(&e.pos.x, &e.pos.y, inverse, e.pos.x, e.pos.y); 
-		nvgTransformPoint(&e.mouseDelta.x, &e.mouseDelta.y, invLinear, e.mouseDelta.x, e.mouseDelta.y);
+		Vec newPos;
+		nvgTransformPoint(&newPos.x, &newPos.y, inverse, e.pos.x, e.pos.y); 
+		e.pos = newPos;
+		Vec newDelta;
+		nvgTransformPoint(&newDelta.x, &newDelta.y, invLinear, e.mouseDelta.x, e.mouseDelta.y);
+		e.mouseDelta = newDelta;
 	}
 	Widget::onDragHover(e);
 	e.pos = pos;

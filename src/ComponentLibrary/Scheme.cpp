@@ -37,7 +37,7 @@ void Scheme::save() {
 	json_object_set_new(settings, "flat", json_real(isFlat?1:0));
 	json_object_set_new(settings, "scheme", json_real(scheme));
 
-	systemCreateDirectory(asset::user("SubmarineFree"));
+	system::createDirectory(asset::user("SubmarineFree"));
 	std::string settingsFilename = asset::user("SubmarineFree/Settings.json");
 	FILE *file = fopen(settingsFilename.c_str(), "w");
 	if (file) {
@@ -77,7 +77,7 @@ void Scheme::setColors() {
 std::shared_ptr<Font> Scheme::font() {
 	if (!_fontLoaded) {
 		_fontLoaded = true;
-		_font = Font::load(asset::system("res/fonts/DejaVuSans.ttf"));	
+		_font = APP->window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));	
 	}
 	return _font;
 }
@@ -122,24 +122,24 @@ void SchemePanel::step() {
 	FramebufferWidget::step();
 }
 
-void SchemeCanvasWidget::draw(NVGcontext *vg) {
+void SchemeCanvasWidget::draw(const DrawArgs &args) {
 	SchemeModuleWidget *smw = dynamic_cast<SchemeModuleWidget *>(parent->parent);
-	nvgSave(vg);
-	smw->render(vg, this);
-	nvgRestore(vg);
+	nvgSave(args.vg);
+	smw->render(args.vg, this);
+	nvgRestore(args.vg);
 	// Standard Panel Border
 	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
-	nvgBeginPath(vg);
-	nvgRect(vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
-	nvgStrokeColor(vg, borderColor);
-	nvgStrokeWidth(vg, 1.0);
-	nvgStroke(vg);
-	Widget::draw(vg);
+	nvgBeginPath(args.vg);
+	nvgRect(args.vg, 0.5, 0.5, box.size.x - 1.0, box.size.y - 1.0);
+	nvgStrokeColor(args.vg, borderColor);
+	nvgStrokeWidth(args.vg, 1.0);
+	nvgStroke(args.vg);
+	Widget::draw(args.vg);
 }
 
 struct SchemeModuleWidgetSchemeMenuItem : MenuItem {
 	int scheme;
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		gScheme.scheme = scheme;
 		gScheme.setColors();
 		gScheme.save();
@@ -151,7 +151,7 @@ struct SchemeModuleWidgetSchemeMenuItem : MenuItem {
 };
 
 struct SchemeModuleWidgetFlatMenuItem : MenuItem {
-	void onAction(EventAction &e) override {
+	void onAction(const event::Action &e) override {
 		gScheme.isFlat = !gScheme.isFlat;
 		gScheme.save();
 	}
@@ -166,7 +166,7 @@ struct SchemeModuleWidgetVisualMenuItem : MenuItem {
 		Menu *menu = new Menu();
 		SchemeModuleWidgetFlatMenuItem *fmi = createMenuItem<SchemeModuleWidgetFlatMenuItem>("Flat");
 		menu->addChild(fmi);
-		menu->addChild(MenuSeparator::create<MenuSeparator>());
+		menu->addChild(new MenuSeparator());
 		SchemeModuleWidgetSchemeMenuItem *vmi = createMenuItem<SchemeModuleWidgetSchemeMenuItem>("Blue");
 		vmi->scheme = 0;
 		menu->addChild(vmi);
