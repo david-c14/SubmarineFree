@@ -9,7 +9,7 @@ Menu *SubTextForegroundParent::createChildMenu()  {
 	return menu;	
 }
 
-void SubTextForegroundMenu::onAction(EventAction &e) {
+void SubTextForegroundMenu::onAction(const event::Action &e) {
 	subText->color = color;
 }
 
@@ -24,7 +24,7 @@ Menu *SubTextBackgroundParent::createChildMenu() {
 	return menu;
 }
 
-void SubTextBackgroundMenu::onAction(EventAction &e) {
+void SubTextBackgroundMenu::onAction(const event::Action &e) {
 	subText->bgColor = color;
 }
 
@@ -35,10 +35,10 @@ void SubTextBackgroundMenu::step() {
 
 int SubText::getTextPosition(Vec mousePos) {
     bndSetFont(font->handle);
-    int textPos = bndIconLabelTextPosition(gVg, textOffset.x, textOffset.y,
+    int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
       box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
       -1, fontSize, text.c_str(), mousePos.x, mousePos.y);
-    bndSetFont(gGuiFont->handle);
+    bndSetFont(APP->window->uiFont->handle);
     return textPos;
 }
 
@@ -56,14 +56,14 @@ void SubText::draw(NVGcontext *vg) {
 		
 		NVGcolor highlightColor = color;
 		highlightColor.a = 0.5;
-		int begin = min(cursor, selection);
-		int end = (this == gFocusedWidget) ? max(cursor, selection) : -1;
+		int begin = std::min(cursor, selection);
+		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
 		bndIconLabelCaret(vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, fontSize, text.c_str(), highlightColor, begin, end);
 	}
 	nvgResetScissor(vg);
-	bndSetFont(gGuiFont->handle);
+	bndSetFont(APP->window->uiFont->handle);
 }
 
 void SubText::appendContextMenu(Menu *menu) {

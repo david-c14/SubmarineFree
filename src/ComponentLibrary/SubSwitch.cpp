@@ -6,11 +6,11 @@
 **************************************************************/
 
 #include "../SubmarineFree.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 void SubSwitch2::draw(NVGcontext *vg) {
-	float cx = 7.0f + (box.size.x - 14.0f) * value / (maxValue - minValue);
-	float cy = 7.0f + (box.size.y - 14.0f) * value / (maxValue - minValue);
+	float cx = 7.0f + (box.size.x - 14.0f) * paramQuantity->getValue() / (paramQuantity->getMaxValue() - paramQuantity->getMinValue());
+	float cy = 7.0f + (box.size.y - 14.0f) * paramQuantity->getValue() / (paramQuantity->getMaxValue() - paramQuantity->getMinValue());
 
 	nvgSave(vg);
 	// Shadow

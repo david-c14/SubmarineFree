@@ -6,7 +6,7 @@
 **************************************************************/
 
 #include "../SubmarineFree.hpp"
-#include "util/color.hpp"
+#include "color.hpp"
 
 void SilverPort::draw(NVGcontext *vg) {
 	nvgSave(vg);
@@ -77,9 +77,9 @@ void SilverPort::draw(NVGcontext *vg) {
 		nvgCircle(vg, radius, radius, 8.0);
 		nvgPathWinding(vg, NVG_HOLE);
 		nvgStrokeWidth(vg, 0.80645);
-		if (type == Port::OUTPUT) {
+		if (type == app::PortWidget::OUTPUT) {
 			if (gScheme.isFlat) {
-				nvgFillColor(vg, colorMult(col, nvgRGB(0x80, 0x80, 0x80)));
+				nvgFillColor(vg, color::mult(col, nvgRGB(0x80, 0x80, 0x80)));
 			}
 			else {
 				nvgFillPaint(vg, nvgRadialGradient(vg, radius + 0.3, radius + 1, 1, 12, col, nvgRGB(0x3f, 0x3f, 0x3f)));

@@ -73,3 +73,15 @@ void init(rack::Plugin *p) {
 	// Any other pluginInstance initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
 }
+
+void setWidgetValue(ParamWidget *widget, float value) {
+	if (widget->paramQuantity) {
+		if (widget->paramQuantity->module) {
+			APP->engine->setParam(widget->paramQuantity->module, widget->paramQuantity->paramId, value);
+		}
+	}
+}
+
+float getWidgetValue(ParamWidget *widget) {
+	return APP->engine->getParam(widget->paramQuantity->module, widget->paramQuantity->paramId);
+}
