@@ -9,9 +9,13 @@
 #include "color.hpp"
 
 void LightButton::draw(NVGcontext *vg) {
+	float value = 0.0f;
+	if (paramQuantity) {
+		value = paramQuantity->getValue();
+	}
 
 	nvgSave(vg);
-	NVGcolor lcol = (paramQuantity->getValue() > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
+	NVGcolor lcol = (value > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
 
 	// Shadow
 	if (!gScheme.isFlat) {

@@ -387,11 +387,13 @@ struct AOFuncDisplay : Knob {
 		speed = 0.5f;
 	}
 	void draw(NVGcontext *vg) override {
-		nvgFontSize(vg, 16);
-		nvgFontFaceId(vg, gScheme.font()->handle);
-		nvgFillColor(vg, SUBLIGHTBLUE);
-		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 41.5, 13, SubmarineAO::functions[getWidgetValue(this)].name.c_str(), NULL);
+		if (this->paramQuantity) {
+			nvgFontSize(vg, 16);
+			nvgFontFaceId(vg, gScheme.font()->handle);
+			nvgFillColor(vg, SUBLIGHTBLUE);
+			nvgTextAlign(vg, NVG_ALIGN_CENTER);
+			nvgText(vg, 41.5, 13, SubmarineAO::functions[getWidgetValue(this)].name.c_str(), NULL);
+		}
 	}
 	void onButton(const event::Button &e) override;
 };
@@ -404,13 +406,15 @@ struct AOConstDisplay : Knob {
 		speed = 0.005;
 	}
 	void draw(NVGcontext *vg) override {
-		char mtext[41];
-		sprintf(mtext, "C=%4.2f", ((int)getWidgetValue(this))/100.0f);
-		nvgFontSize(vg, 16);
-		nvgFontFaceId(vg, gScheme.font()->handle);
-		nvgFillColor(vg, SUBLIGHTBLUE);
-		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 41.5, 13, mtext, NULL);
+		if (this->paramQuantity) {
+			char mtext[41];
+			sprintf(mtext, "C=%4.2f", ((int)getWidgetValue(this))/100.0f);
+			nvgFontSize(vg, 16);
+			nvgFontFaceId(vg, gScheme.font()->handle);
+			nvgFillColor(vg, SUBLIGHTBLUE);
+			nvgTextAlign(vg, NVG_ALIGN_CENTER);
+			nvgText(vg, 41.5, 13, mtext, NULL);
+		}
 	}
 	void onButton(const event::Button &e) override;
 };

@@ -295,6 +295,7 @@ struct EO_Display : TransparentWidget {
 	}
 
 	void draw(NVGcontext *vg) override {
+		debug("Draw");
 		if (!module) {
 			return;
 		}
@@ -319,7 +320,7 @@ struct EO_Display : TransparentWidget {
 
 struct EO_Measure : TransparentWidget {
 	EO_102 *module;
-	char measureText[41];
+	char measureText[41] = "";
 	NVGcolor col;
 
 	virtual void updateText() {
@@ -401,7 +402,6 @@ struct EO102 : SchemeModuleWidget {
 	EO102(EO_102 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(405, 380);
 		addChild(new SchemePanel(this->box.size));
-
 		{
 			EO_Display * display = new EO_Display();
 			display->module = module;
@@ -435,6 +435,7 @@ struct EO102 : SchemeModuleWidget {
 			display->col = SUBLIGHTRED;
 			addChild(display);
 		}
+
 
 		for (int i = 0; i < 2; i++) {
 			addInput(createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i));

@@ -9,8 +9,17 @@
 #include "color.hpp"
 
 void SubSwitch2::draw(NVGcontext *vg) {
-	float cx = 7.0f + (box.size.x - 14.0f) * paramQuantity->getValue() / (paramQuantity->getMaxValue() - paramQuantity->getMinValue());
-	float cy = 7.0f + (box.size.y - 14.0f) * paramQuantity->getValue() / (paramQuantity->getMaxValue() - paramQuantity->getMinValue());
+	float value = 0.0f;
+	float minValue = 0.0f;
+	float maxValue = 1.0f;
+	if (paramQuantity) {
+		value = paramQuantity->getValue();
+		minValue = paramQuantity->getMinValue();
+		maxValue = paramQuantity->getMaxValue();
+	}
+
+	float cx = 7.0f + (box.size.x - 14.0f) * value / (maxValue - minValue);
+	float cy = 7.0f + (box.size.y - 14.0f) * value / (maxValue - minValue);
 
 	nvgSave(vg);
 	// Shadow

@@ -21,6 +21,14 @@ void LightKnob::setRadius(int r) {
 void LightKnob::draw(NVGcontext *vg) {
 	nvgSave(vg);
 	NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
+	float value = 0.0f;
+	float minValue = -1.0f;
+	float maxValue = 1.0f;
+	if (paramQuantity) {
+		value = paramQuantity->getValue();
+		minValue = paramQuantity->getMinValue();
+		maxValue = paramQuantity->getMaxValue();
+	}
 
 	// Shadow
 	if (!gScheme.isFlat) {
@@ -52,11 +60,11 @@ void LightKnob::draw(NVGcontext *vg) {
 	}
 
 	float angle;
-	if (std::isfinite(paramQuantity->getMinValue()) && std::isfinite(paramQuantity->getMaxValue())) {
-		angle = rescale(paramQuantity->getValue(), paramQuantity->getMinValue(), paramQuantity->getMaxValue(), minAngle, maxAngle);
+	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
+		angle = rescale(value, minValue, maxValue, minAngle, maxAngle);
 	}
 	else {
-		angle = rescale(paramQuantity->getValue(), -1.0, 1.0, minAngle, maxAngle);
+		angle = rescale(value, -1.0, 1.0, minAngle, maxAngle);
 		angle = fmodf(angle, 2*M_PI);
 	}
 	float cx = (1.0f + sinf(angle) * 0.7f) * radius;
