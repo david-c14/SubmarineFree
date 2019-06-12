@@ -353,8 +353,8 @@ struct WK_Param : MedKnob<LightKnob> {
 	
 	void onChange(const event::Change &e) override {
 		MedKnob<LightKnob>::onChange(e);
-		WK_101 *module = dynamic_cast<WK_101 *>(this->paramQuantity->module);
-		if (module) {
+		if (paramQuantity) {
+			WK_101 *module = dynamic_cast<WK_101 *>(this->paramQuantity->module);
 			module->tunings[this->paramQuantity->paramId - WK_101::PARAM_1] = getWidgetValue(this);
 			module->toSend = true;
 		}

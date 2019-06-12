@@ -493,7 +493,9 @@ struct CategoryMenu : MenuItem {
 struct CCopyMenu : MenuItem {
 	AOConstDisplay *widget;
 	void onAction(const event::Action &e) override {
-		SubmarineAO::CvalClipboard = getWidgetValue(widget); 
+		if (widget->paramQuantity) {
+			SubmarineAO::CvalClipboard = getWidgetValue(widget); 
+		}
 	}
 };
 
@@ -523,7 +525,9 @@ struct CValMenu : MenuItem {
 struct FCopyMenu : MenuItem {
 	AOFuncDisplay *widget;
 	void onAction(const event::Action &e) override {
-		SubmarineAO::FunctorClipboard = getWidgetValue(widget); 
+		if (widget->paramQuantity) {
+			SubmarineAO::FunctorClipboard = getWidgetValue(widget); 
+		}
 	}
 };
 

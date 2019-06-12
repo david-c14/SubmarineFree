@@ -536,8 +536,8 @@ struct PO102 : PO_Layout {
 		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE));
 		if (module) {
 			module->configParam(PO_101::PARAM_TUNE, -96.0f, 72.0f, -12.0f);
+			module->baseFreq = 1.0f;
 		}
-		module->baseFreq = 1.0f;
 		Layout();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {

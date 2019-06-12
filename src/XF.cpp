@@ -81,8 +81,8 @@ void XF::crossFade(XF_Controls *controls) {
 }
 
 void XF_LightKnob::step() {
-	Module *module = paramQuantity->module;
-	if (module) {
+	if (paramQuantity) {
+		Module *module = paramQuantity->module;
 		if (link) {
 			setEnabled(!module->inputs[cv].active && (module->params[link].value < 0.5f));
 		}
