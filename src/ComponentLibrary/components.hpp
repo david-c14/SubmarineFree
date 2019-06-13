@@ -22,7 +22,7 @@ struct SilverPort : PortWidget {
 		box.size.x = 25;
 		box.size.y = 25;
 	}
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 };
 
 struct RedPort : SilverPort {
@@ -57,7 +57,7 @@ struct SubSwitch2 : app::Switch {
 			box.size.y = length;
 		}
 	}
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 };
 
 struct SubSwitch3 : SubSwitch2 {
@@ -88,7 +88,7 @@ struct LightButton : app::Switch {
 		box.size.x = 16.0f;
 		box.size.y = 16.0f;
 	}
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 };
 
 //////////////////
@@ -104,7 +104,7 @@ struct LightKnob : Knob {
 	int enabled = 1;
 	NVGcolor color = SUBLIGHTBLUE;
 	LightKnob() {smooth = false;}
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 	void setEnabled(int val);
 	void setRadius(int r);
 };
@@ -160,7 +160,7 @@ struct RedKnob : K {
 };
 
 struct LightSlider : LightKnob {
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 	void onDragMove(const event::DragMove &e) override;
 };
 
@@ -244,7 +244,7 @@ struct SubText : LedDisplayTextField {
 		color = SUBLIGHTBLUE;
 	}
 	int getTextPosition(Vec mousePos) override; 
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 	void appendContextMenu(Menu *menu);
 	SubTextForegroundMenu *createForegroundMenuItem(std::string label, NVGcolor color);
 	SubTextBackgroundMenu *createBackgroundMenuItem(std::string label, NVGcolor color);
@@ -291,7 +291,7 @@ struct MouseTransformWidget:Widget {
 	void translate(Vec delta);
 	void rotate(float angle);
 	void scale(Vec s);
-	void draw(NVGcontext *vg) override;
+	void draw(const DrawArgs &args) override;
 	void onButton(const event::Button &e) override;
 	void onHover(const event::Hover &e) override;
 	void onHoverKey(const event::HoverKey &e) override;

@@ -321,17 +321,17 @@ struct WK_Display : TransparentWidget {
 	int index;
 	char dspText[20];
 	
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawArgs &args) override {
 		if (!module) {
 			return;
 		}
 		float val = module->tunings[index];
 		sprintf(dspText, "%+05.2f", val);
-		nvgFontSize(vg, 14);
-		nvgFontFaceId(vg, gScheme.font()->handle);
-		nvgFillColor(vg, SUBLIGHTBLUE);
-		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 30, 13, dspText, NULL);
+		nvgFontSize(args.vg, 14);
+		nvgFontFaceId(args.vg, gScheme.font()->handle);
+		nvgFillColor(args.vg, SUBLIGHTBLUE);
+		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+		nvgText(args.vg, 30, 13, dspText, NULL);
 	}
 };
 

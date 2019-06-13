@@ -42,13 +42,13 @@ int SubText::getTextPosition(Vec mousePos) {
     return textPos;
 }
 
-void SubText::draw(NVGcontext *vg) {
-	nvgScissor(vg, 0, 0, box.size.x, box.size.y);
+void SubText::draw(const DrawArgs &args) {
+	nvgScissor(args.vg, 0, 0, box.size.x, box.size.y);
 	//Background
-	nvgBeginPath(vg);
-	nvgRoundedRect(vg, 0, 0, box.size.x, box.size.y, 5.0);
-	nvgFillColor(vg, bgColor);
-	nvgFill(vg);
+	nvgBeginPath(args.vg);
+	nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
+	nvgFillColor(args.vg, bgColor);
+	nvgFill(args.vg);
 
 	//Text
 	if (font->handle >= 0) {
@@ -58,11 +58,11 @@ void SubText::draw(NVGcontext *vg) {
 		highlightColor.a = 0.5;
 		int begin = std::min(cursor, selection);
 		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
-		bndIconLabelCaret(vg, textOffset.x, textOffset.y,
+		bndIconLabelCaret(args.vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, fontSize, text.c_str(), highlightColor, begin, end);
 	}
-	nvgResetScissor(vg);
+	nvgResetScissor(args.vg);
 	bndSetFont(APP->window->uiFont->handle);
 }
 

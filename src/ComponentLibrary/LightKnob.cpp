@@ -18,8 +18,8 @@ void LightKnob::setRadius(int r) {
 	box.size.y = r * 2;
 }
 
-void LightKnob::draw(NVGcontext *vg) {
-	nvgSave(vg);
+void LightKnob::draw(const DrawArgs &args) {
+	nvgSave(args.vg);
 	NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
 	float value = 0.0f;
 	float minValue = -1.0f;
@@ -32,31 +32,31 @@ void LightKnob::draw(NVGcontext *vg) {
 
 	// Shadow
 	if (!gScheme.isFlat) {
-		nvgBeginPath(vg);
-		nvgCircle(vg, radius, radius * 1.2, radius);
-		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.15));
-		nvgFill(vg);
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, radius, radius * 1.2, radius);
+		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.15));
+		nvgFill(args.vg);
 	}
 		
 	// Circle
 	{
 		if (!gScheme.isFlat) {
-			nvgSave(vg);
-			nvgBeginPath(vg);
-			nvgCircle(vg, radius, radius, radius);
-			nvgTranslate(vg, radius, radius);
-			nvgRotate(vg, M_PI / -15);
-			nvgScale(vg, 40, 1);
+			nvgSave(args.vg);
+			nvgBeginPath(args.vg);
+			nvgCircle(args.vg, radius, radius, radius);
+			nvgTranslate(args.vg, radius, radius);
+			nvgRotate(args.vg, M_PI / -15);
+			nvgScale(args.vg, 40, 1);
 			NVGpaint paint;
-			paint = nvgRadialGradient(vg, 0, 0, 0, radius * 0.2, nvgRGB(0x7a,0x7a,0x7a), nvgRGB(10,10,10));
-			nvgFillPaint(vg, paint);
-			nvgFill(vg);	
-			nvgRestore(vg);
+			paint = nvgRadialGradient(args.vg, 0, 0, 0, radius * 0.2, nvgRGB(0x7a,0x7a,0x7a), nvgRGB(10,10,10));
+			nvgFillPaint(args.vg, paint);
+			nvgFill(args.vg);	
+			nvgRestore(args.vg);
 		}
-		nvgBeginPath(vg);
-		nvgCircle(vg, radius, radius, radius * 0.9);
-		nvgFillColor(vg, nvgRGB(10,10,10));
-		nvgFill(vg);
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, radius, radius, radius * 0.9);
+		nvgFillColor(args.vg, nvgRGB(10,10,10));
+		nvgFill(args.vg);
 	}
 
 	float angle;
@@ -74,35 +74,35 @@ void LightKnob::draw(NVGcontext *vg) {
 	
 	// Light
 	{
-		nvgSave(vg);
-		nvgBeginPath(vg);
-		nvgTranslate(vg, radius, radius);
-		nvgRotate(vg, angle);
-		nvgRect(vg, radius * -0.05, radius * -0.9, radius * 0.1, radius * 0.4);
+		nvgSave(args.vg);
+		nvgBeginPath(args.vg);
+		nvgTranslate(args.vg, radius, radius);
+		nvgRotate(args.vg, angle);
+		nvgRect(args.vg, radius * -0.05, radius * -0.9, radius * 0.1, radius * 0.4);
 		if (gScheme.isFlat) {
-			nvgFillColor(vg, lcol);
+			nvgFillColor(args.vg, lcol);
 		}
 		else {
 			NVGpaint paint;
 			NVGcolor ocol = color::mult(lcol, 0.1);
-			paint = nvgRadialGradient(vg, 0, radius * -0.7, radius * 0.05, radius * 0.2, lcol, ocol);
-			nvgFillPaint(vg, paint);
+			paint = nvgRadialGradient(args.vg, 0, radius * -0.7, radius * 0.05, radius * 0.2, lcol, ocol);
+			nvgFillPaint(args.vg, paint);
 		}
-		nvgFill(vg);
-		nvgRestore(vg);
+		nvgFill(args.vg);
+		nvgRestore(args.vg);
 	}
 	
 	// Halo
 	if (!gScheme.isFlat) {
-		nvgBeginPath(vg);
-		nvgRect(vg, cx - oradius, cy - oradius, 2 * oradius, 2 * oradius);
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, cx - oradius, cy - oradius, 2 * oradius, 2 * oradius);
 		NVGpaint paint;
 		NVGcolor icol = color::mult(lcol, 0.08);
 		NVGcolor ocol = nvgRGB(0, 0, 0);
-		paint = nvgRadialGradient(vg, cx, cy, lradius, oradius, icol, ocol);
-		nvgFillPaint(vg, paint);
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-		nvgFill(vg);	
+		paint = nvgRadialGradient(args.vg, cx, cy, lradius, oradius, icol, ocol);
+		nvgFillPaint(args.vg, paint);
+		nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
+		nvgFill(args.vg);	
 	}
-	nvgRestore(vg);	
+	nvgRestore(args.vg);	
 }

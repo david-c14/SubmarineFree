@@ -46,10 +46,10 @@ void MouseTransformWidget::scale(Vec s) {
 	std::memcpy(invLinear, inverse, 4 * sizeof(float));
 };
 
-void MouseTransformWidget::draw(NVGcontext *vg) {
+void MouseTransformWidget::draw(const DrawArgs &args) {
 	// No need to save the state because that is done in the parent
-	nvgTransform(vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
-	Widget::draw(vg);
+	nvgTransform(args.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
+	Widget::draw(args);
 };
 
 void MouseTransformWidget::onButton(const event::Button &e) {

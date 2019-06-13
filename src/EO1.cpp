@@ -294,7 +294,7 @@ struct EO_Display : TransparentWidget {
 		nvgResetScissor(vg);
 	}
 
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawArgs &args) override {
 		debug("Draw");
 		if (!module) {
 			return;
@@ -302,19 +302,19 @@ struct EO_Display : TransparentWidget {
 		NVGcolor col = SUBLIGHTBLUETRANS;
 		for (int i = 0; i < 2; i++) {
 			if (module->inputs[EO_102::INPUT_1 + i].active) {
-				drawTrace(vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col, module->traceMode[i]); 
+				drawTrace(args.vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col, module->traceMode[i]); 
 			}
 			col = SUBLIGHTREDTRANS;
 		}
-		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
-		drawIndex(vg, clamp(module->params[EO_102::PARAM_INDEX_2].value, 0.0f, 1.0f));
-		drawIndexV(vg, clamp(module->params[EO_102::PARAM_INDEX_3].value, 0.0f, 1.0f));
+		drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
+		drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_2].value, 0.0f, 1.0f));
+		drawIndexV(args.vg, clamp(module->params[EO_102::PARAM_INDEX_3].value, 0.0f, 1.0f));
 		if (module->inputs[EO_102::INPUT_EXT].active)
-			drawTrigger(vg, module->params[EO_102::PARAM_TRIGGER].value, 0.0f, 1.0f);
+			drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].value, 0.0f, 1.0f);
 		else
-			drawTrigger(vg, module->params[EO_102::PARAM_TRIGGER].value, module->params[EO_102::PARAM_OFFSET_1].value, module->params[EO_102::PARAM_SCALE_1].value);
-		drawMask(vg, clamp(module->params[EO_102::PARAM_PRE].value, 0.0f, 1.0f * PRE_SIZE) / BUFFER_SIZE);
-		drawPre(vg, 1.0f * module->preCount / BUFFER_SIZE);
+			drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].value, module->params[EO_102::PARAM_OFFSET_1].value, module->params[EO_102::PARAM_SCALE_1].value);
+		drawMask(args.vg, clamp(module->params[EO_102::PARAM_PRE].value, 0.0f, 1.0f * PRE_SIZE) / BUFFER_SIZE);
+		drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
 };
 
@@ -326,13 +326,13 @@ struct EO_Measure : TransparentWidget {
 	virtual void updateText() {
 	} 
 
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawArgs &args) override {
 		updateText();
-		nvgFontSize(vg, 14);
-		nvgFontFaceId(vg, gScheme.font()->handle);
-		nvgFillColor(vg, col);
-		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, box.size.x / 2, 12, measureText, NULL);
+		nvgFontSize(args.vg, 14);
+		nvgFontFaceId(args.vg, gScheme.font()->handle);
+		nvgFillColor(args.vg, col);
+		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+		nvgText(args.vg, box.size.x / 2, 12, measureText, NULL);
 	}
 };
 

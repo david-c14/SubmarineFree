@@ -240,19 +240,19 @@ struct LA_Display : TransparentWidget {
 		nvgResetScissor(vg);
 	}
 
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawArgs &args) override {
 		if (!module) {
 			return;
 		}
 		for (int i = 0; i < 8; i++) {
 			if (module->inputs[LA_108::INPUT_1 + i].active) {
-				drawTrace(vg, module->buffer[i], 32.5f + 35 * i); 
+				drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i); 
 			}
 		}
-		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_1].value, 0.0f, 1.0f));
-		drawIndex(vg, clamp(module->params[LA_108::PARAM_INDEX_2].value, 0.0f, 1.0f));
-		drawMask(vg, clamp(module->params[LA_108::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
-		drawPre(vg, 1.0f * module->preCount / BUFFER_SIZE);
+		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].value, 0.0f, 1.0f));
+		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].value, 0.0f, 1.0f));
+		drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
+		drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
 };
 
@@ -260,7 +260,7 @@ struct LA_Measure : TransparentWidget {
 	LA_108 *module;
 	char measureText[41];
 
-	void draw(NVGcontext *vg) override {
+	void draw(const DrawArgs &args) override {
 		if (!module) {
 			return;
 		}
@@ -287,11 +287,11 @@ struct LA_Measure : TransparentWidget {
 			sprintf(measureText, "%4.2fs", width);
 		else
 			sprintf(measureText, "%4.1fs", width);
-		nvgFontSize(vg, 14);
-		nvgFontFaceId(vg, gScheme.font()->handle);
-		nvgFillColor(vg, SUBLIGHTBLUE);
-		nvgTextAlign(vg, NVG_ALIGN_CENTER);
-		nvgText(vg, 27, 12, measureText, NULL);
+		nvgFontSize(args.vg, 14);
+		nvgFontFaceId(args.vg, gScheme.font()->handle);
+		nvgFillColor(args.vg, SUBLIGHTBLUE);
+		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+		nvgText(args.vg, 27, 12, measureText, NULL);
 	}
 };
 

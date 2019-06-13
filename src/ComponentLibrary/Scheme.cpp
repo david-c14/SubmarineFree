@@ -134,7 +134,7 @@ void SchemeCanvasWidget::draw(const DrawArgs &args) {
 	nvgStrokeColor(args.vg, borderColor);
 	nvgStrokeWidth(args.vg, 1.0);
 	nvgStroke(args.vg);
-	Widget::draw(args.vg);
+	Widget::draw(args);
 }
 
 struct SchemeModuleWidgetSchemeMenuItem : MenuItem {

@@ -8,71 +8,71 @@
 #include "../SubmarineFree.hpp"
 #include "color.hpp"
 
-void LightButton::draw(NVGcontext *vg) {
+void LightButton::draw(const DrawArgs &args) {
 	float value = 0.0f;
 	if (paramQuantity) {
 		value = paramQuantity->getValue();
 	}
 
-	nvgSave(vg);
+	nvgSave(args.vg);
 	NVGcolor lcol = (value > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
 
 	// Shadow
 	if (!gScheme.isFlat) {
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, 0.0f, 0.0f, box.size.x, box.size.y * 1.2f, 3.0f);
-		nvgFillColor(vg, nvgRGBAf(0, 0, 0, 0.15));
-		nvgFill(vg);
+		nvgBeginPath(args.vg);
+		nvgRoundedRect(args.vg, 0.0f, 0.0f, box.size.x, box.size.y * 1.2f, 3.0f);
+		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.15));
+		nvgFill(args.vg);
 	}
 
 	// Body
 	{
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, 0.5f, 0.5f, box.size.x - 1.0f, box.size.y - 1.0f, 2.5f);
+		nvgBeginPath(args.vg);
+		nvgRoundedRect(args.vg, 0.5f, 0.5f, box.size.x - 1.0f, box.size.y - 1.0f, 2.5f);
 		if (gScheme.isFlat) {
-			nvgFillColor(vg, nvgRGB(0xcc, 0xcc, 0xcc));
+			nvgFillColor(args.vg, nvgRGB(0xcc, 0xcc, 0xcc));
 		}
 		else {
 			NVGpaint paint;
-			paint = nvgLinearGradient(vg, 0, 0, 0, box.size.y, nvgRGB(0xdd, 0xdd, 0xdd), nvgRGB(0xbb, 0xbb, 0xbb));
-			nvgFillPaint(vg, paint);
+			paint = nvgLinearGradient(args.vg, 0, 0, 0, box.size.y, nvgRGB(0xdd, 0xdd, 0xdd), nvgRGB(0xbb, 0xbb, 0xbb));
+			nvgFillPaint(args.vg, paint);
 		}
-		nvgStrokeColor(vg, nvgRGB(0x55, 0x77, 0x77));
-		nvgFill(vg);
-		nvgStroke(vg);
+		nvgStrokeColor(args.vg, nvgRGB(0x55, 0x77, 0x77));
+		nvgFill(args.vg);
+		nvgStroke(args.vg);
 	}
 
 	Rect lightbox = Rect(Vec(box.size.x / 4.0f, box.size.y / 4.0f), Vec(box.size.x / 2.0f, box.size.y / 4.0f));	
 
 	// Light
 	{
-		nvgBeginPath(vg);
-		nvgRect(vg, lightbox.pos.x, lightbox.pos.y, lightbox.size.x, lightbox.size.y);
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, lightbox.pos.x, lightbox.pos.y, lightbox.size.x, lightbox.size.y);
 		if (gScheme.isFlat) {
-			nvgFillColor(vg, lcol);
+			nvgFillColor(args.vg, lcol);
 		}
 		else {
 			NVGpaint paint;
 			NVGcolor ocol = color::mult(lcol, 0.1);
-			paint = nvgRadialGradient(vg, box.size.x / 2.0f, box.size.y * 0.375f, 1.0f, 4.0f, lcol, ocol);
-			nvgFillPaint(vg, paint);
+			paint = nvgRadialGradient(args.vg, box.size.x / 2.0f, box.size.y * 0.375f, 1.0f, 4.0f, lcol, ocol);
+			nvgFillPaint(args.vg, paint);
 		}
-		nvgFill(vg);
+		nvgFill(args.vg);
 	}
 
 	// Halo
 	if (!gScheme.isFlat) {
 		float lradius = mm2px(0.544);
 		float oradius = lradius + 15.0;
-		nvgBeginPath(vg);
-		nvgRect(vg, box.size.x / 2.0 - oradius, box.size.y * 0.375f - oradius, 2 * oradius, 2 * oradius);
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, box.size.x / 2.0 - oradius, box.size.y * 0.375f - oradius, 2 * oradius, 2 * oradius);
 		NVGpaint paint;
 		NVGcolor icol = color::mult(lcol, 0.08);
 		NVGcolor ocol = nvgRGB(0, 0, 0);
-		paint = nvgRadialGradient(vg, box.size.x / 2.0, box.size.y * 0.375f, lradius, oradius, icol, ocol);
-		nvgFillPaint(vg, paint);
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-		nvgFill(vg);	
+		paint = nvgRadialGradient(args.vg, box.size.x / 2.0, box.size.y * 0.375f, lradius, oradius, icol, ocol);
+		nvgFillPaint(args.vg, paint);
+		nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
+		nvgFill(args.vg);	
 	}
-	nvgRestore(vg);
+	nvgRestore(args.vg);
 }
