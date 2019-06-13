@@ -6,330 +6,330 @@
 	"authorUrl": "https://vcvrack.submarine.org.uk",
 	"sourceUrl": "https://github.com/david-c14/SubmarineFree",
 	"version": "1.0.0",
-	"modules": {
-		"AG-104": {
+	"modules": [
+		{
 			"slug":"AG-104",
 			"name":"AG-104",
 			"description": "AG-104 AND Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"AG-106": {
+		{
 			"slug":"AG-106",
 			"name":"AG-106",
 			"description": "AG-106 AND Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"A0-106": {
+		{
 			"slug":"A0-106",
 			"name":"A0-106",
 			"description": "A0-106 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
-		"A0-112": {
+		{
 			"slug":"A0-112",
 			"name":"A0-112",
 			"description": "A0-112 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
-		"A0-118": {
+		{
 			"slug":"A0-118",
 			"name":"A0-118",
 			"description": "A0-118 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
-		"A0-124": {
+		{
 			"slug":"A0-124",
 			"name":"A0-124",
 			"description": "A0-124 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
-		"A0-136": {
+		{
 			"slug":"A0-136",
 			"name":"A0-136",
 			"description": "A0-136 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
-		"BB-120": {
+		{
 			"slug":"BB-120",
 			"name":"BB-120",
 			"description": "BB-120 20-Stage Bucket Brigade Sample and Hold",
 			"tags": ["LOGIC", "DELAY", "SAMPLE", "MULTIPLE"]
 		},
-		"BP-101": {
+		{
 			"slug":"BP-101",
 			"name":"BP-101",
 			"description": "BP-101 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-102": {
+		{
 			"slug":"BP-102",
 			"name":"BP-102",
 			"description": "BP-102 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-104": {
+		{
 			"slug":"BP-104",
 			"name":"BP-104",
 			"description": "BP-104 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-108": {
+		{
 			"slug":"BP-108",
 			"name":"BP-108",
 			"description": "BP-108 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-110": {
+		{
 			"slug":"BP-110",
 			"name":"BP-110",
 			"description": "BP-110 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-112": {
+		{
 			"slug":"BP-112",
 			"name":"BP-112",
 			"description": "BP-112 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-116": {
+		{
 			"slug":"BP-116",
 			"name":"BP-116",
 			"description": "BP-116 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-120": {
+		{
 			"slug":"BP-120",
 			"name":"BP-120",
 			"description": "BP-120 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-124": {
+		{
 			"slug":"BP-124",
 			"name":"BP-124",
 			"description": "BP-124 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"BP-132": {
+		{
 			"slug":"BP-132",
 			"name":"BP-132",
 			"description": "BP-132 Blanking Plate",
 			"tags": ["BLANK"]
 		},
-		"DN-112": {
+		{
 			"slug":"DN-112",
 			"name":"DN-112",
 			"description": "DN-112 Digital Noise",
 			"tags": ["DIGITAL", "NOISE", "MULTIPLE"]
 		},
-		"EO-102": {
+		{
 			"slug":"EO-102",
 			"name":"EO-102",
 			"description": "EO-102 Envelope Oscilloscope",
 			"tags": ["VISUAL"]
 		},
-		"FF-110": {
+		{
 			"slug":"FF-110",
 			"name":"FF-110",
 			"description": "FF-110 10-Stage Flip-Flop Counter",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"FF-120": {
+		{
 			"slug":"FF-120",
 			"name":"FF-120",
 			"description": "FF-120 20-Stage Flip-Flop Counter",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"FF-206": {
+		{
 			"slug":"FF-206",
 			"name":"FF-206",
 			"description": "FF-206 Edge Triggered Flip-Flops",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"FF-212": {
+		{
 			"slug":"FF-212",
 			"name":"FF-212",
 			"description": "FF-212 Edge Triggered Flip-Flops",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"LA-108": {
+		{
 			"slug":"LA-108",
 			"name":"LA-108",
 			"description": "LA-108 Logic Analyser",
 			"tags": ["LOGIC", "VISUAL"]
 		},
-		"LD-103": {
+		{
 			"slug":"LD-103",
 			"name":"LD-103",
 			"description": "LD-103 Schmitt Trigger Line Drivers",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"LD-106": {
+		{
 			"slug":"LD-106",
 			"name":"LD-106",
 			"description": "LD-106 Schmitt Trigger Line Drivers",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"NG-106": {
+		{
 			"slug":"NG-106",
 			"name":"NG-106",
 			"description": "NG-106 NOT Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"NG-112": {
+		{
 			"slug":"NG-112",
 			"name":"NG-112",
 			"description": "NG-112 NOT Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"OG-104": {
+		{
 			"slug":"OG-104",
 			"name":"OG-104",
 			"description": "OG-104 OR Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"OG-106": {
+		{
 			"slug":"OG-106",
 			"name":"OG-106",
 			"description": "OG-106 OR Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"PG-104": {
+		{
 			"slug":"PG-104",
 			"name":"PG-104",
 			"description": "PG-104 Pulse Generators",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"PG-112": {
+		{
 			"slug":"PG-112",
 			"name":"PG-112",
 			"description": "PG-112 Pulse Generators",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"PO-101": {
+		{
 			"slug":"PO-101",
 			"name":"PO-101",
 			"description": "PO-101 Phased VCO",
 			"tags": ["OSCILLATOR", "MULTIPLE", "DIGITAL"]
 		},
-		"PO-102": {
+		{
 			"slug":"PO-102",
 			"name":"PO-102",
 			"description": "PO-102 Phased LFO",
 			"tags": ["OSCILLATOR", "MULTIPLE", "DIGITAL"]
 		},
-		"PO-204": {
+		{
 			"slug":"PO-204",
 			"name":"PO-204",
 			"description": "PO-204 Phase Modulation Engine",
 			"tags": ["OSCILLATOR", "QUAD", "DIGITAL"]
 		},
-		"SS-112": {
+		{
 			"slug":"SS-112",
 			"name":"SS-112",
 			"description": "SS-112 12 Input Sinks",
 			"tags": ["UTILITY"]
 		},
-		"SS-208": {
+		{
 			"slug":"SS-208",
 			"name":"SS-208",
 			"description": "SS-208 8 Irrational Output Voltage Sources",
 			"tags": ["UTILITY"]
 		},
-		"SS-212": {
+		{
 			"slug":"SS-212",
 			"name":"SS-212",
 			"description": "SS-212 12 Chromatic Output Voltage Sources",
 			"tags": ["UTILITY"]
 		},
-		"SS-220": {
+		{
 			"slug":"SS-220",
 			"name":"SS-220",
 			"description": "SS-220 120 Chromatic Output Voltage Sources",
 			"tags": ["UTILITY"]
 		},
-		"SS-221": {
+		{
 			"slug":"SS-221",
 			"name":"SS-221",
 			"description": "SS-221 21 Output Voltage Sources",
 			"tags": ["UTILITY"]
 		},
-		"TD-116": {
+		{
 			"slug":"TD-116",
 			"name":"TD-116",
 			"description": "TD-116 Text Display",
 			"tags": ["VISUAL"]
 		},
-		"TD-202": {
+		{
 			"slug":"TD-202",
 			"name":"TD-202",
 			"description": "TD-202 Vertical Text Display",
 			"tags": ["VISUAL"]
 		},
-		"TF-101": {
+		{
 			"slug":"TF-101",
 			"name":"TF-101",
 			"description": "TF-101 Text Display Format Control",
 			"tags": ["VISUAL"]
 		},
-		"TM-105": {
+		{
 			"slug":"TM-105",
 			"name":"TM-105",
 			"description": "TM-105 Torpedo Message Merge",
 			"tags": ["UTILITY"]
 		},
-		"WK-101": {
+		{
 			"slug":"WK-101",
 			"name":"WK-101",
 			"description": "WK-101 Das Wohltemperierte Klavier",
 			"tags": ["QUANTIZER", "TUNER"]
 		},
-		"WK-205": {
+		{
 			"slug":"WK-205",
 			"name":"WK-205",
 			"description": "WK-205 Das Wohltemperierte Klavier Nano",
 			"tags": ["QUANTIZER", "TUNER", "MULTIPLE"]
 		},
-		"XF-101": {
+		{
 			"slug":"XF-101",
 			"name":"XF-101",
 			"description": "XF-101 Single Mono Cross Fader",
 			"tags": ["MIXER"]
 		},
-		"XF-102": {
+		{
 			"slug":"XF-102",
 			"name":"XF-102",
 			"description": "XF-102 Dual Mono Cross Fader",
 			"tags": ["MIXER", "DUAL"]
 		},
-		"XF-104": {
+		{
 			"slug":"XF-104",
 			"name":"XF-104",
 			"description": "XF-104 Quad Mono Cross Fader",
 			"tags": ["MIXER", "QUAD"]
 		},
-		"XF-201": {
+		{
 			"slug":"XF-201",
 			"name":"XF-201",
 			"description": "XF-201 Single Stereo Cross Fader",
 			"tags": ["MIXER"]
 		},
-		"XF-202": {
+		{
 			"slug":"XF-202",
 			"name":"XF-202",
 			"description": "XF-202 Dual Stereo Cross Fader",
 			"tags": ["MIXER", "DUAL"]
 		},
-		"XG-104": {
+		{
 			"slug":"XG-104",
 			"name":"XG-104",
 			"description": "XG-104 XOR Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
-		"XG-106": {
+		{
 			"slug":"XG-106",
 			"name":"XG-106",
 			"description": "XG-106 XOR Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		}
-	}
+	]
 }
