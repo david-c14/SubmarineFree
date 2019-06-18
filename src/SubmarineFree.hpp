@@ -89,8 +89,6 @@ struct SubHelper {
 	}
 };
 
-void setWidgetValue(ParamWidget *widget, float value);
-
 float getWidgetValue(ParamWidget *widget);
 
 #define SUBMENU "\xe2\x96\xb6"
