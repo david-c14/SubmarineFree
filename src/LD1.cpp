@@ -33,51 +33,41 @@ struct LD_1 : DS_Module {
 	}
 };
 
-struct LD1Base {
-	ParamWidget **cutoffWidgets;
-	ParamWidget **widthWidgets;
-	void appendContextMenu(Menu *menu, unsigned int count);
-};
-
+template <int x>
 struct LDMenuItem: MenuItem {
-	LD1Base *ld;
-	unsigned int deviceCount;
+	Module *module;
 	float cutoff;
 	float width;
 	void onAction(const event::Action &e) override {
-		for (unsigned int i = 0; i < deviceCount; i++) {
-			setWidgetValue(ld->cutoffWidgets[i], cutoff);
-			setWidgetValue(ld->widthWidgets[i], width);
+		for (unsigned int i = 0; i < x; i++) {
+			APP->engine->setParam(module, LD_1<x>::PARAM_CUTOFF_1 + i, cutoff);
+			APP->engine->setParam(module, LD_1<x>::PARAM_WIDTH_1 + i, width);
 		}
 	}
 };
 
+template <int x>
 struct LDParentMenuItem : MenuItem {
-	LD1Base *ld;
-	unsigned int count;
+	Module *module;
 	Menu *createChildMenu() override {
 		Menu *menu = new Menu();
-		LDMenuItem *menuItem = createMenuItem<LDMenuItem>("Cutoff 5V");
-		menuItem->ld = ld;
-		menuItem->deviceCount = count;
+		LDMenuItem<x> *menuItem = createMenuItem<LDMenuItem<x>>("Cutoff 5V");
+		menuItem->module = module;
 		menuItem->cutoff = 5.0f;
 		menuItem->width = 1.0f;
 		menu->addChild(menuItem);
-		menuItem = createMenuItem<LDMenuItem>("Cutoff 0V");
-		menuItem->ld = ld;
-		menuItem->deviceCount = count;
+		menuItem = createMenuItem<LDMenuItem<x>>("Cutoff 0V");
+		menuItem->module = module;
 		menuItem->cutoff = 0.0f;
 		menuItem->width = 0.0f;
 		menu->addChild(menuItem);
-		menuItem = createMenuItem<LDMenuItem>("Cutoff 2.5V");
-		menuItem->ld = ld;
-		menuItem->deviceCount = count;
+		menuItem = createMenuItem<LDMenuItem<x>>("Cutoff 2.5V");
+		menuItem->module = module;
 		menuItem->cutoff = 2.5f;
 		menuItem->width = 0.5f;
 		menu->addChild(menuItem);
-		menuItem = createMenuItem<LDMenuItem>("TTL Levels");
-		menuItem->ld = ld;
-		menuItem->deviceCount = count;
+		menuItem = createMenuItem<LDMenuItem<x>>("TTL Levels");
+		menuItem->module = module;
 		menuItem->cutoff = 1.4f;
 		menuItem->width = 0.6f;
 		menu->addChild(menuItem);
@@ -86,23 +76,11 @@ struct LDParentMenuItem : MenuItem {
 	}
 };
 
-void LD1Base::appendContextMenu(Menu *menu, unsigned int count) {
-		LDParentMenuItem *menuItem = createMenuItem<LDParentMenuItem>("Input Range");
-		menuItem->ld = this;
-		menuItem->count = count;
-		menuItem->rightText = SUBMENU;
-		menu->addChild(menuItem);
-}
-
-struct LD103 : SchemeModuleWidget, LD1Base {
+struct LD103 : SchemeModuleWidget {
 	static const int deviceCount = 3;	
-	ParamWidget *cw[deviceCount];
-	ParamWidget *ww[deviceCount];
 	LD103(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
-		cutoffWidgets = cw;
-		widthWidgets = ww;
 
 		for (int i = 0; i < deviceCount; i++) {
 			int offset = 116 * i;
@@ -110,10 +88,8 @@ struct LD103 : SchemeModuleWidget, LD1Base {
 
 			addOutput(createOutputCentered<BluePort>(Vec(15,115.5 + offset), module, LD_1<3>::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i);
-			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i);
-			addParam(widthWidgets[i]);
+			addParam(createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i));
+			addParam(createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i));
 			if (module) {
 				module->configParam(LD_1<3>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
 				module->configParam(LD_1<3>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
@@ -122,7 +98,12 @@ struct LD103 : SchemeModuleWidget, LD1Base {
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
-		LD1Base::appendContextMenu(menu, deviceCount);
+		if (module) {
+			LDParentMenuItem<deviceCount> *menuItem = createMenuItem<LDParentMenuItem<deviceCount>>("Input Range");
+			menuItem->module = module;
+			menuItem->rightText = SUBMENU;
+			menu->addChild(menuItem);
+		}
 		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
 		if (dsMod) {
 			dsMod->appendContextMenu(menu);
@@ -146,15 +127,11 @@ struct LD103 : SchemeModuleWidget, LD1Base {
 	}
 };
 
-struct LD106 : SchemeModuleWidget, LD1Base {
+struct LD106 : SchemeModuleWidget {
 	static const int deviceCount = 6;	
-	ParamWidget *cw[deviceCount];
-	ParamWidget *ww[deviceCount];
 	LD106(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(90, 380);
 		addChild(new SchemePanel(this->box.size));
-		cutoffWidgets = cw;
-		widthWidgets = ww;
 
 		for (int i = 0; i < deviceCount; i++) {
 			int offset = 58 * i;
@@ -162,10 +139,8 @@ struct LD106 : SchemeModuleWidget, LD1Base {
 
 			addOutput(createOutputCentered<BluePort>(Vec(74.5,31.5 + offset), module, LD_1<6>::OUTPUT_1 + i));
 
-			cutoffWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i);
-			addParam(cutoffWidgets[i]);
-			widthWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i);
-			addParam(widthWidgets[i]);
+			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i));
+			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i));
 			if (module) {
 				module->configParam(LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
 				module->configParam(LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
@@ -174,7 +149,12 @@ struct LD106 : SchemeModuleWidget, LD1Base {
 	}
 	void appendContextMenu(Menu *menu) override{
 		SchemeModuleWidget::appendContextMenu(menu);
-		LD1Base::appendContextMenu(menu, deviceCount);
+		if (module) {
+			LDParentMenuItem<deviceCount> *menuItem = createMenuItem<LDParentMenuItem<deviceCount>>("Input Range");
+			menuItem->module = module;
+			menuItem->rightText = SUBMENU;
+			menu->addChild(menuItem);
+		}
 		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
 		if (dsMod) {
 			dsMod->appendContextMenu(menu);

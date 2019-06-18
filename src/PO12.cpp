@@ -280,12 +280,12 @@ void PO_101::rsn(float phase) {
 }
 
 void PO_101::step() {
+
 	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f));
 	float deltaTime = freq / APP->engine->getSampleRate();
 	phase += deltaTime;
 	double intPart;
 	phase = modf(phase, &intPart); 
-	
 	{
 		float waveShape = clamp(params[PARAM_WAVE].value, 0.0f, 4.0f);
 		if (waveShape < 0.5f)
@@ -511,6 +511,7 @@ struct PO_Layout : SchemeModuleWidget {
 		drawText(vg, 38, 182, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "3\xcf\x80/2");
 		drawText(vg, 142, 182, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x80/2");
 	}
+	
 };
 
 struct PO101 : PO_Layout {

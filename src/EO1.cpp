@@ -295,7 +295,6 @@ struct EO_Display : TransparentWidget {
 	}
 
 	void draw(const DrawArgs &args) override {
-		debug("Draw");
 		if (!module) {
 			return;
 		}
