@@ -118,7 +118,7 @@ void SchemePanel::step() {
 		dirty = true;
 	}
 	scheme = gScheme.scheme;
-	oversample = 2.0;
+	//oversample = 2.0;
 	FramebufferWidget::step();
 }
 
@@ -281,7 +281,6 @@ void SchemeModuleWidget::drawText(NVGcontext *vg, float x, float y, int align, f
 }
 
 void SchemeModuleWidget::drawBase(NVGcontext *vg, const char *txt) {
-	debug(txt);
 	drawBackground(vg);
 	if (box.size.x < 90) {
 		drawLogo(vg, (box.size.x - 20) / 2.0f, box.size.y - 15, 1, 0);
@@ -299,9 +298,7 @@ void SchemeModuleWidget::drawBase(NVGcontext *vg, const char *txt) {
 }
 
 void SchemeModuleWidget::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
-	debug("Parent render Start");
 	drawBackground(vg);
-	debug("Parent render End");
 }
 
 void SchemeModuleWidget::appendContextMenu(Menu * menu) {
