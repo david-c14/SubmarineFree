@@ -2,9 +2,11 @@
 	"slug": "SubmarineFree",
 	"name": "Submarine (Free)",
 	"author": "carbon14",
-	"license": "BSD-3",
+	"license": "BSD-3-Clause",
 	"authorUrl": "https://vcvrack.submarine.org.uk",
 	"sourceUrl": "https://github.com/david-c14/SubmarineFree",
+	"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/index.md",
+	"donateUrl": "https://www.paypal.me/SubmarineFree",
 	"version": "1.0.0",
 	"modules": [
 		{
