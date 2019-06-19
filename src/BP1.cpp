@@ -17,7 +17,7 @@ struct BP1 : SchemeModuleWidget {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBackground(vg);
 		drawLogo(vg, box.size.x - 20, 365, 1, 0);
-		drawText(vg, 3, 377, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 12, gScheme.alternative, "submarine");
+		drawText(vg, 3, 377, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 12, gScheme.getAlternative(module), "submarine");
 	}
 };
 
@@ -29,7 +29,7 @@ struct BP1_1 : BP1<1> {
 		nvgSave(vg);
 		nvgTranslate(vg, 1, 377);
 		nvgRotate(vg, -M_PI / 2.0f);
-		drawText(vg, 0, 0, NVG_ALIGN_LEFT | NVG_ALIGN_TOP, 12, gScheme.alternative, "submarine");
+		drawText(vg, 0, 0, NVG_ALIGN_LEFT | NVG_ALIGN_TOP, 12, gScheme.getAlternative(module), "submarine");
 		nvgRestore(vg);
 	}
 };
@@ -55,7 +55,7 @@ struct BP1_20 : BP1<20> {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBackground(vg);
 		drawLogo(vg, 0, 70, 15, 0);
-		drawText(vg, 150, 377, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 12, gScheme.alternative, "submarine");
+		drawText(vg, 150, 377, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 12, gScheme.getAlternative(module), "submarine");
 	}
 };
 

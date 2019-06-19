@@ -660,7 +660,7 @@ struct AOWidget : SchemeModuleWidget {
 		char workingSpace[10];
 		snprintf(workingSpace, 10, "AO-1%02d", x * y);
 		drawBase(vg, workingSpace);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);
@@ -687,18 +687,18 @@ struct AOWidget : SchemeModuleWidget {
 			nvgStroke(vg);
 		}
 		for (unsigned int iy = 0; iy < x - 1; iy++) {
-			drawText(vg, 16.5, 100 + iy * 46, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "X IN");
-			drawText(vg, 58.5 + y * 90, 100 + iy * 46, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "X OUT");
+			drawText(vg, 16.5, 100 + iy * 46, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "X IN");
+			drawText(vg, 58.5 + y * 90, 100 + iy * 46, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "X OUT");
 		}
 		if (y > 1) {
 			for (unsigned int ix = 0; ix < y - 1; ix++) {
-				drawText(vg, 127.5 + ix * 90, 34, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "Y IN");
-				drawText(vg, 127.5 + ix * 90, 351, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "Y OUT");
+				drawText(vg, 127.5 + ix * 90, 34, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "Y IN");
+				drawText(vg, 127.5 + ix * 90, 351, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "Y OUT");
 			}
 		}
 		else {
-			drawText(vg, 97, 34, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "Y IN");
-			drawText(vg, 97, 351, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "Y OUT");
+			drawText(vg, 97, 34, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "Y IN");
+			drawText(vg, 97, 351, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "Y OUT");
 		}
 		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
 		nvgBeginPath(vg);

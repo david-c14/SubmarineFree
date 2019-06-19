@@ -408,8 +408,8 @@ struct WK101 : SchemeModuleWidget {
 	void step() override;
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WK-101");
-		nvgFillColor(vg, gScheme.alternative);
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgFillColor(vg, gScheme.getAlternative(module));
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, 1);
 		nvgLineJoin(vg, 1);
@@ -560,12 +560,12 @@ struct WK101 : SchemeModuleWidget {
 		nvgRoundedRect(vg, 50, 332, 50, 17, 4);
 		nvgFill(vg);
 
-		drawText(vg, 36, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "V/OCT");
-		drawText(vg, 114, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC");
-		drawText(vg, 16.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "IN");
-		drawText(vg, 55.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OUT");
-		drawText(vg, 94.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "IN");
-		drawText(vg, 133.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OUT");
+		drawText(vg, 36, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "V/OCT");
+		drawText(vg, 114, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC");
+		drawText(vg, 16.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN");
+		drawText(vg, 55.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
+		drawText(vg, 94.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN");
+		drawText(vg, 133.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
 	}
 };
 
@@ -731,8 +731,8 @@ struct WK205 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WK-205");
-		drawText(vg, 15, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC");
-		nvgStrokeColor(vg, gScheme.contrast);
+		drawText(vg, 15, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC");
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgBeginPath(vg);

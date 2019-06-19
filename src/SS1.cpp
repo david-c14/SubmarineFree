@@ -48,14 +48,14 @@ struct SS208 : SchemeModuleWidget {
 	}
 	void render (NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SS-208");
-		drawText(vg, 15, 54, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x80");
-		drawText(vg, 15, 97, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x84");
-		drawText(vg, 15, 140, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x84\xaf");
-		drawText(vg, 15, 183, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a\xc2\xbd");
-		drawText(vg, 15, 226, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "2");
-		drawText(vg, 15, 269, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "3");
-		drawText(vg, 15, 312, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "5");
-		drawText(vg, 15, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xe2\x88\x9a" "7");
+		drawText(vg, 15, 54, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xcf\x80");
+		drawText(vg, 15, 97, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xcf\x84");
+		drawText(vg, 15, 140, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xe2\x84\xaf");
+		drawText(vg, 15, 183, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xe2\x88\x9a\xc2\xbd");
+		drawText(vg, 15, 226, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xe2\x88\x9a" "2");
+		drawText(vg, 15, 269, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xe2\x88\x9a" "3");
+		drawText(vg, 15, 312, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xe2\x88\x9a" "5");
+		drawText(vg, 15, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xe2\x88\x9a" "7");
 	}
 };
 
@@ -98,7 +98,7 @@ struct SS212 : SchemeModuleWidget {
 	void appendContextMenu(Menu *menu) override;
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SS-212");
-		nvgFillColor(vg, gScheme.alternative);
+		nvgFillColor(vg, gScheme.getAlternative(module));
 		nvgBeginPath(vg);
 		nvgRoundedRect(vg, 2, 17, 26, 28, 2);
 		nvgRoundedRect(vg, 2, 75, 26, 28, 2);
@@ -171,27 +171,27 @@ struct SS221 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SS-221");
-		drawText(vg, 37.5, 34, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "10V");
-		drawText(vg, 37.5, 50, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "9V");
-		drawText(vg, 37.5, 66, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "8V");
-		drawText(vg, 37.5, 82, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "7V");
-		drawText(vg, 37.5, 98, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "6V");
-		drawText(vg, 37.5, 114, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "5V");
-		drawText(vg, 37.5, 130, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "4V");
-		drawText(vg, 37.5, 146, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "3V");
-		drawText(vg, 37.5, 162, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "2V");
-		drawText(vg, 37.5, 178, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "1V");
-		drawText(vg, 37.5, 194, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "0V");
-		drawText(vg, 37.5, 210, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-1V");
-		drawText(vg, 37.5, 226, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-2V");
-		drawText(vg, 37.5, 242, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-3V");
-		drawText(vg, 37.5, 258, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-4V");
-		drawText(vg, 37.5, 274, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-5V");
-		drawText(vg, 37.5, 290, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-6V");
-		drawText(vg, 37.5, 306, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-7V");
-		drawText(vg, 37.5, 322, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-8V");
-		drawText(vg, 37.5, 338, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-9V");
-		drawText(vg, 37.5, 354, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "-10");
+		drawText(vg, 37.5, 34, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "10V");
+		drawText(vg, 37.5, 50, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "9V");
+		drawText(vg, 37.5, 66, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "8V");
+		drawText(vg, 37.5, 82, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "7V");
+		drawText(vg, 37.5, 98, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "6V");
+		drawText(vg, 37.5, 114, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "5V");
+		drawText(vg, 37.5, 130, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "4V");
+		drawText(vg, 37.5, 146, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "3V");
+		drawText(vg, 37.5, 162, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "2V");
+		drawText(vg, 37.5, 178, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "1V");
+		drawText(vg, 37.5, 194, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "0V");
+		drawText(vg, 37.5, 210, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-1V");
+		drawText(vg, 37.5, 226, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-2V");
+		drawText(vg, 37.5, 242, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-3V");
+		drawText(vg, 37.5, 258, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-4V");
+		drawText(vg, 37.5, 274, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-5V");
+		drawText(vg, 37.5, 290, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-6V");
+		drawText(vg, 37.5, 306, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-7V");
+		drawText(vg, 37.5, 322, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-8V");
+		drawText(vg, 37.5, 338, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-9V");
+		drawText(vg, 37.5, 354, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "-10");
 	}
 };
 
@@ -220,8 +220,8 @@ struct SS220 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SS-220");
-		nvgFillColor(vg, gScheme.alternative);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgFillColor(vg, gScheme.getAlternative(module));
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgBeginPath(vg);
 		nvgRoundedRect(vg, 2, 17, 296, 28, 2);

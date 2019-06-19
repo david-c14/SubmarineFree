@@ -193,13 +193,24 @@ struct Scheme {
 	int font(NVGcontext *vg);
 	bool isFlat = false;
 	int scheme = Blue;
+	std::shared_ptr<Font> _font = NULL;
+	bool _fontLoaded = false;
+	NVGcolor getBackground(Module *module) { return module?background:_background; }
+	NVGcolor getAlternative(Module *module) { return module?alternative:_alternative; }
+	NVGcolor getContrast(Module *module) { return module?contrast:_contrast; }
+	NVGcolor getHighlight(Module *module) { return module?highlight:_highlight; }
+	NVGcolor getShadow(Module *module) { return module?shadow:_shadow; }
+private:
 	NVGcolor background = nvgRGB(0x29, 0x4f, 0x77);
 	NVGcolor alternative = nvgRGB(0x71, 0x9f, 0xcf);
 	NVGcolor contrast = nvgRGB(0xff, 0xff, 0xff);
 	NVGcolor highlight = nvgRGB(0x3a, 0x6e, 0xa5);
 	NVGcolor shadow = nvgRGB(0x18, 0x2d, 0x44);
-	std::shared_ptr<Font> _font = NULL;
-	bool _fontLoaded = false;
+	NVGcolor _background = nvgRGB(0x29, 0x4f, 0x77);
+	NVGcolor _alternative = nvgRGB(0x71, 0x9f, 0xcf);
+	NVGcolor _contrast = nvgRGB(0xff, 0xff, 0xff);
+	NVGcolor _highlight = nvgRGB(0x3a, 0x6e, 0xa5);
+	NVGcolor _shadow = nvgRGB(0x18, 0x2d, 0x44);
 };
 
 extern Scheme gScheme;

@@ -385,7 +385,7 @@ struct LA108 : SchemeModuleWidget {
 		nvgStroke(vg);
 		
 		//Silkscreen
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgBeginPath(vg);
 		for (int i = 0; i < 8; i++) {
 			nvgMoveTo(vg, 16.5, 32.5 + 35 * i);
@@ -401,16 +401,16 @@ struct LA108 : SchemeModuleWidget {
 		nvgLineTo(vg, 104.5, 329.5);
 		nvgStroke(vg);
 
-		drawText(vg, 16.5, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "EXT.TR"); 
-		drawText(vg, 58, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "TRIGGER"); 
-		drawText(vg, 93, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "EDGE"); 
-		drawText(vg, 128, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "MODE"); 
-		drawText(vg, 125, 318, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CONT"); 
-		drawText(vg, 125, 330, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "ONCE"); 
-		drawText(vg, 158, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "RESET"); 
-		drawText(vg, 190, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "TIME"); 
-		drawText(vg, 240, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "L INDEX R"); 
-		drawText(vg, 283, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "PRE."); 
+		drawText(vg, 16.5, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "EXT.TR"); 
+		drawText(vg, 58, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "TRIGGER"); 
+		drawText(vg, 93, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "EDGE"); 
+		drawText(vg, 128, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "MODE"); 
+		drawText(vg, 125, 318, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CONT"); 
+		drawText(vg, 125, 330, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ONCE"); 
+		drawText(vg, 158, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "RESET"); 
+		drawText(vg, 190, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "TIME"); 
+		drawText(vg, 240, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "L INDEX R"); 
+		drawText(vg, 283, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "PRE."); 
 
 	}
 };

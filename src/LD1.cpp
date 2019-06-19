@@ -130,7 +130,7 @@ struct LD103 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "LD-103");
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 2);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgBeginPath(vg);
@@ -140,8 +140,8 @@ struct LD103 : SchemeModuleWidget {
 		}
 		nvgStroke(vg);
 		for (int i = 0; i < 3; i++) {
-			drawText(vg, 22, 72 + i * 116, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "C");
-			drawText(vg, 3, 80 + i * 116, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "W");
+			drawText(vg, 22, 72 + i * 116, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "C");
+			drawText(vg, 3, 80 + i * 116, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "W");
 		}
 	}
 };
@@ -184,18 +184,18 @@ struct LD106 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "LD-106");
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineJoin(vg, NVG_ROUND);
 		nvgLineCap(vg, NVG_ROUND);
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgBeginPath(vg);
 		for (int i = 0; i < 5; i++) {
 			nvgMoveTo(vg, 3, 73.5 + i * 58);
 			nvgLineTo(vg, 87, 73.5 + i * 58);
 		}
 		nvgStroke(vg);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgBeginPath(vg);
 		for (int i = 0; i < 6; i++) {
 			nvgMoveTo(vg, 16, 31.5 + i * 58);
@@ -215,8 +215,8 @@ struct LD106 : SchemeModuleWidget {
 		}
 		nvgStroke(vg);
 		for (int i = 0; i < 6; i++) {
-			drawText(vg, 28, 58 + i * 58, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 6, gScheme.contrast, "CUTOFF");
-			drawText(vg, 62, 65 + i * 58, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 6, gScheme.contrast, "WIDTH");
+			drawText(vg, 28, 58 + i * 58, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 6, gScheme.getContrast(module), "CUTOFF");
+			drawText(vg, 62, 65 + i * 58, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 6, gScheme.getContrast(module), "WIDTH");
 		}
 	}
 };

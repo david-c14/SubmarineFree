@@ -186,8 +186,8 @@ struct TD116 : SchemeModuleWidget {
 
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TD-116");
-		drawText(vg, 30, 36, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC IN");
-		drawText(vg, 210, 36, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SYNC OUT");
+		drawText(vg, 30, 36, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC IN");
+		drawText(vg, 210, 36, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC OUT");
 	}
 };
 

@@ -102,7 +102,7 @@ struct BB120 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "BB-120");
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgBeginPath(vg);
@@ -114,8 +114,8 @@ struct BB120 : SchemeModuleWidget {
 			nvgLineTo(vg, 43.5, 110.5 + i * 30);
 		}
 		nvgStroke(vg);
-		drawText(vg, 43.5, 32, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "IN");
-		drawText(vg, 16.5, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CLK");
+		drawText(vg, 43.5, 32, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN");
+		drawText(vg, 16.5, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CLK");
 	}
 };
 

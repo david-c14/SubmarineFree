@@ -96,7 +96,7 @@ struct XF202 : SchemeModuleWidget {
 		drawBase(vg, "XF-202");
 		
 		// Dividers
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);
@@ -105,7 +105,7 @@ struct XF202 : SchemeModuleWidget {
 		nvgLineTo(vg, 117, 190.5);
 		nvgStroke(vg);
 
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 	
 		for (unsigned int i = 0; i < 2; i++) {
 			nvgBeginPath(vg);
@@ -118,17 +118,17 @@ struct XF202 : SchemeModuleWidget {
 			nvgBezierTo(vg, 82.333336, 100.833336 + 176 * i, 83.666664, 102.166664 + 176 * i, 85.000000, 103.500000 + 176 * i);
 			nvgStroke(vg);
 
-			drawText(vg, 34, 113 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "A");
-			drawText(vg, 80, 113 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "B");
-			drawText(vg, 26, 164 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "UNI");
-			drawText(vg, 26, 176 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "BI");
-			drawText(vg, 30, 36 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "A");
-			drawText(vg, 28, 138 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "CV");
-			drawText(vg, 90, 36 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 16, gScheme.contrast, "B");
-			drawText(vg, 90, 138 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 18, gScheme.contrast, "\xe2\x86\xa6");
-			drawText(vg, 86, 161 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LIN");
-			drawText(vg, 86, 170 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LOG");
-			drawText(vg, 86, 179 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "AUTO");
+			drawText(vg, 34, 113 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "A");
+			drawText(vg, 80, 113 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "B");
+			drawText(vg, 26, 164 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "UNI");
+			drawText(vg, 26, 176 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "BI");
+			drawText(vg, 30, 36 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 16, gScheme.getContrast(module), "A");
+			drawText(vg, 28, 138 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 16, gScheme.getContrast(module), "CV");
+			drawText(vg, 90, 36 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 16, gScheme.getContrast(module), "B");
+			drawText(vg, 90, 138 + 176 * i, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 18, gScheme.getContrast(module), "\xe2\x86\xa6");
+			drawText(vg, 86, 161 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "LIN");
+			drawText(vg, 86, 170 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "LOG");
+			drawText(vg, 86, 179 + 176 * i, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "AUTO");
 		}
 	}
 };

@@ -28,6 +28,12 @@ Scheme::Scheme() {
 	if (c1) {
 		scheme = json_number_value(c1);
 		setColors();
+		_background = background;
+		_alternative = alternative;
+		_contrast = contrast;
+		_highlight = highlight;
+		_shadow = shadow;
+		
 	}
 	json_decref(rootJ);
 }
@@ -73,7 +79,7 @@ void Scheme::setColors() {
 	}
 	
 }
-	
+
 std::shared_ptr<Font> Scheme::font() {
 	if (!_fontLoaded) {
 		_fontLoaded = true;
@@ -184,7 +190,7 @@ void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 	if (gScheme.isFlat) {
 		nvgBeginPath(vg);
 		nvgRect(vg, 0, 0, box.size.x, box.size.y);
-		nvgFillColor(vg, gScheme.background);
+		nvgFillColor(vg, gScheme.getBackground(module));
 		nvgFill(vg);	
 	}
 	else {
@@ -193,18 +199,18 @@ void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 		nvgLineTo(vg, box.size.x, 0);
 		nvgLineTo(vg, 0, box.size.y);
 		nvgClosePath(vg);
-		nvgFillColor(vg, gScheme.highlight);
+		nvgFillColor(vg, gScheme.getHighlight(module));
 		nvgFill(vg);
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, box.size.x, 0);
 		nvgLineTo(vg, box.size.x, box.size.y);
 		nvgLineTo(vg, 0, box.size.y);
 		nvgClosePath(vg);
-		nvgFillColor(vg, gScheme.shadow);
+		nvgFillColor(vg, gScheme.getShadow(module));
 		nvgFill(vg);
 		nvgBeginPath(vg);
 		nvgRect(vg, 1, 1, box.size.x - 2, box.size.y - 2);
-		nvgFillColor(vg, gScheme.background);
+		nvgFillColor(vg, gScheme.getBackground(module));
 		nvgFill(vg);	
 	}
 }
@@ -265,7 +271,7 @@ void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float s
 	nvgBezierTo(vg, 9.446276, 1.001906, 9.400099, 1.000038, 9.353911, 1.000000);
 	nvgBezierTo(vg, 9.353911, 1.000000, 9.353910, 1.000000, 9.353910, 1.000000);
 	nvgClosePath(vg);
-	nvgFillColor(vg, gScheme.alternative);
+	nvgFillColor(vg, gScheme.getAlternative(module));
 	nvgPathWinding(vg, NVG_SOLID);
 	nvgShapeAntiAlias(vg, true);
 	nvgFill(vg);
@@ -287,13 +293,13 @@ void SchemeModuleWidget::drawBase(NVGcontext *vg, const char *txt) {
 	}
 	else {
 		drawLogo(vg, box.size.x - 20, box.size.y - 15, 1, 0);
-		drawText(vg, 3, 378, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 12, gScheme.alternative, "submarine");
+		drawText(vg, 3, 378, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 12, gScheme.getAlternative(module), "submarine");
 	}
 	if (box.size.x > 30) {
-		drawText(vg, box.size.x / 2.0f, 12, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 12, gScheme.alternative, txt);
+		drawText(vg, box.size.x / 2.0f, 12, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 12, gScheme.getAlternative(module), txt);
 	}
 	else {
-		drawText(vg, box.size.x / 2.0f, 10, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.alternative, txt);
+		drawText(vg, box.size.x / 2.0f, 10, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getAlternative(module), txt);
 	}
 }
 

@@ -106,14 +106,14 @@ struct FF110 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override{
 		drawBase(vg, "FF-110");
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, 15, 89.5);
 		nvgLineTo(vg, 15, 350.5);
 		nvgStroke(vg);
-		drawText(vg, 15, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CLOCK");
+		drawText(vg, 15, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CLOCK");
 	}
 };
 
@@ -140,7 +140,7 @@ struct FF120 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "FF-120");
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgBeginPath(vg);
@@ -151,7 +151,7 @@ struct FF120 : SchemeModuleWidget {
 			nvgLineTo(vg, 43.5, 110.0 + i * 30);
 		}
 		nvgStroke(vg);
-		drawText(vg, 30, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CLOCK");
+		drawText(vg, 30, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CLOCK");
 	}
 };
 

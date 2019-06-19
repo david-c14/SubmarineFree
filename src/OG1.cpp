@@ -65,10 +65,10 @@ struct OG104 : SchemeModuleWidget {
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, 15, 31.5);
 		nvgLineTo(vg, 15, 348.5);
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgStrokeWidth(vg, 1);
 		nvgStroke(vg);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		for (int i = 0; i < 4; i++) {
 			nvgBeginPath(vg);
 			nvgMoveTo(vg, 15, 31.5 + i * 87);
@@ -101,7 +101,7 @@ struct OG106 : SchemeModuleWidget {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "OG-106");
 		nvgStrokeWidth(vg, 1);
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);
 		for (int i = 0; i < 5; i++) {
@@ -113,7 +113,7 @@ struct OG106 : SchemeModuleWidget {
 			nvgLineTo(vg, 38.5, 103.5 + i * 58);
 			nvgStroke(vg);
 		}
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		for (int i = 0; i < 6; i++) {
 			nvgBeginPath(vg);
 			nvgMoveTo(vg, 16, 31.5 + i * 58);

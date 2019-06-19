@@ -51,7 +51,7 @@ struct NG106 : SchemeModuleWidget {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "NG-106");
 		nvgStrokeWidth(vg, 1);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		for (int i = 0; i < 6; i++) {
 			nvgBeginPath(vg);
 			nvgMoveTo(vg, 15, 31.5 + i * 58);
@@ -82,7 +82,7 @@ struct NG112 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "NG-112");
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);	
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);

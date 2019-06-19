@@ -462,8 +462,8 @@ struct PO_Layout : SchemeModuleWidget {
 		}
 	}
 	void LayoutScreen(NVGcontext *vg) {
-		nvgFillColor(vg, gScheme.background);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgFillColor(vg, gScheme.getBackground(module));
+		nvgStrokeColor(vg, gScheme.getBackground(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);
@@ -502,14 +502,14 @@ struct PO_Layout : SchemeModuleWidget {
 		nvgFill(vg);
 		nvgStroke(vg);
 
-		drawText(vg, 30, 89, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "TUNE");
-		drawText(vg, 85, 89, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "FINE");
-		drawText(vg, 90, 177, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "PHASED");
-		drawText(vg, 90, 187, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "OUTPUT");
-		drawText(vg, 90, 135, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "0");
-		drawText(vg, 90, 229, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x80");
-		drawText(vg, 38, 182, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "3\xcf\x80/2");
-		drawText(vg, 142, 182, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "\xcf\x80/2");
+		drawText(vg, 30, 89, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "TUNE");
+		drawText(vg, 85, 89, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "FINE");
+		drawText(vg, 90, 177, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "PHASED");
+		drawText(vg, 90, 187, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "OUTPUT");
+		drawText(vg, 90, 135, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "0");
+		drawText(vg, 90, 229, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xcf\x80");
+		drawText(vg, 38, 182, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "3\xcf\x80/2");
+		drawText(vg, 142, 182, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "\xcf\x80/2");
 	}
 	
 };
@@ -576,7 +576,7 @@ struct PO204 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "PO-204");
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);
@@ -613,7 +613,7 @@ struct PO204 : SchemeModuleWidget {
 		nvgLineTo(vg, 135.5, 79.5);
 
 		nvgStroke(vg);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgBeginPath(vg);
 
 		nvgMoveTo(vg, 4.5, 79.5);
@@ -677,14 +677,14 @@ struct PO204 : SchemeModuleWidget {
 
 		nvgStroke(vg);
 		
-		drawText(vg, 30.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "V/Oct");
-		drawText(vg, 79.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "TUNE");
-		drawText(vg, 124.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "FINE");
+		drawText(vg, 30.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "V/Oct");
+		drawText(vg, 79.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "TUNE");
+		drawText(vg, 124.5, 67, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "FINE");
 		for (unsigned int i = 0; i < 4; i++) {
-			drawText(vg, 17, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "WAVE");
-			drawText(vg, 57, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "PHASE");
-			drawText(vg, 97, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "MULT");
-			drawText(vg, 133, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.contrast, "OUT");
+			drawText(vg, 17, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "WAVE");
+			drawText(vg, 57, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "PHASE");
+			drawText(vg, 97, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "MULT");
+			drawText(vg, 133, 123.6 + 70 * i, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 10, gScheme.getContrast(module), "OUT");
 		}
 
 	}

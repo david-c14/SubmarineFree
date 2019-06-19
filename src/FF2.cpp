@@ -107,12 +107,12 @@ struct FF206 : SchemeModuleWidget {
 		drawBase(vg, "FF-206");
 		nvgStrokeWidth(vg, 2);
 		nvgLineCap(vg, NVG_ROUND);
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, 15, 31.5);
 		nvgLineTo(vg, 15, 349.5);
 		nvgStroke(vg);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgBeginPath(vg);
 		for (int i = 0; i < 6; i++) {
 			nvgMoveTo(vg, 15, 31.5 + i * 58);
@@ -146,7 +146,7 @@ struct FF212 : SchemeModuleWidget {
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);
-		nvgStrokeColor(vg, gScheme.contrast);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgBeginPath(vg);
 		for (int i = 0; i < 12; i++) {
 			nvgMoveTo(vg, 16, 31.5 + i * 29);
@@ -164,7 +164,7 @@ struct FF212 : SchemeModuleWidget {
 		}
 		nvgStroke(vg);
 		
-		nvgStrokeColor(vg, gScheme.alternative);
+		nvgStrokeColor(vg, gScheme.getAlternative(module));
 		nvgBeginPath(vg);
 		for (int i = 0; i < 11; i++) {
 			nvgMoveTo(vg, 74, 31.5 + i * 29);

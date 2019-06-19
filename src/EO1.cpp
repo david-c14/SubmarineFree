@@ -498,7 +498,7 @@ struct EO102 : SchemeModuleWidget {
 		nvgFill(vg);
 		
 		// Rounded backgrounds for labels
-		nvgFillColor(vg, gScheme.contrast);
+		nvgFillColor(vg, gScheme.getContrast(module));
 		nvgBeginPath(vg);
 		nvgRoundedRect(vg, 5, 355, 65, 10, 5);
 		nvgRoundedRect(vg, 80, 355, 65, 10, 5);
@@ -510,26 +510,26 @@ struct EO102 : SchemeModuleWidget {
 		// Text
 		drawText(vg, 37.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, SUBLIGHTBLUE, "CHANNEL A");
 		drawText(vg, 112.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, SUBLIGHTRED, "CHANNEL B");
-		drawText(vg, 172.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.background, "TIME");
-		drawText(vg, 232.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.background, "TRIGGER");
-		drawText(vg, 337.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.background, "INDICES");
-		drawText(vg, 16.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CV");
-		drawText(vg, 16.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 11, gScheme.contrast, "\xe2\x99\xaa");
-		drawText(vg, 50, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SCALE");
-		drawText(vg, 50, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OFFSET");
-		drawText(vg, 91.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CV");
-		drawText(vg, 91.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 11, gScheme.contrast, "\xe2\x99\xaa");
-		drawText(vg, 125, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "SCALE");
-		drawText(vg, 125, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "OFFSET");
-		drawText(vg, 172.5, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "PRE");
-		drawText(vg, 172.5, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "TIME");
-		drawText(vg, 211.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "CONT.");
-		drawText(vg, 211.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "ONCE");
-		drawText(vg, 245, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "RUN");
-		drawText(vg, 245, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LEVEL");
-		drawText(vg, 290, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "LEFT");
-		drawText(vg, 332, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "RIGHT");
-		drawText(vg, 376, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.contrast, "HORZ");
+		drawText(vg, 172.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getBackground(module), "TIME");
+		drawText(vg, 232.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getBackground(module), "TRIGGER");
+		drawText(vg, 337.5, 363, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getBackground(module), "INDICES");
+		drawText(vg, 16.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CV");
+		drawText(vg, 16.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 11, gScheme.getContrast(module), "\xe2\x99\xaa");
+		drawText(vg, 50, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SCALE");
+		drawText(vg, 50, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OFFSET");
+		drawText(vg, 91.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CV");
+		drawText(vg, 91.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 11, gScheme.getContrast(module), "\xe2\x99\xaa");
+		drawText(vg, 125, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SCALE");
+		drawText(vg, 125, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OFFSET");
+		drawText(vg, 172.5, 298, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "PRE");
+		drawText(vg, 172.5, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "TIME");
+		drawText(vg, 211.5, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CONT.");
+		drawText(vg, 211.5, 302, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ONCE");
+		drawText(vg, 245, 265, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "RUN");
+		drawText(vg, 245, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "LEVEL");
+		drawText(vg, 290, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "LEFT");
+		drawText(vg, 332, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "RIGHT");
+		drawText(vg, 376, 350, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "HORZ");
 	}
 };
 
