@@ -60,8 +60,8 @@ struct TM_105 : Module  {
 	TM_105InPort inPort3 = TM_105InPort(this, INPUT_3);
 	TM_105InPort inPort4 = TM_105InPort(this, INPUT_4);
 	TM_105InPort inPort5 = TM_105InPort(this, INPUT_5);
-	PulseGenerator msgPulses[5];
-	PulseGenerator errPulses[5];
+	dsp::PulseGenerator msgPulses[5];
+	dsp::PulseGenerator errPulses[5];
 	Torpedo::RawOutputPort outPort = Torpedo::RawOutputPort(this, OUTPUT_TOR);	
 	TM_105() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);

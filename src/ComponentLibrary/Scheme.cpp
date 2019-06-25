@@ -17,7 +17,7 @@ Scheme::Scheme() {
 	fclose(file);
 	if (!rootJ) {
 		std::string message = string::f("Submarine Free Settings: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		warn(message.c_str());
+		WARN(message.c_str());
 		return;
 	}
 	json_t *h1 = json_object_get(rootJ, "flat");
@@ -93,7 +93,6 @@ int Scheme::font(NVGcontext *vg) {
 	if (ret != -1) {
 		return ret;
 	}
-	info("Loading font for subDejaVu");
 	return nvgCreateFont(vg, "subDejaVu", asset::system("res/fonts/DejaVuSans.ttf").c_str());
 }
 

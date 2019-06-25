@@ -20,7 +20,7 @@ struct PG_1 : DS_Module {
 		NUM_LIGHTS
 	};
 	DS_Schmitt schmitt[x];
-	PulseGenerator pulse[x];
+	dsp::PulseGenerator pulse[x];
 
 	PG_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
