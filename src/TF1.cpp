@@ -49,7 +49,7 @@ struct TF_101 : Module  {
 		prevValues[6] = 12.0f;
 		outPort.size(1);
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 	std::string encodeColor(float r, float g, float b) {
 		std::string out;
 		out.push_back('A'+(int)(r * 255) / 16);	
@@ -63,7 +63,7 @@ struct TF_101 : Module  {
 	}
 };
 
-void TF_101::step() {
+void TF_101::process(const ProcessArgs &args) {
 	for (int i = 0; i < 6; i++) {
 		float newValue = clamp(params[PARAM_FG_RED + i].value + inputs[INPUT_FG_RED + i].value / 10.0f, 0.0f, 1.0f); 
 		lights[LIGHT_FG_RED + i].value = newValue; 

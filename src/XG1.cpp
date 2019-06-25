@@ -23,7 +23,7 @@ struct XG_1 : DS_Module {
 	XG_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override {
+	void process(const ProcessArgs &args) override {
 		int setCount = 0;
 		for (int i = 0; i < x; i++) {
 			if (inputs[INPUT_A_1 + i].active)

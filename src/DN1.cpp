@@ -31,7 +31,7 @@ struct DN_1 : DS_Module {
 		}
 	}
 
-	void step() override {
+	void process(const ProcessArgs &args) override {
 		for (int i = 0; i < x; i++) {
 			if (outputs[OUTPUT_1 + i].active) {
 				unsigned int lsb = lfsr[i] & 1;

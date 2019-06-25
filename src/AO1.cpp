@@ -447,7 +447,7 @@ struct AO1 : Module {
 	AO1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override {
+	void process(const ProcessArgs &args) override {
 		float vx[x];
 		for (unsigned int ix = 0; ix < x; ix++) {
 			vx[ix] = inputs[INPUT_X_1 + ix].value;

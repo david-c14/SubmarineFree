@@ -69,7 +69,7 @@ struct TM_105 : Module  {
 			queue.push_back(TM_Msg());
 		}
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 };
 
 void TM_105InPort::received(std::string appId, std::string msg) {
@@ -87,7 +87,7 @@ void TM_105InPort::error(unsigned int errorType) {
 	tmModule->errPulses[_portNum - TM_105::INPUT_1].trigger(0.1f);
 }
 
-void TM_105::step() {
+void TM_105::process(const ProcessArgs &args) {
 	inPort1.process();
 	inPort2.process();
 	inPort3.process();

@@ -47,10 +47,10 @@ struct XF_101 : XF {
 	};
 
 	XF_101() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 };
 
-void XF_101::step() {
+void XF_101::process(const ProcessArgs &args) {
 	crossFade(&controls[0]);
 }
 

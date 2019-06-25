@@ -20,7 +20,7 @@ struct TD_116 : Module {
 		config(0, 1, 1, 0);
 		outPort.size(1);
 	}
-	void step() override {
+	void process(const ProcessArgs &args) override {
 		inPort.process();
 		outPort.process();
 	}

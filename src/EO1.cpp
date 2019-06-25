@@ -59,7 +59,7 @@ struct EO_102 : Module {
 	EO_102() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 	void startFrame(void);
 };
 
@@ -77,7 +77,7 @@ void EO_102::startFrame() {
 	traceStep = 1;
 }
 
-void EO_102::step() {
+void EO_102::process(const ProcessArgs &args) {
 	if (runMode > 0.5f) {
 		if (params[PARAM_RUNMODE].value < 0.5f) {
 			params[PARAM_RUN].value = 1.0f;

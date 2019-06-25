@@ -65,10 +65,10 @@ struct XF_102 : XF {
 			controls[i + deviceCount].correlator = &correlators[x];
 		}
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 };
 
-void XF_102::step() {
+void XF_102::process(const ProcessArgs &args) {
 	if (params[PARAM_LINK_1].value > 0.5f) {
 		crossFade(&controls[2]);
 	}

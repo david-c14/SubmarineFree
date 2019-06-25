@@ -114,7 +114,7 @@ struct PO_101 : Module, PO_Util {
 	PO_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 	void sin(float phase);
 	void tri(float phase);
 	void saw(float phase);
@@ -279,7 +279,7 @@ void PO_101::rsn(float phase) {
 	}
 }
 
-void PO_101::step() {
+void PO_101::process(const ProcessArgs &args) {
 
 	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f));
 	float deltaTime = freq / APP->engine->getSampleRate();
@@ -351,12 +351,12 @@ struct PO_204 : Module, PO_Util {
 	PO_204() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 	float phase = 0.0f;
 	float baseFreq = 261.626f;
 };
 
-void PO_204::step() {
+void PO_204::process(const ProcessArgs &args) {
 	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_TUNE].active?inputs[INPUT_TUNE].value:0.0f));
 	float deltaTime = freq / APP->engine->getSampleRate();
 	phase += deltaTime;
@@ -463,7 +463,7 @@ struct PO_Layout : SchemeModuleWidget {
 	}
 	void LayoutScreen(NVGcontext *vg) {
 		nvgFillColor(vg, gScheme.getBackground(module));
-		nvgStrokeColor(vg, gScheme.getBackground(module));
+		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgLineJoin(vg, NVG_ROUND);

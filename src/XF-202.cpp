@@ -50,10 +50,10 @@ struct XF_202 : XF {
 			controls[i].correlator = &correlators[i];
 		}
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 };
 
-void XF_202::step() {
+void XF_202::process(const ProcessArgs &args) {
 	crossFade(&controls[0]);
 	crossFade(&controls[1]);
 }

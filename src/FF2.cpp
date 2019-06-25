@@ -29,7 +29,7 @@ struct FF_2 : DS_Module {
 	FF_2() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override {
+	void process(const ProcessArgs &args) override {
 		if (doResetFlag) doReset();
 		if (doRandomFlag) doRandomize();
 		for (int i = 0; i < x; i++) {

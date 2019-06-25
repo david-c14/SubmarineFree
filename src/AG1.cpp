@@ -24,7 +24,7 @@ struct AG_1 : DS_Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
 
-	void step() override {
+	void process(const ProcessArgs &args) override {
 		int connCount = 0;
 		int setCount = 0;
 		for (int i = 0; i < x; i++) {

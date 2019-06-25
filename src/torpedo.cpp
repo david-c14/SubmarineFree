@@ -1,3 +1,4 @@
+#include "rack0.hpp"
 #include "torpedo.hpp"
 using namespace Torpedo;
 

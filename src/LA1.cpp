@@ -62,7 +62,7 @@ struct LA_108 : DS_Module {
 	LA_108() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 	void startFrame(void);
 };
 
@@ -81,7 +81,7 @@ void LA_108::startFrame() {
 	bufferIndex = 0;
 }
 
-void LA_108::step() {
+void LA_108::process(const ProcessArgs &args) {
 	// Set trigger lights
 	for (int i = 0; i < 9; i++)
 		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);

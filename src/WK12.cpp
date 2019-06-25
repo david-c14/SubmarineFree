@@ -1,11 +1,9 @@
 //SubTag W2 W10
 
 #include "SubmarineFree.hpp"
-//#include <mutex>
 #include "torpedo.hpp"
 #include <fstream>
 #include <cctype>
-#include "UpdateRing.hpp"
 
 struct WK_Update {
 	float offsets[12];
@@ -256,40 +254,31 @@ struct WK_101 : Module {
 	};
 	float tunings[12];
 	int toSend = 0;
-	UpdateRing<WK_Update> updateRing;
-	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
-	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
+//	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
+//	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
 
 	WK_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		outPort.size(5);
+//		outPort.size(5);
 	}
-	void step() override;
-	void PrepareUpdate() {
-		WK_Update *upd = updateRing.bg();
-		for (int i = 0; i < 12; i++)
-			upd->offsets[i] = tunings[i];
-		upd->isDirty = true;
-		updateRing.swap();
-	}
+	void process(const ProcessArgs &args) override;
 };
 
-void WK_101::step() {
+void WK_101::process(const ProcessArgs &args) {
 	int quantized = floor((12.0f * inputs[INPUT_CV].value) + 0.5f);
 	int note = (120 + quantized) % 12;
 	outputs[OUTPUT_CV].value = (tunings[note] / 1200.0f) + (quantized / 12.0f);	
 	for (int i = 0; i < 12; i++) 
 		lights[LIGHT_1 + i].value = (note == i)?1.0f:0.0f;
-	if (toSend && !outPort.isBusy()) {
-		toSend = 0;
-		json_t *rootJ = json_array();
-		for (int i = 0; i < 12; i++)
-			json_array_append_new(rootJ, json_real(tunings[i]));
-		outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
-	}
-	outPort.process();
-	inPort.process();
-
+//	if (toSend && !outPort.isBusy()) {
+//		toSend = 0;
+//		json_t *rootJ = json_array();
+//		for (int i = 0; i < 12; i++)
+//			json_array_append_new(rootJ, json_real(tunings[i]));
+	//	outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
+//	}
+	//outPort.process();
+	//inPort.process();
 }
 
 void WK101_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
@@ -305,15 +294,8 @@ void WK101_InputPort::received(std::string pluginName, std::string moduleName, j
 		if (j1)
 			tunings[i] = json_number_value(j1);
 	}
-	{
-		//std::lock_guard<std::mutex> guard(wkModule->mtx);
-		//wkModule->isDirty = true;
-		WK_Update *upd = wkModule->updateRing.bg();
-		for (int i = 0; i < 12; i++)
-			upd->offsets[i] = tunings[i];
-		upd->isDirty = true;
-		wkModule->updateRing.swap();
-	}
+	for (int i = 0; i < 12; i++)
+		wkModule->params[WK_101::PARAM_1].setValue(tunings[i]);
 }
 
 struct WK_Display : TransparentWidget {
@@ -342,9 +324,10 @@ struct WK101_MenuItem : MenuItem {
 		if (!module) {
 			return;
 		}
-		for (int i = 0; i < 12; i++)
+		for (int i = 0; i < 12; i++) {
 			module->tunings[i] = tunings[index].offsets[i];
-		module->PrepareUpdate();
+			APP->engine->setParam(module, WK_101::PARAM_1 + i, tunings[index].offsets[i]);
+		}
 		module->toSend = true;
 	}
 };
@@ -353,11 +336,13 @@ struct WK_Param : MedKnob<LightKnob> {
 	
 	void onChange(const event::Change &e) override {
 		MedKnob<LightKnob>::onChange(e);
+		/*
 		if (paramQuantity) {
 			WK_101 *module = dynamic_cast<WK_101 *>(this->paramQuantity->module);
 			module->tunings[this->paramQuantity->paramId - WK_101::PARAM_1] = getWidgetValue(this);
 			module->toSend = true;
 		}
+		*/
 	}
 };
 
@@ -369,8 +354,8 @@ struct WK101 : SchemeModuleWidget {
 
 		addInput(createInputCentered<SilverPort>(Vec(16.5,41.5), module, WK_101::INPUT_CV));
 		addOutput(createOutputCentered<SilverPort>(Vec(55.5,41.5), module, WK_101::OUTPUT_CV));
-		addInput(createInputCentered<BlackPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
-		addOutput(createOutputCentered<BlackPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_TOR));
+	//	addInput(createInputCentered<BlackPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
+	//	addOutput(createOutputCentered<BlackPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_TOR));
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -405,7 +390,6 @@ struct WK101 : SchemeModuleWidget {
 		WK_Tunings::loadTunings(pluginInstance);
 	}
 	void appendContextMenu(Menu *menu) override;
-	void step() override;
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WK-101");
 		nvgFillColor(vg, gScheme.getAlternative(module));
@@ -583,32 +567,6 @@ void WK101::appendContextMenu(Menu *menu) {
 	}
 }
 
-void WK101::step() {
-	float tunings[12];
-	int isDirty = 0;
-	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
-	if (!module) {
-		return;
-	}
-	{
-		WK_Update *upd  = module->updateRing.fg();
-		if (upd->isDirty) {
-			for (int i = 0; i < 12; i++)
-				tunings[i] = upd->offsets[i];
-			upd->isDirty = false;
-			isDirty = true;
-		}
-	}
-	if (isDirty) {
-		for (int i = 0; i < 12; i++) {
-			if (getWidgetValue(widgets[i]) != tunings[i])
-				APP->engine->setParam(module, WK_101::PARAM_1 + i, tunings[i]);
-		}
-	}
-
-	ModuleWidget::step();
-}
-
 struct WK_205;
 
 struct WK205_InputPort : Torpedo::PatchInputPort {
@@ -648,7 +606,7 @@ struct WK_205 : Module {
 	WK_205() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override;
+	void process(const ProcessArgs &args) override;
 	json_t *dataToJson(void) override {
 		json_t *rootJ = json_array();
 		for (int i = 0; i < 12; i++)
@@ -668,7 +626,7 @@ struct WK_205 : Module {
 	}
 };
 
-void WK_205::step() {
+void WK_205::process(const ProcessArgs &args) {
 	for (int i = 0; i < deviceCount; i++) {
 		int quantized = floor((12.0f * inputs[INPUT_CV_1 + i].value) + 0.5f);
 		int note = (120 + quantized) % 12;

@@ -30,7 +30,7 @@ struct FF_1 : DS_Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
 
-	void step() override {
+	void process(const ProcessArgs &args) override {
 		if (doResetFlag) doReset();
 		if (doRandomFlag) doRandomize();
 		if (inputs[INPUT].active) {
