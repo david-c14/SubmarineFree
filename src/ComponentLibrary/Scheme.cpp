@@ -16,7 +16,7 @@ Scheme::Scheme() {
 	json_t *rootJ = json_loadf(file, 0, &error);
 	fclose(file);
 	if (!rootJ) {
-		std::string message = stringf("Submarine Free Settings: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		std::string message = string::f("Submarine Free Settings: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		warn(message.c_str());
 		return;
 	}
