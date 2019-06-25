@@ -87,7 +87,7 @@ void LA_108::process(const ProcessArgs &args) {
 		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
-	int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
+	int frameCount = (int)ceilf(deltaTime * args.sampleRate);
 	
 	// Add frame to preBuffer
 	if (++preFrameIndex >= frameCount) {
@@ -140,7 +140,7 @@ void LA_108::process(const ProcessArgs &args) {
 			}
 
 			// Reset if we've waited too long
-			if (frameIndex >= APP->engine->getSampleRate() * holdTime) {
+			if (frameIndex >= args.sampleRate * holdTime) {
 				startFrame();
 				return;
 			}

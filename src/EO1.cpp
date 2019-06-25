@@ -87,8 +87,8 @@ void EO_102::process(const ProcessArgs &args) {
 	runMode = params[PARAM_RUNMODE].value;
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
-	int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
-	lights[LIGHT_TRIGGER].value = triggerLight.process(APP->engine->getSampleTime());
+	int frameCount = (int)ceilf(deltaTime * args.sampleRate);
+	lights[LIGHT_TRIGGER].value = triggerLight.process(args.sampleTime);
 	
 	// Add frame to preBuffer
 	for (int i = 0; i < 2; i++) {

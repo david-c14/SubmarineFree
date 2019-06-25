@@ -25,8 +25,8 @@ struct PG_1 : DS_Module {
 	PG_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
-	void step() override {
-		float deltaTime = 1.0f / APP->engine->getSampleRate();
+	void process(const ProcessArgs &args) override {
+		float deltaTime = 1.0f / args.sampleRate;
 		for (int i = 0; i < x; i++) {
 			if (schmitt[i].redge(this, inputs[INPUT_1 + i].value)) {
 				pulse[i].process(deltaTime);

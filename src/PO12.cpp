@@ -282,7 +282,7 @@ void PO_101::rsn(float phase) {
 void PO_101::process(const ProcessArgs &args) {
 
 	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f));
-	float deltaTime = freq / APP->engine->getSampleRate();
+	float deltaTime = freq / args.sampleRate;
 	phase += deltaTime;
 	double intPart;
 	phase = modf(phase, &intPart); 
@@ -358,7 +358,7 @@ struct PO_204 : Module, PO_Util {
 
 void PO_204::process(const ProcessArgs &args) {
 	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_TUNE].active?inputs[INPUT_TUNE].value:0.0f));
-	float deltaTime = freq / APP->engine->getSampleRate();
+	float deltaTime = freq / args.sampleRate;
 	phase += deltaTime;
 	double intPart;
 	phase = modf(phase, &intPart); 
