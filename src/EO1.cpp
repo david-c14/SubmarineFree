@@ -48,7 +48,7 @@ struct EO_102 : Module {
 	float preFrameIndex = 0;
 	int preCount = 0;
 
-	SchmittTrigger trigger;
+	dsp::SchmittTrigger trigger;
 	PulseGenerator triggerLight;
 	float runMode;
 	int setRun = 0;
