@@ -24,7 +24,7 @@ struct NG_1 : DS_Module {
 	}
 	void process(const ProcessArgs &args) override {
 		for (int i = 0; i < x; i++) {
-			outputs[OUTPUT_1 + i].value = (inputs[INPUT_1 + i].value < midpoint())?voltage1:voltage0;
+			outputs[OUTPUT_1 + i].setVoltage((inputs[INPUT_1 + i].getVoltage() < midpoint())?voltage1:voltage0);
 		}
 	}
 };

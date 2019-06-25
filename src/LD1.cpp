@@ -28,7 +28,7 @@ struct LD_1 : DS_Module {
 	}
 	void process(const ProcessArgs &args) override {
 		for (int i = 0; i < x; i++) {
-			outputs[OUTPUT_1 + i].value = output(schmittState[i].state(params[PARAM_CUTOFF_1 + i].value - params[PARAM_WIDTH_1 + i].value, params[PARAM_CUTOFF_1 + i].value + params[PARAM_WIDTH_1 + i].value, inputs[INPUT_1 + i].value));
+			outputs[OUTPUT_1 + i].setVoltage(output(schmittState[i].state(params[PARAM_CUTOFF_1 + i].getValue() - params[PARAM_WIDTH_1 + i].getValue(), params[PARAM_CUTOFF_1 + i].getValue() + params[PARAM_WIDTH_1 + i].getValue(), inputs[INPUT_1 + i].getVoltage())));
 		}
 	}
 };

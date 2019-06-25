@@ -27,14 +27,14 @@ struct SS_208 : Module {
 	static constexpr int deviceCount = 8;
 	SS_208() : Module() {
 		config(0, 0, deviceCount, 0);
-		outputs[0].value = M_PI;
-		outputs[1].value = 2 * M_PI;
-		outputs[2].value = M_E;
-		outputs[3].value = M_SQRT1_2;
-		outputs[4].value = M_SQRT2;
-		outputs[5].value = powf(3.0f, 0.5f);
-		outputs[6].value = powf(5.0f, 0.5f);
-		outputs[7].value = powf(7.0f, 0.5f);
+		outputs[0].setVoltage(M_PI);
+		outputs[1].setVoltage(2 * M_PI);
+		outputs[2].setVoltage(M_E);
+		outputs[3].setVoltage(M_SQRT1_2);
+		outputs[4].setVoltage(M_SQRT2);
+		outputs[5].setVoltage(powf(3.0f, 0.5f));
+		outputs[6].setVoltage(powf(5.0f, 0.5f));
+		outputs[7].setVoltage(powf(7.0f, 0.5f));
 	}
 };
 
@@ -64,7 +64,7 @@ struct SS_212 : Module {
 	int v = 0;
 	void setValues() {
 		for (int i = 0; i < deviceCount; i++) {
-			outputs[i].value = v + 1.0f * i / 12.0f;
+			outputs[i].setVoltage(v + 1.0f * i / 12.0f);
 		}
 	}
 
@@ -156,7 +156,7 @@ struct SS_221 : Module {
 	SS_221() : Module() {
 		config(0, 0, deviceCount, 0);
 		for (int i = 0; i < deviceCount; i++) {
-			outputs[i].value = 10.0f - i;
+			outputs[i].setVoltage(10.0f - i);
 		}
 	}
 };
@@ -202,7 +202,7 @@ struct SS_220 : Module {
 		config(0, 0, deviceCount * deviceSetCount, 0);
 		for (int j = 0; j < deviceSetCount; j++) {
 			for (int i = 0; i < deviceCount; i++) {
-				outputs[j * deviceCount + i].value = (j - 5.0f) + 1.0f * i / 12.0f;
+				outputs[j * deviceCount + i].setVoltage((j - 5.0f) + 1.0f * i / 12.0f);
 			}
 		}
 	}

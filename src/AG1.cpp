@@ -28,21 +28,21 @@ struct AG_1 : DS_Module {
 		int connCount = 0;
 		int setCount = 0;
 		for (int i = 0; i < x; i++) {
-			if (inputs[INPUT_A_1 + i].active) {
+			if (inputs[INPUT_A_1 + i].isConnected()) {
 				connCount++;
-				if (inputs[INPUT_A_1 + i].value > midpoint())
+				if (inputs[INPUT_A_1 + i].getVoltage() > midpoint())
 					setCount++;
 			}
-			if (inputs[INPUT_B_1 + i].active) {
+			if (inputs[INPUT_B_1 + i].isConnected()) {
 				connCount++;
-				if (inputs[INPUT_B_1 + i].value > midpoint())
+				if (inputs[INPUT_B_1 + i].getVoltage() > midpoint())
 					setCount++;
 			}
-			if (outputs[OUTPUT_1 + i].active) {
+			if (outputs[OUTPUT_1 + i].isConnected()) {
 				if (connCount)
-					outputs[OUTPUT_1 + i].value = (connCount == setCount)?voltage1:voltage0;
+					outputs[OUTPUT_1 + i].setVoltage((connCount == setCount)?voltage1:voltage0);
 				else
-					outputs[OUTPUT_1 + i].value = voltage0;
+					outputs[OUTPUT_1 + i].setVoltage(voltage0);
 				connCount = 0;
 				setCount = 0;
 			}

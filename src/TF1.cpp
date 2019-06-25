@@ -65,14 +65,14 @@ struct TF_101 : Module  {
 
 void TF_101::process(const ProcessArgs &args) {
 	for (int i = 0; i < 6; i++) {
-		float newValue = clamp(params[PARAM_FG_RED + i].value + inputs[INPUT_FG_RED + i].value / 10.0f, 0.0f, 1.0f); 
+		float newValue = clamp(params[PARAM_FG_RED + i].getValue() + inputs[INPUT_FG_RED + i].getVoltage() / 10.0f, 0.0f, 1.0f); 
 		lights[LIGHT_FG_RED + i].value = newValue; 
 		if (prevValues[i] != newValue) {
 			isDirty = true;
 			prevValues[i] = newValue;
 		}
 	}
-	float newValue = clamp(params[PARAM_FONT_SIZE].value + inputs[INPUT_FONT_SIZE].value * 2.0f, 6.0f, 26.0f); 
+	float newValue = clamp(params[PARAM_FONT_SIZE].getValue() + inputs[INPUT_FONT_SIZE].getVoltage() * 2.0f, 6.0f, 26.0f); 
 	if (prevValues[6] != newValue) {
 		isDirty = true;
 		prevValues[6] = newValue;

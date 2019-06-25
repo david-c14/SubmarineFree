@@ -66,12 +66,12 @@ struct EO_102 : Module {
 void EO_102::startFrame() {
 	triggerLight.trigger(0.1f);
 	frameIndex = 0;
-	preCount = (int)(params[PARAM_PRE].value + 0.5f);
+	preCount = (int)(params[PARAM_PRE].getValue() + 0.5f);
 	for (int i = 0; i < 2; i++) {
 		for (int s = 0; s < preCount; s++) {
 			buffer[i][s] = preBuffer[i][(preBufferIndex + (PRE_SIZE * 2) - preCount + s) % PRE_SIZE];
 		}
-		traceMode[i] = (int)(params[PARAM_MODE_1 + i].value + 0.5f);
+		traceMode[i] = (int)(params[PARAM_MODE_1 + i].getValue() + 0.5f);
 	}
 	bufferIndex = preCount;
 	traceStep = 1;
@@ -79,31 +79,31 @@ void EO_102::startFrame() {
 
 void EO_102::process(const ProcessArgs &args) {
 	if (runMode > 0.5f) {
-		if (params[PARAM_RUNMODE].value < 0.5f) {
-			params[PARAM_RUN].value = 1.0f;
+		if (params[PARAM_RUNMODE].getValue() < 0.5f) {
+			params[PARAM_RUN].setValue(1.0f);
 			setRun = 1;
 		}
 	}
-	runMode = params[PARAM_RUNMODE].value;
+	runMode = params[PARAM_RUNMODE].getValue();
 	// Compute time
-	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
+	float deltaTime = powf(2.0f, params[PARAM_TIME].getValue());
 	int frameCount = (int)ceilf(deltaTime * args.sampleRate);
 	lights[LIGHT_TRIGGER].value = triggerLight.process(args.sampleTime);
 	
 	// Add frame to preBuffer
 	for (int i = 0; i < 2; i++) {
-		if (params[PARAM_MODE_1 + i].value > 0.5f) {
+		if (params[PARAM_MODE_1 + i].getValue() > 0.5f) {
 			if (traceStep) {
-				preBuffer[i][preBufferIndex] = fabs(inputs[INPUT_1 + i].value);
+				preBuffer[i][preBufferIndex] = fabs(inputs[INPUT_1 + i].getVoltage());
 			}
-			preBuffer[i][preBufferIndex] = std::max(preBuffer[i][preBufferIndex], (float)fabs(inputs[INPUT_1 + i].value));
+			preBuffer[i][preBufferIndex] = std::max(preBuffer[i][preBufferIndex], (float)fabs(inputs[INPUT_1 + i].getVoltage()));
 		}
 	}
 	if (++preFrameIndex >= frameCount) {
 		preFrameIndex = 0;
 		for (int i = 0; i < 2; i++) {
-			if (params[PARAM_MODE_1 + i].value < 0.5f) {
-				preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].value;
+			if (params[PARAM_MODE_1 + i].getValue() < 0.5f) {
+				preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].getVoltage();
 			}
 		}
 		preBufferIndex++;
@@ -117,9 +117,9 @@ void EO_102::process(const ProcessArgs &args) {
 		for (int i = 0; i < 2; i++) {
 			if (traceMode[i]) {
 				if (traceStep) {
-					buffer[i][bufferIndex] = fabs(inputs[INPUT_1 + i].value);
+					buffer[i][bufferIndex] = fabs(inputs[INPUT_1 + i].getVoltage());
 				}
-				buffer[i][bufferIndex] = std::max(buffer[i][bufferIndex], (float)fabs(inputs[INPUT_1 + i].value));
+				buffer[i][bufferIndex] = std::max(buffer[i][bufferIndex], (float)fabs(inputs[INPUT_1 + i].getVoltage()));
 			}
 		}
 		traceStep = 0;
@@ -127,7 +127,7 @@ void EO_102::process(const ProcessArgs &args) {
 			frameIndex = 0;
 			for (int i = 0; i < 2; i++) {
 				if (!traceMode[i]) {
-					buffer[i][bufferIndex] = inputs[INPUT_1 + i].value;
+					buffer[i][bufferIndex] = inputs[INPUT_1 + i].getVoltage();
 				}
 			}
 			bufferIndex++;
@@ -136,13 +136,13 @@ void EO_102::process(const ProcessArgs &args) {
 	}
 
 	int triggerInput = INPUT_1;
-	if (inputs[INPUT_EXT].active)
+	if (inputs[INPUT_EXT].isConnected())
 		triggerInput = INPUT_EXT;
 	
 	// Are we waiting on the next trigger?
 	if (bufferIndex >= BUFFER_SIZE) {
 		// Trigger immediately if nothing connected to trigger input
-		if (!inputs[triggerInput].active) {
+		if (!inputs[triggerInput].isConnected()) {
 			startFrame();
 			return;
 		}
@@ -153,14 +153,14 @@ void EO_102::process(const ProcessArgs &args) {
 		}
 		frameIndex++;
 
-		float gate = inputs[triggerInput].value;
-		int triggered = trigger.process(rescale(gate, params[PARAM_TRIGGER].value - 0.1f, params[PARAM_TRIGGER].value, 0.0f, 1.0f)); 
+		float gate = inputs[triggerInput].getVoltage();
+		int triggered = trigger.process(rescale(gate, params[PARAM_TRIGGER].getValue() - 0.1f, params[PARAM_TRIGGER].getValue(), 0.0f, 1.0f)); 
 
-		if (params[PARAM_RUN].value > 0.5f) {
+		if (params[PARAM_RUN].getValue() > 0.5f) {
 			if (triggered) {
 				startFrame();
 				if (runMode > 0.5f) {// Continuous run mode
-					params[PARAM_RUN].value = 0;
+					params[PARAM_RUN].setValue(0);
 					resetRun = 1;
 				}
 				return;
@@ -300,19 +300,19 @@ struct EO_Display : TransparentWidget {
 		}
 		NVGcolor col = SUBLIGHTBLUETRANS;
 		for (int i = 0; i < 2; i++) {
-			if (module->inputs[EO_102::INPUT_1 + i].active) {
-				drawTrace(args.vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].value, module->params[EO_102::PARAM_SCALE_1 + i].value, col, module->traceMode[i]); 
+			if (module->inputs[EO_102::INPUT_1 + i].isConnected()) {
+				drawTrace(args.vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].getValue(), module->params[EO_102::PARAM_SCALE_1 + i].getValue(), col, module->traceMode[i]); 
 			}
 			col = SUBLIGHTREDTRANS;
 		}
-		drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_1].value, 0.0f, 1.0f));
-		drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_2].value, 0.0f, 1.0f));
-		drawIndexV(args.vg, clamp(module->params[EO_102::PARAM_INDEX_3].value, 0.0f, 1.0f));
-		if (module->inputs[EO_102::INPUT_EXT].active)
-			drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].value, 0.0f, 1.0f);
+		drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
+		drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
+		drawIndexV(args.vg, clamp(module->params[EO_102::PARAM_INDEX_3].getValue(), 0.0f, 1.0f));
+		if (module->inputs[EO_102::INPUT_EXT].isConnected())
+			drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].getValue(), 0.0f, 1.0f);
 		else
-			drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].value, module->params[EO_102::PARAM_OFFSET_1].value, module->params[EO_102::PARAM_SCALE_1].value);
-		drawMask(args.vg, clamp(module->params[EO_102::PARAM_PRE].value, 0.0f, 1.0f * PRE_SIZE) / BUFFER_SIZE);
+			drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].getValue(), module->params[EO_102::PARAM_OFFSET_1].getValue(), module->params[EO_102::PARAM_SCALE_1].getValue());
+		drawMask(args.vg, clamp(module->params[EO_102::PARAM_PRE].getValue(), 0.0f, 1.0f * PRE_SIZE) / BUFFER_SIZE);
 		drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
 };
@@ -340,10 +340,10 @@ struct EO_Measure_Horz : EO_Measure {
 		if (!module) {
 			return;
 		} 
-		float deltaTime = powf(2.0f, module->params[EO_102::PARAM_TIME].value);
+		float deltaTime = powf(2.0f, module->params[EO_102::PARAM_TIME].getValue());
 		int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
 		frameCount *= BUFFER_SIZE;
-		float width = (float)frameCount * fabs(module->params[EO_102::PARAM_INDEX_1].value - module->params[EO_102::PARAM_INDEX_2].value) / APP->engine->getSampleRate(); 
+		float width = (float)frameCount * fabs(module->params[EO_102::PARAM_INDEX_1].getValue() - module->params[EO_102::PARAM_INDEX_2].getValue()) / APP->engine->getSampleRate(); 
 		
 		if (width < 0.00000995f)
 			sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
@@ -372,7 +372,7 @@ struct EO_Measure_Vert : EO_Measure {
 		if (!module) {
 			return; 
 		}
-		float height = ((module->params[EO_102::PARAM_INDEX_3].value - 0.2f) * 20.0f - module->params[EO_102::PARAM_OFFSET_1 + index].value) / powf(2, module->params[EO_102::PARAM_SCALE_1 + index].value);
+		float height = ((module->params[EO_102::PARAM_INDEX_3].getValue() - 0.2f) * 20.0f - module->params[EO_102::PARAM_OFFSET_1 + index].getValue()) / powf(2, module->params[EO_102::PARAM_SCALE_1 + index].getValue());
 		
 		float ah = fabs(height);
 		if (ah < 0.00000995f)

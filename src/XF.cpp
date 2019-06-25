@@ -41,10 +41,10 @@ int XF_Correlator::correlate(float a, float b) {
 }
 
 void XF::crossFade(XF_Controls *controls) {
-	float fade = clamp((inputs[controls->cv].active?params[controls->polar].value * 5.0f + inputs[controls->cv].value:params[controls->fader].value)/10.0f, 0.0f, 1.0f);
+	float fade = clamp((inputs[controls->cv].isConnected()?params[controls->polar].getValue() * 5.0f + inputs[controls->cv].getVoltage():params[controls->fader].getValue())/10.0f, 0.0f, 1.0f);
 	int mode = 0;
-	if (params[controls->mode].value > 1.5f) {
-		mode = controls->correlator->correlate(inputs[controls->a].value, inputs[controls->b].value);
+	if (params[controls->mode].getValue() > 1.5f) {
+		mode = controls->correlator->correlate(inputs[controls->a].getVoltage(), inputs[controls->b].getVoltage());
 		if (controls->correlator->correlation < -0.1f) {
 			lights[controls->light3].value = 0.0f;
 			lights[controls->light3 + 1].value = 1.0f;
@@ -54,7 +54,7 @@ void XF::crossFade(XF_Controls *controls) {
 			lights[controls->light3 + 1].value = 0.0f;
 		}
 	}
-	else if (params[controls->mode].value > 0.5f) {
+	else if (params[controls->mode].getValue() > 0.5f) {
 		mode = 0;
 		lights[controls->light3].value = 0.0f;
 		lights[controls->light3 + 1].value = 0.0f;
@@ -65,16 +65,16 @@ void XF::crossFade(XF_Controls *controls) {
 		lights[controls->light3 + 1].value = 0.0f;
 	}
 	if (mode == 0) {
-		outputs[controls->out].value = inputs[controls->a].value * powf(1.0f - fade, 0.5f) + inputs[controls->b].value * powf(fade, 0.5f);
+		outputs[controls->out].setVoltage(inputs[controls->a].getVoltage() * powf(1.0f - fade, 0.5f) + inputs[controls->b].getVoltage() * powf(fade, 0.5f));
 		if (controls->outr)
-			outputs[controls->outr].value = inputs[controls->ar].value * powf(1.0f - fade, 0.5f) + inputs[controls->br].value * powf(fade, 0.5f);
+			outputs[controls->outr].setVoltage(inputs[controls->ar].getVoltage() * powf(1.0f - fade, 0.5f) + inputs[controls->br].getVoltage() * powf(fade, 0.5f));
 		lights[controls->light1].value = 0.0f;
 		lights[controls->light2].value = 1.0f;
 	}
 	else {
-		outputs[controls->out].value = inputs[controls->a].value * (1.0f - fade) + inputs[controls->b].value * fade;
+		outputs[controls->out].setVoltage(inputs[controls->a].getVoltage() * (1.0f - fade) + inputs[controls->b].getVoltage() * fade);
 		if (controls->outr)
-			outputs[controls->outr].value = inputs[controls->ar].value * (1.0f - fade) + inputs[controls->br].value * fade;
+			outputs[controls->outr].setVoltage(inputs[controls->ar].getVoltage() * (1.0f - fade) + inputs[controls->br].getVoltage() * fade);
 		lights[controls->light1].value = 1.0f;
 		lights[controls->light2].value = 0.0f;
 	}
@@ -84,10 +84,10 @@ void XF_LightKnob::step() {
 	if (paramQuantity) {
 		Module *module = paramQuantity->module;
 		if (link) {
-			setEnabled(!module->inputs[cv].active && (module->params[link].value < 0.5f));
+			setEnabled(!module->inputs[cv].isConnected() && (module->params[link].getValue() < 0.5f));
 		}
 		else {
-			setEnabled(!module->inputs[cv].active);
+			setEnabled(!module->inputs[cv].isConnected());
 		}
 	}
 	Knob::step();

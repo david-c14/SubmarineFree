@@ -450,22 +450,22 @@ struct AO1 : Module {
 	void process(const ProcessArgs &args) override {
 		float vx[x];
 		for (unsigned int ix = 0; ix < x; ix++) {
-			vx[ix] = inputs[INPUT_X_1 + ix].value;
+			vx[ix] = inputs[INPUT_X_1 + ix].getVoltage();
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			float vy = inputs[INPUT_Y_1 + iy].value;
+			float vy = inputs[INPUT_Y_1 + iy].getVoltage();
 			for (unsigned int ix = 0; ix < x; ix++) {
-				unsigned int f = params[PARAM_FUNC_1 + ix + iy * x].value;
+				unsigned int f = params[PARAM_FUNC_1 + ix + iy * x].getValue();
 				if (f >= SubmarineAO::functions.size())
 					f = SubmarineAO::functions.size() - 1;
 				if (f > 0)
-					vy = vx[ix] = SubmarineAO::functions[f].func(vx[ix], vy, ((int)params[PARAM_CONST_1 + ix + iy * x].value)/100.0f);
+					vy = vx[ix] = SubmarineAO::functions[f].func(vx[ix], vy, ((int)params[PARAM_CONST_1 + ix + iy * x].getValue())/100.0f);
 				// if f is equal to 0, then both x and y pass (crossing) through the module unchanged.
 			}
-			outputs[OUTPUT_Y_1 + iy].value = std::isfinite(vy)?vy:0.0f;
+			outputs[OUTPUT_Y_1 + iy].setVoltage(std::isfinite(vy)?vy:0.0f);
 		}
 		for (unsigned int ix = 0; ix < x; ix++) {
-			outputs[OUTPUT_X_1 + ix].value = std::isfinite(vx[ix])?vx[ix]:0.0f;
+			outputs[OUTPUT_X_1 + ix].setVoltage(std::isfinite(vx[ix])?vx[ix]:0.0f);
 		}
 	}
 };

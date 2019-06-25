@@ -69,7 +69,7 @@ struct XF_102 : XF {
 };
 
 void XF_102::process(const ProcessArgs &args) {
-	if (params[PARAM_LINK_1].value > 0.5f) {
+	if (params[PARAM_LINK_1].getValue() > 0.5f) {
 		crossFade(&controls[2]);
 	}
 	else {

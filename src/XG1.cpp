@@ -26,14 +26,14 @@ struct XG_1 : DS_Module {
 	void process(const ProcessArgs &args) override {
 		int setCount = 0;
 		for (int i = 0; i < x; i++) {
-			if (inputs[INPUT_A_1 + i].active)
-				if (inputs[INPUT_A_1 + i].value > midpoint())
+			if (inputs[INPUT_A_1 + i].isConnected())
+				if (inputs[INPUT_A_1 + i].getVoltage() > midpoint())
 					setCount++;
-			if (inputs[INPUT_B_1 + i].active)
-				if (inputs[INPUT_B_1 + i].value > midpoint())
+			if (inputs[INPUT_B_1 + i].isConnected())
+				if (inputs[INPUT_B_1 + i].getVoltage() > midpoint())
 					setCount++;
-			if (outputs[OUTPUT_1 + i].active) {
-				outputs[OUTPUT_1 + i].value = (setCount % 2)?voltage1:voltage0;
+			if (outputs[OUTPUT_1 + i].isConnected()) {
+				outputs[OUTPUT_1 + i].setVoltage((setCount % 2)?voltage1:voltage0);
 				setCount = 0;
 			}
 		}

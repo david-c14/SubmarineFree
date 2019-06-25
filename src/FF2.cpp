@@ -33,8 +33,8 @@ struct FF_2 : DS_Module {
 		if (doResetFlag) doReset();
 		if (doRandomFlag) doRandomize();
 		for (int i = 0; i < x; i++) {
-			if (inputs[INPUT_1 + i].active) {
-				if (schmittTrigger[i].redge(this, inputs[INPUT_1 + i].value))
+			if (inputs[INPUT_1 + i].isConnected()) {
+				if (schmittTrigger[i].redge(this, inputs[INPUT_1 + i].getVoltage()))
 					state[i] = !state[i];	
 			}
 			else {
@@ -43,7 +43,7 @@ struct FF_2 : DS_Module {
 						state[i] = !state[i];
 				}
 			}
-			outputs[OUTPUT_1 + i].value = state[i]?voltage1:voltage0;
+			outputs[OUTPUT_1 + i].setVoltage(state[i]?voltage1:voltage0);
 		}
 	}
 	void doRandomize() {
@@ -52,16 +52,16 @@ struct FF_2 : DS_Module {
 		std::uniform_int_distribution<int> distribution(0,1);
 		for (int i = 0; i < x; i++) {
 		 	state[i] = distribution(generator);
-			if (i) if (!inputs[INPUT_1 + i].active) schmittTrigger[i].set(state[i-1]);
-			outputs[OUTPUT_1 + i].value = state[i]?voltage1:voltage0;
+			if (i) if (!inputs[INPUT_1 + i].isConnected()) schmittTrigger[i].set(state[i-1]);
+			outputs[OUTPUT_1 + i].setVoltage(state[i]?voltage1:voltage0);
 		}
 	}
 	void doReset() {
 		doResetFlag = 0;
 		for (int i = 0; i < x; i++) {
 			state[i] = 0;
-			if (!inputs[INPUT_1 + i].active) schmittTrigger[i].reset();
-			outputs[OUTPUT_1 + i].value = voltage0;
+			if (!inputs[INPUT_1 + i].isConnected()) schmittTrigger[i].reset();
+			outputs[OUTPUT_1 + i].setVoltage(voltage0);
 		}
 	}
 	void onRandomize() override {

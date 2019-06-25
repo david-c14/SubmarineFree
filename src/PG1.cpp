@@ -28,13 +28,13 @@ struct PG_1 : DS_Module {
 	void process(const ProcessArgs &args) override {
 		float deltaTime = 1.0f / args.sampleRate;
 		for (int i = 0; i < x; i++) {
-			if (schmitt[i].redge(this, inputs[INPUT_1 + i].value)) {
+			if (schmitt[i].redge(this, inputs[INPUT_1 + i].getVoltage())) {
 				pulse[i].process(deltaTime);
-				pulse[i].trigger(powf(10.0f, params[PARAM_1 + i].value));
-				outputs[OUTPUT_1 + i].value = voltage1;
+				pulse[i].trigger(powf(10.0f, params[PARAM_1 + i].getValue()));
+				outputs[OUTPUT_1 + i].setVoltage(voltage1);
 			}
 			else {
-				outputs[OUTPUT_1 + i].value = pulse[i].process(deltaTime)?voltage1:voltage0;
+				outputs[OUTPUT_1 + i].setVoltage(pulse[i].process(deltaTime)?voltage1:voltage0);
 			}
 		}
 	}

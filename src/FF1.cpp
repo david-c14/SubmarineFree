@@ -33,15 +33,15 @@ struct FF_1 : DS_Module {
 	void process(const ProcessArgs &args) override {
 		if (doResetFlag) doReset();
 		if (doRandomFlag) doRandomize();
-		if (inputs[INPUT].active) {
-			if (schmittTrigger[0].redge(this, inputs[INPUT].value))
+		if (inputs[INPUT].isConnected()) {
+			if (schmittTrigger[0].redge(this, inputs[INPUT].getVoltage()))
 				state[0] = !state[0];
 		}
-		outputs[OUTPUT_1].value = state[0]?voltage1:voltage0;
+		outputs[OUTPUT_1].setVoltage(state[0]?voltage1:voltage0);
 		for (int i = 1; i < deviceCount; i++) {
 			if (schmittTrigger[i].fedge(this, state[i-1]?voltage1:voltage0))
 						state[i] = !state[i];
-			outputs[OUTPUT_1 + i].value = state[i]?voltage1:voltage0;
+			outputs[OUTPUT_1 + i].setVoltage(state[i]?voltage1:voltage0);
 		}
 	}
 	void doRandomize() {
@@ -49,11 +49,11 @@ struct FF_1 : DS_Module {
 		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
 		std::uniform_int_distribution<int> distribution(0,1);
 		state[0] = distribution(generator);
-		outputs[OUTPUT_1].value = state[0]?voltage1:voltage0;
+		outputs[OUTPUT_1].setVoltage(state[0]?voltage1:voltage0);
 		for (int i = 1; i < deviceCount; i++) {
 			state[i] = distribution(generator);
 			schmittTrigger[i].set(state[i-1]);
-			outputs[OUTPUT_1 + i].value = state[i]?voltage1:voltage0;
+			outputs[OUTPUT_1 + i].setVoltage(state[i]?voltage1:voltage0);
 		}
 	}
 	void doReset() {
@@ -61,7 +61,7 @@ struct FF_1 : DS_Module {
 		for (int i = 0; i < deviceCount; i++) {
 			state[i] = 0;
 			if (i) schmittTrigger[i].reset();
-			outputs[OUTPUT_1 + i].value = voltage0;
+			outputs[OUTPUT_1 + i].setVoltage(voltage0);
 		}
 	}
 	void onRandomize() override {

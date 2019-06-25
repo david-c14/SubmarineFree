@@ -126,168 +126,168 @@ struct PO_101 : Module, PO_Util {
 
 void PO_101::sin(float phase) {
 	phase *= (2 * M_PI);
-	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
-		outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sin(phase + deg0));
-	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
-		outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sin(phase + deg30)); 
-	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
-		outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sin(phase + deg45)); 
-	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
-		outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sin(phase + deg60)); 
-	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
-		outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sin(phase + deg90)); 
-	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
-		outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sin(phase + deg120)); 
-	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
-		outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sin(phase + deg135)); 
-	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
-		outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sin(phase + deg150)); 
+	if (outputs[OUTPUT_1].isConnected() || outputs[OUTPUT_9].isConnected())
+		outputs[OUTPUT_9].setVoltage(-(outputs[OUTPUT_1].value = PO_Util::sin(phase + deg0)));
+	if (outputs[OUTPUT_2].isConnected() || outputs[OUTPUT_10].isConnected())
+		outputs[OUTPUT_10].setVoltage(-(outputs[OUTPUT_2].value = PO_Util::sin(phase + deg30))); 
+	if (outputs[OUTPUT_3].isConnected() || outputs[OUTPUT_11].isConnected())
+		outputs[OUTPUT_11].setVoltage(-(outputs[OUTPUT_3].value = PO_Util::sin(phase + deg45))); 
+	if (outputs[OUTPUT_4].isConnected() || outputs[OUTPUT_12].isConnected())
+		outputs[OUTPUT_12].setVoltage(-(outputs[OUTPUT_4].value = PO_Util::sin(phase + deg60))); 
+	if (outputs[OUTPUT_5].isConnected() || outputs[OUTPUT_13].isConnected())
+		outputs[OUTPUT_13].setVoltage(-(outputs[OUTPUT_5].value = PO_Util::sin(phase + deg90))); 
+	if (outputs[OUTPUT_6].isConnected() || outputs[OUTPUT_14].isConnected())
+		outputs[OUTPUT_14].setVoltage(-(outputs[OUTPUT_6].value = PO_Util::sin(phase + deg120))); 
+	if (outputs[OUTPUT_7].isConnected() || outputs[OUTPUT_15].isConnected())
+		outputs[OUTPUT_15].setVoltage(-(outputs[OUTPUT_7].value = PO_Util::sin(phase + deg135))); 
+	if (outputs[OUTPUT_8].isConnected() || outputs[OUTPUT_16].isConnected())
+		outputs[OUTPUT_16].setVoltage(-(outputs[OUTPUT_8].value = PO_Util::sin(phase + deg150))); 
 	for (int i = 0; i < 4; i++) {
-		if (outputs[OUTPUT_17 + i].active) {
-			float offset = params[PARAM_PHASE_1 + i].value;
-			if (inputs[INPUT_PHASE_1 + i].active)
-				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+		if (outputs[OUTPUT_17 + i].isConnected()) {
+			float offset = params[PARAM_PHASE_1 + i].getValue();
+			if (inputs[INPUT_PHASE_1 + i].isConnected())
+				offset += inputs[INPUT_PHASE_1 + i].getVoltage() * 0.4f;
 			offset *= 2 * M_PI;
-			outputs[OUTPUT_17 + i].value = PO_Util::sin(phase + offset);
+			outputs[OUTPUT_17 + i].setVoltage(PO_Util::sin(phase + offset));
 		}	
 	}
 }
 
 void PO_101::tri(float phase) {
-	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
-		outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::tri(phase + ph0));
-	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
-		outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::tri(phase + ph30)); 
-	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
-		outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::tri(phase + ph45)); 
-	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
-		outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::tri(phase + ph60)); 
-	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
-		outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::tri(phase + ph90)); 
-	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
-		outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::tri(phase + ph120)); 
-	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
-		outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::tri(phase + ph135)); 
-	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
-		outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::tri(phase + ph150)); 
+	if (outputs[OUTPUT_1].isConnected() || outputs[OUTPUT_9].isConnected())
+		outputs[OUTPUT_9].setVoltage(-(outputs[OUTPUT_1].value = PO_Util::tri(phase + ph0)));
+	if (outputs[OUTPUT_2].isConnected() || outputs[OUTPUT_10].isConnected())
+		outputs[OUTPUT_10].setVoltage(-(outputs[OUTPUT_2].value = PO_Util::tri(phase + ph30))); 
+	if (outputs[OUTPUT_3].isConnected() || outputs[OUTPUT_11].isConnected())
+		outputs[OUTPUT_11].setVoltage(-(outputs[OUTPUT_3].value = PO_Util::tri(phase + ph45))); 
+	if (outputs[OUTPUT_4].isConnected() || outputs[OUTPUT_12].isConnected())
+		outputs[OUTPUT_12].setVoltage(-(outputs[OUTPUT_4].value = PO_Util::tri(phase + ph60))); 
+	if (outputs[OUTPUT_5].isConnected() || outputs[OUTPUT_13].isConnected())
+		outputs[OUTPUT_13].setVoltage(-(outputs[OUTPUT_5].value = PO_Util::tri(phase + ph90))); 
+	if (outputs[OUTPUT_6].isConnected() || outputs[OUTPUT_14].isConnected())
+		outputs[OUTPUT_14].setVoltage(-(outputs[OUTPUT_6].value = PO_Util::tri(phase + ph120))); 
+	if (outputs[OUTPUT_7].isConnected() || outputs[OUTPUT_15].isConnected())
+		outputs[OUTPUT_15].setVoltage(-(outputs[OUTPUT_7].value = PO_Util::tri(phase + ph135))); 
+	if (outputs[OUTPUT_8].isConnected() || outputs[OUTPUT_16].isConnected())
+		outputs[OUTPUT_16].setVoltage(-(outputs[OUTPUT_8].value = PO_Util::tri(phase + ph150))); 
 	for (int i = 0; i < 4; i++) {
-		if (outputs[OUTPUT_17 + i].active) {
-			float offset = params[PARAM_PHASE_1 + i].value;
-			if (inputs[INPUT_PHASE_1 + i].active)
-				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
-			outputs[OUTPUT_17 + i].value = PO_Util::tri(phase + offset);
+		if (outputs[OUTPUT_17 + i].isConnected()) {
+			float offset = params[PARAM_PHASE_1 + i].getValue();
+			if (inputs[INPUT_PHASE_1 + i].isConnected())
+				offset += inputs[INPUT_PHASE_1 + i].getVoltage() * 0.4f;
+			outputs[OUTPUT_17 + i].setVoltage(PO_Util::tri(phase + offset));
 		}	
 	}
 }
 
 void PO_101::saw(float phase) {
-	if (outputs[OUTPUT_1].active)
-		outputs[OUTPUT_1].value = PO_Util::saw(phase + ph0);
-	if (outputs[OUTPUT_2].active)
-		outputs[OUTPUT_2].value = PO_Util::saw(phase + ph30); 
-	if (outputs[OUTPUT_3].active)
-		outputs[OUTPUT_3].value = PO_Util::saw(phase + ph45); 
-	if (outputs[OUTPUT_4].active)
-		outputs[OUTPUT_4].value = PO_Util::saw(phase + ph60); 
-	if (outputs[OUTPUT_5].active)
-		outputs[OUTPUT_5].value = PO_Util::saw(phase + ph90); 
-	if (outputs[OUTPUT_6].active)
-		outputs[OUTPUT_6].value = PO_Util::saw(phase + ph120); 
-	if (outputs[OUTPUT_7].active)
-		outputs[OUTPUT_7].value = PO_Util::saw(phase + ph135); 
-	if (outputs[OUTPUT_8].active)
-		outputs[OUTPUT_8].value = PO_Util::saw(phase + ph150); 
-	if (outputs[OUTPUT_9].active)
-		outputs[OUTPUT_9].value = PO_Util::saw(phase + ph180);
-	if (outputs[OUTPUT_10].active)
-		outputs[OUTPUT_10].value = PO_Util::saw(phase + ph210); 
-	if (outputs[OUTPUT_11].active)
-		outputs[OUTPUT_11].value = PO_Util::saw(phase + ph225); 
-	if (outputs[OUTPUT_12].active)
-		outputs[OUTPUT_12].value = PO_Util::saw(phase + ph240); 
-	if (outputs[OUTPUT_13].active)
-		outputs[OUTPUT_13].value = PO_Util::saw(phase + ph270); 
-	if (outputs[OUTPUT_14].active)
-		outputs[OUTPUT_14].value = PO_Util::saw(phase + ph300); 
-	if (outputs[OUTPUT_15].active)
-		outputs[OUTPUT_15].value = PO_Util::saw(phase + ph315); 
-	if (outputs[OUTPUT_16].active)
-		outputs[OUTPUT_16].value = PO_Util::saw(phase + ph330); 
+	if (outputs[OUTPUT_1].isConnected())
+		outputs[OUTPUT_1].setVoltage(PO_Util::saw(phase + ph0));
+	if (outputs[OUTPUT_2].isConnected())
+		outputs[OUTPUT_2].setVoltage(PO_Util::saw(phase + ph30)); 
+	if (outputs[OUTPUT_3].isConnected())
+		outputs[OUTPUT_3].setVoltage(PO_Util::saw(phase + ph45)); 
+	if (outputs[OUTPUT_4].isConnected())
+		outputs[OUTPUT_4].setVoltage(PO_Util::saw(phase + ph60)); 
+	if (outputs[OUTPUT_5].isConnected())
+		outputs[OUTPUT_5].setVoltage(PO_Util::saw(phase + ph90)); 
+	if (outputs[OUTPUT_6].isConnected())
+		outputs[OUTPUT_6].setVoltage(PO_Util::saw(phase + ph120)); 
+	if (outputs[OUTPUT_7].isConnected())
+		outputs[OUTPUT_7].setVoltage(PO_Util::saw(phase + ph135)); 
+	if (outputs[OUTPUT_8].isConnected())
+		outputs[OUTPUT_8].setVoltage(PO_Util::saw(phase + ph150)); 
+	if (outputs[OUTPUT_9].isConnected())
+		outputs[OUTPUT_9].setVoltage(PO_Util::saw(phase + ph180));
+	if (outputs[OUTPUT_10].isConnected())
+		outputs[OUTPUT_10].setVoltage(PO_Util::saw(phase + ph210)); 
+	if (outputs[OUTPUT_11].isConnected())
+		outputs[OUTPUT_11].setVoltage(PO_Util::saw(phase + ph225)); 
+	if (outputs[OUTPUT_12].isConnected())
+		outputs[OUTPUT_12].setVoltage(PO_Util::saw(phase + ph240)); 
+	if (outputs[OUTPUT_13].isConnected())
+		outputs[OUTPUT_13].setVoltage(PO_Util::saw(phase + ph270)); 
+	if (outputs[OUTPUT_14].isConnected())
+		outputs[OUTPUT_14].setVoltage(PO_Util::saw(phase + ph300)); 
+	if (outputs[OUTPUT_15].isConnected())
+		outputs[OUTPUT_15].setVoltage(PO_Util::saw(phase + ph315)); 
+	if (outputs[OUTPUT_16].isConnected())
+		outputs[OUTPUT_16].setVoltage(PO_Util::saw(phase + ph330)); 
 	for (int i = 0; i < 4; i++) {
-		if (outputs[OUTPUT_17 + i].active) {
-			float offset = params[PARAM_PHASE_1 + i].value;
-			if (inputs[INPUT_PHASE_1 + i].active)
-				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
-			outputs[OUTPUT_17 + i].value = PO_Util::saw(phase + offset);
+		if (outputs[OUTPUT_17 + i].isConnected()) {
+			float offset = params[PARAM_PHASE_1 + i].getValue();
+			if (inputs[INPUT_PHASE_1 + i].isConnected())
+				offset += inputs[INPUT_PHASE_1 + i].getVoltage() * 0.4f;
+			outputs[OUTPUT_17 + i].setVoltage(PO_Util::saw(phase + offset));
 		}	
 	}
 }
 
 void PO_101::sqr(float phase) {
-	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
-		outputs[OUTPUT_9].value = -(outputs[OUTPUT_1].value = PO_Util::sqr(phase + ph0));
-	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
-		outputs[OUTPUT_10].value = -(outputs[OUTPUT_2].value = PO_Util::sqr(phase + ph30)); 
-	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
-		outputs[OUTPUT_11].value = -(outputs[OUTPUT_3].value = PO_Util::sqr(phase + ph45)); 
-	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
-		outputs[OUTPUT_12].value = -(outputs[OUTPUT_4].value = PO_Util::sqr(phase + ph60)); 
-	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
-		outputs[OUTPUT_13].value = -(outputs[OUTPUT_5].value = PO_Util::sqr(phase + ph90)); 
-	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
-		outputs[OUTPUT_14].value = -(outputs[OUTPUT_6].value = PO_Util::sqr(phase + ph120)); 
-	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
-		outputs[OUTPUT_15].value = -(outputs[OUTPUT_7].value = PO_Util::sqr(phase + ph135)); 
-	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
-		outputs[OUTPUT_16].value = -(outputs[OUTPUT_8].value = PO_Util::sqr(phase + ph150)); 
+	if (outputs[OUTPUT_1].isConnected() || outputs[OUTPUT_9].isConnected())
+		outputs[OUTPUT_9].setVoltage(-(outputs[OUTPUT_1].value = PO_Util::sqr(phase + ph0)));
+	if (outputs[OUTPUT_2].isConnected() || outputs[OUTPUT_10].isConnected())
+		outputs[OUTPUT_10].setVoltage(-(outputs[OUTPUT_2].value = PO_Util::sqr(phase + ph30))); 
+	if (outputs[OUTPUT_3].isConnected() || outputs[OUTPUT_11].isConnected())
+		outputs[OUTPUT_11].setVoltage(-(outputs[OUTPUT_3].value = PO_Util::sqr(phase + ph45))); 
+	if (outputs[OUTPUT_4].isConnected() || outputs[OUTPUT_12].isConnected())
+		outputs[OUTPUT_12].setVoltage(-(outputs[OUTPUT_4].value = PO_Util::sqr(phase + ph60))); 
+	if (outputs[OUTPUT_5].isConnected() || outputs[OUTPUT_13].isConnected())
+		outputs[OUTPUT_13].setVoltage(-(outputs[OUTPUT_5].value = PO_Util::sqr(phase + ph90))); 
+	if (outputs[OUTPUT_6].isConnected() || outputs[OUTPUT_14].isConnected())
+		outputs[OUTPUT_14].setVoltage(-(outputs[OUTPUT_6].value = PO_Util::sqr(phase + ph120))); 
+	if (outputs[OUTPUT_7].isConnected() || outputs[OUTPUT_15].isConnected())
+		outputs[OUTPUT_15].setVoltage(-(outputs[OUTPUT_7].value = PO_Util::sqr(phase + ph135))); 
+	if (outputs[OUTPUT_8].isConnected() || outputs[OUTPUT_16].isConnected())
+		outputs[OUTPUT_16].setVoltage(-(outputs[OUTPUT_8].value = PO_Util::sqr(phase + ph150))); 
 	for (int i = 0; i < 4; i++) {
-		if (outputs[OUTPUT_17 + i].active) {
-			float offset = params[PARAM_PHASE_1 + i].value;
-			if (inputs[INPUT_PHASE_1 + i].active)
-				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
-			outputs[OUTPUT_17 + i].value = PO_Util::sqr(phase + offset);
+		if (outputs[OUTPUT_17 + i].isConnected()) {
+			float offset = params[PARAM_PHASE_1 + i].getValue();
+			if (inputs[INPUT_PHASE_1 + i].isConnected())
+				offset += inputs[INPUT_PHASE_1 + i].getVoltage() * 0.4f;
+			outputs[OUTPUT_17 + i].setVoltage(PO_Util::sqr(phase + offset));
 		}	
 	}
 }
 	
 void PO_101::rsn(float phase) {
 	phase *= (2 * M_PI);
-	if (outputs[OUTPUT_1].active || outputs[OUTPUT_9].active)
-		outputs[OUTPUT_9].value = (outputs[OUTPUT_1].value = PO_Util::rsn(phase + deg0));
-	if (outputs[OUTPUT_2].active || outputs[OUTPUT_10].active)
-		outputs[OUTPUT_10].value = (outputs[OUTPUT_2].value = PO_Util::rsn(phase + deg30)); 
-	if (outputs[OUTPUT_3].active || outputs[OUTPUT_11].active)
-		outputs[OUTPUT_11].value = (outputs[OUTPUT_3].value = PO_Util::rsn(phase + deg45)); 
-	if (outputs[OUTPUT_4].active || outputs[OUTPUT_12].active)
-		outputs[OUTPUT_12].value = (outputs[OUTPUT_4].value = PO_Util::rsn(phase + deg60)); 
-	if (outputs[OUTPUT_5].active || outputs[OUTPUT_13].active)
-		outputs[OUTPUT_13].value = (outputs[OUTPUT_5].value = PO_Util::rsn(phase + deg90)); 
-	if (outputs[OUTPUT_6].active || outputs[OUTPUT_14].active)
-		outputs[OUTPUT_14].value = (outputs[OUTPUT_6].value = PO_Util::rsn(phase + deg120)); 
-	if (outputs[OUTPUT_7].active || outputs[OUTPUT_15].active)
-		outputs[OUTPUT_15].value = (outputs[OUTPUT_7].value = PO_Util::rsn(phase + deg135)); 
-	if (outputs[OUTPUT_8].active || outputs[OUTPUT_16].active)
-		outputs[OUTPUT_16].value = (outputs[OUTPUT_8].value = PO_Util::rsn(phase + deg150)); 
+	if (outputs[OUTPUT_1].isConnected() || outputs[OUTPUT_9].isConnected())
+		outputs[OUTPUT_9].setVoltage((outputs[OUTPUT_1].value = PO_Util::rsn(phase + deg0)));
+	if (outputs[OUTPUT_2].isConnected() || outputs[OUTPUT_10].isConnected())
+		outputs[OUTPUT_10].setVoltage((outputs[OUTPUT_2].value = PO_Util::rsn(phase + deg30))); 
+	if (outputs[OUTPUT_3].isConnected() || outputs[OUTPUT_11].isConnected())
+		outputs[OUTPUT_11].setVoltage((outputs[OUTPUT_3].value = PO_Util::rsn(phase + deg45))); 
+	if (outputs[OUTPUT_4].isConnected() || outputs[OUTPUT_12].isConnected())
+		outputs[OUTPUT_12].setVoltage((outputs[OUTPUT_4].value = PO_Util::rsn(phase + deg60))); 
+	if (outputs[OUTPUT_5].isConnected() || outputs[OUTPUT_13].isConnected())
+		outputs[OUTPUT_13].setVoltage((outputs[OUTPUT_5].value = PO_Util::rsn(phase + deg90))); 
+	if (outputs[OUTPUT_6].isConnected() || outputs[OUTPUT_14].isConnected())
+		outputs[OUTPUT_14].setVoltage((outputs[OUTPUT_6].value = PO_Util::rsn(phase + deg120))); 
+	if (outputs[OUTPUT_7].isConnected() || outputs[OUTPUT_15].isConnected())
+		outputs[OUTPUT_15].setVoltage((outputs[OUTPUT_7].value = PO_Util::rsn(phase + deg135))); 
+	if (outputs[OUTPUT_8].isConnected() || outputs[OUTPUT_16].isConnected())
+		outputs[OUTPUT_16].setVoltage((outputs[OUTPUT_8].value = PO_Util::rsn(phase + deg150))); 
 	for (int i = 0; i < 4; i++) {
-		if (outputs[OUTPUT_17 + i].active) {
-			float offset = params[PARAM_PHASE_1 + i].value;
-			if (inputs[INPUT_PHASE_1 + i].active)
-				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
+		if (outputs[OUTPUT_17 + i].isConnected()) {
+			float offset = params[PARAM_PHASE_1 + i].getValue();
+			if (inputs[INPUT_PHASE_1 + i].isConnected())
+				offset += inputs[INPUT_PHASE_1 + i].getVoltage() * 0.4f;
 			offset *= 2 * M_PI;
-			outputs[OUTPUT_17 + i].value = PO_Util::rsn(phase + offset);
+			outputs[OUTPUT_17 + i].setVoltage(PO_Util::rsn(phase + offset));
 		}	
 	}
 }
 
 void PO_101::process(const ProcessArgs &args) {
 
-	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * dsp::quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_NOTE_CV].active?inputs[INPUT_NOTE_CV].value:0.0f));
+	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].getValue() + 3.0f * dsp::quadraticBipolar(params[PARAM_FINE].getValue())) / 12.0f + (inputs[INPUT_NOTE_CV].isConnected()?inputs[INPUT_NOTE_CV].getVoltage():0.0f));
 	float deltaTime = freq / args.sampleRate;
 	phase += deltaTime;
 	double intPart;
 	phase = modf(phase, &intPart); 
 	{
-		float waveShape = clamp(params[PARAM_WAVE].value, 0.0f, 4.0f);
+		float waveShape = clamp(params[PARAM_WAVE].getValue(), 0.0f, 4.0f);
 		if (waveShape < 0.5f)
 			sin(phase);
 		else if (waveShape < 1.5f)
@@ -357,18 +357,18 @@ struct PO_204 : Module, PO_Util {
 };
 
 void PO_204::process(const ProcessArgs &args) {
-	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].value + 3.0f * dsp::quadraticBipolar(params[PARAM_FINE].value)) / 12.0f + (inputs[INPUT_TUNE].active?inputs[INPUT_TUNE].value:0.0f));
+	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].getValue() + 3.0f * dsp::quadraticBipolar(params[PARAM_FINE].getValue())) / 12.0f + (inputs[INPUT_TUNE].isConnected()?inputs[INPUT_TUNE].getVoltage():0.0f));
 	float deltaTime = freq / args.sampleRate;
 	phase += deltaTime;
 	double intPart;
 	phase = modf(phase, &intPart); 
 	for (int i = 0; i < 4; i++) {
-		if (outputs[OUTPUT_1 + i].active) {
-			float offset = phase + params[PARAM_PHASE_1 + i].value;
-			if (inputs[INPUT_PHASE_1 + i].active)
-				offset += inputs[INPUT_PHASE_1 + i].value * 0.4f;
-			offset *= floor(clamp(params[PARAM_MULT_1 + i].value + (inputs[INPUT_MULT_1 + i].active?inputs[INPUT_MULT_1 + i].value:0.0f) * 16.0f / 10.0f, 1.0f, 16.5f));
-			float wave = params[PARAM_WAVE_1 + i].value + (inputs[INPUT_WAVE_1 + i].active?inputs[INPUT_WAVE_1 + i].value:0.0f);
+		if (outputs[OUTPUT_1 + i].isConnected()) {
+			float offset = phase + params[PARAM_PHASE_1 + i].getValue();
+			if (inputs[INPUT_PHASE_1 + i].isConnected())
+				offset += inputs[INPUT_PHASE_1 + i].getVoltage() * 0.4f;
+			offset *= floor(clamp(params[PARAM_MULT_1 + i].getValue() + (inputs[INPUT_MULT_1 + i].isConnected()?inputs[INPUT_MULT_1 + i].getVoltage():0.0f) * 16.0f / 10.0f, 1.0f, 16.5f));
+			float wave = params[PARAM_WAVE_1 + i].getValue() + (inputs[INPUT_WAVE_1 + i].isConnected()?inputs[INPUT_WAVE_1 + i].getVoltage():0.0f);
 			double waveSection;
 			wave = modf(clamp(wave, 0.0f, 10.0f), &waveSection);		
 			float w1 = 0.0f;
@@ -418,7 +418,7 @@ void PO_204::process(const ProcessArgs &args) {
 					w2 = w1 = PO_Util::sin(offset * 2 * M_PI);
 					break;
 			}
-			outputs[OUTPUT_1 + i].value = w1 * (1.0f - wave) + w2 * wave;
+			outputs[OUTPUT_1 + i].setVoltage(w1 * (1.0f - wave) + w2 * wave);
 		}	
 	}
 }

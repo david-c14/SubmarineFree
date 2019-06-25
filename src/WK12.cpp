@@ -265,9 +265,9 @@ struct WK_101 : Module {
 };
 
 void WK_101::process(const ProcessArgs &args) {
-	int quantized = floor((12.0f * inputs[INPUT_CV].value) + 0.5f);
+	int quantized = floor((12.0f * inputs[INPUT_CV].getVoltage()) + 0.5f);
 	int note = (120 + quantized) % 12;
-	outputs[OUTPUT_CV].value = (tunings[note] / 1200.0f) + (quantized / 12.0f);	
+	outputs[OUTPUT_CV].setVoltage((tunings[note] / 1200.0f) + (quantized / 12.0f));	
 	for (int i = 0; i < 12; i++) 
 		lights[LIGHT_1 + i].value = (note == i)?1.0f:0.0f;
 //	if (toSend && !outPort.isBusy()) {
@@ -628,9 +628,9 @@ struct WK_205 : Module {
 
 void WK_205::process(const ProcessArgs &args) {
 	for (int i = 0; i < deviceCount; i++) {
-		int quantized = floor((12.0f * inputs[INPUT_CV_1 + i].value) + 0.5f);
+		int quantized = floor((12.0f * inputs[INPUT_CV_1 + i].getVoltage()) + 0.5f);
 		int note = (120 + quantized) % 12;
-		outputs[OUTPUT_CV_1 + i].value = (tunings[note] / 1200.0f) + (quantized / 12.0f);	
+		outputs[OUTPUT_CV_1 + i].setVoltage((tunings[note] / 1200.0f) + (quantized / 12.0f));	
 	}
 	inPort.process();
 }

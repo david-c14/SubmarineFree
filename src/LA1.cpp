@@ -68,7 +68,7 @@ struct LA_108 : DS_Module {
 
 void LA_108::startFrame() {
 	frameIndex = 0;
-	preCount = (int)(params[PARAM_PRE].value + 0.5f);
+	preCount = (int)(params[PARAM_PRE].getValue() + 0.5f);
 	if (preCount) {
 		for (int i = 0; i < 8; i++) {
 			for (int s = 0; s < preCount; s++) {
@@ -84,16 +84,16 @@ void LA_108::startFrame() {
 void LA_108::process(const ProcessArgs &args) {
 	// Set trigger lights
 	for (int i = 0; i < 9; i++)
-		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].value == i);
+		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].getValue() == i);
 	// Compute time
-	float deltaTime = powf(2.0f, params[PARAM_TIME].value);
+	float deltaTime = powf(2.0f, params[PARAM_TIME].getValue());
 	int frameCount = (int)ceilf(deltaTime * args.sampleRate);
 	
 	// Add frame to preBuffer
 	if (++preFrameIndex >= frameCount) {
 		preFrameIndex = 0;
 		for (int i = 0; i < 8; i++)
-			preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].value;
+			preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].getVoltage();
 		preBufferIndex++;
 		if (preBufferIndex >= 32)
 			preBufferIndex = 0;
@@ -104,18 +104,18 @@ void LA_108::process(const ProcessArgs &args) {
 		if (++frameIndex >= frameCount) {
 			frameIndex = 0;
 			for (int i = 0; i < 8; i++)
-				buffer[i][bufferIndex] = inputs[INPUT_1 + i].value;
+				buffer[i][bufferIndex] = inputs[INPUT_1 + i].getVoltage();
 			bufferIndex++;
 		}
 	}
 
-	int triggerInput = LA_108::INPUT_1 + (int)(clamp(params[PARAM_TRIGGER].value, 0.0f, 8.0f));
-	int edge = (params[PARAM_EDGE].value > 0.5f);
+	int triggerInput = LA_108::INPUT_1 + (int)(clamp(params[PARAM_TRIGGER].getValue(), 0.0f, 8.0f));
+	int edge = (params[PARAM_EDGE].getValue() > 0.5f);
 	
 	// Are we waiting on the next trigger?
 	if (bufferIndex >= BUFFER_SIZE) {
 		// Trigger immediately if nothing connected to trigger input
-		if (!inputs[triggerInput].active) {
+		if (!inputs[triggerInput].isConnected()) {
 			startFrame();
 			return;
 		}
@@ -126,11 +126,11 @@ void LA_108::process(const ProcessArgs &args) {
 		}
 		frameIndex++;
 
-		float gate = inputs[triggerInput].value;
+		float gate = inputs[triggerInput].getVoltage();
 		int triggered = trigger.edge(this, gate, edge);
 
-		if (params[PARAM_RUN].value < 0.5f) { // Continuous run mode
-			params[PARAM_RESET].value = 0.0f;
+		if (params[PARAM_RUN].getValue() < 0.5f) { // Continuous run mode
+			params[PARAM_RESET].setValue(0.0f);
 			resetRunMode = 1;
 			// Reset if triggered
 			float holdTime = 0.1f;
@@ -146,10 +146,10 @@ void LA_108::process(const ProcessArgs &args) {
 			}
 		}
 		else {
-			if (params[PARAM_RESET].value > 0.5f) {
+			if (params[PARAM_RESET].getValue() > 0.5f) {
 				if (triggered) {
 					startFrame();
-					params[PARAM_RESET].value = 0.0f;
+					params[PARAM_RESET].setValue(0.0f);
 					resetRunMode = 1;
 					return;
 				}
@@ -245,13 +245,13 @@ struct LA_Display : TransparentWidget {
 			return;
 		}
 		for (int i = 0; i < 8; i++) {
-			if (module->inputs[LA_108::INPUT_1 + i].active) {
+			if (module->inputs[LA_108::INPUT_1 + i].isConnected()) {
 				drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i); 
 			}
 		}
-		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].value, 0.0f, 1.0f));
-		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].value, 0.0f, 1.0f));
-		drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].value, 0.0f, 32.0f) / BUFFER_SIZE);
+		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
+		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
+		drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].getValue(), 0.0f, 32.0f) / BUFFER_SIZE);
 		drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
 	}
 };
@@ -264,10 +264,10 @@ struct LA_Measure : TransparentWidget {
 		if (!module) {
 			return;
 		}
-		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].value);
+		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].getValue());
 		int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
 		frameCount *= BUFFER_SIZE;
-		float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].value - module->params[LA_108::PARAM_INDEX_2].value) / APP->engine->getSampleRate(); 
+		float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].getValue() - module->params[LA_108::PARAM_INDEX_2].getValue()) / APP->engine->getSampleRate(); 
 		
 		if (width < 0.00000995f)
 			sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);

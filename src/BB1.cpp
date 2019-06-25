@@ -34,29 +34,29 @@ struct BB_1 : DS_Module {
 		if (doResetFlag) doReset();
 		if (doRandomFlag) doRandomize();
 		int triggered = true;
-		if (inputs[INPUT_CLK].active) {
-			triggered = schmittTrigger.redge(this, inputs[INPUT_CLK].value);
+		if (inputs[INPUT_CLK].isConnected()) {
+			triggered = schmittTrigger.redge(this, inputs[INPUT_CLK].getVoltage());
 		}
 		if (triggered) {
 			for (int i = x - 1; i; i--)
 				sample[i] = sample[i - 1];
-			sample[0] = inputs[INPUT_CV].value;
+			sample[0] = inputs[INPUT_CV].getVoltage();
 		}
 		for (int i = 0; i < x; i++)
-			outputs[OUTPUT_1 + i].value = sample[i];
+			outputs[OUTPUT_1 + i].setVoltage(sample[i]);
 	}
 	void doRandomize() {
 		doRandomFlag = 0;
 		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
 		std::uniform_real_distribution<float> distribution(voltage0, voltage1);	
 		for (int i = 0; i < x; i++) {
-			outputs[OUTPUT_1 + i].value = sample[i] = distribution(generator); 
+			outputs[OUTPUT_1 + i].setVoltage(sample[i] = distribution(generator)); 
 		}
 	}
 	void doReset() {
 		doResetFlag = 0;
 		for (int i = 0; i < x; i++)
-			outputs[OUTPUT_1 + i].value = sample[i] = 0.0f;
+			outputs[OUTPUT_1 + i].setVoltage(sample[i] = 0.0f);
 	}
 	void onRandomize() override {
 		if (APP->engine->isPaused()) {
