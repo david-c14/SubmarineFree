@@ -5,11 +5,6 @@
 #include <fstream>
 #include <cctype>
 
-struct WK_Update {
-	float offsets[12];
-	int isDirty = false;
-};
-
 struct WK_Tuning {
 	std::string name;
 	float offsets[12];
@@ -238,38 +233,30 @@ struct WK_101 : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		LIGHT_1,
-		LIGHT_2,
-		LIGHT_3,
-		LIGHT_4,
-		LIGHT_5,
-		LIGHT_6,
-		LIGHT_7,
-		LIGHT_8,
-		LIGHT_9,
-		LIGHT_10,
-		LIGHT_11,
-		LIGHT_12,
 		NUM_LIGHTS
 	};
-	float tunings[12];
 	int toSend = 0;
+	unsigned int light = PARAM_1;
 //	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
 //	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
 
 	WK_101() : Module() {
+		DEBUG("Module %p", this);
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (unsigned int i = 0; i < NUM_PARAMS; i++) {
+			configParam(PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+		}
 //		outPort.size(5);
 	}
 	void process(const ProcessArgs &args) override;
 };
 
 void WK_101::process(const ProcessArgs &args) {
+	return;
 	int quantized = floor((12.0f * inputs[INPUT_CV].getVoltage()) + 0.5f);
 	int note = (120 + quantized) % 12;
-	outputs[OUTPUT_CV].setVoltage((tunings[note] / 1200.0f) + (quantized / 12.0f));	
-	for (int i = 0; i < 12; i++) 
-		lights[LIGHT_1 + i].value = (note == i)?1.0f:0.0f;
+	outputs[OUTPUT_CV].setVoltage((params[PARAM_1 + note].getValue() / 1200.0f) + (quantized / 12.0f));	
+	light = note;
 //	if (toSend && !outPort.isBusy()) {
 //		toSend = 0;
 //		json_t *rootJ = json_array();
@@ -307,7 +294,7 @@ struct WK_Display : TransparentWidget {
 		if (!module) {
 			return;
 		}
-		float val = module->tunings[index];
+		float val = APP->engine->getParam(module, WK_101::PARAM_1 + index);
 		sprintf(dspText, "%+05.2f", val);
 		nvgFontSize(args.vg, 14);
 		nvgFontFaceId(args.vg, gScheme.font()->handle);
@@ -325,7 +312,6 @@ struct WK101_MenuItem : MenuItem {
 			return;
 		}
 		for (int i = 0; i < 12; i++) {
-			module->tunings[i] = tunings[index].offsets[i];
 			APP->engine->setParam(module, WK_101::PARAM_1 + i, tunings[index].offsets[i]);
 		}
 		module->toSend = true;
@@ -333,22 +319,26 @@ struct WK101_MenuItem : MenuItem {
 };
 
 struct WK_Param : MedKnob<LightKnob> {
-	
+	WK_101 *module;
+	unsigned int index;
+	void step() override {
+		if (module) {
+			color = (index == module->light)?SUBLIGHTRED:SUBLIGHTBLUE;
+		}
+		MedKnob::step();
+	}
 	void onChange(const event::Change &e) override {
 		MedKnob<LightKnob>::onChange(e);
-		/*
-		if (paramQuantity) {
-			WK_101 *module = dynamic_cast<WK_101 *>(this->paramQuantity->module);
-			module->tunings[this->paramQuantity->paramId - WK_101::PARAM_1] = getWidgetValue(this);
-			module->toSend = true;
+		
+		if (module) {
+		//	module->toSend = true;
 		}
-		*/
 	}
 };
 
 struct WK101 : SchemeModuleWidget {
-	WK_Param *widgets[12];
 	WK101(WK_101 *module) : SchemeModuleWidget(module) {
+		DEBUG("ModuleWidget %p", this);
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
 
@@ -359,37 +349,34 @@ struct WK101 : SchemeModuleWidget {
 
 		for (int i = 0; i < 5; i++)
 		{
-			WK_Display *display = new WK_Display();
+/*			WK_Display *display = new WK_Display();
 			display->module = module;
 			display->index = i;
 			display->box.pos = Vec(45, 79 + 21 * i);
 			display->box.size = Vec(60, 20);
-			addChild(display);
-			widgets[i] = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i);
-			addParam(widgets[i]);
-			if (module) {
-				module->configParam(WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
-			}
-			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(23 + 104 * (i%2), 89 + 21 * i), module, WK_101::LIGHT_1 + i));
+			addChild(display);*/
+			WK_Param *widget = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i);
+			widget->module = module;
+			widget->index = i;
+			addParam(widget);
 		}
 		for (int i = 5; i < 12; i++)
 		{
-			WK_Display *display = new WK_Display();
+			/*WK_Display *display = new WK_Display();
 			display->module = module;
 			display->index = i;
 			display->box.pos = Vec(45, 100 + 21 * i);
 			display->box.size = Vec(60, 20);
-			addChild(display);
-			widgets[i] = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i);
-			addParam(widgets[i]);
-			if (module) {
-				module->configParam(WK_101::PARAM_1 + i, -50.0f, 50.0f, 0.0f);
-			}
-			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(127 - 104 * (i%2), 110 + 21 * i), module, WK_101::LIGHT_1 + i));
+			addChild(display);*/
+			WK_Param *widget = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i);
+			widget->module = module;
+			widget->index = i;
+			addParam(widget);
 		}
-		WK_Tunings::loadTunings(pluginInstance);
+//		WK_Tunings::loadTunings(pluginInstance);
 	}
 	void appendContextMenu(Menu *menu) override;
+/*
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WK-101");
 		nvgFillColor(vg, gScheme.getAlternative(module));
@@ -551,9 +538,11 @@ struct WK101 : SchemeModuleWidget {
 		drawText(vg, 94.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN");
 		drawText(vg, 133.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
 	}
+	*/
 };
 
 void WK101::appendContextMenu(Menu *menu) {
+	return;
 	SchemeModuleWidget::appendContextMenu(menu);
 	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
 	if (module) {
