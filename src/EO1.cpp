@@ -58,6 +58,19 @@ struct EO_102 : Module {
 
 	EO_102() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (unsigned int i = 0; i < 2; i++) {
+			configParam(PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f);
+			configParam(PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f);
+			configParam(PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f);
+		}
+		configParam(PARAM_TIME, -6.0f, -16.0f, -14.0f);
+		configParam(PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f);
+		configParam(PARAM_TRIGGER, -10.0f, 10.0f, 0.0f);
+		configParam(PARAM_RUNMODE, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f);
+		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f);
+		configParam(PARAM_INDEX_3, 0.0f, 1.0f, 0.2f);
 	}
 	void process(const ProcessArgs &args) override;
 	void startFrame(void);
@@ -441,11 +454,6 @@ struct EO102 : SchemeModuleWidget {
 			addParam(createParamCentered<SubSwitch2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i));
 			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 320), module, EO_102::PARAM_OFFSET_1 + i));
 			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + i));
-			if (module) {
-				module->configParam(EO_102::PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f);
-				module->configParam(EO_102::PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f);
-				module->configParam(EO_102::PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f);
-			}
 		}
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(172.5, 320), module, EO_102::PARAM_TIME));
 		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE));
@@ -460,16 +468,6 @@ struct EO102 : SchemeModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3));
-		if (module) {
-			module->configParam(EO_102::PARAM_TIME, -6.0f, -16.0f, -14.0f);
-			module->configParam(EO_102::PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f);
-			module->configParam(EO_102::PARAM_TRIGGER, -10.0f, 10.0f, 0.0f);
-			module->configParam(EO_102::PARAM_RUNMODE, 0.0f, 1.0f, 0.0f);
-			module->configParam(EO_102::PARAM_RUN, 0.0f, 1.0f, 1.0f);
-			module->configParam(EO_102::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f);
-			module->configParam(EO_102::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f);
-			module->configParam(EO_102::PARAM_INDEX_3, 0.0f, 1.0f, 0.2f);
-		}
 	}
 	void step() override {
 		EO_102 *eoMod = dynamic_cast<EO_102 *>(module);

@@ -31,7 +31,12 @@ struct XF_104 : XF {
 	XF_Controls controls[(int)(deviceCount * 1.5f)];
 
 	XF_104() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		configParam(PARAM_LINK_1, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_LINK_2, 0.0f, 1.0f, 0.0f);
 		for (int i = 0; i < deviceCount; i++) {
+			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f);
+			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f);
+			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
 			controls[i].a = INPUT_A_1 + i;
 			controls[i].ar = 0;
 			controls[i].b = INPUT_B_1 + i;
@@ -115,11 +120,6 @@ struct XF104 : SchemeModuleWidget {
 					break;
 			}
 			addParam(fader);
-			if (module) {
-				module->configParam(XF_104::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f);
-				module->configParam(XF_104::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f);
-				module->configParam(XF_104::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
-			}
 
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 48.5 + offset), module, XF_104::LIGHT_LIN_1 + i));
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 58.5 + offset), module, XF_104::LIGHT_LOG_1 + i));
@@ -128,10 +128,6 @@ struct XF104 : SchemeModuleWidget {
 
 		addParam(createParamCentered<LightButton>(Vec(98, 102.5), module, XF_104::PARAM_LINK_1));
 		addParam(createParamCentered<LightButton>(Vec(98, 278.5), module, XF_104::PARAM_LINK_2));
-		if (module) {
-			module->configParam(XF_104::PARAM_LINK_1, 0.0f, 1.0f, 0.0f);
-			module->configParam(XF_104::PARAM_LINK_2, 0.0f, 1.0f, 0.0f);
-		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "XF-104");

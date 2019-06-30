@@ -6,7 +6,7 @@ using namespace rack;
 extern Plugin *pluginInstance;
 
 // Forward-declare each Model, defined in each module source file
-/*
+
 extern Model *modelAG104;
 extern Model *modelAG106;
 
@@ -66,11 +66,10 @@ extern Model *modelTD116;
 extern Model *modelTD202;
 extern Model *modelTF101;
 extern Model *modelTM105;
-*/
+
 extern Model *modelWK101;
 extern Model *modelWK205;
 
-/*
 extern Model *modelXF101;
 extern Model *modelXF102;
 extern Model *modelXF104;
@@ -81,7 +80,6 @@ extern Model *modelXF301;
 extern Model *modelXG104;
 extern Model *modelXG106;
 
-*/
 #include "ComponentLibrary/components.hpp"
 
 struct SubHelper {

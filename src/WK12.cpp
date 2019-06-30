@@ -252,7 +252,6 @@ struct WK_101 : Module {
 };
 
 void WK_101::process(const ProcessArgs &args) {
-	return;
 	int quantized = floor((12.0f * inputs[INPUT_CV].getVoltage()) + 0.5f);
 	int note = (120 + quantized) % 12;
 	outputs[OUTPUT_CV].setVoltage((params[PARAM_1 + note].getValue() / 1200.0f) + (quantized / 12.0f));	
@@ -349,12 +348,12 @@ struct WK101 : SchemeModuleWidget {
 
 		for (int i = 0; i < 5; i++)
 		{
-/*			WK_Display *display = new WK_Display();
+			WK_Display *display = new WK_Display();
 			display->module = module;
 			display->index = i;
 			display->box.pos = Vec(45, 79 + 21 * i);
 			display->box.size = Vec(60, 20);
-			addChild(display);*/
+			addChild(display);
 			WK_Param *widget = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i);
 			widget->module = module;
 			widget->index = i;
@@ -362,21 +361,21 @@ struct WK101 : SchemeModuleWidget {
 		}
 		for (int i = 5; i < 12; i++)
 		{
-			/*WK_Display *display = new WK_Display();
+			WK_Display *display = new WK_Display();
 			display->module = module;
 			display->index = i;
 			display->box.pos = Vec(45, 100 + 21 * i);
 			display->box.size = Vec(60, 20);
-			addChild(display);*/
+			addChild(display);
 			WK_Param *widget = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i);
 			widget->module = module;
 			widget->index = i;
 			addParam(widget);
 		}
-//		WK_Tunings::loadTunings(pluginInstance);
+		WK_Tunings::loadTunings(pluginInstance);
 	}
 	void appendContextMenu(Menu *menu) override;
-/*
+
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WK-101");
 		nvgFillColor(vg, gScheme.getAlternative(module));
@@ -538,11 +537,9 @@ struct WK101 : SchemeModuleWidget {
 		drawText(vg, 94.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN");
 		drawText(vg, 133.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
 	}
-	*/
 };
 
 void WK101::appendContextMenu(Menu *menu) {
-	return;
 	SchemeModuleWidget::appendContextMenu(menu);
 	WK_101 *module = dynamic_cast<WK_101 *>(this->module);
 	if (module) {

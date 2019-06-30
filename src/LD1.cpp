@@ -25,6 +25,10 @@ struct LD_1 : DS_Module {
 
 	LD_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (unsigned int i = 0; i < x; i++) {
+			configParam(PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
+			configParam(PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		for (int i = 0; i < x; i++) {
@@ -106,10 +110,6 @@ struct LD103 : SchemeModuleWidget {
 
 			addParam(createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i));
 			addParam(createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i));
-			if (module) {
-				module->configParam(LD_1<3>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
-				module->configParam(LD_1<3>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
-			}
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -160,10 +160,6 @@ struct LD106 : SchemeModuleWidget {
 
 			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i));
 			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i));
-			if (module) {
-				module->configParam(LD_1<6>::PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
-				module->configParam(LD_1<6>::PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
-			}
 		}
 	}
 	void appendContextMenu(Menu *menu) override{

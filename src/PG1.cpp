@@ -24,6 +24,9 @@ struct PG_1 : DS_Module {
 
 	PG_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (unsigned int i = 0; i < x; i++) {
+			configParam(PARAM_1 + i, -5.0f, 2.0f, -2.0f);
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		float deltaTime = 1.0f / args.sampleRate;
@@ -52,9 +55,6 @@ struct PG104 : SchemeModuleWidget {
 			addOutput(createOutputCentered<BluePort>(Vec(15, 89.5 + offset), module, PG_1<4>::OUTPUT_1 + i));
 
 			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 59.5 + offset), module, PG_1<4>::PARAM_1 + i));
-			if (module) {
-				module->configParam(PG_1<4>::PARAM_1 + i, -5.0f, 2.0f, -2.0f);
-			}
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -90,9 +90,6 @@ struct PG112 : SchemeModuleWidget {
 			addOutput(createOutputCentered<BluePort>(Vec(104.5, 31.5 + offset), module, PG_1<12>::OUTPUT_1 + i));
 
 			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(45, 31.5 + offset), module, PG_1<12>::PARAM_1 + i));
-			if (module) {
-				module->configParam(PG_1<12>::PARAM_1 + i, -5.0f, 2.0f, -2.0f);
-			}
 		}
 	}
 	void appendContextMenu(Menu *menu) override {

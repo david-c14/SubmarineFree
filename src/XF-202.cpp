@@ -34,6 +34,9 @@ struct XF_202 : XF {
 
 	XF_202() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		for (int i = 0; i < deviceCount; i++) {
+			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f);
+			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f);
+			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
 			controls[i].a = INPUT_A_1 + i;
 			controls[i].ar = INPUT_AR_1 + i;
 			controls[i].b = INPUT_B_1 + i;
@@ -80,11 +83,6 @@ struct XF202 : SchemeModuleWidget {
 			fader->cv = XF_202::INPUT_CV_1 + i;
 			fader->link = 0;
 			addParam(fader);
-			if (module) {
-				module->configParam(XF_202::PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f);
-				module->configParam(XF_202::PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f);
-				module->configParam(XF_202::PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f);
-			}
 
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 157.5 + offset), module, XF_202::LIGHT_LIN_1 + i));
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(82.5, 167.5 + offset), module, XF_202::LIGHT_LOG_1 + i));

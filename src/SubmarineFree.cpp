@@ -8,7 +8,7 @@ void init(rack::Plugin *p) {
 	pluginInstance = p;
 
 	// Add all Models defined throughout the pluginInstance
-/*
+
 	p->addModel(modelAG104);
 	p->addModel(modelAG106);
 	p->addModel(modelAO106);
@@ -46,11 +46,10 @@ void init(rack::Plugin *p) {
 	p->addModel(modelTD202);
 	p->addModel(modelTF101);
 	p->addModel(modelTM105);
-*/
+
 	p->addModel(modelWK101);
 	p->addModel(modelWK205);
 
-/*
 	p->addModel(modelXF101);
 	p->addModel(modelXF102);
 	p->addModel(modelXF104);
@@ -72,7 +71,6 @@ void init(rack::Plugin *p) {
 	p->addModel(modelBP124);
 	p->addModel(modelBP132);
 
-*/
 	// Any other pluginInstance initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
 }

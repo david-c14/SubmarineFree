@@ -43,6 +43,13 @@ struct TF_101 : Module  {
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);	
 	TF_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configParam(PARAM_FG_RED, 0.0f, 1.0f, 0.1569f);
+		configParam(PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f);
+		configParam(PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f);
+		configParam(PARAM_BG_RED, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f);
 		prevValues[0] = 0.1569f;
 		prevValues[1] = 0.6902f;
 		prevValues[2] = 0.9529f;
@@ -117,16 +124,6 @@ struct TF101 : SchemeModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 253), module, TF_101::PARAM_BG_GREEN));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 293), module, TF_101::PARAM_BG_BLUE));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 347), module, TF_101::PARAM_FONT_SIZE));
-
-		if (module) {
-			module->configParam(TF_101::PARAM_FG_RED, 0.0f, 1.0f, 0.1569f);
-			module->configParam(TF_101::PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f);
-			module->configParam(TF_101::PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f);
-			module->configParam(TF_101::PARAM_BG_RED, 0.0f, 1.0f, 0.0f);
-			module->configParam(TF_101::PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f);
-			module->configParam(TF_101::PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f);
-			module->configParam(TF_101::PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f);
-		}
 
 		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 55.5), module, TF_101::LIGHT_FG_RED));
 		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 189.5), module, TF_101::LIGHT_BG_RED));

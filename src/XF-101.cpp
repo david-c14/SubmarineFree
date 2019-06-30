@@ -46,7 +46,12 @@ struct XF_101 : XF {
 		}
 	};
 
-	XF_101() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	XF_101() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+		configParam(PARAM_CV_1, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_MODE_1, 0.0f, 2.0f, 0.0f);
+		configParam(PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
+	}
+
 	void process(const ProcessArgs &args) override;
 };
 
@@ -72,11 +77,6 @@ struct XF101 : SchemeModuleWidget {
 		fader->cv = XF_101::INPUT_CV_1;
 		fader->link = 0;
 		addParam(fader);
-		if (module) {
-			module->configParam(XF_101::PARAM_CV_1, 0.0f, 1.0f, 0.0f);
-			module->configParam(XF_101::PARAM_MODE_1, 0.0f, 2.0f, 0.0f);
-			module->configParam(XF_101::PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
-		}
 
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 48.5), module, XF_101::LIGHT_LIN_1));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(142.5, 58.5), module, XF_101::LIGHT_LOG_1));

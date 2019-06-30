@@ -61,6 +61,14 @@ struct LA_108 : DS_Module {
 
 	LA_108() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configParam(PARAM_TRIGGER, 0.0f, 8.0f, 0.0f);
+		configParam(PARAM_EDGE, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_RUN, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_RESET, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_TIME, -6.0f, -16.0f, -14.0f);
+		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f);
+		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f);
+		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f);
 	}
 	void process(const ProcessArgs &args) override;
 	void startFrame(void);
@@ -334,16 +342,6 @@ struct LA108 : SchemeModuleWidget {
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2));
 		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE));
-		if (module) {
-			module->configParam(LA_108::PARAM_TRIGGER, 0.0f, 8.0f, 0.0f);
-			module->configParam(LA_108::PARAM_EDGE, 0.0f, 1.0f, 0.0f);
-			module->configParam(LA_108::PARAM_RUN, 0.0f, 1.0f, 0.0f);
-			module->configParam(LA_108::PARAM_RESET, 0.0f, 1.0f, 0.0f);
-			module->configParam(LA_108::PARAM_TIME, -6.0f, -16.0f, -14.0f);
-			module->configParam(LA_108::PARAM_INDEX_1, 0.0f, 1.0f, 0.0f);
-			module->configParam(LA_108::PARAM_INDEX_2, 0.0f, 1.0f, 1.0f);
-			module->configParam(LA_108::PARAM_PRE, 0.0f, 32.0f, 0.0f);
-		}
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);

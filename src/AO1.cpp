@@ -446,6 +446,12 @@ struct AO1 : Module {
 
 	AO1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (unsigned int ix = 0; ix < x; ix++) {
+			for (unsigned int iy = 0; iy < y; iy++) {
+				configParam(PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f );
+				configParam(PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f);
+			}
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		float vx[x];
@@ -649,10 +655,6 @@ struct AOWidget : SchemeModuleWidget {
 				cd->module = module;
 				cd->index = AO1<x,y>::PARAM_CONST_1 + ix + iy * x;
 				addParam(cd);
-				if (module) {
-					module->configParam(AO1<x,y>::PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f );
-					module->configParam(AO1<x,y>::PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f);
-				}
 			}
 		}
 	}
