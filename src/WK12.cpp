@@ -237,16 +237,15 @@ struct WK_101 : Module {
 	};
 	int toSend = 0;
 	unsigned int light = PARAM_1;
-//	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
-//	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
+	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
+	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
 
 	WK_101() : Module() {
-		DEBUG("Module %p", this);
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < NUM_PARAMS; i++) {
 			configParam(PARAM_1 + i, -50.0f, 50.0f, 0.0f);
 		}
-//		outPort.size(5);
+		outPort.size(5);
 	}
 	void process(const ProcessArgs &args) override;
 };
@@ -256,15 +255,15 @@ void WK_101::process(const ProcessArgs &args) {
 	int note = (120 + quantized) % 12;
 	outputs[OUTPUT_CV].setVoltage((params[PARAM_1 + note].getValue() / 1200.0f) + (quantized / 12.0f));	
 	light = note;
-//	if (toSend && !outPort.isBusy()) {
-//		toSend = 0;
-//		json_t *rootJ = json_array();
-//		for (int i = 0; i < 12; i++)
-//			json_array_append_new(rootJ, json_real(tunings[i]));
-	//	outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
-//	}
-	//outPort.process();
-	//inPort.process();
+	if (toSend && !outPort.isBusy()) {
+		toSend = 0;
+		json_t *rootJ = json_array();
+		for (int i = 0; i < 12; i++)
+			json_array_append_new(rootJ, json_real(params[PARAM_1 + i].getValue()));
+		outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
+	}
+	outPort.process();
+	inPort.process();
 }
 
 void WK101_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
@@ -281,7 +280,7 @@ void WK101_InputPort::received(std::string pluginName, std::string moduleName, j
 			tunings[i] = json_number_value(j1);
 	}
 	for (int i = 0; i < 12; i++)
-		wkModule->params[WK_101::PARAM_1].setValue(tunings[i]);
+		wkModule->params[WK_101::PARAM_1 + i].setValue(tunings[i]);
 }
 
 struct WK_Display : TransparentWidget {
@@ -330,21 +329,20 @@ struct WK_Param : MedKnob<LightKnob> {
 		MedKnob<LightKnob>::onChange(e);
 		
 		if (module) {
-		//	module->toSend = true;
+			module->toSend = true;
 		}
 	}
 };
 
 struct WK101 : SchemeModuleWidget {
 	WK101(WK_101 *module) : SchemeModuleWidget(module) {
-		DEBUG("ModuleWidget %p", this);
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
 
 		addInput(createInputCentered<SilverPort>(Vec(16.5,41.5), module, WK_101::INPUT_CV));
 		addOutput(createOutputCentered<SilverPort>(Vec(55.5,41.5), module, WK_101::OUTPUT_CV));
-	//	addInput(createInputCentered<BlackPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
-	//	addOutput(createOutputCentered<BlackPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_TOR));
+		addInput(createInputCentered<BlackPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
+		addOutput(createOutputCentered<BlackPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_TOR));
 
 		for (int i = 0; i < 5; i++)
 		{

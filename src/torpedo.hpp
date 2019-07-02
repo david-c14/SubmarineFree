@@ -28,7 +28,8 @@ namespace Torpedo {
 		unsigned int _portNum;
 		unsigned int _state = STATE_QUIESCENT;
 
-		unsigned int dbg = 0;
+		bool dbg = false;
+		bool hiSpeed = true;
 
 		BasePort(Module *module, unsigned int portNum) {
 			_module = module;
@@ -51,11 +52,8 @@ namespace Torpedo {
 		std::string _appId;
 		unsigned int _counter;
 		std::string _message;
-		Output *_port;
 
-		RawOutputPort(Module *module, unsigned int portNum) : BasePort(module, portNum) {
-			_port = &(_module->outputs[_portNum]);
-		}
+		RawOutputPort(Module *module, unsigned int portNum) : BasePort(module, portNum) {}
 
 		virtual void abort();
 		virtual void appId(std::string app) { _appId.assign(app); }
@@ -74,11 +72,8 @@ namespace Torpedo {
 		unsigned int _counter;
 		unsigned int _length;
 		std::string _message;
-		Input *_port;
 
-		RawInputPort(Module *module, unsigned int portNum) : BasePort(module, portNum) { 
-			_port = &(_module->inputs[_portNum]);
-		}
+		RawInputPort(Module *module, unsigned int portNum) : BasePort(module, portNum) {}
 
 		void process();
 		virtual void received(std::string appId, std::string message);
