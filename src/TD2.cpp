@@ -20,6 +20,31 @@ struct TDVText : SubText {
 			SubText::onButton(e);
 		}
 	}
+	void draw (const DrawArgs &args) override {
+		nvgScissor(args.vg, 0, 0, box.size.x, box.size.y);
+
+		nvgBeginPath(args.vg);
+		nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5);
+		nvgFillColor(args.vg, bgColor);
+		nvgFill(args.vg);
+
+		nvgTranslate(args.vg, 25, 0);
+		nvgRotate(args.vg, M_PI / 2.0f);
+		
+		if (font->handle >= 0) {
+			bndSetFont(font->handle);
+			NVGcolor highlightColor = color;
+			highlightColor.a = 0.5;
+			int begin = std::min(cursor, selection);
+			int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
+			bndIconLabelCaret(args.vg, textOffset.y, textOffset.x+2,
+				box.size.y - 2*textOffset.y,
+				box.size.x - 2*textOffset.x,
+				-1, color, 28, text.c_str(), highlightColor, begin, end);
+		}
+		nvgResetScissor(args.vg);
+		bndSetFont(APP->window->uiFont->handle);
+	}
 };
 
 struct TD_202 : Module {
@@ -36,19 +61,18 @@ struct TD_202 : Module {
 struct TD202 : SchemeModuleWidget {
 	TDVText *textField;
 
-	TD202(TD_202 *module) : SchemeModuleWidget(module) {
+	TD202(Module *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
-	
-		MouseTransformWidget *tw = createWidget<MouseTransformWidget>(Vec(2, 15));
-		tw->rotate(M_PI / 2.0f);
-		addChild(tw);
 
-		textField = createWidget<TDVText>(Vec(0, -25));
-		textField->box.size = Vec(350, 25);
-		tw->addChild(textField);
+		//MouseTransformWidget *tw = createWidget<MouseTransformWidget>(Vec(2, 15));
+	//	tw->rotate(M_PI / 2.0f);
+		//addChild(tw);
+
+		textField = createWidget<TDVText>(Vec(2, 15));
+		textField->box.size = Vec(25, 350);
+		addChild(textField);
 	}
-
 	json_t *toJson() override {
 		json_t *rootJ = ModuleWidget::toJson();
 
@@ -76,6 +100,7 @@ struct TD202 : SchemeModuleWidget {
 	}
 
 	void step() override {
+		SchemeModuleWidget::step();
 		TD_202 *tdModule = dynamic_cast<TD_202 *>(module);
 		if (!tdModule) {
 			return;
@@ -93,6 +118,7 @@ struct TD202 : SchemeModuleWidget {
 		SchemeModuleWidget::appendContextMenu(menu);
 		textField->appendContextMenu(menu);
 	}
+
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TD-202");
 	}

@@ -1,13 +1,6 @@
 #include "SubmarineFree.hpp"
 
 template <int x>
-struct BP1x : ModuleWidget {
-	BP1x(Module *module) : ModuleWidget(module) {
-		setPanel(SubHelper::LoadPanel(pluginInstance, "BP-1", x));
-	}
-};
-
-template <int x>
 struct BP1 : SchemeModuleWidget {
 	BP1(Module *module) : SchemeModuleWidget(module) {
 		SchemePanel *panel = new SchemePanel(Vec(x * 15, 380));
@@ -35,7 +28,16 @@ struct BP1_1 : BP1<1> {
 };
 
 struct BP1_2 : BP1<2> {
-	BP1_2(Module *module) : BP1<2>(module) {}
+	SubText *textField;
+	BP1_2(Module *module) : BP1<2>(module) {
+		MouseTransformWidget *tw = createWidget<MouseTransformWidget>(Vec(2, 15));
+		tw->rotate(M_PI / 2.0f);
+		addChild(tw);
+
+		textField = createWidget<SubText>(Vec(0, -25));
+		textField->box.size = Vec(350, 25);
+		tw->addChild(textField);
+	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBackground(vg);
 		drawLogo(vg, 5, 365, 1, 0);

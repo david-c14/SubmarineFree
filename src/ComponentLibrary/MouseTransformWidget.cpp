@@ -47,9 +47,14 @@ void MouseTransformWidget::scale(Vec s) {
 };
 
 void MouseTransformWidget::draw(const DrawArgs &args) {
+	DrawArgs txCtx = args;
+	if (hasInverse) {
+		nvgTransformPoint(&txCtx.clipBox.pos.x, &txCtx.clipBox.pos.y, inverse, txCtx.clipBox.pos.x, txCtx.clipBox.pos.y);
+	}
+	
 	// No need to save the state because that is done in the parent
-	nvgTransform(args.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
-	Widget::draw(args);
+	nvgTransform(txCtx.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
+	Widget::draw(txCtx);
 };
 
 void MouseTransformWidget::onButton(const event::Button &e) {

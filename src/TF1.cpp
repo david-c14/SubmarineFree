@@ -73,7 +73,7 @@ struct TF_101 : Module  {
 void TF_101::process(const ProcessArgs &args) {
 	for (int i = 0; i < 6; i++) {
 		float newValue = clamp(params[PARAM_FG_RED + i].getValue() + inputs[INPUT_FG_RED + i].getVoltage() / 10.0f, 0.0f, 1.0f); 
-		lights[LIGHT_FG_RED + i].value = newValue; 
+		lights[LIGHT_FG_RED + i].setBrightness(newValue); 
 		if (prevValues[i] != newValue) {
 			isDirty = true;
 			prevValues[i] = newValue;

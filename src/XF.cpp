@@ -46,37 +46,37 @@ void XF::crossFade(XF_Controls *controls) {
 	if (params[controls->mode].getValue() > 1.5f) {
 		mode = controls->correlator->correlate(inputs[controls->a].getVoltage(), inputs[controls->b].getVoltage());
 		if (controls->correlator->correlation < -0.1f) {
-			lights[controls->light3].value = 0.0f;
-			lights[controls->light3 + 1].value = 1.0f;
+			lights[controls->light3].setBrightness(0.0f);
+			lights[controls->light3 + 1].setBrightness(1.0f);
 		}
 		else {
-			lights[controls->light3].value = 1.0f;
-			lights[controls->light3 + 1].value = 0.0f;
+			lights[controls->light3].setBrightness(1.0f);
+			lights[controls->light3 + 1].setBrightness(0.0f);
 		}
 	}
 	else if (params[controls->mode].getValue() > 0.5f) {
 		mode = 0;
-		lights[controls->light3].value = 0.0f;
-		lights[controls->light3 + 1].value = 0.0f;
+		lights[controls->light3].setBrightness(0.0f);
+		lights[controls->light3 + 1].setBrightness(0.0f);
 	}
 	else {
 		mode = 1;
-		lights[controls->light3].value = 0.0f;
-		lights[controls->light3 + 1].value = 0.0f;
+		lights[controls->light3].setBrightness(0.0f);
+		lights[controls->light3 + 1].setBrightness(0.0f);
 	}
 	if (mode == 0) {
 		outputs[controls->out].setVoltage(inputs[controls->a].getVoltage() * powf(1.0f - fade, 0.5f) + inputs[controls->b].getVoltage() * powf(fade, 0.5f));
 		if (controls->outr)
 			outputs[controls->outr].setVoltage(inputs[controls->ar].getVoltage() * powf(1.0f - fade, 0.5f) + inputs[controls->br].getVoltage() * powf(fade, 0.5f));
-		lights[controls->light1].value = 0.0f;
-		lights[controls->light2].value = 1.0f;
+		lights[controls->light1].setBrightness(0.0f);
+		lights[controls->light2].setBrightness(1.0f);
 	}
 	else {
 		outputs[controls->out].setVoltage(inputs[controls->a].getVoltage() * (1.0f - fade) + inputs[controls->b].getVoltage() * fade);
 		if (controls->outr)
 			outputs[controls->outr].setVoltage(inputs[controls->ar].getVoltage() * (1.0f - fade) + inputs[controls->br].getVoltage() * fade);
-		lights[controls->light1].value = 1.0f;
-		lights[controls->light2].value = 0.0f;
+		lights[controls->light1].setBrightness(1.0f);
+		lights[controls->light2].setBrightness(0.0f);
 	}
 }
 

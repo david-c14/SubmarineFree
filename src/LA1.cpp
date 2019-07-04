@@ -92,7 +92,7 @@ void LA_108::startFrame() {
 void LA_108::process(const ProcessArgs &args) {
 	// Set trigger lights
 	for (int i = 0; i < 9; i++)
-		lights[LIGHT_1 + i].value = (params[PARAM_TRIGGER].getValue() == i);
+		lights[LIGHT_1 + i].setBrightness(params[PARAM_TRIGGER].getValue() == i);
 	// Compute time
 	float deltaTime = powf(2.0f, params[PARAM_TIME].getValue());
 	int frameCount = (int)ceilf(deltaTime * args.sampleRate);

@@ -103,9 +103,9 @@ void TM_105::process(const ProcessArgs &args) {
 		}
 	}
 	for(unsigned int i = 0; i < 5; i++) {
-		lights[LIGHT_Q_1 + i].value = count > i;
-		lights[LIGHT_M_1 + i].value = msgPulses[i].process(args.sampleTime); 
-		lights[LIGHT_E_1 + i].value = errPulses[i].process(args.sampleTime); 
+		lights[LIGHT_Q_1 + i].setBrightness(count > i);
+		lights[LIGHT_M_1 + i].setBrightness(msgPulses[i].process(args.sampleTime)); 
+		lights[LIGHT_E_1 + i].setBrightness(errPulses[i].process(args.sampleTime)); 
 	}
 	outPort.process();
 }
