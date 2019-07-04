@@ -75,7 +75,7 @@ extern Model *modelXF102;
 extern Model *modelXF104;
 extern Model *modelXF201;
 extern Model *modelXF202;
-extern Model *modelXF301;
+//extern Model *modelXF301;
 
 extern Model *modelXG104;
 extern Model *modelXG106;
