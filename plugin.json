@@ -2,11 +2,14 @@
 	"slug": "SubmarineFree",
 	"name": "Submarine (Free)",
 	"author": "carbon14",
+        "brand": "Submarine",
 	"license": "BSD-3-Clause",
 	"authorUrl": "https://vcvrack.submarine.org.uk",
+        "authorEmail": "carbon14@submarine.org.uk",
 	"sourceUrl": "https://github.com/david-c14/SubmarineFree",
 	"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/index.md",
 	"donateUrl": "https://www.paypal.me/SubmarineFree",
+        "pluginUrl": "https://github.com/david-c14/SubmarineFree/blob/master/README.md",
 	"version": "1.0.0",
 	"modules": [
 		{
@@ -55,7 +58,7 @@
 			"slug":"BB-120",
 			"name":"BB-120",
 			"description": "BB-120 20-Stage Bucket Brigade Sample and Hold",
-			"tags": ["LOGIC", "DELAY", "SAMPLE", "MULTIPLE"]
+			"tags": ["LOGIC", "DELAY", "SAMPLE AND HOLD", "MULTIPLE"]
 		},
 		{
 			"slug":"BP-101",
