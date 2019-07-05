@@ -302,9 +302,19 @@ struct EO_Display : TransparentWidget {
 		nvgFill(vg);
 		nvgResetScissor(vg);
 	}
+	
+	void drawEasterEgg(NVGcontext *vg) {
+		scheme::drawLogoPath(vg, 0, 0, 15, 0);
+		nvgFillColor(vg, SUBLIGHTREDTRANS);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 100, 50, 12, 0);
+		nvgStrokeColor(vg, SUBLIGHTBLUETRANS);
+		nvgStroke(vg);
+	}
 
 	void draw(const DrawArgs &args) override {
 		if (!module) {
+			drawEasterEgg(args.vg);
 			return;
 		}
 		NVGcolor col = SUBLIGHTBLUETRANS;

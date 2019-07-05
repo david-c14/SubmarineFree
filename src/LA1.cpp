@@ -244,8 +244,29 @@ struct LA_Display : TransparentWidget {
 		nvgResetScissor(vg);
 	}
 
+	void drawEasterEgg(NVGcontext *vg) {
+		nvgFillColor(vg, SUBLIGHTBLUE);
+		scheme::drawLogoPath(vg, 100, 2.5f, 2.0f, 0);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 20, 37.5f, 2.0f, 0);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 160, 72.5f, 2.0f, 0);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 145, 107.5f, 2.0f, 0);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 75, 142.5f, 2.0f, 0);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 120, 177.5f, 2.0f, 0);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 40, 212.5f, 2.0f, 0);
+		nvgFill(vg);
+		scheme::drawLogoPath(vg, 60, 247.5f, 2.0f, 0);
+		nvgFill(vg);
+	}
+
 	void draw(const DrawArgs &args) override {
 		if (!module) {
+			drawEasterEgg(args.vg);
 			return;
 		}
 		for (int i = 0; i < 8; i++) {

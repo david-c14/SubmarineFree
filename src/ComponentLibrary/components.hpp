@@ -229,6 +229,10 @@ struct SchemeCanvasWidget : Widget {
 	void draw(const DrawArgs &args) override;
 };
 
+namespace scheme {
+	void drawLogoPath(NVGcontext *vg, float left, float top, float scale, float rotate);
+}
+
 struct SchemeModuleWidget : app::ModuleWidget {
 	SchemeModuleWidget(Module *module): ModuleWidget() {
 		setModule(module);

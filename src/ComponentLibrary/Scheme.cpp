@@ -214,7 +214,7 @@ void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 	}
 }
 
-void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate) {
+void scheme::drawLogoPath(NVGcontext *vg, float left, float top, float scale, float rotate) {
 	nvgSave(vg);
 	nvgTranslate(vg, left, top);
 	nvgRotate(vg, rotate);
@@ -270,6 +270,12 @@ void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float s
 	nvgBezierTo(vg, 9.446276, 1.001906, 9.400099, 1.000038, 9.353911, 1.000000);
 	nvgBezierTo(vg, 9.353911, 1.000000, 9.353910, 1.000000, 9.353910, 1.000000);
 	nvgClosePath(vg);
+	nvgRestore(vg);
+}
+
+void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate) {
+	nvgSave(vg);
+	scheme::drawLogoPath(vg, left, top, scale, rotate);
 	nvgFillColor(vg, gScheme.getAlternative(module));
 	nvgPathWinding(vg, NVG_SOLID);
 	nvgShapeAntiAlias(vg, true);
