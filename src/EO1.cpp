@@ -51,8 +51,6 @@ struct EO_102 : Module {
 	dsp::SchmittTrigger trigger;
 	dsp::PulseGenerator triggerLight;
 	float runMode;
-	int setRun = 0;
-	int resetRun = 0;
 	int traceMode[2];
 	int traceStep;	
 
@@ -94,7 +92,6 @@ void EO_102::process(const ProcessArgs &args) {
 	if (runMode > 0.5f) {
 		if (params[PARAM_RUNMODE].getValue() < 0.5f) {
 			params[PARAM_RUN].setValue(1.0f);
-			setRun = 1;
 		}
 	}
 	runMode = params[PARAM_RUNMODE].getValue();
@@ -174,7 +171,6 @@ void EO_102::process(const ProcessArgs &args) {
 				startFrame();
 				if (runMode > 0.5f) {// Continuous run mode
 					params[PARAM_RUN].setValue(0);
-					resetRun = 1;
 				}
 				return;
 			}

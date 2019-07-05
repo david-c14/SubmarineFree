@@ -57,8 +57,6 @@ struct LA_108 : DS_Module {
 
 	DS_Schmitt trigger;
 
-	int resetRunMode = 0;
-
 	LA_108() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_TRIGGER, 0.0f, 8.0f, 0.0f);
@@ -139,7 +137,6 @@ void LA_108::process(const ProcessArgs &args) {
 
 		if (params[PARAM_RUN].getValue() < 0.5f) { // Continuous run mode
 			params[PARAM_RESET].setValue(0.0f);
-			resetRunMode = 1;
 			// Reset if triggered
 			float holdTime = 0.1f;
 			if (triggered) {
@@ -158,7 +155,6 @@ void LA_108::process(const ProcessArgs &args) {
 				if (triggered) {
 					startFrame();
 					params[PARAM_RESET].setValue(0.0f);
-					resetRunMode = 1;
 					return;
 				}
 			}
@@ -349,16 +345,6 @@ struct LA108 : SchemeModuleWidget {
 		if (dsMod) {
 			dsMod->appendContextMenu(menu);
 		}
-	}
-	void step() override {
-		LA_108 *laMod = dynamic_cast<LA_108 *>(module);
-		if (laMod) {
-			if (laMod->resetRunMode) {
-				laMod->resetRunMode = 0;
-				APP->engine->setParam(laMod, LA_108::PARAM_RESET, 0.0f); 
-			}
-		}
-		ModuleWidget::step();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "LA_108");
