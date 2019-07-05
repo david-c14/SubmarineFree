@@ -27,6 +27,8 @@ struct SS_208 : Module {
 	static constexpr int deviceCount = 8;
 	SS_208() : Module() {
 		config(0, 0, deviceCount, 0);
+	}
+	void step() override {
 		outputs[0].setVoltage(M_PI);
 		outputs[1].setVoltage(2 * M_PI);
 		outputs[2].setVoltage(M_E);
@@ -70,6 +72,8 @@ struct SS_212 : Module {
 
 	SS_212() : Module() {
 		config(0, 0, deviceCount, 0);
+	}
+	void step() override {
 		setValues();
 	}
 
@@ -155,6 +159,8 @@ struct SS_221 : Module {
 	static constexpr int deviceCount = 21;
 	SS_221() : Module() {
 		config(0, 0, deviceCount, 0);
+	}
+	void step() override {
 		for (int i = 0; i < deviceCount; i++) {
 			outputs[i].setVoltage(10.0f - i);
 		}
@@ -200,6 +206,8 @@ struct SS_220 : Module {
 	static constexpr int deviceSetCount = 10;
 	SS_220() : Module() {
 		config(0, 0, deviceCount * deviceSetCount, 0);
+	}
+	void step() override {
 		for (int j = 0; j < deviceSetCount; j++) {
 			for (int i = 0; i < deviceCount; i++) {
 				outputs[j * deviceCount + i].setVoltage((j - 5.0f) + 1.0f * i / 12.0f);
