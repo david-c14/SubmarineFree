@@ -469,20 +469,6 @@ struct EO102 : SchemeModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3));
 	}
-	void step() override {
-		EO_102 *eoMod = dynamic_cast<EO_102 *>(module);
-		if (eoMod) {
-			if (eoMod->setRun) {
-				eoMod->setRun = 0;
-				APP->engine->setParam(eoMod, EO_102::PARAM_RUNMODE, 1.0f);
-			}
-			if (eoMod->resetRun) {
-				eoMod->resetRun = 0;
-				APP->engine->setParam(eoMod, EO_102::PARAM_RUNMODE, 0.0f);
-			}
-		}
-		ModuleWidget::step();
-	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "EO-102");
 
