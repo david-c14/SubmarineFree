@@ -295,6 +295,12 @@
 			"tags": ["QUANTIZER", "TUNER", "MULTIPLE"]
 		},
 		{
+			"slug":"WM-101",
+			"name":"WM-101",
+			"description":"WM-101 Wire Manager",
+			"tags": ["UTILITY"]
+		},
+		{
 			"slug":"XF-101",
 			"name":"XF-101",
 			"description": "XF-101 Single Mono Cross Fader",

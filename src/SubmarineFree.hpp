@@ -70,6 +70,8 @@ extern Model *modelTM105;
 extern Model *modelWK101;
 extern Model *modelWK205;
 
+extern Model *modelWM101;
+
 extern Model *modelXF101;
 extern Model *modelXF102;
 extern Model *modelXF104;
