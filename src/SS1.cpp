@@ -25,18 +25,27 @@ struct SS112 : SchemeModuleWidget {
 
 struct SS_208 : Module {
 	static constexpr int deviceCount = 8;
+	float values[8];
 	SS_208() : Module() {
 		config(0, 0, deviceCount, 0);
+		values[0] = M_PI;
+		values[1] = 2 * M_PI;
+		values[2] = M_E;
+		values[3] = M_SQRT1_2;
+		values[4] = M_SQRT2;
+		values[5] = powf(3.0f, 0.5f);
+		values[6] = powf(5.0f, 0.5f);
+		values[7] = powf(7.0f, 0.5f);
 	}
 	void process(const ProcessArgs &args) override {
-		outputs[0].setVoltage(M_PI);
-		outputs[1].setVoltage(2 * M_PI);
-		outputs[2].setVoltage(M_E);
-		outputs[3].setVoltage(M_SQRT1_2);
-		outputs[4].setVoltage(M_SQRT2);
-		outputs[5].setVoltage(powf(3.0f, 0.5f));
-		outputs[6].setVoltage(powf(5.0f, 0.5f));
-		outputs[7].setVoltage(powf(7.0f, 0.5f));
+		outputs[0].setVoltage(values[0]);
+		outputs[1].setVoltage(values[1]);
+		outputs[2].setVoltage(values[2]);
+		outputs[3].setVoltage(values[3]);
+		outputs[4].setVoltage(values[4]);
+		outputs[5].setVoltage(values[5]);
+		outputs[6].setVoltage(values[6]);
+		outputs[7].setVoltage(values[7]);
 	}
 };
 
