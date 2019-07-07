@@ -57,9 +57,13 @@ struct MinButton : OpaqueWidget {
 	MinButton() {
 		this->box.size = Vec(10, 20);
 	}
-	void onDragEnd(const event::DragEnd &e) override {
-		mw->Minimize(mw->box.size.x > 16.0f);
-		e.consume(this);
+	void onButton(const event::Button &e) override {
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			mw->Minimize(mw->box.size.x > 16.0f);
+			e.consume(this);
+			return;
+		}
+		OpaqueWidget::onButton(e);
 	}
 	void draw(const DrawArgs &args) override {
 		nvgBeginPath(args.vg);
@@ -117,16 +121,27 @@ struct CheckBox : OpaqueWidget {
 		nvgStroke(args.vg);
 		OpaqueWidget::draw(args);
 	}
-	void onDragEnd(const event::DragEnd &e) override {
-		selected = !selected;
-		e.consume(this);
-		onClick();
+	void onButton(const event::Button &e) override {
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			selected = !selected;
+			e.consume(this);
+			onClick();
+			return;
+		}
+		OpaqueWidget::onButton(e);
 	}
 	virtual void onClick() {
 	}
 };
 
-struct WireButton : Widget {
+struct WireButton;
+
+struct DeleteMenu : MenuItem {
+	WireButton *wireButton;
+	void onAction(const event::Action &e) override;
+};
+
+struct WireButton : OpaqueWidget {
 	NVGcolor color;
 	CheckBox *checkBox;
 	WireButton() {
@@ -162,9 +177,30 @@ struct WireButton : Widget {
 		nvgFillColor(args.vg, nvgRGBf(0.0, 0.0, 0.0));
 		nvgFill(args.vg);
 
-		Widget::draw(args);
+		OpaqueWidget::draw(args);
+	}
+	void onButton(const event::Button &e) override {
+		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+			Menu *menu = createMenu();
+			DeleteMenu *dm = new DeleteMenu();
+			dm->wireButton = this;
+			dm->text = "Delete";
+			menu->addChild(dm);
+			e.consume(this);
+			return;
+		}
+		OpaqueWidget::onButton(e);
+	}
+	void deleteWire() {
+		parent->removeChild(this);
+		delete this;
 	}
 };
+
+void DeleteMenu::onAction(const event::Action &e) {
+	wireButton->deleteWire();
+	e.consume(this);
+}
 
 struct CheckAll : CheckBox {
 	ScrollWidget *scrollWidget;
