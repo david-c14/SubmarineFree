@@ -120,6 +120,9 @@ struct CheckBox : OpaqueWidget {
 	void onDragEnd(const event::DragEnd &e) override {
 		selected = !selected;
 		e.consume(this);
+		onClick();
+	}
+	virtual void onClick() {
 	}
 };
 
@@ -163,6 +166,15 @@ struct WireButton : Widget {
 	}
 };
 
+struct CheckAll : CheckBox {
+	ScrollWidget *scrollWidget;
+	void onClick() override {
+		for (Widget *widget : scrollWidget->container->children) {
+			WireButton *wb = dynamic_cast<WireButton *>(widget);
+			wb->checkBox->selected = selected;
+		}
+	}
+}; 
 
 struct WM101 : SizeableModuleWidget {
 	MinButton *minButton;
@@ -178,9 +190,14 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->box.size = Vec(box.size.x - 20, box.size.y - 30);
 		addChild(backPanel);
 		scrollWidget = new ScrollWidget();
-		scrollWidget->box.pos = Vec(0, 10);
-		scrollWidget->box.size = Vec(backPanel->box.size.x, backPanel->box.size.y - 10);
+		scrollWidget->box.pos = Vec(0, 21);
+		scrollWidget->box.size = Vec(backPanel->box.size.x, backPanel->box.size.y - 21);
 		backPanel->addChild(scrollWidget);
+		CheckAll *checkAll = new CheckAll();
+		checkAll->box.pos = Vec(1,1);
+		checkAll->box.size = Vec(19, 19);
+		checkAll->scrollWidget = scrollWidget;
+		backPanel->addChild(checkAll);
 		loadSettings();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
