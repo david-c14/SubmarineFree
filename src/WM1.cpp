@@ -2,10 +2,11 @@
 
 struct SizeableModuleWidget : SchemeModuleWidget {
 	bool stabilized = false;
-	float fullSize = 210.0f;
+	float fullSize = 0;
 	SchemePanel *panel;
-	SizeableModuleWidget(Module *module) : SchemeModuleWidget(module) {
-		this->box.size = Vec(210, 380);
+	SizeableModuleWidget(Module *module, float size) : SchemeModuleWidget(module) {
+		fullSize = size;
+		this->box.size = Vec(fullSize, 380);
 		panel = new SchemePanel(this->box.size);
 		addChild(panel);
 	}
@@ -90,13 +91,52 @@ struct BackPanel : Widget {
 	}
 };
 
+struct CheckBox : OpaqueWidget {
+	std::string label;
+	int selected = false;
+	void draw (const DrawArgs &args) override {
+		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		if (!label.empty()) {
+			nvgFontFaceId(args.vg, APP->window->uiFont->handle);
+			nvgFontSize(args.vg, 13);	
+			nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
+			nvgText(args.vg, 21, box.size.y / 2, label.c_str(), NULL);
+		}
+		nvgStrokeWidth(args.vg, 1);
+		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		if (selected) {
+			nvgBeginPath(args.vg);
+			nvgMoveTo(args.vg, box.size.y / 2 - 4, box.size.y / 2 - 5);
+			nvgLineTo(args.vg, box.size.y / 2 + 6, box.size.y / 2 + 5);
+			nvgMoveTo(args.vg, box.size.y / 2 - 4, box.size.y / 2 + 5);
+			nvgLineTo(args.vg, box.size.y / 2 + 6, box.size.y / 2 - 5);
+			nvgStroke(args.vg);
+		}
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, box.size.y / 2 - 7, box.size.y / 2 - 8, 16, 16);
+		nvgStroke(args.vg);
+		OpaqueWidget::draw(args);
+	}
+	void onDragEnd(const event::DragEnd &e) override {
+		selected = !selected;
+		e.consume(this);
+	}
+};
+
 struct WireButton : Widget {
 	NVGcolor color;
+	CheckBox *checkBox;
+	WireButton() {
+		checkBox = new CheckBox();
+		checkBox->box.pos = Vec(1,1);
+		checkBox->box.size = Vec(19, 19);
+		addChild(checkBox);
+	}
 	void draw(const DrawArgs &args) override {
 		NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, 32, box.size.y / 2);
-		nvgLineTo(args.vg, box.size.x - 40, box.size.y / 2);
+		nvgLineTo(args.vg, box.size.x, box.size.y / 2);
 		nvgStrokeColor(args.vg, colorOutline);
 		nvgStrokeWidth(args.vg, 5);
 		nvgStroke(args.vg);
@@ -123,13 +163,14 @@ struct WireButton : Widget {
 	}
 };
 
+
 struct WM101 : SizeableModuleWidget {
 	MinButton *minButton;
 	BackPanel *backPanel;
 	ScrollWidget *scrollWidget;
-	WM101(Module *module) : SizeableModuleWidget(module) {
+	WM101(Module *module) : SizeableModuleWidget(module, 180) {
 		minButton = new MinButton();
-		minButton->box.pos = Vec(0,180);
+		minButton->box.pos = Vec(170,180);
 		minButton->mw = this;
 		addChild(minButton); 
 		backPanel = new BackPanel();
@@ -140,11 +181,7 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->box.pos = Vec(0, 10);
 		scrollWidget->box.size = Vec(backPanel->box.size.x, backPanel->box.size.y - 10);
 		backPanel->addChild(scrollWidget);
-		WireButton *wb = new WireButton();
-		wb->box.pos = Vec(0, 0);
-		wb->box.size = Vec(scrollWidget->box.size.x, 21);
-		wb->color = nvgRGB(255,0,0);
-		scrollWidget->addChild(wb);
+		loadSettings();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (this->box.size.x > 16.0f) {
@@ -172,6 +209,33 @@ struct WM101 : SizeableModuleWidget {
 		minButton->box.pos.x = small?2.5f:(this->box.size.x - 10.0f);
 		backPanel->visible = !small;
 		SizeableModuleWidget::onResize();	
+	}
+	void addColor(NVGcolor color, int selected) {
+		float y = scrollWidget->container->children.size() * 21;
+		WireButton *wb = new WireButton();
+		wb->box.pos = Vec(0, y);
+		wb->box.size = Vec(scrollWidget->box.size.x, 21);
+		wb->color = color;
+		wb->checkBox->selected = selected;
+		scrollWidget->container->addChild(wb);
+	}
+	void setDefaults() {
+		addColor(nvgRGB(0xc9, 0xb7, 0x0e), true);
+		addColor(nvgRGB(0xc9, 0x18, 0x47), true);
+		addColor(nvgRGB(0x0c, 0x8e, 0x15), true);
+		addColor(nvgRGB(0x09, 0x86, 0xad), true);
+		addColor(nvgRGB(0xff, 0xae, 0xc9), false);
+		addColor(nvgRGB(0xb7, 0x00, 0xb5), false);
+		addColor(nvgRGB(0x80, 0x80, 0x80), false);
+		addColor(nvgRGB(0xff, 0xff, 0xff), false);
+		addColor(nvgRGB(0x10, 0x0f, 0x12), false);
+		addColor(nvgRGB(0xff, 0x99, 0x41), false);
+		addColor(nvgRGB(0x80, 0x36, 0x10), false);
+	}
+	void loadSettings() {
+		setDefaults();
+		setDefaults();
+		setDefaults();
 	}
 };
 
