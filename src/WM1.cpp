@@ -3,11 +3,15 @@
 struct SizeableModuleWidget : SchemeModuleWidget {
 	bool stabilized = false;
 	float fullSize = 210.0f;
+	SchemePanel *panel;
 	SizeableModuleWidget(Module *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(210, 380);
-		addChild(new SchemePanel(this->box.size));
+		panel = new SchemePanel(this->box.size);
+		addChild(panel);
 	}
 	void Resize() {
+		panel->box.size = this->box.size;
+		panel->dirty = true;
 		onResize();
 	}
 	void Minimize(bool minimize) {
@@ -49,28 +53,82 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 
 struct MinButton : OpaqueWidget {
 	SizeableModuleWidget *mw;
+	MinButton() {
+		this->box.size = Vec(10, 20);
+	}
 	void onDragEnd(const event::DragEnd &e) override {
 		mw->Minimize(mw->box.size.x > 16.0f);
 		e.consume(this);
 	}
+	void draw(const DrawArgs &args) override {
+		nvgBeginPath(args.vg);
+		if (this->box.pos.x < 15.0f) {
+			nvgMoveTo(args.vg, 0, 0);
+			nvgLineTo(args.vg, 10, 10);
+			nvgLineTo(args.vg, 0, 20);
+			nvgClosePath(args.vg);
+		}
+		else {
+			nvgMoveTo(args.vg, 10, 0);
+			nvgLineTo(args.vg, 0, 10);
+			nvgLineTo(args.vg, 10, 20);
+			nvgClosePath(args.vg);
+		}
+		nvgFillColor(args.vg, gScheme.getAlternative(mw->module));
+		nvgFill(args.vg);
+		Widget::draw(args);
+	}
+};
+
+struct BackPanel : Widget {
+	void draw(const DrawArgs &args) override {
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+		nvgFillColor(args.vg, nvgRGB(0 ,0 ,0));
+		nvgFill(args.vg);
+		Widget::draw(args);
+	}
 };
 
 struct WM101 : SizeableModuleWidget {
+	MinButton *minButton;
+	BackPanel *backPanel;
 	WM101(Module *module) : SizeableModuleWidget(module) {
-		MinButton *minButton = new MinButton();
-		minButton->box.pos = Vec(0,0);
-		minButton->box.size = Vec(15,30);
+		minButton = new MinButton();
+		minButton->box.pos = Vec(0,180);
 		minButton->mw = this;
 		addChild(minButton); 
+		backPanel = new BackPanel();
+		backPanel->box.pos = Vec(10, 15);
+		backPanel->box.size = Vec(box.size.x - 20, box.size.y - 30);
+		addChild(backPanel);
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
-		drawBase(vg, "WM-101");
+		if (this->box.size.x > 16.0f) {
+			drawBase(vg, "WM-101");
+		}
+		else {
+			drawBackground(vg);
+			drawLogo(vg, 0, 380, 1, -M_PI / 2.0f);
+			nvgSave(vg);
+			nvgTranslate(vg, 0, 377);
+			nvgRotate(vg, -M_PI / 2.0f);
+			drawText(vg, 20, 0, NVG_ALIGN_LEFT | NVG_ALIGN_TOP, 12, gScheme.getAlternative(module), "submarine");
+			drawText(vg, 220, 0, NVG_ALIGN_LEFT | NVG_ALIGN_TOP, 12, gScheme.getAlternative(module), "WM-101 Wire Manager");
+			nvgRestore(vg);
+		}
 	}
 	void step() override {
 		if (!stabilized) {
 			stabilized = true;
 		}
 		SizeableModuleWidget::step();
+	}
+	void onResize() override {
+		bool small = this->box.size.x < 16.0f;
+		minButton->box.pos.x = small?2.5f:(this->box.size.x - 10.0f);
+		backPanel->visible = !small;
+		SizeableModuleWidget::onResize();	
 	}
 };
 
