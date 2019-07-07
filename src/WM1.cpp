@@ -90,9 +90,43 @@ struct BackPanel : Widget {
 	}
 };
 
+struct WireButton : Widget {
+	NVGcolor color;
+	void draw(const DrawArgs &args) override {
+		NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, 32, box.size.y / 2);
+		nvgLineTo(args.vg, box.size.x - 40, box.size.y / 2);
+		nvgStrokeColor(args.vg, colorOutline);
+		nvgStrokeWidth(args.vg, 5);
+		nvgStroke(args.vg);
+		
+		nvgStrokeColor(args.vg, color);
+		nvgStrokeWidth(args.vg, 3);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, 32, box.size.y / 2, 9);
+		nvgFillColor(args.vg, color);
+		nvgFill(args.vg);
+		
+		nvgStrokeWidth(args.vg, 1.0);
+		nvgStrokeColor(args.vg, colorOutline);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, 32, box.size.y / 2, 5);
+		nvgFillColor(args.vg, nvgRGBf(0.0, 0.0, 0.0));
+		nvgFill(args.vg);
+
+		Widget::draw(args);
+	}
+};
+
 struct WM101 : SizeableModuleWidget {
 	MinButton *minButton;
 	BackPanel *backPanel;
+	ScrollWidget *scrollWidget;
 	WM101(Module *module) : SizeableModuleWidget(module) {
 		minButton = new MinButton();
 		minButton->box.pos = Vec(0,180);
@@ -102,6 +136,15 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->box.pos = Vec(10, 15);
 		backPanel->box.size = Vec(box.size.x - 20, box.size.y - 30);
 		addChild(backPanel);
+		scrollWidget = new ScrollWidget();
+		scrollWidget->box.pos = Vec(0, 10);
+		scrollWidget->box.size = Vec(backPanel->box.size.x, backPanel->box.size.y - 10);
+		backPanel->addChild(scrollWidget);
+		WireButton *wb = new WireButton();
+		wb->box.pos = Vec(0, 0);
+		wb->box.size = Vec(scrollWidget->box.size.x, 21);
+		wb->color = nvgRGB(255,0,0);
+		scrollWidget->addChild(wb);
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (this->box.size.x > 16.0f) {
