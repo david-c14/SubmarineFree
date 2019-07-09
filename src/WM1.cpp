@@ -1,3 +1,4 @@
+#include <settings.hpp>
 #include "SubmarineFree.hpp"
 
 struct SizeableModuleWidget : SchemeModuleWidget {
@@ -95,6 +96,49 @@ struct BackPanel : Widget {
 	}
 };
 
+struct EventSlider : ui::Slider {
+	int transparent = false;
+	EventSlider() {
+		quantity = new Quantity();
+	}
+	~EventSlider() {
+		delete quantity;
+	}
+	void draw(const DrawArgs &args) override {
+		DEBUG("%f", quantity->getValue());
+		Vec minHandlePos;
+		Vec maxHandlePos;
+		float width;
+		float height;
+		if (box.size.x < box.size.y) {
+			width = box.size.x;
+			height = 10;
+			minHandlePos = Vec(box.size.x / 2, height / 2);
+			maxHandlePos = Vec(box.size.x / 2, box.size.y - height / 2);
+		}
+		else {
+			width = 10;
+			height = box.size.y;
+			minHandlePos = Vec(width / 2, box.size.y / 2);
+			maxHandlePos = Vec(box.size.x - width / 2, box.size.y / 2);
+		}
+		Vec pos = Vec(rescale(quantity->getValue(), quantity->getMinValue(), quantity->getMaxValue(), minHandlePos.x, maxHandlePos.x), rescale(quantity->getValue(), quantity->getMinValue(), quantity->getMaxValue(), minHandlePos.y, maxHandlePos.y));
+		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
+		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		nvgStrokeWidth(args.vg, 1);
+		if (!transparent) {
+			nvgBeginPath(args.vg);
+			nvgMoveTo(args.vg, minHandlePos.x, minHandlePos.y);
+			nvgLineTo(args.vg, maxHandlePos.x, maxHandlePos.y);
+			nvgStroke(args.vg);
+		}
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, pos.x - width / 2 + 0.5, pos.y - height / 2 + 0.5, width - 1, height - 1);
+		if (!transparent) nvgFill(args.vg);
+		nvgStroke(args.vg);
+	}
+};
+
 struct CheckBox : OpaqueWidget {
 	std::string label;
 	int selected = false;
@@ -135,8 +179,23 @@ struct CheckBox : OpaqueWidget {
 	}
 };
 
-struct ClickButton : OpaqueWidget {
+struct EventLabel : Widget {
 	std::string label;
+	void draw(const DrawArgs &args) override {
+		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		if (!label.empty()) {
+			nvgFontFaceId(args.vg, APP->window->uiFont->handle);
+			nvgFontSize(args.vg, 13);
+			nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE | NVG_ALIGN_CENTER);
+			nvgText(args.vg, box.size.x / 2, box.size.y / 2, label.c_str(), NULL);
+		}
+		Widget::draw(args);
+	}
+};
+
+struct EventButton : OpaqueWidget {
+	std::string label;
+	std::function<void ()> clickHandler;
 	void draw(const DrawArgs &args) override {
 		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		if (!label.empty()) {
@@ -155,12 +214,12 @@ struct ClickButton : OpaqueWidget {
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
 			e.consume(this);
-			onClick();
+			if (clickHandler) {
+				clickHandler();
+			}
 			return;
 		}
 		OpaqueWidget::onButton(e);
-	}
-	virtual void onClick() {
 	}
 };
 
@@ -227,22 +286,14 @@ struct WireButton : OpaqueWidget {
 	}
 };
 
-struct WM101;
-
-struct DeleteOkButton : ClickButton {
-	WM101 *wm;
-	void onClick() override;
-};
-
-struct CancelButton : ClickButton {
-	WM101 *wm;
-	void onClick() override;
-};
-
 struct WM101 : SizeableModuleWidget {
 	MinButton *minButton;
 	BackPanel *backPanel;
 	BackPanel *deleteConfirmPanel;
+	EventButton *deleteCancelButton;
+	EventButton *deleteOkButton;
+	BackPanel *editPanel;
+	EventSlider *rSlider;
 	
 	ScrollWidget *scrollWidget;
 	WM101(Module *module) : SizeableModuleWidget(module, 180) {
@@ -271,20 +322,35 @@ struct WM101 : SizeableModuleWidget {
 		deleteConfirmPanel->box.size = backPanel->box.size;
 		deleteConfirmPanel->visible = false;
 		addChild(deleteConfirmPanel);
+
+		EventLabel *deleteLabel = new EventLabel();
+		deleteLabel->box.pos = Vec(15, 195);
+		deleteLabel->box.size = Vec(box.size.x - 40, 19);
+		deleteLabel->label = "Delete Color?";
+		deleteConfirmPanel->addChild(deleteLabel);
 		
-		DeleteOkButton *dob = new DeleteOkButton();
-		dob->box.pos = Vec(5, 100);
-		dob->box.size = Vec(80, 20);
-		dob->wm = this;
-		dob->label = "OK";
-		deleteConfirmPanel->addChild(dob);
+		deleteOkButton = new EventButton();
+		deleteOkButton->box.pos = Vec(15, box.size.y - 90);
+		deleteOkButton->box.size = Vec(55, 19);
+		deleteOkButton->label = "OK";
+		deleteConfirmPanel->addChild(deleteOkButton);
 		
-		CancelButton *cb = new CancelButton();
-		cb->box.pos = Vec(85, 100);
-		cb->box.size = Vec(80, 20);
-		cb->wm = this;
-		cb->label = "Cancel";
-		deleteConfirmPanel->addChild(cb);
+		deleteCancelButton = new EventButton();
+		deleteCancelButton->box.pos = Vec(box.size.x - 90, box.size.y - 90);
+		deleteCancelButton->box.size = Vec(55, 19);
+		deleteCancelButton->label = "Cancel";
+		deleteConfirmPanel->addChild(deleteCancelButton);
+
+		editPanel = new BackPanel();
+		editPanel->box.pos = backPanel->box.pos;
+		editPanel->box.size = backPanel->box.size;
+		editPanel->visible = false;
+		addChild(editPanel);
+		
+		rSlider = new EventSlider();
+		rSlider->box.pos = Vec(10, 20);
+		rSlider->box.size = Vec(150, 20);
+		editPanel->addChild(rSlider);
 		
 		loadSettings();
 	}
@@ -329,10 +395,10 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->container->addChild(wb);
 	}
 	void setDefaults() {
-		addColor(nvgRGB(0xc9, 0xb7, 0x0e), true);
-		addColor(nvgRGB(0xc9, 0x18, 0x47), true);
-		addColor(nvgRGB(0x0c, 0x8e, 0x15), true);
-		addColor(nvgRGB(0x09, 0x86, 0xad), true);
+		for (NVGcolor color : settings::cableColors) {
+			addColor(color, true);
+		}
+		
 		addColor(nvgRGB(0xff, 0xae, 0xc9), false);
 		addColor(nvgRGB(0xb7, 0x00, 0xb5), false);
 		addColor(nvgRGB(0x80, 0x80, 0x80), false);
@@ -342,8 +408,6 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0x80, 0x36, 0x10), false);
 	}
 	void loadSettings() {
-		setDefaults();
-		setDefaults();
 		setDefaults();
 	}
 	void checkAll(bool selected) {
@@ -360,12 +424,15 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void addWireMenu(WireButton *wb) {
 		Menu *menu = createMenu();
-		EventMenuItem *dm = new EventMenuItem();
-		dm->text = "Delete";
-		dm->clickHandler = [=]() {
-			this->deleteWire(wb);
+		MenuLabel *label = new MenuLabel();
+		label->text = "Color: " + color::toHexString(wb->color);
+		menu->addChild(label);
+		EventMenuItem *ed = new EventMenuItem();
+		ed->text = "Edit";
+		ed->clickHandler = [=]() {
+			this->editDialog(wb);
 		};
-		menu->addChild(dm);
+		menu->addChild(ed);
 		if (!isFirst(wb)) {
 			EventMenuItem *mu = new EventMenuItem();
 			mu->text = "Move Up";
@@ -382,6 +449,12 @@ struct WM101 : SizeableModuleWidget {
 			};
 			menu->addChild(md);
 		}
+		EventMenuItem *dm = new EventMenuItem();
+		dm->text = "Delete";
+		dm->clickHandler = [=]() {
+			this->deleteDialog(wb);
+		};
+		menu->addChild(dm);
 	}
 	void deleteWire(WireButton *wb) {
 		scrollWidget->container->removeChild(wb);
@@ -411,21 +484,30 @@ struct WM101 : SizeableModuleWidget {
 		wb1->checkBox->selected = wb2->checkBox->selected;
 		wb2->checkBox->selected = sel;
 	}
+	void deleteDialog(WireButton *wb) {
+		deleteCancelButton->clickHandler = [=]() {
+			this->cancel();	
+		};	
+		deleteOkButton->clickHandler = [=]() {
+			this->deleteOk(wb);
+		};
+		backPanel->visible = false;
+		deleteConfirmPanel->visible = true;
+	}
 	void cancel() {
 		backPanel->visible = true;
+		editPanel->visible = false;
 		deleteConfirmPanel->visible = false;
 	}
-	void deleteOk() {
+	void deleteOk(WireButton *wb) {
+		this->deleteWire(wb);
 		cancel();
+	}
+	void editDialog(WireButton *wb) {
+		backPanel->visible = false;
+		editPanel->visible = true;
 	}
 
 };
 
-void DeleteOkButton::onClick() {
-	wm->deleteOk();
-}
-
-void CancelButton::onClick() {
-	wm->cancel();
-}
 Model *modelWM101 = createModel<Module, WM101>("WM-101");
