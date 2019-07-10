@@ -172,10 +172,18 @@ struct EventSlider : OpaqueWidget {
 
 };
 
-struct CheckBox : OpaqueWidget {
+struct CheckBox : EventButton {
 	std::string label;
 	int selected = false;
-	std::function<void()> clickHandler;
+	std::function<void()> changeHandler;
+	CheckBox() {
+		clickHandler = [=]() { 
+			selected = !selected;
+			if (changeHandler) {
+				changeHandler();
+			}
+		};
+	}
 	void draw (const DrawArgs &args) override {
 		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		if (!label.empty()) {
@@ -199,16 +207,20 @@ struct CheckBox : OpaqueWidget {
 		nvgStroke(args.vg);
 		OpaqueWidget::draw(args);
 	}
-	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
-			selected = !selected;
-			e.consume(this);
-			if (clickHandler) {
-				clickHandler();
-			}
-			return;
-		}
-		OpaqueWidget::onButton(e);
+};
+
+struct AddButton : EventButton {
+	void draw (const DrawArgs &args) override {
+		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		nvgStrokeWidth(args.vg, 2);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x / 2, 0);
+		nvgLineTo(args.vg, box.size.x / 2, box.size.y);
+		nvgMoveTo(args.vg, 0, box.size.y / 2);
+		nvgLineTo(args.vg, box.size.x, box.size.y / 2);
+
+		nvgStroke(args.vg);
+		OpaqueWidget::draw(args);
 	}
 };
 
@@ -378,10 +390,17 @@ struct WM101 : SizeableModuleWidget {
 		CheckBox *checkBoxAll = new CheckBox();
 		checkBoxAll->box.pos = Vec(1,1);
 		checkBoxAll->box.size = Vec(19, 19);
-		checkBoxAll->clickHandler = [=](){
+		checkBoxAll->changeHandler = [=](){
 			this->checkAll(checkBoxAll->selected);
 		};
 		backPanel->addChild(checkBoxAll);
+		AddButton *addButton = new AddButton();
+		addButton->box.pos = Vec(70, 1);
+		addButton->box.size = Vec(20, 20);
+		addButton->clickHandler = [=]() {
+			this->editDialog(NULL);
+		};
+		backPanel->addChild(addButton);
 
 		deleteConfirmPanel = new BackPanel();
 		deleteConfirmPanel->box.pos = backPanel->box.pos;
