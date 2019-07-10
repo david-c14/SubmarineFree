@@ -256,7 +256,51 @@ struct RectButton : OpaqueWidget {
 	}
 };
 
-struct WireButton;
+struct EditPanel : BackPanel {
+	std::function<void(NVGcolor)> completeHandler;
+	std::function<void()> cancelHandler;
+	EventSlider *r;
+	EventSlider *g;
+	EventSlider *b;
+	EditPanel() {
+		r = new EventSlider();
+		r->box.pos = Vec(5, 100);
+		r->box.size = Vec(100, 21);
+		addChild(r);
+		g = new EventSlider();
+		g->box.pos = Vec(5, 130);
+		g->box.size = Vec(100, 21);
+		addChild(g);
+		b = new EventSlider();
+		b->box.pos = Vec(5, 160);
+		b->box.size = Vec(100, 21);
+		addChild(b);
+		RectButton *saveButton = new RectButton();
+		saveButton->box.pos = Vec(15, 260);
+		saveButton->box.size = Vec(55, 19);
+		saveButton->label = "Save";
+		saveButton->clickHandler = [=](){
+			if (this->completeHandler) {
+				this->completeHandler(nvgRGBf(r->value, g->value, b->value));
+			}
+		};
+		addChild(saveButton);
+		
+		RectButton *cancelButton = new RectButton();
+		cancelButton->box.pos = Vec(120, 260);
+		cancelButton->box.size = Vec(55, 19);
+		cancelButton->label = "Cancel";
+		cancelButton->clickHandler = [=](){
+			if (this->cancelHandler) {
+				this->cancelHandler();
+			}
+		};
+		addChild(cancelButton);
+	}
+	void draw(const DrawArgs &args) override {
+		BackPanel::draw(args);
+	}
+};
 
 struct EventMenuItem : MenuItem {
 	std::function<void()> clickHandler;
@@ -268,10 +312,9 @@ struct EventMenuItem : MenuItem {
 	}	
 };
 
-struct WireButton : OpaqueWidget {
+struct WireButton : EventButton {
 	NVGcolor color;
 	CheckBox *checkBox;
-	std::function<void ()> rightClickHandler;
 	WireButton() {
 		checkBox = new CheckBox();
 		checkBox->box.pos = Vec(1,1);
@@ -307,16 +350,6 @@ struct WireButton : OpaqueWidget {
 
 		OpaqueWidget::draw(args);
 	}
-	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-			if (rightClickHandler) {
-				rightClickHandler();
-			}
-			e.consume(this);
-			return;
-		}
-		OpaqueWidget::onButton(e);
-	}
 };
 
 struct WM101 : SizeableModuleWidget {
@@ -325,7 +358,7 @@ struct WM101 : SizeableModuleWidget {
 	BackPanel *deleteConfirmPanel;
 	RectButton *deleteCancelButton;
 	RectButton *deleteOkButton;
-	BackPanel *editPanel;
+	EditPanel *editPanel;
 	EventSlider *rSlider;
 	
 	ScrollWidget *scrollWidget;
@@ -374,16 +407,14 @@ struct WM101 : SizeableModuleWidget {
 		deleteCancelButton->label = "Cancel";
 		deleteConfirmPanel->addChild(deleteCancelButton);
 
-		editPanel = new BackPanel();
+		editPanel = new EditPanel();
 		editPanel->box.pos = backPanel->box.pos;
 		editPanel->box.size = backPanel->box.size;
 		editPanel->visible = false;
+		editPanel->cancelHandler = [=]() {
+			this->cancel();
+		};
 		addChild(editPanel);
-		
-		rSlider = new EventSlider();
-		rSlider->box.pos = Vec(10, 20);
-		rSlider->box.size = Vec(150, 20);
-		editPanel->addChild(rSlider);
 		
 		loadSettings();
 	}
@@ -538,9 +569,27 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void editDialog(WireButton *wb) {
 		backPanel->visible = false;
+		editPanel->completeHandler = [=](NVGcolor col) {
+			if (wb) {
+				wb->color = col;
+			}
+			else {
+				addColor(col, false);
+			}
+			cancel();
+		};
+		if (wb) {
+			editPanel->r->value = wb->color.r;
+			editPanel->g->value = wb->color.g;
+			editPanel->b->value = wb->color.b;
+		}
+		else {
+			editPanel->r->value = 0.5f;
+			editPanel->g->value = 0.5f;
+			editPanel->b->value = 0.5f;
+		}
 		editPanel->visible = true;
 	}
-
 };
 
 Model *modelWM101 = createModel<Module, WM101>("WM-101");
