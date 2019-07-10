@@ -1,6 +1,28 @@
 #include <settings.hpp>
 #include "SubmarineFree.hpp"
 
+struct EventButton : OpaqueWidget {
+	std::function<void ()> clickHandler;
+	std::function<void ()> rightClickHandler;
+	void onButton(const event::Button &e) override {
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+			if (clickHandler) {
+				clickHandler();
+				e.consume(this);
+				return;
+			}
+		}
+		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+			if (rightClickHandler) {
+				rightClickHandler();
+				e.consume(this);
+				return;
+			}
+		}
+		OpaqueWidget::onButton(e);
+	}
+};
+
 struct SizeableModuleWidget : SchemeModuleWidget {
 	bool stabilized = false;
 	float fullSize = 0;
@@ -96,16 +118,14 @@ struct BackPanel : Widget {
 	}
 };
 
-struct EventSlider : ui::Slider {
+struct EventSlider : OpaqueWidget {
 	int transparent = false;
-	EventSlider() {
-		quantity = new Quantity();
-	}
-	~EventSlider() {
-		delete quantity;
-	}
+	float value = 0.5f;
+	float minValue = 0.0f;
+	float maxValue = 1.0f;
+	std::function<void(float)> changeHandler;
 	void draw(const DrawArgs &args) override {
-		DEBUG("%f", quantity->getValue());
+		DEBUG("%f", value);
 		Vec minHandlePos;
 		Vec maxHandlePos;
 		float width;
@@ -122,7 +142,7 @@ struct EventSlider : ui::Slider {
 			minHandlePos = Vec(width / 2, box.size.y / 2);
 			maxHandlePos = Vec(box.size.x - width / 2, box.size.y / 2);
 		}
-		Vec pos = Vec(rescale(quantity->getValue(), quantity->getMinValue(), quantity->getMaxValue(), minHandlePos.x, maxHandlePos.x), rescale(quantity->getValue(), quantity->getMinValue(), quantity->getMaxValue(), minHandlePos.y, maxHandlePos.y));
+		Vec pos = Vec(rescale(value, minValue, maxValue, minHandlePos.x, maxHandlePos.x), rescale(value, minValue, maxValue, minHandlePos.y, maxHandlePos.y));
 		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
 		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		nvgStrokeWidth(args.vg, 1);
@@ -137,6 +157,24 @@ struct EventSlider : ui::Slider {
 		if (!transparent) nvgFill(args.vg);
 		nvgStroke(args.vg);
 	}
+	void onDragStart(const event::DragStart &e) override {
+		if (e.button != GLFW_MOUSE_BUTTON_LEFT) return;
+		APP->window->cursorLock();
+	}
+	void onDragMove(const event::DragMove &e) override {
+		float oldValue = value;
+		value += e.mouseDelta.x * (maxValue - minValue) * 0.001f;
+		value = clamp(value, minValue, maxValue);
+		if (oldValue != value) {
+			if (changeHandler) {
+				changeHandler(value);
+			}
+		}
+	}
+	void onDragEnd(const event::DragEnd &e) override {
+		APP->window->cursorUnlock();
+	}
+
 };
 
 struct CheckBox : OpaqueWidget {
@@ -193,7 +231,7 @@ struct EventLabel : Widget {
 	}
 };
 
-struct EventButton : OpaqueWidget {
+struct RectButton : OpaqueWidget {
 	std::string label;
 	std::function<void ()> clickHandler;
 	void draw(const DrawArgs &args) override {
@@ -290,8 +328,8 @@ struct WM101 : SizeableModuleWidget {
 	MinButton *minButton;
 	BackPanel *backPanel;
 	BackPanel *deleteConfirmPanel;
-	EventButton *deleteCancelButton;
-	EventButton *deleteOkButton;
+	RectButton *deleteCancelButton;
+	RectButton *deleteOkButton;
 	BackPanel *editPanel;
 	EventSlider *rSlider;
 	
@@ -329,13 +367,13 @@ struct WM101 : SizeableModuleWidget {
 		deleteLabel->label = "Delete Color?";
 		deleteConfirmPanel->addChild(deleteLabel);
 		
-		deleteOkButton = new EventButton();
+		deleteOkButton = new RectButton();
 		deleteOkButton->box.pos = Vec(15, box.size.y - 90);
 		deleteOkButton->box.size = Vec(55, 19);
 		deleteOkButton->label = "OK";
 		deleteConfirmPanel->addChild(deleteOkButton);
 		
-		deleteCancelButton = new EventButton();
+		deleteCancelButton = new RectButton();
 		deleteCancelButton->box.pos = Vec(box.size.x - 90, box.size.y - 90);
 		deleteCancelButton->box.size = Vec(55, 19);
 		deleteCancelButton->label = "Cancel";
