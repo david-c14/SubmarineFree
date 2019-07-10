@@ -75,18 +75,13 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 	}
 };
 
-struct MinButton : OpaqueWidget {
+struct MinButton : EventButton {
 	SizeableModuleWidget *mw;
 	MinButton() {
 		this->box.size = Vec(10, 20);
-	}
-	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+		this->clickHandler = [=]() {
 			mw->Minimize(mw->box.size.x > 16.0f);
-			e.consume(this);
-			return;
-		}
-		OpaqueWidget::onButton(e);
+		};
 	}
 	void draw(const DrawArgs &args) override {
 		nvgBeginPath(args.vg);
