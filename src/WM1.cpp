@@ -224,6 +224,23 @@ struct AddButton : EventButton {
 	}
 };
 
+struct MenuButton : EventButton {
+	void draw (const DrawArgs &args) override {
+		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		nvgStrokeWidth(args.vg, 2);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, 0, box.size.y / 2 - 4);
+		nvgLineTo(args.vg, box.size.x, box.size.y / 2 - 4);
+		nvgMoveTo(args.vg, 0, box.size.y / 2);
+		nvgLineTo(args.vg, box.size.x, box.size.y / 2);
+		nvgMoveTo(args.vg, 0, box.size.y / 2 + 4);
+		nvgLineTo(args.vg, box.size.x, box.size.y / 2 + 4);
+
+		nvgStroke(args.vg);
+		OpaqueWidget::draw(args);
+	}
+};
+
 struct EventLabel : Widget {
 	std::string label;
 	void draw(const DrawArgs &args) override {
@@ -434,12 +451,16 @@ struct WM101 : SizeableModuleWidget {
 		};
 		backPanel->addChild(checkBoxAll);
 		AddButton *addButton = new AddButton();
-		addButton->box.pos = Vec(70, 1);
-		addButton->box.size = Vec(20, 20);
+		addButton->box.pos = Vec(57, 2);
+		addButton->box.size = Vec(16, 16);
 		addButton->clickHandler = [=]() {
 			this->editDialog(NULL);
 		};
 		backPanel->addChild(addButton);
+		MenuButton *menuButton = new MenuButton();
+		menuButton->box.pos = Vec(112, 2);
+		menuButton->box.size = Vec(16, 16);
+		backPanel->addChild(menuButton);
 
 		deleteConfirmPanel = new BackPanel();
 		deleteConfirmPanel->box.pos = backPanel->box.pos;
@@ -454,13 +475,13 @@ struct WM101 : SizeableModuleWidget {
 		deleteConfirmPanel->addChild(deleteLabel);
 		
 		deleteOkButton = new RectButton();
-		deleteOkButton->box.pos = Vec(15, box.size.y - 90);
+		deleteOkButton->box.pos = Vec(5, 250);
 		deleteOkButton->box.size = Vec(55, 19);
 		deleteOkButton->label = "OK";
 		deleteConfirmPanel->addChild(deleteOkButton);
 		
 		deleteCancelButton = new RectButton();
-		deleteCancelButton->box.pos = Vec(box.size.x - 90, box.size.y - 90);
+		deleteCancelButton->box.pos = Vec(70, 250);
 		deleteCancelButton->box.size = Vec(55, 19);
 		deleteCancelButton->label = "Cancel";
 		deleteConfirmPanel->addChild(deleteCancelButton);
