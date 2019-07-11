@@ -276,19 +276,19 @@ struct EditPanel : BackPanel {
 	EventSlider *b;
 	EditPanel() {
 		r = new EventSlider();
-		r->box.pos = Vec(5, 100);
-		r->box.size = Vec(100, 21);
+		r->box.pos = Vec(10, 105);
+		r->box.size = Vec(110, 19);
 		addChild(r);
 		g = new EventSlider();
-		g->box.pos = Vec(5, 130);
-		g->box.size = Vec(100, 21);
+		g->box.pos = Vec(10, 145);
+		g->box.size = Vec(110, 19);
 		addChild(g);
 		b = new EventSlider();
-		b->box.pos = Vec(5, 160);
-		b->box.size = Vec(100, 21);
+		b->box.pos = Vec(10, 185);
+		b->box.size = Vec(110, 19);
 		addChild(b);
 		RectButton *saveButton = new RectButton();
-		saveButton->box.pos = Vec(15, 260);
+		saveButton->box.pos = Vec(5, 250);
 		saveButton->box.size = Vec(55, 19);
 		saveButton->label = "Save";
 		saveButton->clickHandler = [=](){
@@ -299,7 +299,7 @@ struct EditPanel : BackPanel {
 		addChild(saveButton);
 		
 		RectButton *cancelButton = new RectButton();
-		cancelButton->box.pos = Vec(120, 260);
+		cancelButton->box.pos = Vec(70, 250);
 		cancelButton->box.size = Vec(55, 19);
 		cancelButton->label = "Cancel";
 		cancelButton->clickHandler = [=](){
@@ -309,8 +309,47 @@ struct EditPanel : BackPanel {
 		};
 		addChild(cancelButton);
 	}
+	void drawBackground(NVGcontext *vg, float r1, float r2, float g1, float g2, float b1, float b2, float y) {
+		NVGpaint grad = nvgLinearGradient(vg, r->box.pos.x + 5, 100, r->box.size.x - 10, 100, nvgRGBf(r1, g1, b1), nvgRGBf(r2, g2, b2));
+		nvgBeginPath(vg);
+		nvgFillPaint(vg, grad);
+		nvgRect(vg, r->box.pos.x, y, r->box.size.x, 10);
+		nvgFill(vg);
+	}
 	void draw(const DrawArgs &args) override {
 		BackPanel::draw(args);
+		NVGcolor color = nvgRGBf(r->value, g->value, b->value);
+		NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, 12, 12);
+		nvgQuadTo(args.vg, box.size.x / 2, 150, box.size.x - 12, 12);
+		nvgStrokeColor(args.vg, colorOutline);
+		nvgStrokeWidth(args.vg, 5);
+		nvgStroke(args.vg);
+
+		nvgStrokeColor(args.vg, color);
+		nvgStrokeWidth(args.vg, 3);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, 12, 12, 9);
+		nvgCircle(args.vg, box.size.x - 12, 12, 9);
+		nvgFillColor(args.vg, color);
+		nvgFill(args.vg);
+
+		nvgStrokeWidth(args.vg, 1.0);
+		nvgStrokeColor(args.vg, colorOutline);
+		nvgStroke(args.vg);
+	
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, 12, 12, 5);
+		nvgCircle(args.vg, box.size.x - 12, 12, 5);
+		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
+		nvgFill(args.vg);
+
+		drawBackground(args.vg, 0, 1, g->value, g->value, b->value, b->value, 109.5f);	
+		drawBackground(args.vg, r->value, r->value, 0, 1, b->value, b->value, 149.5f);
+		drawBackground(args.vg, r->value, r->value, g->value, g->value, 0, 1, 189.5f);
 	}
 };
 
@@ -374,9 +413,9 @@ struct WM101 : SizeableModuleWidget {
 	EventSlider *rSlider;
 	
 	ScrollWidget *scrollWidget;
-	WM101(Module *module) : SizeableModuleWidget(module, 180) {
+	WM101(Module *module) : SizeableModuleWidget(module, 150) {
 		minButton = new MinButton();
-		minButton->box.pos = Vec(170,180);
+		minButton->box.pos = Vec(140,180);
 		minButton->mw = this;
 		addChild(minButton); 
 		backPanel = new BackPanel();
