@@ -424,6 +424,7 @@ struct WM101 : SizeableModuleWidget {
 	MinButton *minButton;
 	BackPanel *backPanel;
 	BackPanel *deleteConfirmPanel;
+	BackPanel *settingsPanel;
 	RectButton *deleteCancelButton;
 	RectButton *deleteOkButton;
 	EditPanel *editPanel;
@@ -460,6 +461,10 @@ struct WM101 : SizeableModuleWidget {
 		MenuButton *menuButton = new MenuButton();
 		menuButton->box.pos = Vec(112, 2);
 		menuButton->box.size = Vec(16, 16);
+		menuButton->clickHandler = [=]() {
+			this->addMenu();
+		};
+		menuButton->rightClickHandler = menuButton->clickHandler;
 		backPanel->addChild(menuButton);
 
 		deleteConfirmPanel = new BackPanel();
@@ -495,6 +500,21 @@ struct WM101 : SizeableModuleWidget {
 		};
 		addChild(editPanel);
 		
+		settingsPanel = new BackPanel();
+		settingsPanel->box.pos = backPanel->box.pos;
+		settingsPanel->box.size = backPanel->box.size;
+		settingsPanel->visible = false;
+		addChild(settingsPanel);
+	
+		RectButton *settingsButton = new RectButton();
+		settingsButton->box.pos = Vec(5, 250);
+		settingsButton->box.size = Vec(55, 19);
+		settingsButton->label = "Close";
+		settingsButton->clickHandler = [=]() {
+			this->cancel();
+		};
+		settingsPanel->addChild(settingsButton);
+
 		loadSettings();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
@@ -564,6 +584,22 @@ struct WM101 : SizeableModuleWidget {
 	}
 	bool isLast(WireButton *wb) {
 		return scrollWidget->container->children.back() == wb;
+	}
+	void addMenu() {
+		Menu *menu = createMenu();
+		EventMenuItem *add = new EventMenuItem();
+		add->text = "Add new color";
+		add->clickHandler = [=]() {
+			this->editDialog(NULL);	
+		};
+		menu->addChild(add);
+
+		EventMenuItem *settings = new EventMenuItem();
+		settings->text = "Settings";
+		settings->clickHandler = [=]() {
+			this->settingsDialog();
+		};
+		menu->addChild(settings);
 	}
 	void addWireMenu(WireButton *wb) {
 		Menu *menu = createMenu();
@@ -640,11 +676,16 @@ struct WM101 : SizeableModuleWidget {
 	void cancel() {
 		backPanel->visible = true;
 		editPanel->visible = false;
+		settingsPanel->visible = false;
 		deleteConfirmPanel->visible = false;
 	}
 	void deleteOk(WireButton *wb) {
 		this->deleteWire(wb);
 		cancel();
+	}
+	void settingsDialog() {
+		backPanel->visible = false;
+		settingsPanel->visible = true;
 	}
 	void editDialog(WireButton *wb) {
 		backPanel->visible = false;
