@@ -174,7 +174,7 @@ struct EventSlider : OpaqueWidget {
 
 struct CheckBox : EventButton {
 	std::string label;
-	int selected = false;
+	bool selected = false;
 	std::function<void()> changeHandler;
 	CheckBox() {
 		clickHandler = [=]() { 
@@ -206,6 +206,42 @@ struct CheckBox : EventButton {
 		nvgRect(args.vg, box.size.y / 2 - 7, box.size.y / 2 - 8, 16, 16);
 		nvgStroke(args.vg);
 		OpaqueWidget::draw(args);
+	}
+};
+
+struct EventRadioButton : EventButton {
+	std::string label;
+	bool selected = false;
+	std::function<void()> changeHandler;
+	EventRadioButton() {
+		clickHandler = [=]() {
+			if (selected)
+				return;
+			selected = true;
+			if (changeHandler) {
+				changeHandler();
+			}
+		};
+	}
+	void draw (const DrawArgs &args) override {
+		nvgStrokeWidth(args.vg, 1);
+		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		if (!label.empty()) {
+			nvgFontFaceId(args.vg, APP->window->uiFont->handle);
+			nvgFontSize(args.vg, 13);
+			nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
+			nvgText(args.vg, 21, box.size.y / 2, label.c_str(), NULL);
+		}
+		if (selected) {
+			nvgBeginPath(args.vg);
+			nvgCircle(args.vg, box.size.y / 2 + 1, box.size.y / 2, 5);
+			nvgFill(args.vg);
+		}
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, box.size.y / 2 + 1, box.size.y / 2, 8);
+		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		nvgStroke(args.vg);
+		EventButton::draw(args);
 	}
 };
 
@@ -421,14 +457,28 @@ struct WireButton : EventButton {
 };
 
 struct WM101 : SizeableModuleWidget {
+
+	enum {
+		HIGHLIGHT_OFF,
+		HIGHLIGHT_LOW,
+		HIGHLIGHT_ON
+	};
+
 	MinButton *minButton;
 	BackPanel *backPanel;
 	BackPanel *deleteConfirmPanel;
-	BackPanel *settingsPanel;
 	RectButton *deleteCancelButton;
 	RectButton *deleteOkButton;
 	EditPanel *editPanel;
-	EventSlider *rSlider;
+	BackPanel *settingsPanel;
+	EventRadioButton *highlightOff;
+	EventRadioButton *highlightLow;
+	EventRadioButton *highlightOn;
+	EventSlider *highlightSlider;
+	CheckBox *varyCheck;
+	EventSlider *varyH;
+	EventSlider *varyS;
+	EventSlider *varyL;
 	
 	ScrollWidget *scrollWidget;
 	WM101(Module *module) : SizeableModuleWidget(module, 150) {
@@ -505,7 +555,89 @@ struct WM101 : SizeableModuleWidget {
 		settingsPanel->box.size = backPanel->box.size;
 		settingsPanel->visible = false;
 		addChild(settingsPanel);
+
+		varyCheck = new CheckBox();
+		varyCheck->label = "Variation";
+		varyCheck->box.pos = Vec(10, 5);
+		varyCheck->box.size = Vec(box.size.x - 40, 19);
+		settingsPanel->addChild(varyCheck);
+
+		EventLabel *hLabel = new EventLabel();
+		hLabel->label = "H";
+		hLabel->box.pos = Vec(10, 25);
+		hLabel->box.size = Vec(10, 19);
+		settingsPanel->addChild(hLabel);
 	
+		EventLabel *sLabel = new EventLabel();
+		sLabel->label = "S";
+		sLabel->box.pos = Vec(10, 45);
+		sLabel->box.size = Vec(10, 19);
+		settingsPanel->addChild(sLabel);
+	
+		EventLabel *lLabel = new EventLabel();
+		lLabel->label = "L";
+		lLabel->box.pos = Vec(10, 65);
+		lLabel->box.size = Vec(10, 19);
+		settingsPanel->addChild(lLabel);
+
+		varyH = new EventSlider();
+		varyH->box.pos = Vec(20, 25);
+		varyH->box.size = Vec(box.size.x - 50, 19);
+		varyH->value = 0.1f;
+		settingsPanel->addChild(varyH);
+	
+		varyS = new EventSlider();
+		varyS->box.pos = Vec(20, 45);
+		varyS->box.size = Vec(box.size.x - 50, 19);
+		varyS->value = 0.1f;
+		settingsPanel->addChild(varyS);
+	
+		varyL = new EventSlider();
+		varyL->box.pos = Vec(20, 65);
+		varyL->box.size = Vec(box.size.x - 50, 19);
+		varyL->value = 0.1f;
+		settingsPanel->addChild(varyL);
+	
+		EventLabel *highlightLabel = new EventLabel();
+		highlightLabel->label = "Highlighting";
+		highlightLabel->box.pos = Vec(10, 105);
+		highlightLabel->box.size = Vec(box.size.x - 40, 19);
+		settingsPanel->addChild(highlightLabel);
+
+		highlightOff = new EventRadioButton();
+		highlightOff->label = "Off";
+		highlightOff->box.pos = Vec(10, 125);
+		highlightOff->box.size = Vec(box.size.x - 40, 19);
+		highlightOff->selected = true;
+		highlightOff->changeHandler = [=]() {
+			this->highlightChanged(HIGHLIGHT_OFF);
+		};
+		settingsPanel->addChild(highlightOff);
+
+		highlightLow = new EventRadioButton();
+		highlightLow->label = "When hovering";
+		highlightLow->box.pos = Vec(10, 145);
+		highlightLow->box.size = Vec(box.size.x - 40, 19);
+		highlightLow->changeHandler = [=]() {
+			this->highlightChanged(HIGHLIGHT_LOW);
+		};
+		settingsPanel->addChild(highlightLow);
+
+		highlightOn = new EventRadioButton();
+		highlightOn->label = "Always On";
+		highlightOn->box.pos = Vec(10, 165);
+		highlightOn->box.size = Vec(box.size.x - 40, 19);
+		highlightOn->changeHandler = [=]() {
+			this->highlightChanged(HIGHLIGHT_ON);
+		};
+		settingsPanel->addChild(highlightOn);
+
+		highlightSlider = new EventSlider();
+		highlightSlider->box.pos = Vec(10, 185);
+		highlightSlider->box.size = Vec(box.size.x - 40, 21);
+		highlightSlider->value = 0.1f;
+		settingsPanel->addChild(highlightSlider);
+
 		RectButton *settingsButton = new RectButton();
 		settingsButton->box.pos = Vec(5, 250);
 		settingsButton->box.size = Vec(55, 19);
@@ -514,6 +646,7 @@ struct WM101 : SizeableModuleWidget {
 			this->cancel();
 		};
 		settingsPanel->addChild(settingsButton);
+
 
 		loadSettings();
 	}
@@ -709,6 +842,24 @@ struct WM101 : SizeableModuleWidget {
 			editPanel->b->value = 0.5f;
 		}
 		editPanel->visible = true;
+	}
+	void highlightChanged(int value) {
+		highlightOff->selected = false;
+		highlightLow->selected = false;
+		highlightOn->selected = false;
+		switch (value) {
+			case HIGHLIGHT_OFF:
+			highlightOff->selected = true;
+			break;
+			
+			case HIGHLIGHT_LOW:
+			highlightLow->selected = true;
+			break;
+		
+			case HIGHLIGHT_ON:
+			highlightOn->selected = true;
+			break;
+		}
 	}
 };
 
