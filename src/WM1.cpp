@@ -120,7 +120,6 @@ struct EventSlider : OpaqueWidget {
 	float maxValue = 1.0f;
 	std::function<void(float)> changeHandler;
 	void draw(const DrawArgs &args) override {
-		DEBUG("%f", value);
 		Vec minHandlePos;
 		Vec maxHandlePos;
 		float width;
@@ -463,6 +462,7 @@ struct WM101 : SizeableModuleWidget {
 		HIGHLIGHT_LOW,
 		HIGHLIGHT_ON
 	};
+	int highlight;
 
 	MinButton *minButton;
 	BackPanel *backPanel;
@@ -704,7 +704,65 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0x80, 0x36, 0x10), false);
 	}
 	void loadSettings() {
-		setDefaults();
+		json_error_t error;
+		FILE *file = fopen(asset::user("SubmarineFree/WM-101.json").c_str(), "r");
+		if (!file) {
+			file = fopen(asset::user("SubmarineUtility/WireManager.json").c_str(), "r");
+		}
+		if (!file) {
+			setDefaults();
+			return;
+		}
+		json_t *rootJ = json_loadf(file, 0, &error);
+		fclose(file);
+		if (!rootJ) {
+			WARN("Submarine Free WM-101: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+			return;
+		}
+		json_t *arr = json_object_get(rootJ, "colors");
+		if (arr) {
+			int size = json_array_size(arr);
+			for (int i = 0; i < size; i++) {
+				json_t *j1 = json_array_get(arr, i);
+				if (j1) {
+					json_t *c1 = json_object_get(j1, "color");
+					if (c1) {
+						int selected = false;
+						json_t *s1 = json_object_get(j1, "selected");
+						if (s1) {
+							selected = json_number_value(s1);
+						}
+						addColor(color::fromHexString(json_string_value(c1)), selected);
+					}
+				}
+			}
+		}
+		json_t *h1 = json_object_get(rootJ, "highlight");
+		if (h1) {
+			highlight = json_number_value(h1);
+			highlightChanged(highlight);
+		}
+		json_t *t1 = json_object_get(rootJ, "highlight_trans");
+		if (t1) {
+			highlightSlider->value = json_number_value(t1);
+		}
+		json_t *v1 = json_object_get(rootJ, "variation");
+		if (v1) {
+			varyCheck->selected = json_number_value(v1);
+		}
+		v1 = json_object_get(rootJ, "variationH");
+		if (v1) {
+			varyH->value = json_number_value(v1);
+		}
+		v1 = json_object_get(rootJ, "variationS");
+		if (v1) {
+			varyS->value = json_number_value(v1);
+		}
+		v1 = json_object_get(rootJ, "variationL");
+		if (v1) {
+			varyL->value = json_number_value(v1);
+		}
+		json_decref(rootJ);
 	}
 	void checkAll(bool selected) {
 		for (Widget *widget : scrollWidget->container->children) {
