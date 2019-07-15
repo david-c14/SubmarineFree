@@ -560,6 +560,7 @@ struct WM101 : SizeableModuleWidget {
 		varyCheck->label = "Variation";
 		varyCheck->box.pos = Vec(10, 5);
 		varyCheck->box.size = Vec(box.size.x - 40, 19);
+		varyCheck->changeHandler = [=]() { this->saveSettings(); };
 		settingsPanel->addChild(varyCheck);
 
 		EventLabel *hLabel = new EventLabel();
@@ -584,18 +585,21 @@ struct WM101 : SizeableModuleWidget {
 		varyH->box.pos = Vec(20, 25);
 		varyH->box.size = Vec(box.size.x - 50, 19);
 		varyH->value = 0.1f;
+		varyH->changeHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyH);
 	
 		varyS = new EventSlider();
 		varyS->box.pos = Vec(20, 45);
 		varyS->box.size = Vec(box.size.x - 50, 19);
 		varyS->value = 0.1f;
+		varyS->changeHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyS);
 	
 		varyL = new EventSlider();
 		varyL->box.pos = Vec(20, 65);
 		varyL->box.size = Vec(box.size.x - 50, 19);
 		varyL->value = 0.1f;
+		varyL->changeHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyL);
 	
 		EventLabel *highlightLabel = new EventLabel();
@@ -611,6 +615,7 @@ struct WM101 : SizeableModuleWidget {
 		highlightOff->selected = true;
 		highlightOff->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_OFF);
+			this->saveSettings();
 		};
 		settingsPanel->addChild(highlightOff);
 
@@ -620,6 +625,7 @@ struct WM101 : SizeableModuleWidget {
 		highlightLow->box.size = Vec(box.size.x - 40, 19);
 		highlightLow->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_LOW);
+			this->saveSettings();
 		};
 		settingsPanel->addChild(highlightLow);
 
@@ -629,6 +635,7 @@ struct WM101 : SizeableModuleWidget {
 		highlightOn->box.size = Vec(box.size.x - 40, 19);
 		highlightOn->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_ON);
+			this->saveSettings();
 		};
 		settingsPanel->addChild(highlightOn);
 
@@ -636,6 +643,7 @@ struct WM101 : SizeableModuleWidget {
 		highlightSlider->box.pos = Vec(10, 185);
 		highlightSlider->box.size = Vec(box.size.x - 40, 21);
 		highlightSlider->value = 0.1f;
+		highlightSlider->changeHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(highlightSlider);
 
 		RectButton *settingsButton = new RectButton();
@@ -646,7 +654,6 @@ struct WM101 : SizeableModuleWidget {
 			this->cancel();
 		};
 		settingsPanel->addChild(settingsButton);
-
 
 		loadSettings();
 	}
@@ -685,10 +692,14 @@ struct WM101 : SizeableModuleWidget {
 		wb->box.size = Vec(scrollWidget->box.size.x, 21);
 		wb->color = color;
 		wb->checkBox->selected = selected;
+		wb->checkBox->changeHandler = [=]() {
+			this->saveSettings();
+		};
 		wb->rightClickHandler = [=]() {
 			this->addWireMenu(wb);
 		};
 		scrollWidget->container->addChild(wb);
+		saveSettings();
 	}
 	void setDefaults() {
 		for (NVGcolor color : settings::cableColors) {
@@ -730,7 +741,7 @@ struct WM101 : SizeableModuleWidget {
 						int selected = false;
 						json_t *s1 = json_object_get(j1, "selected");
 						if (s1) {
-							selected = json_number_value(s1);
+							selected = clamp((int)json_number_value(s1), 0, 1);
 						}
 						addColor(color::fromHexString(json_string_value(c1)), selected);
 					}
@@ -739,36 +750,65 @@ struct WM101 : SizeableModuleWidget {
 		}
 		json_t *h1 = json_object_get(rootJ, "highlight");
 		if (h1) {
-			highlight = json_number_value(h1);
+			highlight = clamp((int)json_number_value(h1), 0, 2);
 			highlightChanged(highlight);
 		}
 		json_t *t1 = json_object_get(rootJ, "highlight_trans");
 		if (t1) {
-			highlightSlider->value = json_number_value(t1);
+			highlightSlider->value = clamp(json_number_value(t1), 0.0f, 1.0f);
 		}
 		json_t *v1 = json_object_get(rootJ, "variation");
 		if (v1) {
-			varyCheck->selected = json_number_value(v1);
+			varyCheck->selected = clamp((int)json_number_value(v1), 0, 1);
 		}
 		v1 = json_object_get(rootJ, "variationH");
 		if (v1) {
-			varyH->value = json_number_value(v1);
+			DEBUG("%f", clamp(json_number_value(v1), 0, 1));
+			varyH->value = clamp(json_number_value(v1), 0.0f, 1.0f);
 		}
 		v1 = json_object_get(rootJ, "variationS");
 		if (v1) {
-			varyS->value = json_number_value(v1);
+			varyS->value = clamp(json_number_value(v1), 0.0f, 1.0f);
 		}
 		v1 = json_object_get(rootJ, "variationL");
 		if (v1) {
-			varyL->value = json_number_value(v1);
+			varyL->value = clamp(json_number_value(v1), 0.0f, 1.0f);
 		}
 		json_decref(rootJ);
+	}
+	void saveSettings() {
+		json_t *settings = json_object();
+		json_t *arr = json_array();
+		for (Widget *w : scrollWidget->container->children) {
+			WireButton *wb = dynamic_cast<WireButton *>(w);
+			json_t *color = json_object();
+			std::string s = color::toHexString(wb->color);
+			json_object_set_new(color, "color", json_string(s.c_str()));
+			json_object_set_new(color,"selected", json_real(wb->checkBox->selected));
+			json_array_append_new(arr, color);
+		}
+		json_object_set_new(settings, "colors", arr);
+		json_object_set_new(settings, "highlight", json_real(highlight));
+		json_object_set_new(settings, "highlight_trans", json_real(highlightSlider->value));
+		json_object_set_new(settings, "variation", json_real(varyCheck->selected));
+		json_object_set_new(settings, "variationH", json_real(varyH->value));
+		json_object_set_new(settings, "variationS", json_real(varyS->value));
+		json_object_set_new(settings, "variationL", json_real(varyL->value));
+		system::createDirectory(asset::user("SubmarineFree"));
+		std::string settingsFilename = asset::user("SubmarineFree/WM-101.json");
+		FILE *file = fopen(settingsFilename.c_str(), "w");
+		if (file) {
+			json_dumpf(settings, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+			fclose(file);
+		}
+		json_decref(settings);
 	}
 	void checkAll(bool selected) {
 		for (Widget *widget : scrollWidget->container->children) {
 			WireButton *wb = dynamic_cast<WireButton *>(widget);
 			wb->checkBox->selected = selected;
 		}
+		saveSettings();
 	}
 	bool isFirst(WireButton *wb) {
 		return scrollWidget->container->children.front() == wb;
@@ -791,6 +831,42 @@ struct WM101 : SizeableModuleWidget {
 			this->settingsDialog();
 		};
 		menu->addChild(settings);
+	
+		EventMenuItem *var = new EventMenuItem();
+		var->text = "Variations";
+		var->rightText = CHECKMARK(varyCheck->selected);
+		var->clickHandler = [=]() {
+			varyCheck->selected = !(varyCheck->selected);
+			saveSettings();
+		};
+		menu->addChild(var);
+
+		EventMenuItem *hOff = new EventMenuItem();
+		hOff->text = "Highlight Off";
+		hOff->rightText = CHECKMARK(highlight == HIGHLIGHT_OFF);
+		hOff->clickHandler = [=]() {
+			highlightChanged(HIGHLIGHT_OFF);
+			saveSettings();
+		};
+		menu->addChild(hOff);
+
+		EventMenuItem *hLow = new EventMenuItem();
+		hLow->text = "Highlight When Hovering";
+		hLow->rightText = CHECKMARK(highlight == HIGHLIGHT_LOW);
+		hLow->clickHandler = [=]() {
+			highlightChanged(HIGHLIGHT_LOW);
+			saveSettings();
+		};
+		menu->addChild(hLow);
+
+		EventMenuItem *hOn = new EventMenuItem();
+		hOn->text = "Highlight Always";
+		hOn->rightText = CHECKMARK(highlight == HIGHLIGHT_ON);
+		hOn->clickHandler = [=]() {
+			highlightChanged(HIGHLIGHT_ON);
+			saveSettings();
+		};
+		menu->addChild(hOn);
 	}
 	void addWireMenu(WireButton *wb) {
 		Menu *menu = createMenu();
@@ -830,6 +906,7 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->container->removeChild(wb);
 		delete wb;
 		reflow();
+		saveSettings();
 	}
 	void reflow() {
 		unsigned int y = 0;
@@ -853,6 +930,7 @@ struct WM101 : SizeableModuleWidget {
 		bool sel = wb1->checkBox->selected;
 		wb1->checkBox->selected = wb2->checkBox->selected;
 		wb2->checkBox->selected = sel;
+		saveSettings();
 	}
 	void deleteDialog(WireButton *wb) {
 		deleteCancelButton->clickHandler = [=]() {
@@ -887,6 +965,7 @@ struct WM101 : SizeableModuleWidget {
 			else {
 				addColor(col, false);
 			}
+			saveSettings();
 			cancel();
 		};
 		if (wb) {
@@ -902,6 +981,7 @@ struct WM101 : SizeableModuleWidget {
 		editPanel->visible = true;
 	}
 	void highlightChanged(int value) {
+		highlight = value;
 		highlightOff->selected = false;
 		highlightLow->selected = false;
 		highlightOn->selected = false;
