@@ -466,6 +466,7 @@ struct WM101 : SizeableModuleWidget {
 
 	MinButton *minButton;
 	BackPanel *backPanel;
+	CheckBox *checkBoxAll;
 	BackPanel *deleteConfirmPanel;
 	RectButton *deleteCancelButton;
 	RectButton *deleteOkButton;
@@ -494,7 +495,7 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->box.pos = Vec(0, 21);
 		scrollWidget->box.size = Vec(backPanel->box.size.x, backPanel->box.size.y - 21);
 		backPanel->addChild(scrollWidget);
-		CheckBox *checkBoxAll = new CheckBox();
+		checkBoxAll = new CheckBox();
 		checkBoxAll->box.pos = Vec(1,1);
 		checkBoxAll->box.size = Vec(19, 19);
 		checkBoxAll->changeHandler = [=](){
@@ -647,7 +648,7 @@ struct WM101 : SizeableModuleWidget {
 		settingsPanel->addChild(highlightSlider);
 
 		RectButton *settingsButton = new RectButton();
-		settingsButton->box.pos = Vec(5, 250);
+		settingsButton->box.pos = Vec(37.5, 250);
 		settingsButton->box.size = Vec(55, 19);
 		settingsButton->label = "Close";
 		settingsButton->clickHandler = [=]() {
@@ -818,12 +819,35 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void addMenu() {
 		Menu *menu = createMenu();
+
+		menu->addChild(new MenuLabel());
+
+		EventMenuItem *cAll = new EventMenuItem();
+		cAll->text = "Select All Colors";
+		cAll->clickHandler = [=]() {
+			checkBoxAll->selected = true;
+			checkAll(true);
+		};
+		menu->addChild(cAll);
+
+		EventMenuItem *uAll = new EventMenuItem();
+		uAll->text = "Unselect All Colors";
+		uAll->clickHandler = [=]() {
+			checkBoxAll->selected = false;
+			checkAll(false);
+		};
+		menu->addChild(uAll);
+
+		menu->addChild(new MenuLabel());
+
 		EventMenuItem *add = new EventMenuItem();
 		add->text = "Add new color";
 		add->clickHandler = [=]() {
 			this->editDialog(NULL);	
 		};
 		menu->addChild(add);
+		
+		menu->addChild(new MenuLabel());
 
 		EventMenuItem *settings = new EventMenuItem();
 		settings->text = "Settings";
@@ -832,6 +856,8 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(settings);
 	
+		menu->addChild(new MenuLabel());
+
 		EventMenuItem *var = new EventMenuItem();
 		var->text = "Variations";
 		var->rightText = CHECKMARK(varyCheck->selected);
