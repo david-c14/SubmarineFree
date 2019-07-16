@@ -1,5 +1,73 @@
 #include <settings.hpp>
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+#include <atomic>
 #include "SubmarineFree.hpp"
+
+struct VIPMutex {
+	int count;
+	std::condition_variable cv;
+	std::mutex countMutex;
+	void wait() {
+	}
+};
+
+struct EngineWorker {
+	Engine *engine;
+	int id;
+	std::thread thread;
+	bool running;
+
+	void start() {
+	}
+	void stop() {
+	}
+	void join() {
+	}
+	void run();
+};
+
+struct HybridBarrier {
+	std::atomic<int> count {0};
+	int total;
+	std::mutex mutex;
+	std::condition_variable cv;
+	std::atomic<bool> yield {false};
+	
+	void wait() {
+	}
+};
+
+struct Engine::Internal {
+	std::vector<Module*> modules;	
+	std::vector<Cable*> cables;
+	std::set<ParamHandle*> paramHandles;
+	std::map<std::tuple<int, int>, ParamHandle*> paramHandleCache;
+	bool paused;
+	bool running;
+	float sampleRate;
+	float sampleTime;
+	uint64_t frame;
+	
+	int nextModuleId;
+	int nextCableId;
+	
+	Module *smoothModule;
+	int smoothParamId;
+	float smoothValue;
+	
+	std::recursive_mutex mutex;
+	std::thread thread;
+	VIPMutex vipMutex;
+
+	bool realTime;
+	int threadCount;
+	std::vector<EngineWorker> workers;
+	HybridBarrier engineBarrier;
+	HybridBarrier workerBarrier;
+	std::atomic<int> workerModuleIndex;
+};
 
 struct EventButton : OpaqueWidget {
 	std::function<void ()> clickHandler;
@@ -464,6 +532,11 @@ struct WM101 : SizeableModuleWidget {
 	};
 	int highlight;
 
+	int lastWireId;
+	int cableCount = 0;
+	Widget *lastCable = NULL;
+	unsigned int newColorIndex = 0;
+
 	MinButton *minButton;
 	BackPanel *backPanel;
 	CheckBox *checkBoxAll;
@@ -676,8 +749,58 @@ struct WM101 : SizeableModuleWidget {
 	void step() override {
 		if (!stabilized) {
 			stabilized = true;
+			//lastWireId = APP->engine->internal->nextCableId;
+			cableCount = APP->scene->rack->cableContainer->children.size();
+		}
+		int newSize = APP->scene->rack->cableContainer->children.size();
+		if (newSize < cableCount) {
+			cableCount = newSize;
+			if (cableCount) 
+				lastCable = APP->scene->rack->cableContainer->children.back();
+			else
+				lastCable = NULL;
+		}
+		else if (newSize > cableCount) {
+			std::list<Widget *>::reverse_iterator iterator = APP->scene->rack->cableContainer->children.rbegin();
+			for (int i = 0; i < newSize - cableCount; i++) {
+				colorCable(*iterator);
+				++iterator;
+			}
+			cableCount = newSize;
+			if (cableCount)
+				lastCable = APP->scene->rack->cableContainer->children.back();
+			else
+				lastCable = NULL;
+			
 		}
 		SizeableModuleWidget::step();
+	}
+	void colorCable(Widget *widget) {
+		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
+		cable->color = findColor(cable->color);
+		if (varyCheck->selected) {
+			cable->color = varyColor(cable->color);
+		}
+	}
+	NVGcolor findColor(NVGcolor color) {
+		auto vi = scrollWidget->container->children.begin();
+		std::advance(vi, newColorIndex);
+		for (int i = 0; i < 2; i++) {
+			while(newColorIndex < scrollWidget->container->children.size()) {
+				newColorIndex++;
+				WireButton *wb = dynamic_cast<WireButton *>(*vi);
+				if (wb->checkBox->selected) {
+					return wb->color;
+				}
+				std::advance(vi, 1);
+			}
+			newColorIndex = 0;
+			vi = scrollWidget->container->children.begin();
+		}
+		return color;
+	}
+	NVGcolor varyColor(NVGcolor color) {
+		return color;
 	}
 	void onResize() override {
 		bool small = this->box.size.x < 16.0f;
@@ -764,7 +887,6 @@ struct WM101 : SizeableModuleWidget {
 		}
 		v1 = json_object_get(rootJ, "variationH");
 		if (v1) {
-			DEBUG("%f", clamp(json_number_value(v1), 0, 1));
 			varyH->value = clamp(json_number_value(v1), 0.0f, 1.0f);
 		}
 		v1 = json_object_get(rootJ, "variationS");
