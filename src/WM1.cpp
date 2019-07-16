@@ -1,73 +1,5 @@
 #include <settings.hpp>
-#include <thread>
-#include <condition_variable>
-#include <mutex>
-#include <atomic>
 #include "SubmarineFree.hpp"
-
-struct VIPMutex {
-	int count;
-	std::condition_variable cv;
-	std::mutex countMutex;
-	void wait() {
-	}
-};
-
-struct EngineWorker {
-	Engine *engine;
-	int id;
-	std::thread thread;
-	bool running;
-
-	void start() {
-	}
-	void stop() {
-	}
-	void join() {
-	}
-	void run();
-};
-
-struct HybridBarrier {
-	std::atomic<int> count {0};
-	int total;
-	std::mutex mutex;
-	std::condition_variable cv;
-	std::atomic<bool> yield {false};
-	
-	void wait() {
-	}
-};
-
-struct Engine::Internal {
-	std::vector<Module*> modules;	
-	std::vector<Cable*> cables;
-	std::set<ParamHandle*> paramHandles;
-	std::map<std::tuple<int, int>, ParamHandle*> paramHandleCache;
-	bool paused;
-	bool running;
-	float sampleRate;
-	float sampleTime;
-	uint64_t frame;
-	
-	int nextModuleId;
-	int nextCableId;
-	
-	Module *smoothModule;
-	int smoothParamId;
-	float smoothValue;
-	
-	std::recursive_mutex mutex;
-	std::thread thread;
-	VIPMutex vipMutex;
-
-	bool realTime;
-	int threadCount;
-	std::vector<EngineWorker> workers;
-	HybridBarrier engineBarrier;
-	HybridBarrier workerBarrier;
-	std::atomic<int> workerModuleIndex;
-};
 
 struct EventButton : OpaqueWidget {
 	std::function<void ()> clickHandler;
@@ -800,7 +732,40 @@ struct WM101 : SizeableModuleWidget {
 		return color;
 	}
 	NVGcolor varyColor(NVGcolor color) {
-		return color;
+		float r = color.r;
+		float g = color.g;
+		float b = color.b;
+		float a = color.a;
+
+	// convert to hsl
+		
+		float Cmax = std::max(r, std::max(g,b));
+		float Cmin = std::min(r, std::min(g,b));
+		float delta = Cmax - Cmin;
+
+		float h = 0;
+		float s = 0;
+		float l = (Cmax + Cmin) / 2;
+
+		if (delta > 0) {
+			s = delta / (1 - std::abs(l * 2 - 1));
+			if (Cmax == r) {
+				h = std::fmod(6 + (g-b)/delta, 6);
+			}
+			else if (Cmax == g) {
+				h = (b-r)/delta + 2;
+			}
+			else {
+				h = (r-g)/delta + 4;
+			}
+		}
+		
+	// Modify color
+
+		h = std::fmod(1 + h / 6 + (random::uniform() - 0.5f) * varyH->value, 1.0f);
+		s = rescale(random::uniform(), 0.0f, 1.0f, std::max(s - varyS->value, 0.0f), std::min(s + varyS->value, 1.0f));
+		l = rescale(random::uniform(), 0.0f, 1.0f, std::max(l - varyL->value, 0.0f), std::min(l + varyL->value, 1.0f));
+		return nvgHSLA(h, s, l, a * 255);
 	}
 	void onResize() override {
 		bool small = this->box.size.x < 16.0f;
