@@ -463,6 +463,8 @@ struct WM101 : SizeableModuleWidget {
 		HIGHLIGHT_ON
 	};
 	int highlight;
+	ModuleWidget *lastHover = NULL;
+	bool highlightIsDirty = true;
 
 	int lastWireId;
 	int cableCount = 0;
@@ -649,7 +651,10 @@ struct WM101 : SizeableModuleWidget {
 		highlightSlider->box.pos = Vec(10, 185);
 		highlightSlider->box.size = Vec(box.size.x - 40, 21);
 		highlightSlider->value = 0.1f;
-		highlightSlider->changeHandler = [=](float x) { this->saveSettings(); };
+		highlightSlider->changeHandler = [=](float x) { 
+			this->saveSettings();
+			highlightIsDirty = true; 
+		};
 		settingsPanel->addChild(highlightSlider);
 
 		RectButton *settingsButton = new RectButton();
@@ -662,6 +667,9 @@ struct WM101 : SizeableModuleWidget {
 		settingsPanel->addChild(settingsButton);
 
 		loadSettings();
+	}
+	~WM101() {
+		this->_delete();
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (this->box.size.x > 16.0f) {
@@ -703,9 +711,51 @@ struct WM101 : SizeableModuleWidget {
 				lastCable = APP->scene->rack->cableContainer->children.back();
 			else
 				lastCable = NULL;
-			
+			highlightIsDirty = true;		
 		}
+		highlightWires();
 		SizeableModuleWidget::step();
+	}
+	void highlightWires() {
+		ModuleWidget *focusedModuleWidget = nullptr;
+		if (highlight) {
+			if (APP->event && APP->event->hoveredWidget) {
+				focusedModuleWidget = dynamic_cast<ModuleWidget *>(APP->event->hoveredWidget);
+				if (!focusedModuleWidget)
+					focusedModuleWidget = APP->event->hoveredWidget->getAncestorOfType<ModuleWidget>();
+			}
+		}
+		if (focusedModuleWidget != lastHover) {
+			lastHover = focusedModuleWidget;
+			highlightIsDirty = true;
+		}
+		if (highlightIsDirty) {
+			highlightIsDirty = false;
+			for (Widget *widget : APP->scene->rack->cableContainer->children) {
+				CableWidget *cable = dynamic_cast<CableWidget *>(widget);
+				if (focusedModuleWidget) {
+					if (!cable->outputPort || !cable->inputPort) {
+						cable->color = nvgTransRGBA(cable->color, 0xFF);
+					}
+					else if (cable->outputPort->getAncestorOfType<ModuleWidget>() == focusedModuleWidget) {
+						cable->color = nvgTransRGBA(cable->color, 0xFF);
+					}
+					else if (cable->inputPort->getAncestorOfType<ModuleWidget>() == focusedModuleWidget) {
+						cable->color = nvgTransRGBA(cable->color, 0xFF);
+					}
+					else {
+						cable->color = nvgTransRGBAf(cable->color, highlightSlider->value);
+					}
+				}
+				else {
+					if (highlight == 2)
+						cable->color = nvgTransRGBAf(cable->color, highlightSlider->value);
+					else
+						cable->color = nvgTransRGBA(cable->color, 0xFF);
+				}
+
+			}
+		}
 	}
 	void colorCable(Widget *widget) {
 		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
@@ -1110,6 +1160,16 @@ struct WM101 : SizeableModuleWidget {
 			case HIGHLIGHT_ON:
 			highlightOn->selected = true;
 			break;
+		}
+		highlightIsDirty = true;
+	}
+	void _delete() {
+		if (!stabilized)
+			return;
+		if (highlight) {
+			highlight = HIGHLIGHT_OFF;
+			highlightIsDirty = true;
+			highlightWires();
 		}
 	}
 };
