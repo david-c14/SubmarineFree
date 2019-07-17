@@ -1,4 +1,5 @@
 #include <settings.hpp>
+#include <functional>
 #include "SubmarineFree.hpp"
 
 struct EventButton : OpaqueWidget {
