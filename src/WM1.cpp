@@ -1,6 +1,8 @@
 #include <settings.hpp>
 #include "SubmarineFree.hpp"
 
+Widget *masterWireManager = NULL;
+
 struct EventButton : OpaqueWidget {
 	std::function<void ()> clickHandler;
 	std::function<void ()> rightClickHandler;
@@ -487,6 +489,7 @@ struct WM101 : SizeableModuleWidget {
 	EventSlider *varyH;
 	EventSlider *varyS;
 	EventSlider *varyL;
+	BackPanel *blockingPanel;
 	
 	ScrollWidget *scrollWidget;
 	WM101(Module *module) : SizeableModuleWidget(module, 150) {
@@ -666,6 +669,24 @@ struct WM101 : SizeableModuleWidget {
 		};
 		settingsPanel->addChild(settingsButton);
 
+		blockingPanel = new BackPanel();
+		blockingPanel->box.pos = backPanel->box.pos;
+		blockingPanel->box.size = backPanel->box.size;
+		blockingPanel->visible = false;
+		addChild(blockingPanel);
+
+		EventLabel *blockingLabel = new EventLabel();
+		blockingLabel->label = "Another WM-101";
+		blockingLabel->box.pos = Vec(5, 100);
+		blockingLabel->box.size = Vec(120, 21);
+		blockingPanel->addChild(blockingLabel);
+
+		EventLabel *blockingLabel2 = new EventLabel();
+		blockingLabel2->label = "is Already Open";
+		blockingLabel2->box.pos = Vec(5, 113);
+		blockingLabel2->box.size = Vec(120, 21);
+		blockingPanel->addChild(blockingLabel2);
+
 		loadSettings();
 	}
 	~WM101() {
@@ -687,6 +708,21 @@ struct WM101 : SizeableModuleWidget {
 		}
 	}
 	void step() override {
+		if (module && masterWireManager != this) {
+			if (masterWireManager) {
+				blockingPanel->visible = true;
+				backPanel->visible = false;	
+				editPanel->visible = false;
+				settingsPanel->visible = false;
+				SizeableModuleWidget::step();
+				return;
+			}
+			blockingPanel->visible = false;
+			backPanel->visible = true;
+			masterWireManager = this;
+			scrollWidget->container->clearChildren();
+			loadSettings();
+		}
 		if (!stabilized) {
 			stabilized = true;
 			//lastWireId = APP->engine->internal->nextCableId;
@@ -838,7 +874,6 @@ struct WM101 : SizeableModuleWidget {
 			this->addWireMenu(wb);
 		};
 		scrollWidget->container->addChild(wb);
-		saveSettings();
 	}
 	void setDefaults() {
 		for (NVGcolor color : settings::cableColors) {
@@ -852,6 +887,7 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0x10, 0x0f, 0x12), false);
 		addColor(nvgRGB(0xff, 0x99, 0x41), false);
 		addColor(nvgRGB(0x80, 0x36, 0x10), false);
+		saveSettings();
 	}
 	void loadSettings() {
 		json_error_t error;
@@ -1164,6 +1200,9 @@ struct WM101 : SizeableModuleWidget {
 		highlightIsDirty = true;
 	}
 	void _delete() {
+		if (masterWireManager != this)
+			return;
+		masterWireManager = NULL;
 		if (!stabilized)
 			return;
 		if (highlight) {
