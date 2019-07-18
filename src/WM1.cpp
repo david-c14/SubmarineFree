@@ -978,7 +978,7 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(new MenuLabel());
 
 		EventMenuItem *add = new EventMenuItem();
-		add->text = "Add new color";
+		add->text = "Add New Color ...";
 		add->clickHandler = [=]() {
 			this->editDialog(NULL);	
 		};
@@ -987,7 +987,7 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(new MenuLabel());
 
 		EventMenuItem *settings = new EventMenuItem();
-		settings->text = "Settings";
+		settings->text = "Settings...";
 		settings->clickHandler = [=]() {
 			this->settingsDialog();
 		};
@@ -1037,7 +1037,7 @@ struct WM101 : SizeableModuleWidget {
 		label->text = "Color: " + color::toHexString(wb->color);
 		menu->addChild(label);
 		EventMenuItem *ed = new EventMenuItem();
-		ed->text = "Edit";
+		ed->text = "Edit...";
 		ed->clickHandler = [=]() {
 			this->editDialog(wb);
 		};
@@ -1059,7 +1059,7 @@ struct WM101 : SizeableModuleWidget {
 			menu->addChild(md);
 		}
 		EventMenuItem *dm = new EventMenuItem();
-		dm->text = "Delete";
+		dm->text = "Delete...";
 		dm->clickHandler = [=]() {
 			this->deleteDialog(wb);
 		};
