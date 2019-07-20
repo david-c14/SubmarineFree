@@ -2,6 +2,8 @@
 #include <functional>
 #include "SubmarineFree.hpp"
 
+Widget *masterWireManager = NULL;
+
 struct EventButton : OpaqueWidget {
 	std::function<void ()> clickHandler;
 	std::function<void ()> rightClickHandler;
@@ -71,6 +73,7 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 		if (widthJ)
 			box.size.x = json_number_value(widthJ);
 		Minimize(box.size.x < 16.0f);
+		APP->scene->rack->requestModulePos(this, box.pos);
 	}
 	virtual void onResize() {
 	}
@@ -119,7 +122,9 @@ struct EventSlider : OpaqueWidget {
 	float value = 0.5f;
 	float minValue = 0.0f;
 	float maxValue = 1.0f;
-	std::function<void(float)> changeHandler;
+	float defaultValue = 0.5f;
+	std::function<void(float)> changedHandler;
+	std::function<void(float)> changingHandler;
 	void draw(const DrawArgs &args) override {
 		Vec minHandlePos;
 		Vec maxHandlePos;
@@ -161,15 +166,23 @@ struct EventSlider : OpaqueWidget {
 		value += e.mouseDelta.x * (maxValue - minValue) * 0.001f;
 		value = clamp(value, minValue, maxValue);
 		if (oldValue != value) {
-			if (changeHandler) {
-				changeHandler(value);
+			if (changingHandler) {
+				changingHandler(value);
 			}
 		}
 	}
 	void onDragEnd(const event::DragEnd &e) override {
 		APP->window->cursorUnlock();
+		if (changedHandler) {
+			changedHandler(value);
+		}
 	}
-
+	void onDoubleClick(const event::DoubleClick &e) override {
+		value = defaultValue;
+		if (changedHandler) {
+			changedHandler(value);
+		}
+	}
 };
 
 struct CheckBox : EventButton {
@@ -467,7 +480,6 @@ struct WM101 : SizeableModuleWidget {
 	ModuleWidget *lastHover = NULL;
 	bool highlightIsDirty = true;
 
-	int lastWireId;
 	int cableCount = 0;
 	Widget *lastCable = NULL;
 	unsigned int newColorIndex = 0;
@@ -476,6 +488,7 @@ struct WM101 : SizeableModuleWidget {
 	BackPanel *backPanel;
 	CheckBox *checkBoxAll;
 	BackPanel *deleteConfirmPanel;
+	EventLabel *deleteLabel;
 	RectButton *deleteCancelButton;
 	RectButton *deleteOkButton;
 	EditPanel *editPanel;
@@ -488,6 +501,7 @@ struct WM101 : SizeableModuleWidget {
 	EventSlider *varyH;
 	EventSlider *varyS;
 	EventSlider *varyL;
+	BackPanel *blockingPanel;
 	
 	ScrollWidget *scrollWidget;
 	WM101(Module *module) : SizeableModuleWidget(module, 150) {
@@ -532,10 +546,9 @@ struct WM101 : SizeableModuleWidget {
 		deleteConfirmPanel->visible = false;
 		addChild(deleteConfirmPanel);
 
-		EventLabel *deleteLabel = new EventLabel();
+		deleteLabel = new EventLabel();
 		deleteLabel->box.pos = Vec(15, 195);
 		deleteLabel->box.size = Vec(box.size.x - 40, 19);
-		deleteLabel->label = "Delete Color?";
 		deleteConfirmPanel->addChild(deleteLabel);
 		
 		deleteOkButton = new RectButton();
@@ -548,6 +561,7 @@ struct WM101 : SizeableModuleWidget {
 		deleteCancelButton->box.pos = Vec(70, 250);
 		deleteCancelButton->box.size = Vec(55, 19);
 		deleteCancelButton->label = "Cancel";
+		deleteCancelButton->clickHandler = [=]() { this->cancel(); };
 		deleteConfirmPanel->addChild(deleteCancelButton);
 
 		editPanel = new EditPanel();
@@ -594,21 +608,21 @@ struct WM101 : SizeableModuleWidget {
 		varyH->box.pos = Vec(20, 25);
 		varyH->box.size = Vec(box.size.x - 50, 19);
 		varyH->value = 0.1f;
-		varyH->changeHandler = [=](float x) { this->saveSettings(); };
+		varyH->changedHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyH);
 	
 		varyS = new EventSlider();
 		varyS->box.pos = Vec(20, 45);
 		varyS->box.size = Vec(box.size.x - 50, 19);
 		varyS->value = 0.1f;
-		varyS->changeHandler = [=](float x) { this->saveSettings(); };
+		varyS->changedHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyS);
 	
 		varyL = new EventSlider();
 		varyL->box.pos = Vec(20, 65);
 		varyL->box.size = Vec(box.size.x - 50, 19);
 		varyL->value = 0.1f;
-		varyL->changeHandler = [=](float x) { this->saveSettings(); };
+		varyL->changedHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyL);
 	
 		EventLabel *highlightLabel = new EventLabel();
@@ -652,20 +666,45 @@ struct WM101 : SizeableModuleWidget {
 		highlightSlider->box.pos = Vec(10, 185);
 		highlightSlider->box.size = Vec(box.size.x - 40, 21);
 		highlightSlider->value = 0.1f;
-		highlightSlider->changeHandler = [=](float x) { 
+		highlightSlider->changedHandler = [=](float x) { 
 			this->saveSettings();
 			highlightIsDirty = true; 
 		};
 		settingsPanel->addChild(highlightSlider);
 
 		RectButton *settingsButton = new RectButton();
-		settingsButton->box.pos = Vec(37.5, 250);
-		settingsButton->box.size = Vec(55, 19);
+		settingsButton->box.pos = Vec(35, 250);
+		settingsButton->box.size = Vec(60, 19);
 		settingsButton->label = "Close";
 		settingsButton->clickHandler = [=]() {
 			this->cancel();
 		};
 		settingsPanel->addChild(settingsButton);
+
+		blockingPanel = new BackPanel();
+		blockingPanel->box.pos = backPanel->box.pos;
+		blockingPanel->box.size = backPanel->box.size;
+		blockingPanel->visible = false;
+		addChild(blockingPanel);
+
+		EventLabel *blockingLabel = new EventLabel();
+		blockingLabel->label = "Another WM-101";
+		blockingLabel->box.pos = Vec(5, 100);
+		blockingLabel->box.size = Vec(120, 21);
+		blockingPanel->addChild(blockingLabel);
+
+		EventLabel *blockingLabel2 = new EventLabel();
+		blockingLabel2->label = "is Already Open";
+		blockingLabel2->box.pos = Vec(5, 113);
+		blockingLabel2->box.size = Vec(120, 21);
+		blockingPanel->addChild(blockingLabel2);
+
+		RectButton *blockingButton = new RectButton();
+		blockingButton->label = "Take Over";
+		blockingButton->box.pos = Vec(30, 150);
+		blockingButton->box.size = Vec(70, 19);
+		blockingButton->clickHandler = [=]() { this->takeMasterSlot(); };
+		blockingPanel->addChild(blockingButton);
 
 		loadSettings();
 	}
@@ -687,10 +726,27 @@ struct WM101 : SizeableModuleWidget {
 			nvgRestore(vg);
 		}
 	}
+	void takeMasterSlot() {
+		blockingPanel->visible = false;
+		backPanel->visible = (box.size.x > 16.0f);
+		masterWireManager = this;
+		scrollWidget->container->clearChildren();
+		loadSettings();
+	}
 	void step() override {
+		if (module && masterWireManager != this) {
+			if (masterWireManager) {
+				blockingPanel->visible = (box.size.x > 16.0f);
+				backPanel->visible = false;	
+				editPanel->visible = false;
+				settingsPanel->visible = false;
+				SizeableModuleWidget::step();
+				return;
+			}
+			takeMasterSlot();
+		}
 		if (!stabilized) {
 			stabilized = true;
-			//lastWireId = APP->engine->internal->nextCableId;
 			cableCount = APP->scene->rack->cableContainer->children.size();
 		}
 		int newSize = APP->scene->rack->cableContainer->children.size();
@@ -822,7 +878,10 @@ struct WM101 : SizeableModuleWidget {
 		bool small = this->box.size.x < 16.0f;
 		minButton->box.pos.x = small?2.5f:(this->box.size.x - 10.0f);
 		backPanel->visible = !small;
+		editPanel->visible = false;
+		blockingPanel->visible = false;
 		deleteConfirmPanel->visible = false;
+		settingsPanel->visible = false;
 		SizeableModuleWidget::onResize();	
 	}
 	void addColor(NVGcolor color, int selected) {
@@ -839,7 +898,6 @@ struct WM101 : SizeableModuleWidget {
 			this->addWireMenu(wb);
 		};
 		scrollWidget->container->addChild(wb);
-		saveSettings();
 	}
 	void setDefaults() {
 		for (NVGcolor color : settings::cableColors) {
@@ -978,8 +1036,17 @@ struct WM101 : SizeableModuleWidget {
 
 		menu->addChild(new MenuLabel());
 
+		EventMenuItem *rAll = new EventMenuItem();
+		rAll->text = "Recolor All Wires...";
+		rAll->clickHandler = [=]() {
+			this->recolorAllDialog();
+		};
+		menu->addChild(rAll);
+
+		menu->addChild(new MenuLabel());
+
 		EventMenuItem *add = new EventMenuItem();
-		add->text = "Add new color";
+		add->text = "Add New Color ...";
 		add->clickHandler = [=]() {
 			this->editDialog(NULL);	
 		};
@@ -988,7 +1055,7 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(new MenuLabel());
 
 		EventMenuItem *settings = new EventMenuItem();
-		settings->text = "Settings";
+		settings->text = "Settings...";
 		settings->clickHandler = [=]() {
 			this->settingsDialog();
 		};
@@ -1038,7 +1105,7 @@ struct WM101 : SizeableModuleWidget {
 		label->text = "Color: " + color::toHexString(wb->color);
 		menu->addChild(label);
 		EventMenuItem *ed = new EventMenuItem();
-		ed->text = "Edit";
+		ed->text = "Edit...";
 		ed->clickHandler = [=]() {
 			this->editDialog(wb);
 		};
@@ -1060,7 +1127,7 @@ struct WM101 : SizeableModuleWidget {
 			menu->addChild(md);
 		}
 		EventMenuItem *dm = new EventMenuItem();
-		dm->text = "Delete";
+		dm->text = "Delete...";
 		dm->clickHandler = [=]() {
 			this->deleteDialog(wb);
 		};
@@ -1097,11 +1164,18 @@ struct WM101 : SizeableModuleWidget {
 		saveSettings();
 	}
 	void deleteDialog(WireButton *wb) {
-		deleteCancelButton->clickHandler = [=]() {
-			this->cancel();	
-		};	
+		deleteLabel->label = "Delete Color?";
 		deleteOkButton->clickHandler = [=]() {
 			this->deleteOk(wb);
+		};
+		backPanel->visible = false;
+		deleteConfirmPanel->visible = true;
+	}
+	void recolorAllDialog() {
+		deleteLabel->label = "Recolor All Wires?";
+		deleteOkButton->clickHandler = [=]() {
+			this->cableCount = 0;
+			this->cancel();
 		};
 		backPanel->visible = false;
 		deleteConfirmPanel->visible = true;
@@ -1117,6 +1191,10 @@ struct WM101 : SizeableModuleWidget {
 		cancel();
 	}
 	void settingsDialog() {
+		varyH->defaultValue = varyH->value;
+		varyS->defaultValue = varyS->value;
+		varyL->defaultValue = varyL->value;
+		highlightSlider->defaultValue = highlightSlider->value;
 		backPanel->visible = false;
 		settingsPanel->visible = true;
 	}
@@ -1165,6 +1243,9 @@ struct WM101 : SizeableModuleWidget {
 		highlightIsDirty = true;
 	}
 	void _delete() {
+		if (masterWireManager != this)
+			return;
+		masterWireManager = NULL;
 		if (!stabilized)
 			return;
 		if (highlight) {

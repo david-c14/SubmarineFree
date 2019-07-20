@@ -57,6 +57,9 @@ Torpedo Message Merge
 # [WK](WK.md)
 Das Wohltemperierte Klavier - Unequal Temperament Quantizer
 
+# [WM](WM.md)
+Wire Manager
+
 # [XF](XF.md)
 A range of mono and stereo equal power cross-faders with linear and logarithmic gain profiles and an autoselector
 
