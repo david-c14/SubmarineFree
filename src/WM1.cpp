@@ -73,6 +73,7 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 		if (widthJ)
 			box.size.x = json_number_value(widthJ);
 		Minimize(box.size.x < 16.0f);
+		APP->scene->rack->requestModulePos(this, box.pos);
 	}
 	virtual void onResize() {
 	}
@@ -176,7 +177,12 @@ struct EventSlider : OpaqueWidget {
 			changedHandler(value);
 		}
 	}
-
+	void onDoubleClick(const event::DoubleClick &e) override {
+		value = defaultValue;
+		if (changedHandler) {
+			changedHandler(value);
+		}
+	}
 };
 
 struct CheckBox : EventButton {
@@ -1185,6 +1191,10 @@ struct WM101 : SizeableModuleWidget {
 		cancel();
 	}
 	void settingsDialog() {
+		varyH->defaultValue = varyH->value;
+		varyS->defaultValue = varyS->value;
+		varyL->defaultValue = varyL->value;
+		highlightSlider->defaultValue = highlightSlider->value;
 		backPanel->visible = false;
 		settingsPanel->visible = true;
 	}
