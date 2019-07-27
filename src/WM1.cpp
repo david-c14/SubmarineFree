@@ -4,6 +4,24 @@
 
 Widget *masterWireManager = NULL;
 
+struct EventAction : history::Action {
+	std::function<void ()> undoHandler;
+	std::function<void ()> redoHandler;
+	void undo() override {
+		if (undoHandler)
+			undoHandler();
+	}
+	void redo() override {
+		if (redoHandler)
+			redoHandler();
+	}
+	EventAction(std::string name, std::function<void()> uHandler, std::function<void()> rHandler) {
+		this->name = name;
+		undoHandler = uHandler;
+		redoHandler = rHandler;
+	}
+};
+
 struct EventButton : OpaqueWidget {
 	std::function<void ()> clickHandler;
 	std::function<void ()> rightClickHandler;
@@ -758,9 +776,20 @@ struct WM101 : SizeableModuleWidget {
 				lastCable = NULL;
 		}
 		else if (newSize > cableCount) {
+			history::ComplexAction* complex;
+			bool recolorAll = (cableCount == -1);
+			if (recolorAll) {
+				history::ComplexAction* complex = new history::ComplexAction();
+				complex->name = "Recolor All Wires";
+				cableCount = 0;
+			}
 			std::list<Widget *>::reverse_iterator iterator = APP->scene->rack->cableContainer->children.rbegin();
 			for (int i = 0; i < newSize - cableCount; i++) {
-				colorCable(*iterator);
+				if (recolorAll)
+					complex->push(colorCable(*iterator, true));
+					//APP->history->push(colorCable(*iterator, true));
+				else
+					colorCable(*iterator, false);
 				++iterator;
 			}
 			cableCount = newSize;
@@ -769,6 +798,8 @@ struct WM101 : SizeableModuleWidget {
 			else
 				lastCable = NULL;
 			highlightIsDirty = true;		
+			if (recolorAll)
+				APP->history->push(complex);
 		}
 		highlightWires();
 		SizeableModuleWidget::step();
@@ -814,12 +845,28 @@ struct WM101 : SizeableModuleWidget {
 			}
 		}
 	}
-	void colorCable(Widget *widget) {
+	EventAction* colorCable(Widget *widget, bool all) {
 		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
+		NVGcolor oldColor = cable->color;
 		cable->color = findColor(cable->color);
 		if (varyCheck->selected) {
 			cable->color = varyColor(cable->color);
 		}
+		NVGcolor newColor = cable->color;
+		int id = cable->cable->id;
+		if (!all) return NULL;
+		return new EventAction("Color Cable",
+			[id, oldColor](){
+				CableWidget *c = APP->scene->rack->getCable(id);
+				if (c)
+					c->color = oldColor;
+			},
+			[id, newColor]() {
+				CableWidget *c = APP->scene->rack->getCable(id);
+				if (c)
+					c->color = newColor;
+			}
+		); 
 	}
 	NVGcolor findColor(NVGcolor color) {
 		auto vi = scrollWidget->container->children.begin();
@@ -1174,7 +1221,7 @@ struct WM101 : SizeableModuleWidget {
 	void recolorAllDialog() {
 		deleteLabel->label = "Recolor All Wires?";
 		deleteOkButton->clickHandler = [=]() {
-			this->cableCount = 0;
+			this->cableCount = -1;
 			this->cancel();
 		};
 		backPanel->visible = false;
