@@ -776,20 +776,16 @@ struct WM101 : SizeableModuleWidget {
 				lastCable = NULL;
 		}
 		else if (newSize > cableCount) {
-			history::ComplexAction* complex;
-			bool recolorAll = (cableCount == -1);
-			if (recolorAll) {
-				history::ComplexAction* complex = new history::ComplexAction();
+			history::ComplexAction* complex = NULL;
+			if (cableCount == -1) {
+				complex = new history::ComplexAction();
 				complex->name = "Recolor All Wires";
+				APP->history->push(complex);
 				cableCount = 0;
 			}
 			std::list<Widget *>::reverse_iterator iterator = APP->scene->rack->cableContainer->children.rbegin();
 			for (int i = 0; i < newSize - cableCount; i++) {
-				if (recolorAll)
-					complex->push(colorCable(*iterator, true));
-					//APP->history->push(colorCable(*iterator, true));
-				else
-					colorCable(*iterator, false);
+				colorCable(*iterator, complex);
 				++iterator;
 			}
 			cableCount = newSize;
@@ -798,8 +794,6 @@ struct WM101 : SizeableModuleWidget {
 			else
 				lastCable = NULL;
 			highlightIsDirty = true;		
-			if (recolorAll)
-				APP->history->push(complex);
 		}
 		highlightWires();
 		SizeableModuleWidget::step();
@@ -845,27 +839,30 @@ struct WM101 : SizeableModuleWidget {
 			}
 		}
 	}
-	EventAction* colorCable(Widget *widget, bool all) {
+	void colorCable(Widget *widget, history::ComplexAction *complex) {
 		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
 		NVGcolor oldColor = cable->color;
 		cable->color = findColor(cable->color);
 		if (varyCheck->selected) {
 			cable->color = varyColor(cable->color);
 		}
+		if (!complex)
+			return;
 		NVGcolor newColor = cable->color;
 		int id = cable->cable->id;
-		if (!all) return NULL;
-		return new EventAction("Color Cable",
-			[id, oldColor](){
-				CableWidget *c = APP->scene->rack->getCable(id);
-				if (c)
-					c->color = oldColor;
-			},
-			[id, newColor]() {
-				CableWidget *c = APP->scene->rack->getCable(id);
-				if (c)
-					c->color = newColor;
-			}
+		complex->push(
+			new EventAction("Color Cable",
+				[id, oldColor](){
+					CableWidget *c = APP->scene->rack->getCable(id);
+					if (c)
+						c->color = oldColor;
+				},
+				[id, newColor]() {
+					CableWidget *c = APP->scene->rack->getCable(id);
+					if (c)
+						c->color = newColor;
+				}
+			)
 		); 
 	}
 	NVGcolor findColor(NVGcolor color) {
