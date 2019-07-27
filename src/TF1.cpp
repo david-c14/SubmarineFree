@@ -95,8 +95,8 @@ void TF_101::process(const ProcessArgs &args) {
 	outPort.process();
 }
 
-struct WhiteLight : GrayModuleLightWidget {
-	WhiteLight() {
+struct RGBLight : GrayModuleLightWidget {
+	RGBLight() {
 		addBaseColor(nvgRGB(0xff, 0x00, 0x00));
 		addBaseColor(nvgRGB(0x00, 0xff, 0x00));
 		addBaseColor(nvgRGB(0x00, 0x00, 0xff));
@@ -125,8 +125,8 @@ struct TF101 : SchemeModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 293), module, TF_101::PARAM_BG_BLUE));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(65, 347), module, TF_101::PARAM_FONT_SIZE));
 
-		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 55.5), module, TF_101::LIGHT_FG_RED));
-		addChild(createLightCentered<MediumLight<WhiteLight>>(Vec(14.5, 189.5), module, TF_101::LIGHT_BG_RED));
+		addChild(createLightCentered<MediumLight<RGBLight>>(Vec(14.5, 55.5), module, TF_101::LIGHT_FG_RED));
+		addChild(createLightCentered<MediumLight<RGBLight>>(Vec(14.5, 189.5), module, TF_101::LIGHT_BG_RED));
 
 		addOutput(createOutputCentered<BlackPort>(Vec(73.5,31.5), module, TF_101::OUTPUT_TOR));
 	}
