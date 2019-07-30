@@ -752,7 +752,10 @@ struct WM101 : SizeableModuleWidget {
 		loadSettings();
 	}
 	void step() override {
-		if (module && masterWireManager != this) {
+		if (!module) {
+			return;
+		}
+		if (masterWireManager != this) {
 			if (masterWireManager) {
 				blockingPanel->visible = (box.size.x > 16.0f);
 				backPanel->visible = false;	
@@ -1171,7 +1174,7 @@ struct WM101 : SizeableModuleWidget {
 			menu->addChild(md);
 		}
 		EventMenuItem *dm = new EventMenuItem();
-		dm->text = "Delete...";
+		dm->text = "Delete Wire...";
 		dm->clickHandler = [=]() {
 			this->deleteDialog(wb);
 		};
