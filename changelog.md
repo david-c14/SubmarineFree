@@ -5,6 +5,7 @@
 30-Jul-2019 Bug fix #38 - WM-101 in module browser was causing wire highlighting. Fixed
 27-Jul-2019 Change WhiteLight to RGBLight to avoid conflict with new WhiteLight defined in API
 27-Jul-2019 WM-101 Add Undo action for Recolor All Wires
+27-Jul-2019 Added changelog
 
 ##v1.0.2
 20-Jul-2019 Add WM-101
