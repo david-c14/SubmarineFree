@@ -57,18 +57,18 @@ struct EO_102 : Module {
 	EO_102() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < 2; i++) {
-			configParam(PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f);
-			configParam(PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f);
-			configParam(PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f);
+			configParam(PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f, string::f("Channel %c display mode", 'A' + (unsigned char)i));
+			configParam(PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f, string::f("Channel %c offset", 'A' + (unsigned char)i));
+			configParam(PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f, string::f("Channel %c scale", 'A' + (unsigned char)i));
 		}
-		configParam(PARAM_TIME, -6.0f, -16.0f, -14.0f);
-		configParam(PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f);
-		configParam(PARAM_TRIGGER, -10.0f, 10.0f, 0.0f);
-		configParam(PARAM_RUNMODE, 0.0f, 1.0f, 0.0f);
-		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f);
-		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f);
-		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f);
-		configParam(PARAM_INDEX_3, 0.0f, 1.0f, 0.2f);
+		configParam(PARAM_TIME, -6.0f, -16.0f, -14.0f, "Time base");
+		configParam(PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f, "Pre-trigger buffer size");
+		configParam(PARAM_TRIGGER, -10.0f, 10.0f, 0.0f, "Trigger level");
+		configParam(PARAM_RUNMODE, 0.0f, 1.0f, 0.0f, "One-shot mode");
+		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f, "Run");
+		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left index position");
+		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right index position");
+		configParam(PARAM_INDEX_3, 0.0f, 1.0f, 0.2f, "Horizontal index position");
 	}
 	void process(const ProcessArgs &args) override;
 	void startFrame(void);
