@@ -43,13 +43,13 @@ struct TF_101 : Module  {
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);	
 	TF_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_FG_RED, 0.0f, 1.0f, 0.1569f);
-		configParam(PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f);
-		configParam(PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f);
-		configParam(PARAM_BG_RED, 0.0f, 1.0f, 0.0f);
-		configParam(PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f);
-		configParam(PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f);
-		configParam(PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f);
+		configParam(PARAM_FG_RED, 0.0f, 1.0f, 0.1569f, "Foreground red", "%", 0.f, 100.f);
+		configParam(PARAM_FG_GREEN, 0.0f, 1.0f, 0.6902f, "Foreground green", "%", 0.f, 100.f);
+		configParam(PARAM_FG_BLUE, 0.0f, 1.0f, 0.9529f, "Foreground blue", "%", 0.f, 100.f);
+		configParam(PARAM_BG_RED, 0.0f, 1.0f, 0.0f, "Background red", "%", 0.f, 100.f);
+		configParam(PARAM_BG_GREEN, 0.0f, 1.0f, 0.0f, "Background green", "%", 0.f, 100.f);
+		configParam(PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f, "Background blue", "%", 0.f, 100.f);
+		configParam(PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f, "Font size", "pts");
 		prevValues[0] = 0.1569f;
 		prevValues[1] = 0.6902f;
 		prevValues[2] = 0.9529f;

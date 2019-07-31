@@ -243,7 +243,7 @@ struct WK_101 : Module {
 	WK_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < NUM_PARAMS; i++) {
-			configParam(PARAM_1 + i, -50.0f, 50.0f, 0.0f);
+			configParam(PARAM_1 + i, -50.0f, 50.0f, 0.0f, "Detune", " cents");
 		}
 		outPort.size(5);
 	}

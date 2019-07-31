@@ -47,9 +47,9 @@ struct XF_101 : XF {
 	};
 
 	XF_101() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		configParam(PARAM_CV_1, 0.0f, 1.0f, 0.0f);
-		configParam(PARAM_MODE_1, 0.0f, 2.0f, 0.0f);
-		configParam(PARAM_FADE_1, 0.0f, 10.0f, 5.0f);
+		configParam(PARAM_CV_1, 0.0f, 1.0f, 0.0f, "CV is bipolar");
+		configParam(PARAM_MODE_1, 0.0f, 2.0f, 0.0f, "Fade profile");
+		configParam(PARAM_FADE_1, 0.0f, 10.0f, 5.0f, "A/B blend", "%", 0.f, 10.f );
 	}
 
 	void process(const ProcessArgs &args) override;
