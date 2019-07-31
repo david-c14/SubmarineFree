@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.4
+- 31-Jul-2019 WM-101 Add tooltips to sliders
+
 ## v1.0.3
 - 30-Jul-2019 WM-101 change menu text from Delete... to Delete Wire... for clarity
 - 30-Jul-2019 Bug fix #38 - WM-101 in module browser was causing wire highlighting. Fixed

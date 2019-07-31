@@ -135,14 +135,24 @@ struct BackPanel : Widget {
 	}
 };
 
+struct EventSlider;
+
+struct EventSliderTooltip : ui::Tooltip {
+	EventSlider *slider;
+	void step() override; 
+};
+
 struct EventSlider : OpaqueWidget {
 	int transparent = false;
 	float value = 0.5f;
 	float minValue = 0.0f;
 	float maxValue = 1.0f;
 	float defaultValue = 0.5f;
+	std::string label;
+	EventSliderTooltip *tooltip = NULL;
 	std::function<void(float)> changedHandler;
 	std::function<void(float)> changingHandler;
+	std::function<std::string(float)> textHandler;
 	void draw(const DrawArgs &args) override {
 		Vec minHandlePos;
 		Vec maxHandlePos;
@@ -201,7 +211,40 @@ struct EventSlider : OpaqueWidget {
 			changedHandler(value);
 		}
 	}
+	void onEnter(const event::Enter &e) override {
+		if (settings::paramTooltip && !tooltip) {
+			tooltip = new EventSliderTooltip();
+			tooltip->slider = this;
+			APP->scene->addChild(tooltip);
+		}	
+	}
+	
+	void onLeave(const event::Leave &e) override {
+		if (tooltip) {
+			APP->scene->removeChild(tooltip);
+			delete tooltip;
+			tooltip = NULL;
+		}
+	}
 };
+
+void EventSliderTooltip::step() {
+	if (slider->textHandler) {
+		text = slider->textHandler(slider->value);
+	}
+	else {
+		text = string::f("%.3g", slider->value);
+	}
+	std::string label = slider->label;
+	if (!label.empty())
+		text = label + ": " + text;
+	Tooltip::step();
+	box.pos = slider->getAbsoluteOffset(slider->box.size).round();
+}
+
+std::string percentageTextHandler(float value) {
+	return string::f("%.3g%c", value * 100.0, '%');
+}
 
 struct CheckBox : EventButton {
 	std::string label;
@@ -362,14 +405,20 @@ struct EditPanel : BackPanel {
 		r = new EventSlider();
 		r->box.pos = Vec(10, 105);
 		r->box.size = Vec(110, 19);
+		r->textHandler = percentageTextHandler;
+		r->label = "Red";
 		addChild(r);
 		g = new EventSlider();
 		g->box.pos = Vec(10, 145);
 		g->box.size = Vec(110, 19);
+		g->textHandler = percentageTextHandler;
+		g->label = "Green";
 		addChild(g);
 		b = new EventSlider();
 		b->box.pos = Vec(10, 185);
 		b->box.size = Vec(110, 19);
+		b->textHandler = percentageTextHandler;
+		b->label = "Blue";
 		addChild(b);
 		RectButton *saveButton = new RectButton();
 		saveButton->box.pos = Vec(5, 250);
@@ -626,6 +675,10 @@ struct WM101 : SizeableModuleWidget {
 		varyH->box.pos = Vec(20, 25);
 		varyH->box.size = Vec(box.size.x - 50, 19);
 		varyH->value = 0.1f;
+		varyH->textHandler = [](float value) -> std::string {
+			return string::f("%.4g%s", value * 360.0, "\xC2\xB0");
+		};
+		varyH->label = "Hue";
 		varyH->changedHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyH);
 	
@@ -633,6 +686,8 @@ struct WM101 : SizeableModuleWidget {
 		varyS->box.pos = Vec(20, 45);
 		varyS->box.size = Vec(box.size.x - 50, 19);
 		varyS->value = 0.1f;
+		varyS->textHandler = percentageTextHandler;
+		varyS->label = "Saturation";
 		varyS->changedHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyS);
 	
@@ -640,6 +695,8 @@ struct WM101 : SizeableModuleWidget {
 		varyL->box.pos = Vec(20, 65);
 		varyL->box.size = Vec(box.size.x - 50, 19);
 		varyL->value = 0.1f;
+		varyL->textHandler = percentageTextHandler;
+		varyL->label = "Lightness";
 		varyL->changedHandler = [=](float x) { this->saveSettings(); };
 		settingsPanel->addChild(varyL);
 	
@@ -684,6 +741,8 @@ struct WM101 : SizeableModuleWidget {
 		highlightSlider->box.pos = Vec(10, 185);
 		highlightSlider->box.size = Vec(box.size.x - 40, 21);
 		highlightSlider->value = 0.1f;
+		highlightSlider->textHandler = percentageTextHandler;
+		highlightSlider->label = "Opacity";
 		highlightSlider->changedHandler = [=](float x) { 
 			this->saveSettings();
 			highlightIsDirty = true; 
