@@ -26,8 +26,8 @@ struct LD_1 : DS_Module {
 	LD_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < x; i++) {
-			configParam(PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f);
-			configParam(PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f);
+			configParam(PARAM_CUTOFF_1 + i, -10.0f, 10.0f, 5.0f, "Cutoff centre", " V");
+			configParam(PARAM_WIDTH_1 + i, 0.0f, 5.0f, 1.0f, "Hysteresis", " V");
 		}
 	}
 	void process(const ProcessArgs &args) override {

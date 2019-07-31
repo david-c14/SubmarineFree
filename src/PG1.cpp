@@ -25,7 +25,7 @@ struct PG_1 : DS_Module {
 	PG_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < x; i++) {
-			configParam(PARAM_1 + i, -5.0f, 2.0f, -2.0f);
+			configParam(PARAM_1 + i, -5.0f, 2.0f, -2.0f, "Pulse width", " s", 10.f);
 		}
 	}
 	void process(const ProcessArgs &args) override {
