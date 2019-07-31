@@ -113,12 +113,12 @@ struct PO_101 : Module, PO_Util {
 
 	PO_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_FINE, -1.0f, +1.0f, 0.0f);
-		configParam(PARAM_WAVE, 0.0f, +4.0f, 0.0f);
+		configParam(PARAM_FINE, -1.0f, +1.0f, 0.0f, "Fine frequency");
+		configParam(PARAM_WAVE, 0.0f, +4.0f, 0.0f, "Wave shape");
 		for (unsigned int i = 0; i < 4; i++) {
-			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f);
+			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f, "Phase shift", "\xc2\xb0", 0.f, 360.f);
 		}
-		configParam(PARAM_TUNE, -54.0f, +54.0f, 0.0f);
+		configParam(PARAM_TUNE, -54.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
 	}
 	void process(const ProcessArgs &args) override;
 	void sin(float phase);
@@ -132,7 +132,7 @@ struct PO_101 : Module, PO_Util {
 
 struct PO_102 : PO_101 {
 	PO_102() : PO_101() {
-		configParam(PARAM_TUNE, -96.0f, 72.0f, -12.0f);
+		configParam(PARAM_TUNE, -96.0f, 72.0f, -12.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, 1.0f);
 		baseFreq = 1.0f;
 	}
 };
@@ -352,12 +352,12 @@ struct PO_204 : Module, PO_Util {
 
 	PO_204() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_TUNE, -90.0f, +54.0f, 0.0f);
-		configParam(PARAM_FINE, -1.0f, +1.0f, 0.0f);
+		configParam(PARAM_TUNE, -90.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
+		configParam(PARAM_FINE, -1.0f, +1.0f, 0.0f, "Fine frequency");
 		for(unsigned int i = 0; i < 4; i++) {
-			configParam(PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f);
-			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f);
-			configParam(PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f);
+			configParam(PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f, "Wave shape");
+			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f, "Phase shift", "\xc2\xb0", 0.f, 360.f);
+			configParam(PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f, "Frequency multiplier");
 		}
 	}
 	void process(const ProcessArgs &args) override;

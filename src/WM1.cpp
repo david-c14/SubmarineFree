@@ -1,3 +1,4 @@
+//SubTag W10
 #include <settings.hpp>
 #include <functional>
 #include "SubmarineFree.hpp"
