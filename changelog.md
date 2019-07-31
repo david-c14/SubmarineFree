@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.0.4
+- 31-Jul-2019 Add parameter labels to all parameters
 - 31-Jul-2019 WM-101 Add tooltips to sliders
 
 ## v1.0.3
