@@ -6,7 +6,6 @@
 namespace SubmarineAO {
 
 	static float FunctorClipboard = NAN;
-	static float CvalClipboard = NAN;
 
 	typedef float (*func_t)(float, float, float);
 
@@ -420,7 +419,6 @@ struct AOConstDisplay : Knob {
 			nvgText(args.vg, 41.5, 13, mtext, NULL);
 		}
 	}
-	void onButton(const event::Button &e) override;
 };
 
 template <unsigned int x, unsigned int y>
@@ -448,8 +446,8 @@ struct AO1 : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int ix = 0; ix < x; ix++) {
 			for (unsigned int iy = 0; iy < y; iy++) {
-				configParam(PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f );
-				configParam(PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f);
+				configParam(PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f, "Algorithm" );
+				configParam(PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f, "Constant", "", 0.f, 0.01f);
 			}
 		}
 	}
@@ -503,40 +501,6 @@ struct CategoryMenu : MenuItem {
 	}
 };
 
-struct CCopyMenu : MenuItem {
-	Module *module;
-	int index;
-	void onAction(const event::Action &e) override {
-		SubmarineAO::CvalClipboard = APP->engine->getParam(module, index);
-	}
-};
-
-struct CPasteMenu : MenuItem {
-	Module *module;
-	int index;
-	void onAction(const event::Action &e) override {
-		if (!std::isnan(SubmarineAO::CvalClipboard))
-			APP->engine->setParam(module, index, SubmarineAO::CvalClipboard);
-	}
-};
-
-struct CValMenu : MenuItem {
-	Module *module;
-	int index;
-	float val;
-	void onAction(const event::Action &e) override {
-		APP->engine->setParam(module, index, val);
-	}
-	static CValMenu *create(Module *_module, int _index, float _val, const char * _text) {
-		CValMenu *vm = new CValMenu();
-		vm->module = _module;
-		vm->index = _index;
-		vm->val = _val;
-		vm->text = std::string(_text);
-		return vm;
-	}
-};
-
 struct FCopyMenu : MenuItem {
 	Module *module;
 	int index;
@@ -553,39 +517,6 @@ struct FPasteMenu : MenuItem {
 			APP->engine->setParam(module, index, SubmarineAO::FunctorClipboard);
 	}
 };
-
-void AOConstDisplay::onButton(const event::Button &e) {
-	if (module) {
-		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-			e.consume(this);
-			Menu *menu = createMenu();
-			CCopyMenu *cm = new CCopyMenu();
-			cm->module = module;
-			cm->index = index;
-			cm->text = "Copy";
-			menu->addChild(cm);
-			if (!std::isnan(SubmarineAO::CvalClipboard)) {
-				CPasteMenu *pm = new CPasteMenu();
-				pm->module = module;
-				pm->index = index;
-				pm->text = "Paste";
-				menu->addChild(pm);
-			}
-			menu->addChild(new MenuEntry);
-			menu->addChild(CValMenu::create(module, index, 10000.0f, "100.00"));
-			menu->addChild(CValMenu::create(module, index, 1000.0f, "10.00"));
-			menu->addChild(CValMenu::create(module, index, 500.0f, "5.00"));
-			menu->addChild(CValMenu::create(module, index, 100.0f, "1.00"));
-			menu->addChild(CValMenu::create(module, index, 0.0f, "0.00"));
-			menu->addChild(CValMenu::create(module, index, -100.0f, "-1.00"));
-			menu->addChild(CValMenu::create(module, index, -500.0f, "-5.00"));
-			menu->addChild(CValMenu::create(module, index, -1000.0f, "-10.00"));
-			menu->addChild(CValMenu::create(module, index, -10000.0f, "-100.00"));
-			return;
-		}
-	}
-	Knob::onButton(e);
-}
 
 void AOFuncDisplay::onButton(const event::Button &e) {
 	if (module) {
