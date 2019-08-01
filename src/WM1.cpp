@@ -497,6 +497,33 @@ struct EventMenuItem : MenuItem {
 	}	
 };
 
+struct WireParamField : ui::TextField {
+	std::function<void(std::string)> changeHandler;
+	void step() override {
+		// Keep selected
+		APP->event->setSelected(this);
+		TextField::step();
+	}
+
+	void setText(std::string text) {
+		this->text = text;
+		selectAll();
+	}
+
+	void onSelectKey(const event::SelectKey &e) override {
+		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
+			if (changeHandler) {
+				changeHandler(text);
+			}
+			ui::MenuOverlay *overlay = getAncestorOfType<ui::MenuOverlay>();
+			overlay->requestDelete();
+			e.consume(this);
+		}
+		if (!e.getTarget())
+			TextField::onSelectKey(e);
+	}
+};
+
 struct WireButton : EventButton {
 	NVGcolor color;
 	CheckBox *checkBox;
@@ -505,6 +532,27 @@ struct WireButton : EventButton {
 		checkBox->box.pos = Vec(1,1);
 		checkBox->box.size = Vec(19, 19);
 		addChild(checkBox);
+	}
+	bool testChar(char x) {
+		if (x >= '0' && x <= '9')
+			return true;
+		if (x >= 'A' && x <= 'F')
+			return true;
+		if (x >= 'a' && x <= 'f')
+			return true;
+		return false;
+	}
+	bool setColor(std::string text) {
+		if (text[0] != '#')
+			return false;
+		for (unsigned int i = 1; i < 7; i++) {
+			if (text.length() <= i)
+				return false;
+			if (!testChar(text[i]))
+				return false;
+		}
+		color = color::fromHexString(text);
+		return true;
 	}
 	void draw(const DrawArgs &args) override {
 		NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
@@ -1211,6 +1259,17 @@ struct WM101 : SizeableModuleWidget {
 		MenuLabel *label = new MenuLabel();
 		label->text = "Color: " + color::toHexString(wb->color);
 		menu->addChild(label);
+		WireParamField *paramField = new WireParamField();
+		paramField->box.size.x = 100;
+		paramField->setText(color::toHexString(wb->color));
+		paramField->changeHandler = [=](std::string text) {
+			if (wb->setColor(text)) {
+				this->saveSettings();
+			};
+		};
+		menu->addChild(paramField);
+		menu->addChild(new MenuLabel());
+		
 		EventMenuItem *ed = new EventMenuItem();
 		ed->text = "Edit...";
 		ed->clickHandler = [=]() {
