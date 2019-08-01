@@ -34,9 +34,9 @@ struct XF_201 : XF {
 
 	XF_201() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		for (int i = 0; i < deviceCount; i++) {
-			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, "CV is bipolar");
-			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, "Fade profile");
-			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f, "A/B blend", "%", 0.f, 10.f);
+			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, string::f("Fader %d CV is bipolar", i + 1));
+			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, string::f("Fader %d Fade profile", i + 1));
+			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f, string::f("Fader %d A/B blend", i + 1), "%", 0.f, 10.f);
 			controls[i].a = INPUT_A_1 + i;
 			controls[i].ar = INPUT_AR_1 + i;
 			controls[i].b = INPUT_B_1 + i;

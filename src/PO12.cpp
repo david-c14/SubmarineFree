@@ -355,9 +355,9 @@ struct PO_204 : Module, PO_Util {
 		configParam(PARAM_TUNE, -90.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
 		configParam(PARAM_FINE, -1.0f, +1.0f, 0.0f, "Fine frequency");
 		for(unsigned int i = 0; i < 4; i++) {
-			configParam(PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f, "Wave shape");
-			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f, "Phase shift", "\xc2\xb0", 0.f, 360.f);
-			configParam(PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f, "Frequency multiplier");
+			configParam(PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f, string::f("Operator #%d wave shape", i + 1));
+			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f, string::f("Operator #%d phase shift", i + 1), "\xc2\xb0", 0.f, 360.f);
+			configParam(PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f, string::f("Operator #%d frequency multiplier", i + 1));
 		}
 	}
 	void process(const ProcessArgs &args) override;
