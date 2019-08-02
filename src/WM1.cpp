@@ -1155,10 +1155,65 @@ struct WM101 : SizeableModuleWidget {
 		}
 		json_decref(settings);
 	}
+	WireButton *findWireButton(unsigned int index) {
+		if (index >= scrollWidget->container->children.size())
+			return NULL;
+		auto vi = scrollWidget->container->children.begin();
+		std::advance(vi, index);
+		return dynamic_cast<WireButton *>(*vi);
+	}
 	void checkAll(bool selected) {
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = selected?"Select All Colors":"Deselect All Colors"; 
+		APP->history->push(complex);
+		EventAction *allAction = new EventAction(
+			complex->name,
+			[selected]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					wm->checkBoxAll->selected = !selected;
+				}
+			},
+			[selected]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					wm->checkBoxAll->selected = selected;
+				}
+			}
+		);
+		complex->push(allAction);
+		
+		signed int index = -1;
 		for (Widget *widget : scrollWidget->container->children) {
 			WireButton *wb = dynamic_cast<WireButton *>(widget);
+			index++;
+			if (wb->checkBox->selected == selected)
+				continue;
 			wb->checkBox->selected = selected;
+			EventAction *action = new EventAction(
+				selected?"Select Color":"Deselect Color",	
+				[index, selected]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						WireButton *wb = wm->findWireButton(index);
+						if (wb) {
+							wb->checkBox->selected = !selected;
+							wm->saveSettings();
+						}
+					}
+				},
+				[index, selected]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						WireButton *wb = wm->findWireButton(index);
+						if (wb) {
+							wb->checkBox->selected = selected;
+							wm->saveSettings();
+						}
+					}
+				}
+			);
+			complex->push(action);
 		}
 		saveSettings();
 	}
