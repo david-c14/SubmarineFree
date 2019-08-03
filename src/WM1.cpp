@@ -583,6 +583,15 @@ struct WireButton : EventButton {
 
 		OpaqueWidget::draw(args);
 	}
+	unsigned int index() {
+		unsigned int i = 0;
+		for (Widget *w : parent->children) {
+			if (w == this)
+				return i;
+			i++;
+		}
+		return 0;
+	}
 };
 
 struct WM101 : SizeableModuleWidget {
@@ -1039,7 +1048,33 @@ struct WM101 : SizeableModuleWidget {
 		settingsPanel->visible = false;
 		SizeableModuleWidget::onResize();	
 	}
-	void addColor(NVGcolor color, int selected) {
+	EventAction *checkBoxAction(unsigned int index, bool selected) {
+		return(new EventAction(
+				selected?"Select Color":"Deselect Color",	
+				[index, selected]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						WireButton *wb = wm->findWireButton(index);
+						if (wb) {
+							wb->checkBox->selected = !selected;
+							wm->saveSettings();
+						}
+					}
+				},
+				[index, selected]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						WireButton *wb = wm->findWireButton(index);
+						if (wb) {
+							wb->checkBox->selected = selected;
+							wm->saveSettings();
+						}
+					}
+				}
+			)
+		);
+	}
+	void addColor(NVGcolor color, bool selected) {
 		float y = scrollWidget->container->children.size() * 21;
 		WireButton *wb = new WireButton();
 		wb->box.pos = Vec(0, y);
@@ -1047,6 +1082,7 @@ struct WM101 : SizeableModuleWidget {
 		wb->color = color;
 		wb->checkBox->selected = selected;
 		wb->checkBox->changeHandler = [=]() {
+//			APP->history->push(this->checkBoxAction(wb->index, wb->checkBox->selected));
 			this->saveSettings();
 		};
 		wb->rightClickHandler = [=]() {
@@ -1190,30 +1226,7 @@ struct WM101 : SizeableModuleWidget {
 			if (wb->checkBox->selected == selected)
 				continue;
 			wb->checkBox->selected = selected;
-			EventAction *action = new EventAction(
-				selected?"Select Color":"Deselect Color",	
-				[index, selected]() {
-					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						WireButton *wb = wm->findWireButton(index);
-						if (wb) {
-							wb->checkBox->selected = !selected;
-							wm->saveSettings();
-						}
-					}
-				},
-				[index, selected]() {
-					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						WireButton *wb = wm->findWireButton(index);
-						if (wb) {
-							wb->checkBox->selected = selected;
-							wm->saveSettings();
-						}
-					}
-				}
-			);
-			complex->push(action);
+			complex->push(checkBoxAction(index, selected));
 		}
 		saveSettings();
 	}
