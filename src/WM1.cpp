@@ -65,6 +65,27 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 		box.size.x = minimize?15:fullSize;
 		ShiftOthers(box.size.x - oldSize);
 		Resize();
+		unsigned int id = module->id;
+		float fs = fullSize; 
+		APP->history->push(new EventAction(
+			"Resize Wire Manager",
+			[id, minimize, fs]() {
+				SizeableModuleWidget *mw = dynamic_cast<SizeableModuleWidget *>(APP->scene->rack->getModule(id));
+				if (mw) {
+					mw->box.size.x = minimize?fs:15;
+					mw->ShiftOthers(minimize?(fs-15):(15-fs));
+					mw->Resize();
+				}
+			},
+			[id, minimize, fs]() {
+				SizeableModuleWidget *mw = dynamic_cast<SizeableModuleWidget *>(APP->scene->rack->getModule(id));
+				if (mw) {
+					mw->box.size.x = minimize?15:fs;
+					mw->ShiftOthers(minimize?(15-fs):(fs-15));
+					mw->Resize();
+				}
+			}
+		));
 	}
 	void ShiftOthers(float delta) {
 		if (!stabilized)
