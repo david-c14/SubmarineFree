@@ -67,6 +67,8 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 		Resize();
 		unsigned int id = module->id;
 		float fs = fullSize; 
+		if (!stabilized)
+			return;
 		APP->history->push(new EventAction(
 			"Resize Wire Manager",
 			[id, minimize, fs]() {
@@ -1114,6 +1116,15 @@ struct WM101 : SizeableModuleWidget {
 		};
 		scrollWidget->container->addChild(wb);
 	}
+	void insertColor(NVGcolor color, bool selected, unsigned int index) {
+		addColor(color, selected);
+		Widget *w = scrollWidget->container->children.back();
+		scrollWidget->container->children.pop_back();
+		auto v = scrollWidget->container->children.begin();
+		std::advance(v, index);
+		scrollWidget->container->children.insert(v, w);
+		this->reflow();
+	}
 	void setDefaults() {
 		for (NVGcolor color : settings::cableColors) {
 			addColor(color, true);
@@ -1392,10 +1403,39 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(dm);
 	}
 	void deleteWire(WireButton *wb) {
+		NVGcolor color = wb->color;
+		bool selected = wb->checkBox->selected;
+		unsigned int index = wb->index();
 		scrollWidget->container->removeChild(wb);
 		delete wb;
 		reflow();
 		saveSettings();
+		APP->history->push(new EventAction(
+			"Delete Color",
+			[color, selected, index]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					if (wm) {
+						wm->insertColor(color, selected, index);
+						wm->saveSettings();
+					}
+				}
+			},
+			[index] {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					if (wm) {
+						WireButton *wb = wm->findWireButton(index);
+						if (wb) {
+							wm->scrollWidget->container->removeChild(wb);
+							delete wb;
+							wm->reflow();
+							wm->saveSettings();
+						}
+					}
+				}
+			}
+		));
 	}
 	void reflow() {
 		unsigned int y = 0;
