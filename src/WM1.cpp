@@ -1049,7 +1049,7 @@ struct WM101 : SizeableModuleWidget {
 		SizeableModuleWidget::onResize();	
 	}
 	EventAction *checkBoxAction(unsigned int index, bool selected) {
-		return(new EventAction(
+		return new EventAction(
 				selected?"Select Color":"Deselect Color",	
 				[index, selected]() {
 					if (masterWireManager) {
@@ -1072,7 +1072,11 @@ struct WM101 : SizeableModuleWidget {
 					}
 				}
 			)
-		);
+		;
+	}
+	void updateWireButtonCheckBox(WireButton *wb) {
+		this->saveSettings();
+		APP->history->push(checkBoxAction(wb->index(), wb->checkBox->selected));
 	}
 	void addColor(NVGcolor color, bool selected) {
 		float y = scrollWidget->container->children.size() * 21;
@@ -1082,8 +1086,7 @@ struct WM101 : SizeableModuleWidget {
 		wb->color = color;
 		wb->checkBox->selected = selected;
 		wb->checkBox->changeHandler = [=]() {
-//			APP->history->push(this->checkBoxAction(wb->index, wb->checkBox->selected));
-			this->saveSettings();
+			this->updateWireButtonCheckBox(wb);
 		};
 		wb->rightClickHandler = [=]() {
 			this->addWireMenu(wb);
