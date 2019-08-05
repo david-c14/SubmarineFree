@@ -731,7 +731,7 @@ struct WM101 : SizeableModuleWidget {
 		varyCheck->label = "Variation";
 		varyCheck->box.pos = Vec(10, 5);
 		varyCheck->box.size = Vec(box.size.x - 40, 19);
-		varyCheck->changeHandler = [=]() { this->saveSettings(); };
+		varyCheck->changeHandler = [=]() { this->varyCheckChanged(); };
 		settingsPanel->addChild(varyCheck);
 
 		EventLabel *hLabel = new EventLabel();
@@ -868,6 +868,27 @@ struct WM101 : SizeableModuleWidget {
 	}
 	~WM101() {
 		this->_delete();
+	}
+	void varyCheckChanged() {
+		bool selected = varyCheck->selected;
+		saveSettings();
+		APP->history->push(new EventAction(
+			selected?"Select Variations":"Deselect Variations",
+			[selected]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					wm->varyCheck->selected = !selected;
+					wm->saveSettings();
+				}
+			},
+			[selected]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					wm->varyCheck->selected = selected;
+					wm->saveSettings();
+				}
+			}
+		));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (this->box.size.x > 16.0f) {
@@ -1326,7 +1347,7 @@ struct WM101 : SizeableModuleWidget {
 		var->rightText = CHECKMARK(varyCheck->selected);
 		var->clickHandler = [=]() {
 			varyCheck->selected = !(varyCheck->selected);
-			saveSettings();
+			varyCheckChanged();
 		};
 		menu->addChild(var);
 
