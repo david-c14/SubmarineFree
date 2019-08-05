@@ -1496,14 +1496,67 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->visible = false;
 		settingsPanel->visible = true;
 	}
+	void editAdd(NVGcolor col) {
+		addColor(col, false);
+		unsigned int index = scrollWidget->container->children.size() - 1;
+		APP->history->push(new EventAction(
+			"Add Color",
+			[index]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					WireButton *wb = wm->findWireButton(index);
+					if (wb) {
+						wm->scrollWidget->container->removeChild(wb);
+						delete wb;
+						wm->saveSettings();
+					}
+				}
+			},
+			[index, col]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					wm->insertColor(col, false, index);
+					wm->saveSettings();
+				}
+			}
+		));
+	}
+	void editEdit(WireButton *wb, NVGcolor col) {
+		NVGcolor oldCol = wb->color;
+		unsigned int index = wb->index();
+		wb->color = col;
+		APP->history->push(new EventAction(
+			"Edit Color",
+			[index, oldCol]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					WireButton *wb = wm->findWireButton(index);
+					if (wb) {
+						wb->color = oldCol;
+						wm->saveSettings();
+					}
+				}
+			},
+			[index, col]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					WireButton *wb = wm->findWireButton(index);
+					if (wb) {
+						wb->color = col;
+						wm->saveSettings();
+					}
+				}
+			}
+		));
+	}
 	void editDialog(WireButton *wb) {
 		backPanel->visible = false;
 		editPanel->completeHandler = [=](NVGcolor col) {
 			if (wb) {
-				wb->color = col;
+				editEdit(wb, col);
 			}
 			else {
-				addColor(col, false);
+				editAdd(col);
 			}
 			saveSettings();
 			cancel();
