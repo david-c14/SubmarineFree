@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.0.4
+- 06-Aug-2019 WM-101 Add undo to all functional changes
 - 01-Aug-2019 WM-101 Add text editor for hex colors
 - 31-Jul-2019 Add parameter labels to all parameters
 - 31-Jul-2019 WM-101 Add tooltips to sliders
