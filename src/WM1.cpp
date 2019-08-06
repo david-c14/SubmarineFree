@@ -167,6 +167,7 @@ struct EventSliderTooltip : ui::Tooltip {
 };
 
 struct EventSlider : OpaqueWidget {
+	float startingValue = 0.5f;
 	int transparent = false;
 	float value = 0.5f;
 	float minValue = 0.0f;
@@ -174,8 +175,8 @@ struct EventSlider : OpaqueWidget {
 	float defaultValue = 0.5f;
 	std::string label;
 	EventSliderTooltip *tooltip = NULL;
-	std::function<void(float)> changedHandler;
-	std::function<void(float)> changingHandler;
+	std::function<void(float, float)> changedHandler;
+	std::function<void(float, float)> changingHandler;
 	std::function<std::string(float)> textHandler;
 	void draw(const DrawArgs &args) override {
 		Vec minHandlePos;
@@ -211,6 +212,7 @@ struct EventSlider : OpaqueWidget {
 	}
 	void onDragStart(const event::DragStart &e) override {
 		if (e.button != GLFW_MOUSE_BUTTON_LEFT) return;
+		startingValue = value;
 		APP->window->cursorLock();
 	}
 	void onDragMove(const event::DragMove &e) override {
@@ -219,20 +221,21 @@ struct EventSlider : OpaqueWidget {
 		value = clamp(value, minValue, maxValue);
 		if (oldValue != value) {
 			if (changingHandler) {
-				changingHandler(value);
+				changingHandler(value, startingValue);
 			}
 		}
 	}
 	void onDragEnd(const event::DragEnd &e) override {
 		APP->window->cursorUnlock();
 		if (changedHandler) {
-			changedHandler(value);
+			changedHandler(value, startingValue);
 		}
 	}
 	void onDoubleClick(const event::DoubleClick &e) override {
+		startingValue = value;
 		value = defaultValue;
 		if (changedHandler) {
-			changedHandler(value);
+			changedHandler(value, startingValue);
 		}
 	}
 	void onEnter(const event::Enter &e) override {
@@ -760,7 +763,26 @@ struct WM101 : SizeableModuleWidget {
 			return string::f("%.4g%s", value * 360.0, "\xC2\xB0");
 		};
 		varyH->label = "Hue";
-		varyH->changedHandler = [=](float x) { this->saveSettings(); };
+		varyH->changedHandler = [=](float value, float oldValue) { 
+			this->saveSettings(); 
+			APP->history->push(new EventAction(
+				"Hue Variation Change",
+				[oldValue]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->varyH->value = oldValue;
+						wm->saveSettings();
+					}
+				},
+				[value]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->varyH->value = value;
+						wm->saveSettings();
+					}
+				}
+			));
+		};
 		settingsPanel->addChild(varyH);
 	
 		varyS = new EventSlider();
@@ -769,7 +791,26 @@ struct WM101 : SizeableModuleWidget {
 		varyS->value = 0.1f;
 		varyS->textHandler = percentageTextHandler;
 		varyS->label = "Saturation";
-		varyS->changedHandler = [=](float x) { this->saveSettings(); };
+		varyS->changedHandler = [=](float value, float oldValue) { 
+			this->saveSettings(); 
+			APP->history->push(new EventAction(
+				"Saturation Variation Change",
+				[oldValue]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->varyS->value = oldValue;
+						wm->saveSettings();
+					}
+				},
+				[value]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->varyS->value = value;
+						wm->saveSettings();
+					}
+				}
+			));
+		};
 		settingsPanel->addChild(varyS);
 	
 		varyL = new EventSlider();
@@ -778,7 +819,26 @@ struct WM101 : SizeableModuleWidget {
 		varyL->value = 0.1f;
 		varyL->textHandler = percentageTextHandler;
 		varyL->label = "Lightness";
-		varyL->changedHandler = [=](float x) { this->saveSettings(); };
+		varyL->changedHandler = [=](float value, float oldValue) { 
+			this->saveSettings(); 
+			APP->history->push(new EventAction(
+				"Lightness Variation Change",
+				[oldValue]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->varyL->value = oldValue;
+						wm->saveSettings();
+					}
+				},
+				[value]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->varyL->value = value;
+						wm->saveSettings();
+					}
+				}
+			));
+		};
 		settingsPanel->addChild(varyL);
 	
 		EventLabel *highlightLabel = new EventLabel();
@@ -824,9 +884,27 @@ struct WM101 : SizeableModuleWidget {
 		highlightSlider->value = 0.1f;
 		highlightSlider->textHandler = percentageTextHandler;
 		highlightSlider->label = "Opacity";
-		highlightSlider->changedHandler = [=](float x) { 
-			this->saveSettings();
-			highlightIsDirty = true; 
+		highlightSlider->changedHandler = [=](float value, float oldValue) { 
+			this->saveSettings(); 
+			APP->history->push(new EventAction(
+				"Highlight Opacity Change",
+				[oldValue]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->highlightSlider->value = oldValue;
+						wm->saveSettings();
+						wm->highlightIsDirty = true;
+					}
+				},
+				[value]() {
+					if (masterWireManager) {
+						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+						wm->highlightSlider->value = value;
+						wm->saveSettings();
+						wm->highlightIsDirty = true;
+					}
+				}
+			));
 		};
 		settingsPanel->addChild(highlightSlider);
 
@@ -1196,7 +1274,7 @@ struct WM101 : SizeableModuleWidget {
 		json_t *h1 = json_object_get(rootJ, "highlight");
 		if (h1) {
 			highlight = clamp((int)json_number_value(h1), 0, 2);
-			highlightChanged(highlight);
+			highlightChangedCore(highlight);
 		}
 		json_t *t1 = json_object_get(rootJ, "highlight_trans");
 		if (t1) {
@@ -1594,7 +1672,7 @@ struct WM101 : SizeableModuleWidget {
 		}
 		editPanel->visible = true;
 	}
-	void highlightChanged(int value) {
+	void highlightChangedCore(int value) {
 		highlight = value;
 		highlightOff->selected = false;
 		highlightLow->selected = false;
@@ -1613,6 +1691,27 @@ struct WM101 : SizeableModuleWidget {
 			break;
 		}
 		highlightIsDirty = true;
+	}
+	void highlightChanged(int value) {
+		int oldValue = highlight;
+		highlightChangedCore(value);
+		APP->history->push(new EventAction(
+			"Highlight Mode Changed",
+			[oldValue]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					wm->highlightChangedCore(oldValue);
+					wm->saveSettings();
+				}
+			},
+			[value]() {
+				if (masterWireManager) {
+					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
+					wm->highlightChangedCore(value);
+					wm->saveSettings();
+				}
+			}
+		));
 	}
 	void _delete() {
 		if (masterWireManager != this)
