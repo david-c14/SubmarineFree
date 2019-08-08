@@ -2,21 +2,21 @@
 #include "../SubmarineFree.hpp"
 #include "EventWidgets.hpp"
 
-	void EventAction::undo() {
+	void EventWidgetAction::undo() {
 		if (undoHandler)
 			undoHandler();
 	}
-	void EventAction::redo() {
+	void EventWidgetAction::redo() {
 		if (redoHandler)
 			redoHandler();
 	}
-	EventAction::EventAction(std::string name, std::function<void()> uHandler, std::function<void()> rHandler) {
+	EventWidgetAction::EventWidgetAction(std::string name, std::function<void()> uHandler, std::function<void()> rHandler) {
 		this->name = name;
 		undoHandler = uHandler;
 		redoHandler = rHandler;
 	}
 
-	void EventButton::onButton(const event::Button &e) {
+	void EventWidgetButtonBase::onButton(const event::Button &e) {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
 			if (clickHandler) {
 				clickHandler();
@@ -34,7 +34,7 @@
 		OpaqueWidget::onButton(e);
 	}
 
-	void EventSlider::draw(const DrawArgs &args) {
+	void EventWidgetSlider::draw(const DrawArgs &args) {
 		Vec minHandlePos;
 		Vec maxHandlePos;
 		float width;
@@ -66,12 +66,12 @@
 		if (!transparent) nvgFill(args.vg);
 		nvgStroke(args.vg);
 	}
-	void EventSlider::onDragStart(const event::DragStart &e) {
+	void EventWidgetSlider::onDragStart(const event::DragStart &e) {
 		if (e.button != GLFW_MOUSE_BUTTON_LEFT) return;
 		startingValue = value;
 		APP->window->cursorLock();
 	}
-	void EventSlider::onDragMove(const event::DragMove &e) {
+	void EventWidgetSlider::onDragMove(const event::DragMove &e) {
 		float oldValue = value;
 		value += e.mouseDelta.x * (maxValue - minValue) * 0.001f;
 		value = clamp(value, minValue, maxValue);
@@ -81,27 +81,27 @@
 			}
 		}
 	}
-	void EventSlider::onDragEnd(const event::DragEnd &e) {
+	void EventWidgetSlider::onDragEnd(const event::DragEnd &e) {
 		APP->window->cursorUnlock();
 		if (changedHandler) {
 			changedHandler(value, startingValue);
 		}
 	}
-	void EventSlider::onDoubleClick(const event::DoubleClick &e) {
+	void EventWidgetSlider::onDoubleClick(const event::DoubleClick &e) {
 		startingValue = value;
 		value = defaultValue;
 		if (changedHandler) {
 			changedHandler(value, startingValue);
 		}
 	}
-	void EventSlider::onEnter(const event::Enter &e) {
+	void EventWidgetSlider::onEnter(const event::Enter &e) {
 		if (settings::paramTooltip && !tooltip) {
-			tooltip = new EventSliderTooltip();
+			tooltip = new EventWidgetSliderTooltip();
 			tooltip->slider = this;
 			APP->scene->addChild(tooltip);
 		}	
 	}
-	void EventSlider::onLeave(const event::Leave &e) {
+	void EventWidgetSlider::onLeave(const event::Leave &e) {
 		if (tooltip) {
 			APP->scene->removeChild(tooltip);
 			delete tooltip;
@@ -109,7 +109,7 @@
 		}
 	}
 
-void EventSliderTooltip::step() {
+void EventWidgetSliderTooltip::step() {
 	if (slider->textHandler) {
 		text = slider->textHandler(slider->value);
 	}
@@ -123,7 +123,7 @@ void EventSliderTooltip::step() {
 	box.pos = slider->getAbsoluteOffset(slider->box.size).round();
 }
 
-	CheckBox::CheckBox() {
+	EventWidgetCheckBox::EventWidgetCheckBox() {
 		clickHandler = [=]() { 
 			selected = !selected;
 			if (changeHandler) {
@@ -131,7 +131,7 @@ void EventSliderTooltip::step() {
 			}
 		};
 	}
-	void CheckBox::draw (const DrawArgs &args) {
+	void EventWidgetCheckBox::draw (const DrawArgs &args) {
 		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		if (!label.empty()) {
 			nvgFontFaceId(args.vg, APP->window->uiFont->handle);
@@ -155,7 +155,7 @@ void EventSliderTooltip::step() {
 		OpaqueWidget::draw(args);
 	}
 
-	EventRadioButton::EventRadioButton() {
+	EventWidgetRadioButton::EventWidgetRadioButton() {
 		clickHandler = [=]() {
 			if (selected)
 				return;
@@ -165,7 +165,7 @@ void EventSliderTooltip::step() {
 			}
 		};
 	}
-	void EventRadioButton::draw (const DrawArgs &args) {
+	void EventWidgetRadioButton::draw (const DrawArgs &args) {
 		nvgStrokeWidth(args.vg, 1);
 		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		if (!label.empty()) {
@@ -183,10 +183,10 @@ void EventSliderTooltip::step() {
 		nvgCircle(args.vg, box.size.y / 2 + 1, box.size.y / 2, 8);
 		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		nvgStroke(args.vg);
-		EventButton::draw(args);
+		EventWidgetButtonBase::draw(args);
 	}
 
-	void EventLabel::draw(const DrawArgs &args) {
+	void EventWidgetLabel::draw(const DrawArgs &args) {
 		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		if (!label.empty()) {
 			nvgFontFaceId(args.vg, APP->window->uiFont->handle);
@@ -197,7 +197,7 @@ void EventSliderTooltip::step() {
 		Widget::draw(args);
 	}
 
-	void RectButton::draw(const DrawArgs &args) {
+	void EventWidgetButton::draw(const DrawArgs &args) {
 		nvgFillColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
 		if (!label.empty()) {
 			nvgFontFaceId(args.vg, APP->window->uiFont->handle);
@@ -212,7 +212,7 @@ void EventSliderTooltip::step() {
 		nvgStroke(args.vg);
 		OpaqueWidget::draw(args);
 	}
-	void RectButton::onButton(const event::Button &e) {
+	void EventWidgetButton::onButton(const event::Button &e) {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
 			e.consume(this);
 			if (clickHandler) {
@@ -223,7 +223,7 @@ void EventSliderTooltip::step() {
 		OpaqueWidget::onButton(e);
 	}
 
-	void EventMenuItem::onAction(const event::Action &e) {
+	void EventWidgetMenuItem::onAction(const event::Action &e) {
 		e.consume(this);
 		if (clickHandler) {
 			clickHandler();

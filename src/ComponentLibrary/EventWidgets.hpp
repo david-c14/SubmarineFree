@@ -1,27 +1,27 @@
 #include <functional>
 
-struct EventAction : history::Action {
+struct EventWidgetAction : history::Action {
 	std::function<void ()> undoHandler;
 	std::function<void ()> redoHandler;
 	void undo() override;
 	void redo() override;
-	EventAction(std::string name, std::function<void()> uHandler, std::function<void()> rHandler);
+	EventWidgetAction(std::string name, std::function<void()> uHandler, std::function<void()> rHandler);
 };
 
-struct EventButton : OpaqueWidget {
+struct EventWidgetButtonBase : OpaqueWidget {
 	std::function<void ()> clickHandler;
 	std::function<void ()> rightClickHandler;
 	void onButton(const event::Button &e) override;
 };
 
-struct EventSlider;
+struct EventWidgetSlider;
 
-struct EventSliderTooltip : ui::Tooltip {
-	EventSlider *slider;
+struct EventWidgetSliderTooltip : ui::Tooltip {
+	EventWidgetSlider *slider;
 	void step() override; 
 };
 
-struct EventSlider : OpaqueWidget {
+struct EventWidgetSlider : OpaqueWidget {
 	float startingValue = 0.5f;
 	int transparent = false;
 	float value = 0.5f;
@@ -29,7 +29,7 @@ struct EventSlider : OpaqueWidget {
 	float maxValue = 1.0f;
 	float defaultValue = 0.5f;
 	std::string label;
-	EventSliderTooltip *tooltip = NULL;
+	EventWidgetSliderTooltip *tooltip = NULL;
 	std::function<void(float, float)> changedHandler;
 	std::function<void(float, float)> changingHandler;
 	std::function<std::string(float)> textHandler;
@@ -42,35 +42,35 @@ struct EventSlider : OpaqueWidget {
 	void onLeave(const event::Leave &e) override;
 };
 
-struct CheckBox : EventButton {
+struct EventWidgetCheckBox : EventWidgetButtonBase {
 	std::string label;
 	bool selected = false;
 	std::function<void()> changeHandler;
-	CheckBox();
+	EventWidgetCheckBox();
 	void draw (const DrawArgs &args) override;
 };
 
-struct EventRadioButton : EventButton {
+struct EventWidgetRadioButton : EventWidgetButtonBase {
 	std::string label;
 	bool selected = false;
 	std::function<void()> changeHandler;
-	EventRadioButton();
+	EventWidgetRadioButton();
 	void draw (const DrawArgs &args) override;
 };
 
-struct EventLabel : Widget {
+struct EventWidgetLabel : Widget {
 	std::string label;
 	void draw(const DrawArgs &args) override;
 };
 
-struct RectButton : OpaqueWidget {
+struct EventWidgetButton : OpaqueWidget {
 	std::string label;
 	std::function<void ()> clickHandler;
 	void draw(const DrawArgs &args) override;
 	void onButton(const event::Button &e) override;
 };
 
-struct EventMenuItem : MenuItem {
+struct EventWidgetMenuItem : MenuItem {
 	std::function<void()> clickHandler;
 	void onAction(const event::Action &e) override;
 };
