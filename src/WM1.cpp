@@ -1,10 +1,6 @@
 //SubTag W10
 #include <settings.hpp>
 #include "SubmarineFree.hpp"
-#include "ComponentLibrary/EventWidgets.hpp"
-#include "ComponentLibrary/SizeableModuleWidget.hpp"
-
-Widget *masterWireManager = NULL;
 
 struct BackPanel : Widget {
 	void draw(const DrawArgs &args) override {
@@ -240,6 +236,11 @@ struct WireButton : EventWidgetButtonBase {
 	}
 };
 
+struct WM101;
+
+WM101 *masterWireManager = NULL;
+
+
 struct WM101 : SizeableModuleWidget {
 
 	enum {
@@ -389,16 +390,14 @@ struct WM101 : SizeableModuleWidget {
 				"Hue Variation Change",
 				[oldValue]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->varyH->value = oldValue;
-						wm->saveSettings();
+						masterWireManager->varyH->value = oldValue;
+						masterWireManager->saveSettings();
 					}
 				},
 				[value]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->varyH->value = value;
-						wm->saveSettings();
+						masterWireManager->varyH->value = value;
+						masterWireManager->saveSettings();
 					}
 				}
 			));
@@ -417,16 +416,14 @@ struct WM101 : SizeableModuleWidget {
 				"Saturation Variation Change",
 				[oldValue]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->varyS->value = oldValue;
-						wm->saveSettings();
+						masterWireManager->varyS->value = oldValue;
+						masterWireManager->saveSettings();
 					}
 				},
 				[value]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->varyS->value = value;
-						wm->saveSettings();
+						masterWireManager->varyS->value = value;
+						masterWireManager->saveSettings();
 					}
 				}
 			));
@@ -445,16 +442,14 @@ struct WM101 : SizeableModuleWidget {
 				"Lightness Variation Change",
 				[oldValue]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->varyL->value = oldValue;
-						wm->saveSettings();
+						masterWireManager->varyL->value = oldValue;
+						masterWireManager->saveSettings();
 					}
 				},
 				[value]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->varyL->value = value;
-						wm->saveSettings();
+						masterWireManager->varyL->value = value;
+						masterWireManager->saveSettings();
 					}
 				}
 			));
@@ -510,18 +505,16 @@ struct WM101 : SizeableModuleWidget {
 				"Highlight Opacity Change",
 				[oldValue]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->highlightSlider->value = oldValue;
-						wm->saveSettings();
-						wm->highlightIsDirty = true;
+						masterWireManager->highlightSlider->value = oldValue;
+						masterWireManager->saveSettings();
+						masterWireManager->highlightIsDirty = true;
 					}
 				},
 				[value]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						wm->highlightSlider->value = value;
-						wm->saveSettings();
-						wm->highlightIsDirty = true;
+						masterWireManager->highlightSlider->value = value;
+						masterWireManager->saveSettings();
+						masterWireManager->highlightIsDirty = true;
 					}
 				}
 			));
@@ -574,16 +567,14 @@ struct WM101 : SizeableModuleWidget {
 			selected?"Select Variations":"Deselect Variations",
 			[selected]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					wm->varyCheck->selected = !selected;
-					wm->saveSettings();
+					masterWireManager->varyCheck->selected = !selected;
+					masterWireManager->saveSettings();
 				}
 			},
 			[selected]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					wm->varyCheck->selected = selected;
-					wm->saveSettings();
+					masterWireManager->varyCheck->selected = selected;
+					masterWireManager->saveSettings();
 				}
 			}
 		));
@@ -795,21 +786,19 @@ struct WM101 : SizeableModuleWidget {
 				selected?"Select Color":"Deselect Color",	
 				[index, selected]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						WireButton *wb = wm->findWireButton(index);
+						WireButton *wb = masterWireManager->findWireButton(index);
 						if (wb) {
 							wb->checkBox->selected = !selected;
-							wm->saveSettings();
+							masterWireManager->saveSettings();
 						}
 					}
 				},
 				[index, selected]() {
 					if (masterWireManager) {
-						WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-						WireButton *wb = wm->findWireButton(index);
+						WireButton *wb = masterWireManager->findWireButton(index);
 						if (wb) {
 							wb->checkBox->selected = selected;
-							wm->saveSettings();
+							masterWireManager->saveSettings();
 						}
 					}
 				}
@@ -960,14 +949,12 @@ struct WM101 : SizeableModuleWidget {
 			complex->name,
 			[selected]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					wm->checkBoxAll->selected = !selected;
+					masterWireManager->checkBoxAll->selected = !selected;
 				}
 			},
 			[selected]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					wm->checkBoxAll->selected = selected;
+					masterWireManager->checkBoxAll->selected = selected;
 				}
 			}
 		);
@@ -1133,24 +1120,18 @@ struct WM101 : SizeableModuleWidget {
 			"Delete Color",
 			[color, selected, index]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					if (wm) {
-						wm->insertColor(color, selected, index);
-						wm->saveSettings();
-					}
+					masterWireManager->insertColor(color, selected, index);
+					masterWireManager->saveSettings();
 				}
 			},
 			[index] {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					if (wm) {
-						WireButton *wb = wm->findWireButton(index);
-						if (wb) {
-							wm->scrollWidget->container->removeChild(wb);
-							delete wb;
-							wm->reflow();
-							wm->saveSettings();
-						}
+					WireButton *wb = masterWireManager->findWireButton(index);
+					if (wb) {
+						masterWireManager->scrollWidget->container->removeChild(wb);
+						delete wb;
+						masterWireManager->reflow();
+						masterWireManager->saveSettings();
 					}
 				}
 			}
@@ -1222,20 +1203,18 @@ struct WM101 : SizeableModuleWidget {
 			"Add Color",
 			[index]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					WireButton *wb = wm->findWireButton(index);
+					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
-						wm->scrollWidget->container->removeChild(wb);
+						masterWireManager->scrollWidget->container->removeChild(wb);
 						delete wb;
-						wm->saveSettings();
+						masterWireManager->saveSettings();
 					}
 				}
 			},
 			[index, col]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					wm->insertColor(col, false, index);
-					wm->saveSettings();
+					masterWireManager->insertColor(col, false, index);
+					masterWireManager->saveSettings();
 				}
 			}
 		));
@@ -1248,21 +1227,19 @@ struct WM101 : SizeableModuleWidget {
 			"Edit Color",
 			[index, oldCol]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					WireButton *wb = wm->findWireButton(index);
+					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
 						wb->color = oldCol;
-						wm->saveSettings();
+						masterWireManager->saveSettings();
 					}
 				}
 			},
 			[index, col]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					WireButton *wb = wm->findWireButton(index);
+					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
 						wb->color = col;
-						wm->saveSettings();
+						masterWireManager->saveSettings();
 					}
 				}
 			}
@@ -1319,16 +1296,14 @@ struct WM101 : SizeableModuleWidget {
 			"Highlight Mode Changed",
 			[oldValue]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					wm->highlightChangedCore(oldValue);
-					wm->saveSettings();
+					masterWireManager->highlightChangedCore(oldValue);
+					masterWireManager->saveSettings();
 				}
 			},
 			[value]() {
 				if (masterWireManager) {
-					WM101 *wm = dynamic_cast<WM101 *>(masterWireManager);
-					wm->highlightChangedCore(value);
-					wm->saveSettings();
+					masterWireManager->highlightChangedCore(value);
+					masterWireManager->saveSettings();
 				}
 			}
 		));

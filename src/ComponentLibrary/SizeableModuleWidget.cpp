@@ -1,7 +1,5 @@
 #include <settings.hpp>
 #include "../SubmarineFree.hpp"
-#include "EventWidgets.hpp"
-#include "SizeableModuleWidget.hpp"
 
 SizeableModuleWidget::SizeableModuleWidget(Module *module, float size) : SchemeModuleWidget(module) {
 	fullSize = size;

@@ -1,6 +1,5 @@
 #include <settings.hpp>
 #include "../SubmarineFree.hpp"
-#include "EventWidgets.hpp"
 
 	void EventWidgetAction::undo() {
 		if (undoHandler)
