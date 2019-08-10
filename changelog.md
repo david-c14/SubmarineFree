@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.0.4
+- 10-Aug-2019 WM-101 Bug fix inactive WM-101 not shifting other modules when minimized
 - 06-Aug-2019 WM-101 Add undo to all functional changes
 - 01-Aug-2019 WM-101 Add text editor for hex colors
 - 31-Jul-2019 Add parameter labels to all parameters
