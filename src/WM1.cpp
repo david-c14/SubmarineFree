@@ -2,112 +2,9 @@
 #include <settings.hpp>
 #include "SubmarineFree.hpp"
 #include "ComponentLibrary/EventWidgets.hpp"
+#include "ComponentLibrary/SizeableModuleWidget.hpp"
 
 Widget *masterWireManager = NULL;
-
-struct SizeableModuleWidget : SchemeModuleWidget {
-	bool stabilized = false;
-	float fullSize = 0;
-	SchemePanel *panel;
-	SizeableModuleWidget(Module *module, float size) : SchemeModuleWidget(module) {
-		fullSize = size;
-		this->box.size = Vec(fullSize, 380);
-		panel = new SchemePanel(this->box.size);
-		addChild(panel);
-	}
-	void Resize() {
-		panel->box.size = this->box.size;
-		panel->dirty = true;
-		onResize();
-	}
-	void Minimize(bool minimize) {
-		float oldSize = box.size.x;
-		box.size.x = minimize?15:fullSize;
-		ShiftOthers(box.size.x - oldSize);
-		Resize();
-		unsigned int id = module->id;
-		float fs = fullSize; 
-		if (!stabilized)
-			return;
-		APP->history->push(new EventWidgetAction(
-			"Resize Wire Manager",
-			[id, minimize, fs]() {
-				SizeableModuleWidget *mw = dynamic_cast<SizeableModuleWidget *>(APP->scene->rack->getModule(id));
-				if (mw) {
-					mw->box.size.x = minimize?fs:15;
-					mw->ShiftOthers(minimize?(fs-15):(15-fs));
-					mw->Resize();
-				}
-			},
-			[id, minimize, fs]() {
-				SizeableModuleWidget *mw = dynamic_cast<SizeableModuleWidget *>(APP->scene->rack->getModule(id));
-				if (mw) {
-					mw->box.size.x = minimize?15:fs;
-					mw->ShiftOthers(minimize?(15-fs):(fs-15));
-					mw->Resize();
-				}
-			}
-		));
-	}
-	void ShiftOthers(float delta) {
-		if (!stabilized)
-			return;
-		if (delta == 0.0f)
-			return;
-		for (Widget *w : APP->scene->rack->moduleContainer->children) {
-			if (this == w)
-				continue;
-			if (this->box.pos.x > w->box.pos.x) 
-				continue;
-			if (this->box.pos.y != w->box.pos.y)
-				continue;
-			w->box.pos.x += delta;
-		}
-	}
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
-		json_object_set_new (rootJ, "width", json_real(box.size.x));
-		return rootJ;
-	}
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-		json_t *widthJ = json_object_get(rootJ, "width");
-		if (widthJ)
-			box.size.x = json_number_value(widthJ);
-		Minimize(box.size.x < 16.0f);
-		APP->scene->rack->requestModulePos(this, box.pos);
-	}
-	virtual void onResize() {
-	}
-};
-
-struct MinButton : EventWidgetButtonBase {
-	SizeableModuleWidget *mw;
-	MinButton() {
-		this->box.size = Vec(10, 20);
-		this->clickHandler = [=]() {
-			mw->Minimize(mw->box.size.x > 16.0f);
-		};
-	}
-	void draw(const DrawArgs &args) override {
-		nvgBeginPath(args.vg);
-		if (this->box.pos.x < 15.0f) {
-			nvgMoveTo(args.vg, 0, 0);
-			nvgLineTo(args.vg, 10, 10);
-			nvgLineTo(args.vg, 0, 20);
-			nvgClosePath(args.vg);
-		}
-		else {
-			nvgMoveTo(args.vg, 10, 0);
-			nvgLineTo(args.vg, 0, 10);
-			nvgLineTo(args.vg, 10, 20);
-			nvgClosePath(args.vg);
-		}
-		nvgFillColor(args.vg, gScheme.getAlternative(mw->module));
-		nvgFill(args.vg);
-		Widget::draw(args);
-	}
-};
 
 struct BackPanel : Widget {
 	void draw(const DrawArgs &args) override {
@@ -717,6 +614,10 @@ struct WM101 : SizeableModuleWidget {
 		if (!module) {
 			return;
 		}
+		if (!stabilized) {
+			stabilized = true;
+			cableCount = APP->scene->rack->cableContainer->children.size();
+		}
 		if (masterWireManager != this) {
 			if (masterWireManager) {
 				blockingPanel->visible = (box.size.x > 16.0f);
@@ -727,10 +628,6 @@ struct WM101 : SizeableModuleWidget {
 				return;
 			}
 			takeMasterSlot();
-		}
-		if (!stabilized) {
-			stabilized = true;
-			cableCount = APP->scene->rack->cableContainer->children.size();
 		}
 		int newSize = APP->scene->rack->cableContainer->children.size();
 		if (newSize < cableCount) {
