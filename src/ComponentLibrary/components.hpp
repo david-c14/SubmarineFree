@@ -250,9 +250,6 @@ struct SchemeModuleWidget : app::ModuleWidget {
 // SubText
 //////////////////
 
-struct SubTextForegroundMenu;
-struct SubTextBackgroundMenu;
-
 struct SubText : LedDisplayTextField {
 	NVGcolor bgColor = nvgRGB(0x00, 0x00, 0x00);
 	int fontSize = 12;
@@ -262,34 +259,10 @@ struct SubText : LedDisplayTextField {
 	int getTextPosition(Vec mousePos) override; 
 	void draw(const DrawArgs &args) override;
 	void appendContextMenu(Menu *menu);
-	SubTextForegroundMenu *createForegroundMenuItem(std::string label, NVGcolor color);
-	SubTextBackgroundMenu *createBackgroundMenuItem(std::string label, NVGcolor color);
+	MenuItem *createForegroundMenuItem(std::string label, NVGcolor color);
+	MenuItem *createBackgroundMenuItem(std::string label, NVGcolor color);
 	virtual void foregroundMenu(Menu *menu);
 	virtual void backgroundMenu(Menu *menu);
-};
-
-struct SubTextForegroundParent : MenuItem {
-	SubText *subText;
-	Menu *createChildMenu() override;
-};
-
-struct SubTextForegroundMenu : MenuItem {
-	SubText *subText;
-	NVGcolor color;
-	void onAction(const event::Action &e) override;
-	void step() override; 
-};
-
-struct SubTextBackgroundParent : MenuItem {
-	SubText *subText;
-	Menu *createChildMenu() override;
-};
-
-struct SubTextBackgroundMenu : MenuItem {
-	SubText *subText;
-	NVGcolor color;
-	void onAction(const event::Action &e) override;
-	void step() override;
 };
 
 //////////////////
@@ -391,7 +364,11 @@ struct EventWidgetButton : EventWidgetButtonBase {
 
 struct EventWidgetMenuItem : MenuItem {
 	std::function<void()> clickHandler;
+	std::function<Menu *()> childMenuHandler;
+	std::function<void()> stepHandler;
 	void onAction(const event::Action &e) override;
+	Menu *createChildMenu() override;
+	void step() override;
 };
 
 //////////////////

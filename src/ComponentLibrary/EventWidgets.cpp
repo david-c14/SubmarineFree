@@ -227,3 +227,17 @@ void EventWidgetMenuItem::onAction(const event::Action &e) {
 		clickHandler();
 	}
 }	
+
+Menu *EventWidgetMenuItem::createChildMenu() {
+	if (childMenuHandler) {
+		return childMenuHandler();
+	}
+	return MenuItem::createChildMenu();
+}
+
+void EventWidgetMenuItem::step() {
+	if (stepHandler) {
+		stepHandler();
+	}
+	MenuItem::step();
+}

@@ -3,36 +3,6 @@
 
 #define COLOR_EQ(x,y) (((x).a == (y).a) && ((x).r == (y).r) && ((x).g == (y).g) && ((x).b == (y).b))
 
-Menu *SubTextForegroundParent::createChildMenu()  {
-	Menu *menu = new Menu();
-	subText->foregroundMenu(menu);
-	return menu;	
-}
-
-void SubTextForegroundMenu::onAction(const event::Action &e) {
-	subText->color = color;
-}
-
-void SubTextForegroundMenu::step() {
-	rightText = CHECKMARK(COLOR_EQ(subText->color, color));
-	MenuItem::step();
-}
-
-Menu *SubTextBackgroundParent::createChildMenu() {
-	Menu *menu = new Menu();
-	subText->backgroundMenu(menu);
-	return menu;
-}
-
-void SubTextBackgroundMenu::onAction(const event::Action &e) {
-	subText->bgColor = color;
-}
-
-void SubTextBackgroundMenu::step() {
-	rightText = CHECKMARK(COLOR_EQ(subText->bgColor, color));
-	MenuItem::step();
-}
-
 int SubText::getTextPosition(Vec mousePos) {
     bndSetFont(font->handle);
     int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
@@ -67,27 +37,43 @@ void SubText::draw(const DrawArgs &args) {
 }
 
 void SubText::appendContextMenu(Menu *menu) {
-	SubTextForegroundParent *fp = createMenuItem<SubTextForegroundParent>("Foreground");
-	fp->subText = this;
-	fp->rightText = SUBMENU; 	
+	EventWidgetMenuItem *fp = createMenuItem<EventWidgetMenuItem>("Foreground");
+	fp->rightText = SUBMENU;
+	fp->childMenuHandler = [=]() {
+		Menu *menu = new Menu();
+		this->foregroundMenu(menu);
+		return menu;
+	};
 	menu->addChild(fp);
-	SubTextBackgroundParent *bp = createMenuItem<SubTextBackgroundParent>("Background");
-	bp->subText = this;
+	EventWidgetMenuItem *bp = createMenuItem<EventWidgetMenuItem>("Background");
 	bp->rightText = SUBMENU;
+	bp->childMenuHandler = [=]() {
+		Menu *menu = new Menu();
+		this->backgroundMenu(menu);
+		return menu;
+	};
 	menu->addChild(bp);
 }
 
-SubTextForegroundMenu *SubText::createForegroundMenuItem(std::string label, NVGcolor color) {
-	SubTextForegroundMenu *menu = createMenuItem<SubTextForegroundMenu>(label);
-	menu->subText = this;
-	menu->color = color;
+MenuItem *SubText::createForegroundMenuItem(std::string label, NVGcolor color) {
+	EventWidgetMenuItem *menu = createMenuItem<EventWidgetMenuItem>(label);
+	menu->stepHandler = [=]() {
+		menu->rightText = CHECKMARK(COLOR_EQ(this->color, color));
+	};
+	menu->clickHandler = [=]() {
+		this->color = color;
+	};	
 	return menu;
 }
 
-SubTextBackgroundMenu *SubText::createBackgroundMenuItem(std::string label, NVGcolor color) {
-	SubTextBackgroundMenu *menu = createMenuItem<SubTextBackgroundMenu>(label);
-	menu->subText = this;
-	menu->color = color;
+MenuItem *SubText::createBackgroundMenuItem(std::string label, NVGcolor color) {
+	EventWidgetMenuItem *menu = createMenuItem<EventWidgetMenuItem>(label);
+	menu->stepHandler = [=]() {
+		menu->rightText = CHECKMARK(COLOR_EQ(this->bgColor, color));
+	};
+	menu->clickHandler = [=]() {
+		this->bgColor = color;
+	};	
 	return menu;
 }
 
