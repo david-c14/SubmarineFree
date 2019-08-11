@@ -384,11 +384,9 @@ struct EventWidgetLabel : Widget {
 	void draw(const DrawArgs &args) override;
 };
 
-struct EventWidgetButton : OpaqueWidget {
+struct EventWidgetButton : EventWidgetButtonBase {
 	std::string label;
-	std::function<void ()> clickHandler;
 	void draw(const DrawArgs &args) override;
-	void onButton(const event::Button &e) override;
 };
 
 struct EventWidgetMenuItem : MenuItem {
