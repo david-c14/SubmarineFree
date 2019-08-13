@@ -142,49 +142,6 @@ void SchemeCanvasWidget::draw(const DrawArgs &args) {
 	Widget::draw(args);
 }
 
-struct SchemeModuleWidgetSchemeMenuItem : MenuItem {
-	int scheme;
-	void onAction(const event::Action &e) override {
-		gScheme.scheme = scheme;
-		gScheme.setColors();
-		gScheme.save();
-	}
-	void step() override {
-		rightText = CHECKMARK(scheme == gScheme.scheme);
-		MenuItem::step();
-	}
-};
-
-struct SchemeModuleWidgetFlatMenuItem : MenuItem {
-	void onAction(const event::Action &e) override {
-		gScheme.isFlat = !gScheme.isFlat;
-		gScheme.save();
-	}
-	void step() override {
-		rightText = CHECKMARK(gScheme.isFlat);
-		MenuItem::step();
-	}
-};
-
-struct SchemeModuleWidgetVisualMenuItem : MenuItem {
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-		SchemeModuleWidgetFlatMenuItem *fmi = createMenuItem<SchemeModuleWidgetFlatMenuItem>("Flat");
-		menu->addChild(fmi);
-		menu->addChild(new MenuSeparator());
-		SchemeModuleWidgetSchemeMenuItem *vmi = createMenuItem<SchemeModuleWidgetSchemeMenuItem>("Blue");
-		vmi->scheme = 0;
-		menu->addChild(vmi);
-		vmi = createMenuItem<SchemeModuleWidgetSchemeMenuItem>("Dark");
-		vmi->scheme = 1;
-		menu->addChild(vmi);
-		vmi = createMenuItem<SchemeModuleWidgetSchemeMenuItem>("Light");
-		vmi->scheme = 2;
-		menu->addChild(vmi);
-		return menu;
-	}
-};
-
 void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 	if (gScheme.isFlat) {
 		nvgBeginPath(vg);
@@ -314,7 +271,51 @@ void SchemeModuleWidget::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 
 void SchemeModuleWidget::appendContextMenu(Menu * menu) {
 	menu->addChild(new MenuEntry);
-	SchemeModuleWidgetVisualMenuItem *m = createMenuItem<SchemeModuleWidgetVisualMenuItem>("Visuals");
+	EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>("Visuals");
+	m->childMenuHandler = [=]() {
+		Menu *menu = new Menu();
+		EventWidgetMenuItem *fmi = createMenuItem<EventWidgetMenuItem>("Flat");
+		fmi->stepHandler = [=]() {
+			fmi->rightText = CHECKMARK(gScheme.isFlat);
+		};
+		fmi->clickHandler = [=]() {
+			gScheme.isFlat = !gScheme.isFlat;
+			gScheme.save();
+		};
+		menu->addChild(fmi);
+		menu->addChild(new MenuSeparator());
+		EventWidgetMenuItem *vmi = createMenuItem<EventWidgetMenuItem>("Blue");
+		vmi->stepHandler = [=]() {
+			vmi->rightText = CHECKMARK(gScheme.scheme == 0);
+		};
+		vmi->clickHandler = [=]() {
+			gScheme.scheme = 0;
+			gScheme.setColors();
+			gScheme.save();	
+		};
+		menu->addChild(vmi);
+		vmi = createMenuItem<EventWidgetMenuItem>("Dark");
+		vmi->stepHandler = [=]() {
+			vmi->rightText = CHECKMARK(gScheme.scheme == 1);
+		};
+		vmi->clickHandler = [=]() {
+			gScheme.scheme = 1;
+			gScheme.setColors();
+			gScheme.save();	
+		};
+		menu->addChild(vmi);
+		vmi = createMenuItem<EventWidgetMenuItem>("Light");
+		vmi->stepHandler = [=]() {
+			vmi->rightText = CHECKMARK(gScheme.scheme == 2);
+		};
+		vmi->clickHandler = [=]() {
+			gScheme.scheme = 2;
+			gScheme.setColors();
+			gScheme.save();	
+		};
+		menu->addChild(vmi);
+		return menu;
+	};
 	m->rightText = SUBMENU;
 	menu->addChild(m);
 }
