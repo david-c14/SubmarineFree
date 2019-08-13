@@ -302,20 +302,6 @@ struct WK_Display : TransparentWidget {
 	}
 };
 
-struct WK101_MenuItem : MenuItem {
-	WK_101 *module;
-	int index;
-	void onAction(const event::Action &e) override {
-		if (!module) {
-			return;
-		}
-		for (int i = 0; i < 12; i++) {
-			APP->engine->setParam(module, WK_101::PARAM_1 + i, tunings[index].offsets[i]);
-		}
-		module->toSend = true;
-	}
-};
-
 struct WK_Param : MedKnob<LightKnob> {
 	WK_101 *module;
 	unsigned int index;
@@ -543,9 +529,13 @@ void WK101::appendContextMenu(Menu *menu) {
 	if (module) {
 		menu->addChild(new MenuEntry);
 		for (unsigned int i = 0; i < tunings.size(); i++) { 
-			WK101_MenuItem *m = createMenuItem<WK101_MenuItem>(tunings[i].name.c_str());
-			m->module = module;
-			m->index = i;
+			EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>(tunings[i].name.c_str());
+			m->clickHandler = [=]() {
+				for (int j = 0; j < 12; j++) {
+					APP->engine->setParam(module, WK_101::PARAM_1 + j, tunings[i].offsets[j]);
+				}
+				module->toSend = true;
+			};
 			menu->addChild(m);
 		}
 	}
@@ -633,18 +623,6 @@ void WK205_InputPort::received(std::string pluginName, std::string moduleName, j
 	}
 }
 
-struct WK205_MenuItem : MenuItem {
-	WK_205 *module;
-	int index;
-	void onAction(const event::Action &e) override {
-		if (!module) {
-			return;
-		}
-		for (int i = 0; i < 12; i++)
-			module->tunings[i] = tunings[index].offsets[i];
-	}
-};
-
 struct WK205 : SchemeModuleWidget {
 	WK205(WK_205 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(30, 380);
@@ -664,9 +642,12 @@ struct WK205 : SchemeModuleWidget {
 		if (module) {
 			menu->addChild(new MenuEntry);
 			for (unsigned int i = 0; i < tunings.size(); i++) { 
-				WK205_MenuItem *m = createMenuItem<WK205_MenuItem>(tunings[i].name.c_str());
-				m->module = module;
-				m->index = i;
+				EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>(tunings[i].name.c_str());
+				m->clickHandler = [=]() {
+					for (int j = 0; j < 12; j++) {
+						module->tunings[j] = tunings[i].offsets[j];
+					}
+				};
 				menu->addChild(m);
 			}
 		}
