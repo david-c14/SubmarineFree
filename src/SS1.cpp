@@ -108,7 +108,32 @@ struct SS212 : SchemeModuleWidget {
 			addOutput(createOutputCentered<SilverPort>(Vec(15,31.5 + i * 29), module, i));
 		}
 	}
-	void appendContextMenu(Menu *menu) override;
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		SS_212 *ss_212 = dynamic_cast<SS_212*>(this->module);
+		if (ss_212) {
+			EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>("Octave");
+			m->rightText = SUBMENU;
+			m->childMenuHandler = [=]() {
+				char label[20];
+				Menu *menu = new Menu();
+				for (int i = -5; i < 5; i++) {
+					sprintf(label, "Octave %d", i);
+					EventWidgetMenuItem *menuItem = createMenuItem<EventWidgetMenuItem>(label);
+					menuItem->stepHandler = [=]() {
+						menuItem->rightText = CHECKMARK(ss_212->v == i);
+					};
+					menuItem->clickHandler = [=]() {
+						ss_212->v = i;
+						ss_212->setValues();
+					};
+					menu->addChild(menuItem);
+				}
+				return menu;
+			};
+			menu->addChild(m);
+		}
+	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SS-212");
 		nvgFillColor(vg, gScheme.getAlternative(module));
@@ -123,46 +148,6 @@ struct SS212 : SchemeModuleWidget {
 		nvgFill(vg);
 	}
 };
-
-struct SSMenuItem : MenuItem {
-	SS_212 *ss_212;
-	int v;
-	void onAction(const event::Action &e) override {
-		ss_212->v = v;
-		ss_212->setValues();
-	}
-	void step() override {
-		rightText = CHECKMARK(ss_212->v == v);
-		MenuItem::step();
-	}
-};
-
-struct SSParentMenuItem : MenuItem {
-	SS_212 *ss_212;
-	char label[20];
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-		for (int i = -5; i < 5; i++) {
-			sprintf(label, "Octave %d", i);
-			SSMenuItem *menuItem = createMenuItem<SSMenuItem>(label);
-			menuItem->ss_212 = ss_212;
-			menuItem->v = i;
-			menu->addChild(menuItem);
-		}
-		return menu;
-	}
-};
-
-void SS212::appendContextMenu(Menu *menu) {
-	SchemeModuleWidget::appendContextMenu(menu);
-	SS_212 *ss_212 = dynamic_cast<SS_212*>(this->module);
-	if (ss_212) {
-		SSParentMenuItem *menuItem = createMenuItem<SSParentMenuItem>("Octave");
-		menuItem->ss_212 = ss_212;
-		menuItem->rightText = SUBMENU;
-		menu->addChild(menuItem);
-	}
-}
 
 struct SS_221 : Module {
 	static constexpr int deviceCount = 21;
