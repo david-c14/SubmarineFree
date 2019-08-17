@@ -273,6 +273,7 @@ struct WM101 : SizeableModuleWidget {
 	EventWidgetSlider *varyH;
 	EventWidgetSlider *varyS;
 	EventWidgetSlider *varyL;
+	EventWidgetCheckBox *redoCheck;
 	BackPanel *blockingPanel;
 	
 	ScrollWidget *scrollWidget;
@@ -521,8 +522,15 @@ struct WM101 : SizeableModuleWidget {
 		};
 		settingsPanel->addChild(highlightSlider);
 
+		redoCheck = new EventWidgetCheckBox();
+		redoCheck->label = "Redo colors?";
+		redoCheck->box.pos = Vec(10, 220);
+		redoCheck->box.size = Vec(box.size.x - 40, 19);
+		redoCheck->changeHandler = [=]() { this->redoCheckChanged(); };
+		settingsPanel->addChild(redoCheck);
+
 		EventWidgetButton *settingsButton = new EventWidgetButton();
-		settingsButton->box.pos = Vec(35, 250);
+		settingsButton->box.pos = Vec(35, 290);
 		settingsButton->box.size = Vec(60, 19);
 		settingsButton->label = "Close";
 		settingsButton->clickHandler = [=]() {
@@ -574,6 +582,25 @@ struct WM101 : SizeableModuleWidget {
 			[selected]() {
 				if (masterWireManager) {
 					masterWireManager->varyCheck->selected = selected;
+					masterWireManager->saveSettings();
+				}
+			}
+		));
+	}
+	void redoCheckChanged() {
+		bool selected = redoCheck->selected;
+		saveSettings();
+		APP->history->push(new EventWidgetAction(
+			selected?"Select Redo colors":"Deselect Redo colors",
+			[selected]() {
+				if (masterWireManager) {
+					masterWireManager->redoCheck->selected = !selected;
+					masterWireManager->saveSettings();
+				}
+			},
+			[selected]() {
+				if (masterWireManager) {
+					masterWireManager->redoCheck->selected = selected;
 					masterWireManager->saveSettings();
 				}
 			}
@@ -694,6 +721,8 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void colorCable(Widget *widget, history::ComplexAction *complex) {
 		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
+		if (cable->cable->id > -1 && !complex && redoCheck->selected)
+			return;
 		NVGcolor oldColor = cable->color;
 		cable->color = findColor(cable->color);
 		if (varyCheck->selected) {
@@ -905,6 +934,10 @@ struct WM101 : SizeableModuleWidget {
 		if (v1) {
 			varyL->value = clamp(json_number_value(v1), 0.0f, 1.0f);
 		}
+		v1 = json_object_get(rootJ, "redo");
+		if (v1) {
+			redoCheck->selected = clamp((int)json_number_value(v1), 0, 1);
+		}
 		json_decref(rootJ);
 	}
 	void saveSettings() {
@@ -925,6 +958,7 @@ struct WM101 : SizeableModuleWidget {
 		json_object_set_new(settings, "variationH", json_real(varyH->value));
 		json_object_set_new(settings, "variationS", json_real(varyS->value));
 		json_object_set_new(settings, "variationL", json_real(varyL->value));
+		json_object_set_new(settings, "redo", json_real(redoCheck->selected));
 		system::createDirectory(asset::user("SubmarineFree"));
 		std::string settingsFilename = asset::user("SubmarineFree/WM-101.json");
 		FILE *file = fopen(settingsFilename.c_str(), "w");
@@ -1031,8 +1065,8 @@ struct WM101 : SizeableModuleWidget {
 		var->text = "Variations";
 		var->rightText = CHECKMARK(varyCheck->selected);
 		var->clickHandler = [=]() {
-			varyCheck->selected = !(varyCheck->selected);
-			varyCheckChanged();
+			this->varyCheck->selected = !(this->varyCheck->selected);
+			this->varyCheckChanged();
 		};
 		menu->addChild(var);
 
@@ -1040,7 +1074,7 @@ struct WM101 : SizeableModuleWidget {
 		hOff->text = "Highlight Off";
 		hOff->rightText = CHECKMARK(highlight == HIGHLIGHT_OFF);
 		hOff->clickHandler = [=]() {
-			highlightChanged(HIGHLIGHT_OFF);
+			this->highlightChanged(HIGHLIGHT_OFF);
 			saveSettings();
 		};
 		menu->addChild(hOff);
@@ -1049,7 +1083,7 @@ struct WM101 : SizeableModuleWidget {
 		hLow->text = "Highlight When Hovering";
 		hLow->rightText = CHECKMARK(highlight == HIGHLIGHT_LOW);
 		hLow->clickHandler = [=]() {
-			highlightChanged(HIGHLIGHT_LOW);
+			this->highlightChanged(HIGHLIGHT_LOW);
 			saveSettings();
 		};
 		menu->addChild(hLow);
@@ -1058,10 +1092,21 @@ struct WM101 : SizeableModuleWidget {
 		hOn->text = "Highlight Always";
 		hOn->rightText = CHECKMARK(highlight == HIGHLIGHT_ON);
 		hOn->clickHandler = [=]() {
-			highlightChanged(HIGHLIGHT_ON);
+			this->highlightChanged(HIGHLIGHT_ON);
 			saveSettings();
 		};
 		menu->addChild(hOn);
+
+		menu->addChild(new MenuLabel());
+
+		EventWidgetMenuItem *redo = new EventWidgetMenuItem();
+		redo->text = "Keep colors on redo";
+		redo->rightText = CHECKMARK(redoCheck->selected);
+		redo->clickHandler = [=]() {
+			this->redoCheck->selected = !(this->redoCheck->selected);
+			this->redoCheckChanged();
+		};
+		menu->addChild(redo);
 	}
 	void addWireMenu(WireButton *wb) {
 		Menu *menu = createMenu();
