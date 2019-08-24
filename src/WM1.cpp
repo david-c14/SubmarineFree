@@ -48,6 +48,58 @@ struct MenuButton : EventWidgetButtonBase {
 	}
 };
 
+struct WirePanel : BackPanel {
+	NVGcolor color;
+	std::function<void()> cancelHandler;
+	WirePanel() {	
+		EventWidgetLabel *label = new EventWidgetLabel();
+		label->label = "Color one wire";
+		label->box.pos = Vec(15, 200);
+		label->box.size = Vec(100, 19);
+		addChild(label);
+		EventWidgetButton *cancelButton = new EventWidgetButton();
+		cancelButton->box.pos = Vec(35, 250);
+		cancelButton->box.size = Vec(60, 19);
+		cancelButton->label = "Cancel";
+		cancelButton->clickHandler = [=](){
+			if (this->cancelHandler) {
+				this->cancelHandler();
+			}
+		};
+		addChild(cancelButton);
+	}
+	void draw(const DrawArgs &args) override {
+		BackPanel::draw(args);
+		NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, 12, 12);
+		nvgQuadTo(args.vg, box.size.x / 2, 150, box.size.x - 12, 12);
+		nvgStrokeColor(args.vg, colorOutline);
+		nvgStrokeWidth(args.vg, 5);
+		nvgStroke(args.vg);
+
+		nvgStrokeColor(args.vg, color);
+		nvgStrokeWidth(args.vg, 3);
+		nvgStroke(args.vg);
+
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, 12, 12, 9);
+		nvgCircle(args.vg, box.size.x - 12, 12, 9);
+		nvgFillColor(args.vg, color);
+		nvgFill(args.vg);
+
+		nvgStrokeWidth(args.vg, 1.0);
+		nvgStrokeColor(args.vg, colorOutline);
+		nvgStroke(args.vg);
+	
+		nvgBeginPath(args.vg);
+		nvgCircle(args.vg, 12, 12, 5);
+		nvgCircle(args.vg, box.size.x - 12, 12, 5);
+		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
+		nvgFill(args.vg);
+	}
+};
+
 struct EditPanel : BackPanel {
 	std::function<void(NVGcolor)> completeHandler;
 	std::function<void()> cancelHandler;
@@ -264,6 +316,7 @@ struct WM101 : SizeableModuleWidget {
 	EventWidgetButton *deleteCancelButton;
 	EventWidgetButton *deleteOkButton;
 	EditPanel *editPanel;
+	WirePanel *wirePanel;
 	BackPanel *settingsPanel;
 	EventWidgetRadioButton *highlightOff;
 	EventWidgetRadioButton *highlightLow;
@@ -345,6 +398,15 @@ struct WM101 : SizeableModuleWidget {
 			this->cancel();
 		};
 		addChild(editPanel);
+
+		wirePanel = new WirePanel();
+		wirePanel->box.pos = backPanel->box.pos;
+		wirePanel->box.size = backPanel->box.size;
+		wirePanel->visible = false;
+		wirePanel->cancelHandler = [=]() {
+			this->cancel();
+		};
+		addChild(wirePanel);
 		
 		settingsPanel = new BackPanel();
 		settingsPanel->box.pos = backPanel->box.pos;
@@ -638,10 +700,8 @@ struct WM101 : SizeableModuleWidget {
 		}
 		if (masterWireManager != this) {
 			if (masterWireManager) {
+				hidePanels();
 				blockingPanel->visible = (box.size.x > 16.0f);
-				backPanel->visible = false;	
-				editPanel->visible = false;
-				settingsPanel->visible = false;
 				SizeableModuleWidget::step();
 				return;
 			}
@@ -803,11 +863,8 @@ struct WM101 : SizeableModuleWidget {
 	void onResize() override {
 		bool small = this->box.size.x < 16.0f;
 		minButton->box.pos.x = small?2.5f:(this->box.size.x - 10.0f);
+		hidePanels();
 		backPanel->visible = !small;
-		editPanel->visible = false;
-		blockingPanel->visible = false;
-		deleteConfirmPanel->visible = false;
-		settingsPanel->visible = false;
 		SizeableModuleWidget::onResize();	
 	}
 	EventWidgetAction *checkBoxAction(unsigned int index, bool selected) {
@@ -850,6 +907,11 @@ struct WM101 : SizeableModuleWidget {
 		};
 		wb->rightClickHandler = [=]() {
 			this->addWireMenu(wb);
+		};
+		wb->doubleClickHandler = [=]() {
+			this->backPanel->visible = false;
+			this->wirePanel->visible = true;
+			this->wirePanel->color = color;
 		};
 		scrollWidget->container->addChild(wb);
 	}
@@ -1224,10 +1286,8 @@ struct WM101 : SizeableModuleWidget {
 		deleteConfirmPanel->visible = true;
 	}
 	void cancel() {
+		hidePanels();
 		backPanel->visible = true;
-		editPanel->visible = false;
-		settingsPanel->visible = false;
-		deleteConfirmPanel->visible = false;
 	}
 	void deleteOk(WireButton *wb) {
 		this->deleteWire(wb);
@@ -1364,6 +1424,14 @@ struct WM101 : SizeableModuleWidget {
 			highlightIsDirty = true;
 			highlightWires();
 		}
+	}
+	void hidePanels() {
+		blockingPanel->visible = false;
+		backPanel->visible = false;	
+		editPanel->visible = false;
+		wirePanel->visible = false;
+		settingsPanel->visible = false;
+		deleteConfirmPanel->visible = false;	
 	}
 };
 

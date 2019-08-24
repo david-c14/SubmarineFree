@@ -305,7 +305,9 @@ struct EventWidgetAction : history::Action {
 struct EventWidgetButtonBase : OpaqueWidget {
 	std::function<void ()> clickHandler;
 	std::function<void ()> rightClickHandler;
+	std::function<void ()> doubleClickHandler;
 	void onButton(const event::Button &e) override;
+	void onDoubleClick(const event::DoubleClick &e) override;
 };
 
 struct EventWidgetSlider;

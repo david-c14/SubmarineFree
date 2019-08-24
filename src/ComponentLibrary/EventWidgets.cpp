@@ -24,6 +24,13 @@ void EventWidgetButtonBase::onButton(const event::Button &e) {
 			e.consume(this);
 			return;
 		}
+		OpaqueWidget::onButton(e);
+		if (e.isConsumed())
+			return;
+		if (doubleClickHandler) {
+			e.consume(this);
+			return;
+		}
 	}
 	if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
 		if (rightClickHandler) {
@@ -33,6 +40,15 @@ void EventWidgetButtonBase::onButton(const event::Button &e) {
 		}
 	}
 	OpaqueWidget::onButton(e);
+}
+
+void EventWidgetButtonBase::onDoubleClick(const event::DoubleClick &e) {
+	if (doubleClickHandler) {
+		doubleClickHandler();
+		e.consume(this);
+		return;
+	}
+	OpaqueWidget::onDoubleClick(e);
 }
 
 void EventWidgetSlider::draw(const DrawArgs &args) {
