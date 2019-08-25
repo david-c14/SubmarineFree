@@ -1088,8 +1088,6 @@ struct WM101 : SizeableModuleWidget {
 	void addMenu() {
 		Menu *menu = createMenu();
 
-		menu->addChild(new MenuLabel());
-
 		EventWidgetMenuItem *cAll = new EventWidgetMenuItem();
 		cAll->text = "Select All Colors";
 		cAll->clickHandler = [=]() {
@@ -1106,7 +1104,7 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(uAll);
 
-		menu->addChild(new MenuLabel());
+		menu->addChild(new MenuSeparator());
 
 		EventWidgetMenuItem *rAll = new EventWidgetMenuItem();
 		rAll->text = "Recolor All Wires...";
@@ -1115,7 +1113,7 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(rAll);
 
-		menu->addChild(new MenuLabel());
+		menu->addChild(new MenuSeparator());
 
 		EventWidgetMenuItem *add = new EventWidgetMenuItem();
 		add->text = "Add New Color ...";
@@ -1124,7 +1122,7 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(add);
 		
-		menu->addChild(new MenuLabel());
+		menu->addChild(new MenuSeparator());
 
 		EventWidgetMenuItem *settings = new EventWidgetMenuItem();
 		settings->text = "Settings...";
@@ -1133,7 +1131,7 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(settings);
 	
-		menu->addChild(new MenuLabel());
+		menu->addChild(new MenuSeparator());
 
 		EventWidgetMenuItem *var = new EventWidgetMenuItem();
 		var->text = "Variations";
@@ -1171,7 +1169,7 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(hOn);
 
-		menu->addChild(new MenuLabel());
+		menu->addChild(new MenuSeparator());
 
 		EventWidgetMenuItem *redo = new EventWidgetMenuItem();
 		redo->text = "Keep colors on redo";
@@ -1196,7 +1194,7 @@ struct WM101 : SizeableModuleWidget {
 			};
 		};
 		menu->addChild(paramField);
-		menu->addChild(new MenuLabel());
+		menu->addChild(new MenuSeparator());
 		
 		EventWidgetMenuItem *ed = new EventWidgetMenuItem();
 		ed->text = "Edit...";
@@ -1209,6 +1207,7 @@ struct WM101 : SizeableModuleWidget {
 		sc->clickHandler = [=]() {
 			this->selectWirePanel(wb->color);
 		};
+		menu->addChild(sc);
 		if (!isFirst(wb)) {
 			EventWidgetMenuItem *mu = new EventWidgetMenuItem();
 			mu->text = "Move Up";
