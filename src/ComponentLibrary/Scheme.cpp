@@ -270,7 +270,7 @@ void SchemeModuleWidget::render(NVGcontext *vg, SchemeCanvasWidget *canvas) {
 }
 
 void SchemeModuleWidget::appendContextMenu(Menu * menu) {
-	menu->addChild(new MenuEntry);
+	menu->addChild(new MenuSeparator);
 	EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>("Visuals");
 	m->childMenuHandler = [=]() {
 		Menu *menu = new Menu();
