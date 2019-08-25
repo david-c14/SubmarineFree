@@ -288,6 +288,11 @@ struct WireButton : EventWidgetButtonBase {
 	}
 };
 
+struct ColorCollection {
+	std::string name;
+	std::vector<NVGcolor> colors;
+};
+
 struct WM101;
 
 WM101 *masterWireManager = NULL;
@@ -307,6 +312,8 @@ struct WM101 : SizeableModuleWidget {
 	int cableCount = 0;
 	Widget *lastCable = NULL;
 	unsigned int newColorIndex = 0;
+
+	std::vector<ColorCollection> collections;	
 
 	MinButton *minButton;
 	BackPanel *backPanel;
@@ -1012,6 +1019,28 @@ struct WM101 : SizeableModuleWidget {
 		if (v1) {
 			redoCheck->selected = clamp((int)json_number_value(v1), 0, 1);
 		}
+		arr = json_object_get(rootJ, "collections");
+		if (arr) {
+			collections.clear();
+			int size = json_array_size(arr);
+			for (int i = 0; i < size; i++) {
+				json_t *j1 = json_array_get(arr, i);
+				if (j1) {
+					json_t *n1 = json_object_get(j1, "name");	
+					json_t *a1 = json_object_get(j1, "colors");
+					if (a1) {
+						ColorCollection coll;
+						coll.name = n1?json_string_value(n1):"[Unnammed]";
+						int csize = json_array_size(a1);
+						for (int j = 0; j < csize; j++) {
+							json_t *c1 = json_array_get(a1, j);
+							coll.colors.push_back(color::fromHexString(json_string_value(c1)));
+						}
+						collections.push_back(coll);
+					}	
+				}
+			}
+		}
 		json_decref(rootJ);
 	}
 	void saveSettings() {
@@ -1033,6 +1062,19 @@ struct WM101 : SizeableModuleWidget {
 		json_object_set_new(settings, "variationS", json_real(varyS->value));
 		json_object_set_new(settings, "variationL", json_real(varyL->value));
 		json_object_set_new(settings, "redo", json_real(redoCheck->selected));
+		arr = json_array();
+		for (ColorCollection coll : collections) {
+			json_t *c1 = json_object();
+			json_object_set_new(c1, "name", json_string(coll.name.c_str()));
+			json_t *a1 = json_array();
+			for (NVGcolor col: coll.colors) {
+				std::string s = color::toHexString(col);
+				json_array_append_new(a1, json_string(s.c_str()));
+			}
+			json_object_set_new(c1, "colors", a1);
+			json_array_append_new(arr, c1);
+		} 
+		json_object_set_new(settings, "collections", arr);
 		system::createDirectory(asset::user("SubmarineFree"));
 		std::string settingsFilename = asset::user("SubmarineFree/WM-101.json");
 		FILE *file = fopen(settingsFilename.c_str(), "w");
