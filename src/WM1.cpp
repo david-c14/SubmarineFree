@@ -735,6 +735,9 @@ struct WM101 : SizeableModuleWidget {
 				lastCable = NULL;
 			highlightIsDirty = true;		
 		}
+		if (wirePanel->visible && APP->scene->rack->incompleteCable) {
+			colorCable(APP->scene->rack->incompleteCable,NULL);
+		}
 		highlightWires();
 		SizeableModuleWidget::step();
 	}
@@ -784,7 +787,13 @@ struct WM101 : SizeableModuleWidget {
 		if (cable->cable->id > -1 && !complex && redoCheck->selected)
 			return;
 		NVGcolor oldColor = cable->color;
-		cable->color = findColor(cable->color);
+		if (wirePanel->visible) {
+			cable->color = wirePanel->color;
+			cancel();
+		}
+		else {
+			cable->color = findColor(cable->color);
+		}
 		if (varyCheck->selected) {
 			cable->color = varyColor(cable->color);
 		}
@@ -895,6 +904,11 @@ struct WM101 : SizeableModuleWidget {
 		this->saveSettings();
 		APP->history->push(checkBoxAction(wb->index(), wb->checkBox->selected));
 	}
+	void selectWirePanel(NVGcolor color) {
+		backPanel->visible = false;
+		wirePanel->visible = true;
+		wirePanel->color = color;
+	}
 	void addColor(NVGcolor color, bool selected) {
 		float y = scrollWidget->container->children.size() * 21;
 		WireButton *wb = new WireButton();
@@ -909,9 +923,7 @@ struct WM101 : SizeableModuleWidget {
 			this->addWireMenu(wb);
 		};
 		wb->doubleClickHandler = [=]() {
-			this->backPanel->visible = false;
-			this->wirePanel->visible = true;
-			this->wirePanel->color = color;
+			this->selectWirePanel(color);
 		};
 		scrollWidget->container->addChild(wb);
 	}
@@ -1192,6 +1204,11 @@ struct WM101 : SizeableModuleWidget {
 			this->editDialog(wb);
 		};
 		menu->addChild(ed);
+		EventWidgetMenuItem *sc = new EventWidgetMenuItem();
+		sc->text = "Color one wire...";
+		sc->clickHandler = [=]() {
+			this->selectWirePanel(wb->color);
+		};
 		if (!isFirst(wb)) {
 			EventWidgetMenuItem *mu = new EventWidgetMenuItem();
 			mu->text = "Move Up";
