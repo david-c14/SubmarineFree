@@ -191,7 +191,7 @@ struct EditPanel : BackPanel {
 	}
 };
 
-struct WireParamField : ui::TextField {
+struct EventParamField : ui::TextField {
 	std::function<void(std::string)> changeHandler;
 	void step() override {
 		// Keep selected
@@ -288,9 +288,41 @@ struct WireButton : EventWidgetButtonBase {
 	}
 };
 
-struct ColorCollection {
+struct ColorCollectionButton : EventWidgetButtonBase {
 	std::string name;
 	std::vector<NVGcolor> colors;
+	
+	void draw(const DrawArgs &args) override {
+		if (!name.empty()) {
+			nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+			nvgFontFaceId(args.vg, APP->window->uiFont->handle);
+			nvgFontSize(args.vg, 13);	
+			nvgTextAlign(args.vg, NVG_ALIGN_BOTTOM);
+			nvgText(args.vg, 2, 15, name.c_str(), NULL);
+		}
+		float width = box.size.x - 25.0f;
+		width = width / colors.size();
+		float left = 0.0f;
+		for (NVGcolor color : colors) {
+			NVGcolor col = color;
+			col.a = 1.0f;
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, left, 15, width, 3);
+			nvgFillColor(args.vg, col);
+			nvgFill(args.vg);
+			left += width;
+		}
+		OpaqueWidget::draw(args);
+	}
+	unsigned int index() {
+		unsigned int i = 0;
+		for (Widget *w : parent->children) {
+			if (w == this)
+				return i;
+			i++;
+		}
+		return 0;
+	}
 };
 
 struct WM101;
@@ -313,8 +345,6 @@ struct WM101 : SizeableModuleWidget {
 	Widget *lastCable = NULL;
 	unsigned int newColorIndex = 0;
 
-	std::vector<ColorCollection> collections;	
-
 	MinButton *minButton;
 	BackPanel *backPanel;
 	EventWidgetCheckBox *checkBoxAll;
@@ -335,6 +365,8 @@ struct WM101 : SizeableModuleWidget {
 	EventWidgetSlider *varyL;
 	EventWidgetCheckBox *redoCheck;
 	BackPanel *blockingPanel;
+	BackPanel *collectionPanel;
+	ScrollWidget *collectionScrollWidget;
 	
 	ScrollWidget *scrollWidget;
 	WM101(Module *module) : SizeableModuleWidget(module, 150) {
@@ -414,6 +446,24 @@ struct WM101 : SizeableModuleWidget {
 			this->cancel();
 		};
 		addChild(wirePanel);
+
+		collectionPanel = new BackPanel();
+		collectionPanel->box.pos = backPanel->box.pos;
+		collectionPanel->box.size = backPanel->box.size;
+		collectionPanel->visible = false;
+		addChild(collectionPanel);
+
+		collectionScrollWidget = new ScrollWidget();
+		collectionScrollWidget->box.pos = Vec(0,0);
+		collectionScrollWidget->box.size = Vec(backPanel->box.size.x, backPanel->box.size.y - 25);
+		collectionPanel->addChild(collectionScrollWidget);
+	
+		EventWidgetButton *collectionCloseButton = new EventWidgetButton();
+		collectionCloseButton->box.pos = Vec(35, 325);
+		collectionCloseButton->box.size = Vec(60, 19);
+		collectionCloseButton->label = "Close";
+		collectionCloseButton->clickHandler = [=]() { this->cancel(); };
+		collectionPanel->addChild(collectionCloseButton);
 		
 		settingsPanel = new BackPanel();
 		settingsPanel->box.pos = backPanel->box.pos;
@@ -1021,7 +1071,7 @@ struct WM101 : SizeableModuleWidget {
 		}
 		arr = json_object_get(rootJ, "collections");
 		if (arr) {
-			collections.clear();
+			collectionScrollWidget->container->clearChildren();
 			int size = json_array_size(arr);
 			for (int i = 0; i < size; i++) {
 				json_t *j1 = json_array_get(arr, i);
@@ -1029,17 +1079,24 @@ struct WM101 : SizeableModuleWidget {
 					json_t *n1 = json_object_get(j1, "name");	
 					json_t *a1 = json_object_get(j1, "colors");
 					if (a1) {
-						ColorCollection coll;
-						coll.name = n1?json_string_value(n1):"[Unnammed]";
+						float y = collectionScrollWidget->container->children.size() * 21;
+						ColorCollectionButton *btn = new ColorCollectionButton();
+						btn->box.pos = Vec(0, y);
+						btn->box.size = Vec(collectionScrollWidget->box.size.x, 21);
+						btn->name = n1?json_string_value(n1):"[Unnammed]";
 						int csize = json_array_size(a1);
 						for (int j = 0; j < csize; j++) {
 							json_t *c1 = json_array_get(a1, j);
-							coll.colors.push_back(color::fromHexString(json_string_value(c1)));
+							btn->colors.push_back(color::fromHexString(json_string_value(c1)));
 						}
-						collections.push_back(coll);
+						btn->rightClickHandler = [=]() {
+							this->addCollectionMenu(btn);
+						};
+						collectionScrollWidget->container->addChild(btn);
 					}	
 				}
 			}
+			reflowCollections();
 		}
 		json_decref(rootJ);
 	}
@@ -1063,11 +1120,12 @@ struct WM101 : SizeableModuleWidget {
 		json_object_set_new(settings, "variationL", json_real(varyL->value));
 		json_object_set_new(settings, "redo", json_real(redoCheck->selected));
 		arr = json_array();
-		for (ColorCollection coll : collections) {
+		for (Widget *w : collectionScrollWidget->container->children) {
+			ColorCollectionButton *cb = dynamic_cast<ColorCollectionButton *>(w);
 			json_t *c1 = json_object();
-			json_object_set_new(c1, "name", json_string(coll.name.c_str()));
+			json_object_set_new(c1, "name", json_string(cb->name.c_str()));
 			json_t *a1 = json_array();
-			for (NVGcolor col: coll.colors) {
+			for (NVGcolor col: cb->colors) {
 				std::string s = color::toHexString(col);
 				json_array_append_new(a1, json_string(s.c_str()));
 			}
@@ -1161,7 +1219,16 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(add);
 		
 		menu->addChild(new MenuSeparator);
+	
+		EventWidgetMenuItem *collections = new EventWidgetMenuItem();
+		collections->text = "Collections...";
+		collections->clickHandler = [=]() {
+			this->collectionsDialog();
+		};
+		menu->addChild(collections);
 
+		menu->addChild(new MenuSeparator);
+	
 		EventWidgetMenuItem *settings = new EventWidgetMenuItem();
 		settings->text = "Settings...";
 		settings->clickHandler = [=]() {
@@ -1218,12 +1285,26 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(redo);
 	}
+	void addCollectionMenu(ColorCollectionButton *cb) {
+		Menu *menu = createMenu();
+		MenuLabel *label = new MenuLabel();
+		label->text = cb->name;
+		menu->addChild(label);
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		paramField->setText(cb->name);
+		paramField->changeHandler = [=](std::string text) {
+			cb->name = text;
+			this->saveSettings();
+		};
+		menu->addChild(paramField);
+	}
 	void addWireMenu(WireButton *wb) {
 		Menu *menu = createMenu();
 		MenuLabel *label = new MenuLabel();
 		label->text = "Color: " + color::toHexString(wb->color);
 		menu->addChild(label);
-		WireParamField *paramField = new WireParamField();
+		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
 		paramField->setText(color::toHexString(wb->color));
 		paramField->changeHandler = [=](std::string text) {
@@ -1301,11 +1382,17 @@ struct WM101 : SizeableModuleWidget {
 	void reflow() {
 		unsigned int y = 0;
 		for (Widget *widget : scrollWidget->container->children) {
-			WireButton *wb = dynamic_cast<WireButton *>(widget);
-			wb->box.pos.y = y;
+			widget->box.pos.y = y;
 			y += 21;
 		}
 		
+	}
+	void reflowCollections() {
+		unsigned int y = 0;
+		for (Widget *widget : collectionScrollWidget->container->children) {
+			widget->box.pos.y = y;
+			y += 21;
+		}
 	}
 	void swap(int i) {
 		if (i < 0) return;
@@ -1354,6 +1441,10 @@ struct WM101 : SizeableModuleWidget {
 		highlightSlider->defaultValue = highlightSlider->value;
 		backPanel->visible = false;
 		settingsPanel->visible = true;
+	}
+	void collectionsDialog() {
+		backPanel->visible = false;
+		collectionPanel->visible = true;
 	}
 	void editAdd(NVGcolor col) {
 		addColor(col, false);
@@ -1485,6 +1576,7 @@ struct WM101 : SizeableModuleWidget {
 		editPanel->visible = false;
 		wirePanel->visible = false;
 		settingsPanel->visible = false;
+		collectionPanel->visible = false;
 		deleteConfirmPanel->visible = false;	
 	}
 };
