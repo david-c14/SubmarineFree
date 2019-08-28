@@ -1149,6 +1149,13 @@ struct WM101 : SizeableModuleWidget {
 		std::advance(vi, index);
 		return dynamic_cast<WireButton *>(*vi);
 	}
+	ColorCollectionButton *findCollectionButton(unsigned int index) {
+		if (index >= collectionScrollWidget->container->children.size())
+			return NULL;
+		auto vi = collectionScrollWidget->container->children.begin();
+		std::advance(vi, index);
+		return dynamic_cast<ColorCollectionButton *>(*vi);
+	}
 	void checkAll(bool selected) {
 		history::ComplexAction *complex = new history::ComplexAction();
 		complex->name = selected?"Select All Colors":"Deselect All Colors"; 
@@ -1294,10 +1301,39 @@ struct WM101 : SizeableModuleWidget {
 		paramField->box.size.x = 100;
 		paramField->setText(cb->name);
 		paramField->changeHandler = [=](std::string text) {
-			cb->name = text;
-			this->saveSettings();
+			this->changeCollectionName(cb, text);
 		};
 		menu->addChild(paramField);
+	}
+	void changeCollectionName(ColorCollectionButton *cb, std::string text) {
+		if (cb->name == text)
+			return;
+		std::string oldName = cb->name;
+		int index = cb->index();
+		cb->name = text;
+		saveSettings();
+		APP->history->push(new EventWidgetAction(
+			"Change Collection Name",
+			[oldName, index]() {
+				if (masterWireManager) {
+					ColorCollectionButton *btn = masterWireManager->findCollectionButton(index);
+					if (btn) {
+						btn->name = oldName;
+						masterWireManager->saveSettings();
+					}
+				}
+			},
+			[text, index] {
+				if (masterWireManager) {
+					ColorCollectionButton *btn = masterWireManager->findCollectionButton(index);
+					if (btn) {
+						btn->name = text;
+						masterWireManager->saveSettings();
+					}
+				}
+			}
+		));
+		
 	}
 	void addWireMenu(WireButton *wb) {
 		Menu *menu = createMenu();
