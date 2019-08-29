@@ -984,6 +984,28 @@ struct WM101 : SizeableModuleWidget {
 		};
 		scrollWidget->container->addChild(wb);
 	}
+	void addCollection(std::string name, std::vector<NVGcolor> colors) {
+		DEBUG("Add collection %d", colors.size());
+		float y = collectionScrollWidget->container->children.size() * 21;
+		ColorCollectionButton *btn = new ColorCollectionButton();
+		btn->box.pos = Vec(0, y);
+		btn->box.size = Vec(collectionScrollWidget->box.size.x, 21);
+		btn->name = name;
+		btn->colors = colors;
+		btn->rightClickHandler = [=]() {
+			this->addCollectionMenu(btn);
+		};
+		collectionScrollWidget->container->addChild(btn);
+	}
+	void insertCollection(std::string name, std::vector<NVGcolor> colors, unsigned int index) {
+		addCollection(name, colors);
+		Widget *w = collectionScrollWidget->container->children.back();
+		collectionScrollWidget->container->children.pop_back();
+		auto v = collectionScrollWidget->container->children.begin();
+		std::advance(v, index);
+		collectionScrollWidget->container->children.insert(v, w);
+		this->reflowCollections();
+	}
 	void insertColor(NVGcolor color, bool selected, unsigned int index) {
 		addColor(color, selected);
 		Widget *w = scrollWidget->container->children.back();
@@ -1079,20 +1101,15 @@ struct WM101 : SizeableModuleWidget {
 					json_t *n1 = json_object_get(j1, "name");	
 					json_t *a1 = json_object_get(j1, "colors");
 					if (a1) {
-						float y = collectionScrollWidget->container->children.size() * 21;
-						ColorCollectionButton *btn = new ColorCollectionButton();
-						btn->box.pos = Vec(0, y);
-						btn->box.size = Vec(collectionScrollWidget->box.size.x, 21);
-						btn->name = n1?json_string_value(n1):"[Unnammed]";
-						int csize = json_array_size(a1);
-						for (int j = 0; j < csize; j++) {
+						std::vector<NVGcolor> colors;
+						int asize = json_array_size(a1);
+						for (int j = 0; j < asize; j++) {
 							json_t *c1 = json_array_get(a1, j);
-							btn->colors.push_back(color::fromHexString(json_string_value(c1)));
+							if (c1) {
+								colors.push_back(color::fromHexString(json_string_value(c1)));
+							}
 						}
-						btn->rightClickHandler = [=]() {
-							this->addCollectionMenu(btn);
-						};
-						collectionScrollWidget->container->addChild(btn);
+						addCollection(n1?json_string_value(n1):"[Unnamed]", colors);
 					}	
 				}
 			}
@@ -1301,6 +1318,12 @@ struct WM101 : SizeableModuleWidget {
 			this->changeCollectionName(cb, text);
 		};
 		menu->addChild(paramField);
+		EventWidgetMenuItem *dm = new EventWidgetMenuItem();
+		dm->text = "Delete Collection...";
+		dm->clickHandler = [=]() {
+			this->deleteCollectionDialog(cb);
+		};
+		menu->addChild(dm);
 	}
 	void changeCollectionName(ColorCollectionButton *cb, std::string text) {
 		if (cb->name == text)
@@ -1383,6 +1406,35 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(dm);
 	}
+	void deleteCollection(ColorCollectionButton *cb) {
+		unsigned int index = cb->index();
+		std::string name = cb->name;
+		std::vector<NVGcolor> colors = cb->colors;
+		collectionScrollWidget->container->removeChild(cb);
+		delete cb;
+		reflowCollections();
+		saveSettings();
+		APP->history->push(new EventWidgetAction(
+			"Delete Collection",
+			[name, colors, index]() {
+				if (masterWireManager) {
+					masterWireManager->insertCollection(name, colors, index);
+					masterWireManager->saveSettings();
+				}
+			},
+			[index] {
+				if (masterWireManager) {
+					ColorCollectionButton *cb = masterWireManager->findCollectionButton(index);
+					if (cb) {
+						masterWireManager->collectionScrollWidget->container->removeChild(cb);
+						delete cb;
+						masterWireManager->reflowCollections();
+						masterWireManager->saveSettings();
+					}
+				}
+			}
+		));
+	}
 	void deleteWire(WireButton *wb) {
 		NVGcolor color = wb->color;
 		bool selected = wb->checkBox->selected;
@@ -1450,6 +1502,14 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->visible = false;
 		deleteConfirmPanel->visible = true;
 	}
+	void deleteCollectionDialog(ColorCollectionButton *cb) {
+		deleteLabel->label = "Delete Collection?";
+		deleteOkButton->clickHandler = [=]() {
+			this->deleteCollectionOk(cb);
+		};
+		collectionPanel->visible = false;
+		deleteConfirmPanel->visible = true;
+	}
 	void recolorAllDialog() {
 		deleteLabel->label = "Recolor All Wires?";
 		deleteOkButton->clickHandler = [=]() {
@@ -1465,6 +1525,10 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void deleteOk(WireButton *wb) {
 		this->deleteWire(wb);
+		cancel();
+	}
+	void deleteCollectionOk(ColorCollectionButton *cb) {
+		this->deleteCollection(cb);
 		cancel();
 	}
 	void settingsDialog() {
