@@ -307,7 +307,7 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 			NVGcolor col = color;
 			col.a = 1.0f;
 			nvgBeginPath(args.vg);
-			nvgRect(args.vg, left, 15, width, 3);
+			nvgRect(args.vg, left, 15, width, 5);
 			nvgFillColor(args.vg, col);
 			nvgFill(args.vg);
 			left += width;
@@ -966,7 +966,7 @@ struct WM101 : SizeableModuleWidget {
 		wirePanel->visible = true;
 		wirePanel->color = color;
 	}
-	void addColor(NVGcolor color, bool selected) {
+	WireButton *addColor(NVGcolor color, bool selected) {
 		float y = scrollWidget->container->children.size() * 21;
 		WireButton *wb = new WireButton();
 		wb->box.pos = Vec(0, y);
@@ -983,9 +983,9 @@ struct WM101 : SizeableModuleWidget {
 			this->selectWirePanel(color);
 		};
 		scrollWidget->container->addChild(wb);
+		return wb;
 	}
-	void addCollection(std::string name, std::vector<NVGcolor> colors) {
-		DEBUG("Add collection %d", colors.size());
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors) {
 		float y = collectionScrollWidget->container->children.size() * 21;
 		ColorCollectionButton *btn = new ColorCollectionButton();
 		btn->box.pos = Vec(0, y);
@@ -996,10 +996,10 @@ struct WM101 : SizeableModuleWidget {
 			this->addCollectionMenu(btn);
 		};
 		collectionScrollWidget->container->addChild(btn);
+		return btn;
 	}
 	void insertCollection(std::string name, std::vector<NVGcolor> colors, unsigned int index) {
-		addCollection(name, colors);
-		Widget *w = collectionScrollWidget->container->children.back();
+		ColorCollectionButton *w = addCollection(name, colors);
 		collectionScrollWidget->container->children.pop_back();
 		auto v = collectionScrollWidget->container->children.begin();
 		std::advance(v, index);
@@ -1007,8 +1007,7 @@ struct WM101 : SizeableModuleWidget {
 		this->reflowCollections();
 	}
 	void insertColor(NVGcolor color, bool selected, unsigned int index) {
-		addColor(color, selected);
-		Widget *w = scrollWidget->container->children.back();
+		WireButton *w = addColor(color, selected);
 		scrollWidget->container->children.pop_back();
 		auto v = scrollWidget->container->children.begin();
 		std::advance(v, index);
@@ -1251,6 +1250,13 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(collections);
 
+		EventWidgetMenuItem *addColl = new EventWidgetMenuItem();
+		addColl->text = "Save as Collection";
+		addColl->clickHandler = [=]() {
+			this->saveCollection();
+		};
+		menu->addChild(addColl);
+
 		menu->addChild(new MenuSeparator);
 	
 		EventWidgetMenuItem *settings = new EventWidgetMenuItem();
@@ -1406,6 +1412,37 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(dm);
 	}
+	void saveCollection() {
+		std::vector<NVGcolor> colors;
+		for (Widget *widget : scrollWidget->container->children) {
+			WireButton *wb = dynamic_cast<WireButton *>(widget);
+			NVGcolor col = wb->color;
+			col.a = wb->checkBox->selected?1.0f:0.0f;
+			colors.push_back(col);
+		}
+		unsigned int index = addCollection(std::string("[Unnamed]"), colors)->index();
+		saveSettings();
+		APP->history->push(new EventWidgetAction(
+			"Save Collection",
+			[index]() {
+				if (masterWireManager) {
+					ColorCollectionButton *cb = masterWireManager->findCollectionButton(index);
+					if (cb) {
+						masterWireManager->collectionScrollWidget->container->removeChild(cb);
+						delete cb;
+						masterWireManager->reflowCollections();
+						masterWireManager->saveSettings();
+					}
+				}
+			},
+			[colors]() {
+				if (masterWireManager) {
+					masterWireManager->addCollection(std::string("Unnamed"), colors);
+					masterWireManager->saveSettings();
+				}
+			}
+		));
+	}
 	void deleteCollection(ColorCollectionButton *cb) {
 		unsigned int index = cb->index();
 		std::string name = cb->name;
@@ -1422,7 +1459,7 @@ struct WM101 : SizeableModuleWidget {
 					masterWireManager->saveSettings();
 				}
 			},
-			[index] {
+			[index]() {
 				if (masterWireManager) {
 					ColorCollectionButton *cb = masterWireManager->findCollectionButton(index);
 					if (cb) {
@@ -1451,7 +1488,7 @@ struct WM101 : SizeableModuleWidget {
 					masterWireManager->saveSettings();
 				}
 			},
-			[index] {
+			[index]() {
 				if (masterWireManager) {
 					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
