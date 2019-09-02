@@ -3,6 +3,7 @@
 #include "SubmarineFree.hpp"
 
 struct BackPanel : Widget {
+	Widget *cancelTargetWidget;
 	void draw(const DrawArgs &args) override {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
@@ -44,6 +45,28 @@ struct MenuButton : EventWidgetButtonBase {
 		nvgLineTo(args.vg, box.size.x, box.size.y / 2 + 4);
 
 		nvgStroke(args.vg);
+		OpaqueWidget::draw(args);
+	}
+};
+
+struct CollectionButton : EventWidgetButtonBase {
+	void draw (const DrawArgs &args) override {
+		nvgStrokeColor(args.vg, nvgRGB(0xff, 0xff, 0xff));
+		nvgStrokeWidth(args.vg, 2);
+		nvgFillColor(args.vg, nvgRGB(0,0,0));
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 1, 1, box.size.x / 2 - 1, box.size.y / 2 - 1);
+		nvgFill(args.vg);
+		nvgStroke(args.vg);
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, box.size.x * 0.25 + 1 , box.size.y * 0.25 + 1, box.size.x / 2 - 1, box.size.y / 2 - 1);
+		nvgFill(args.vg);
+		nvgStroke(args.vg);
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, box.size.x * 0.5 + 1, box.size.y * 0.5 + 1, box.size.x / 2 - 1, box.size.y / 2 - 1);
+		nvgFill(args.vg);
+		nvgStroke(args.vg);
+
 		OpaqueWidget::draw(args);
 	}
 };
@@ -337,7 +360,7 @@ struct WM101 : SizeableModuleWidget {
 		HIGHLIGHT_LOW,
 		HIGHLIGHT_ON
 	};
-	int highlight;
+	int highlight = HIGHLIGHT_OFF;
 	ModuleWidget *lastHover = NULL;
 	bool highlightIsDirty = true;
 
@@ -390,12 +413,19 @@ struct WM101 : SizeableModuleWidget {
 		};
 		backPanel->addChild(checkBoxAll);
 		AddButton *addButton = new AddButton();
-		addButton->box.pos = Vec(57, 2);
+		addButton->box.pos = Vec(38, 2);
 		addButton->box.size = Vec(16, 16);
 		addButton->clickHandler = [=]() {
 			this->editDialog(NULL);
 		};
 		backPanel->addChild(addButton);
+		CollectionButton *collectionButton = new CollectionButton();
+		collectionButton->box.pos = Vec(75, 2);
+		collectionButton->box.size = Vec(16, 16);
+		collectionButton->clickHandler = [=]() {
+			this->collectionsDialog();
+		};
+		backPanel->addChild(collectionButton);
 		MenuButton *menuButton = new MenuButton();
 		menuButton->box.pos = Vec(112, 2);
 		menuButton->box.size = Vec(16, 16);
@@ -682,7 +712,8 @@ struct WM101 : SizeableModuleWidget {
 		blockingButton->clickHandler = [=]() { this->takeMasterSlot(); };
 		blockingPanel->addChild(blockingButton);
 
-		loadSettings();
+		if (!module)
+			loadSettings();
 	}
 	~WM101() {
 		this->_delete();
@@ -1069,6 +1100,7 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0x10, 0x0f, 0x12), false);
 		addColor(nvgRGB(0xff, 0x99, 0x41), false);
 		addColor(nvgRGB(0x80, 0x36, 0x10), false);
+		addCollection(std::string("Default"), currentCollection());
 	}
 	void loadSettings() {
 		json_error_t error;
@@ -1583,6 +1615,7 @@ struct WM101 : SizeableModuleWidget {
 		};
 		backPanel->visible = false;
 		deleteConfirmPanel->visible = true;
+		deleteConfirmPanel->cancelTargetWidget = NULL;
 	}
 	void deleteCollectionDialog(ColorCollectionButton *cb) {
 		deleteLabel->label = "Delete Collection?";
@@ -1591,6 +1624,7 @@ struct WM101 : SizeableModuleWidget {
 		};
 		collectionPanel->visible = false;
 		deleteConfirmPanel->visible = true;
+		deleteConfirmPanel->cancelTargetWidget = collectionPanel;
 	}
 	void recolorAllDialog() {
 		deleteLabel->label = "Recolor All Wires?";
@@ -1600,9 +1634,15 @@ struct WM101 : SizeableModuleWidget {
 		};
 		backPanel->visible = false;
 		deleteConfirmPanel->visible = true;
+		deleteConfirmPanel->cancelTargetWidget = NULL;
 	}
 	void cancel() {
 		hidePanels();
+		if (deleteConfirmPanel->cancelTargetWidget) {
+			deleteConfirmPanel->cancelTargetWidget->visible = true;
+			deleteConfirmPanel->cancelTargetWidget = NULL;
+			return;
+		}
 		backPanel->visible = true;
 	}
 	void deleteOk(WireButton *wb) {
