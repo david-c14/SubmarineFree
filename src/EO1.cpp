@@ -23,6 +23,7 @@ struct EO_102 : Module {
 		PARAM_PRE,
 		PARAM_MODE_1,
 		PARAM_MODE_2,
+		PARAM_COLORS,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -69,6 +70,7 @@ struct EO_102 : Module {
 		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left index position");
 		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right index position");
 		configParam(PARAM_INDEX_3, 0.0f, 1.0f, 0.2f, "Horizontal index position");
+		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
 	}
 	void process(const ProcessArgs &args) override;
 	void startFrame(void);
@@ -180,6 +182,7 @@ void EO_102::process(const ProcessArgs &args) {
 
 struct EO_Display : TransparentWidget {
 	EO_102 *module;
+	PortWidget *ports[2];
 
 	void drawTrace(NVGcontext *vg, float *values, float offset, float scale, NVGcolor col, int mode) {
 		if (!values)
@@ -320,6 +323,9 @@ struct EO_Display : TransparentWidget {
 		NVGcolor col = SUBLIGHTBLUETRANS;
 		for (int i = 0; i < 2; i++) {
 			if (module->inputs[EO_102::INPUT_1 + i].isConnected()) {
+				if (module->params[EO_102::PARAM_COLORS].getValue()) {
+					col = APP->scene->rack->getTopCable(ports[i])->color;
+				}
 				drawTrace(args.vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].getValue(), module->params[EO_102::PARAM_SCALE_1 + i].getValue(), col, module->traceMode[i]); 
 			}
 			col = SUBLIGHTREDTRANS;
@@ -420,43 +426,41 @@ struct EO102 : SchemeModuleWidget {
 	EO102(EO_102 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(405, 380);
 		addChild(new SchemePanel(this->box.size));
-		{
-			EO_Display * display = new EO_Display();
-			display->module = module;
-			display->box.pos = Vec(2.5, 14);
-			display->box.size = Vec(box.size.x - 5, 236);
-			addChild(display);
-		}
-		{
-			EO_Measure_Horz * display = new EO_Measure_Horz();
-			display->module = module;
-			display->box.pos = Vec(284, 272);
-			display->box.size = Vec(54, 16);
-			display->col = nvgRGBA(0xff, 0xff, 0xff, 0xff);
-			addChild(display);
-		}
-		{
-			EO_Measure_Vert * display = new EO_Measure_Vert();
-			display->module = module;
-			display->box.pos = Vec(341, 254);
-			display->box.size = Vec(62, 16);
-			display->index = 0;
-			display->col = SUBLIGHTBLUE;
-			addChild(display);
-		}
-		{
-			EO_Measure_Vert * display = new EO_Measure_Vert();
-			display->module = module;
-			display->box.pos = Vec(341, 272);
-			display->box.size = Vec(62, 16);
-			display->index = 1;
-			display->col = SUBLIGHTRED;
-			addChild(display);
-		}
+
+		EO_Display * display = new EO_Display();
+		display->module = module;
+		display->box.pos = Vec(2.5, 14);
+		display->box.size = Vec(box.size.x - 5, 236);
+		addChild(display);
+
+		EO_Measure_Horz * measureH = new EO_Measure_Horz();
+		measureH->module = module;
+		measureH->box.pos = Vec(284, 272);
+		measureH->box.size = Vec(54, 16);
+		measureH->col = nvgRGBA(0xff, 0xff, 0xff, 0xff);
+		addChild(measureH);
+
+		EO_Measure_Vert * measureV1 = new EO_Measure_Vert();
+		measureV1->module = module;
+		measureV1->box.pos = Vec(341, 254);
+		measureV1->box.size = Vec(62, 16);
+		measureV1->index = 0;
+		measureV1->col = SUBLIGHTBLUE;
+		addChild(measureV1);
+
+		EO_Measure_Vert * measureV2 = new EO_Measure_Vert();
+		measureV2->module = module;
+		measureV2->box.pos = Vec(341, 272);
+		measureV2->box.size = Vec(62, 16);
+		measureV2->index = 1;
+		measureV2->col = SUBLIGHTRED;
+		addChild(measureV2);
 
 
 		for (int i = 0; i < 2; i++) {
-			addInput(createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i));
+			PortWidget *port = createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i);
+			addInput(port);
+			display->ports[i] = port;
 			addParam(createParamCentered<SubSwitch2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i));
 			addParam(createParamCentered<MedKnob<LightKnob>>(Vec(50 + 75 * i, 320), module, EO_102::PARAM_OFFSET_1 + i));
 			addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(50 + 75 * i, 270), module, EO_102::PARAM_SCALE_1 + i));
@@ -474,6 +478,18 @@ struct EO102 : SchemeModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(290, 320), module, EO_102::PARAM_INDEX_1));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(332, 320), module, EO_102::PARAM_INDEX_2));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3));
+	}
+	void appendContextMenu(Menu *menu) override {
+		menu->addChild(new MenuSeparator);
+		EventWidgetMenuItem *vmi = createMenuItem<EventWidgetMenuItem>("Match Cable Colors");
+		vmi->stepHandler = [=]() {
+			vmi->rightText = CHECKMARK(module->params[EO_102::PARAM_COLORS].getValue());
+		};
+		vmi->clickHandler = [=]() {
+			bool val = module->params[EO_102::PARAM_COLORS].getValue();
+			module->params[EO_102::PARAM_COLORS].setValue(!val);
+		};
+		menu->addChild(vmi);
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "EO-102");
