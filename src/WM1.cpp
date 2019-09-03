@@ -776,6 +776,7 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->visible = (box.size.x > 16.0f);
 		masterWireManager = this;
 		scrollWidget->container->clearChildren();
+		collectionScrollWidget->container->clearChildren();
 		loadSettings();
 	}
 	void step() override {

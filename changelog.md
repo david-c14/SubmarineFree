@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.0.4
+- 03-Sep-2019 WM-101 Add color collections
 - 25-Aug-2019 WM-101 Add ability to color a single wire
 - 17-Aug-2019 WM-101 Allow redo cable changes to maintain original color
 - 10-Aug-2019 WM-101 Bug fix inactive WM-101 not shifting other modules when minimized
