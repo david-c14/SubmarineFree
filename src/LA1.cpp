@@ -16,6 +16,7 @@ struct LA_108 : DS_Module {
 		PARAM_RUN,
 		PARAM_RESET,
 		PARAM_PRE,
+		PARAM_COLORS,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -67,6 +68,7 @@ struct LA_108 : DS_Module {
 		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left index position");
 		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right index position");
 		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f, "Pre-trigger buffer size");
+		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
 	}
 	void process(const ProcessArgs &args) override;
 	void startFrame(void);
@@ -164,8 +166,9 @@ void LA_108::process(const ProcessArgs &args) {
 
 struct LA_Display : TransparentWidget {
 	LA_108 *module;
+	PortWidget *ports[8];
 
-	void drawTrace(NVGcontext *vg, float *values, float offset) {
+	void drawTrace(NVGcontext *vg, float *values, float offset, NVGcolor col) {
 		if (!values)
 			return;
 		nvgSave(vg);
@@ -183,7 +186,7 @@ struct LA_Display : TransparentWidget {
 			else
 				nvgLineTo(vg, x, y);
 		} 
-		nvgStrokeColor(vg, SUBLIGHTBLUETRANS);
+		nvgStrokeColor(vg, col);
 		nvgLineCap(vg, NVG_ROUND);
 		nvgMiterLimit(vg, 2.0f);
 		nvgStrokeWidth(vg, 1.5f);
@@ -271,13 +274,20 @@ struct LA_Display : TransparentWidget {
 		}
 		for (int i = 0; i < 8; i++) {
 			if (module->inputs[LA_108::INPUT_1 + i].isConnected()) {
-				drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i); 
+				NVGcolor col = getColor(i);
+				drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i, col); 
 			}
 		}
 		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
 		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
 		drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].getValue(), 0.0f, 32.0f) / BUFFER_SIZE);
 		drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
+	}
+	
+	NVGcolor getColor(int i) {
+		if (!module->params[LA_108::PARAM_COLORS].getValue())
+			return SUBLIGHTBLUETRANS;
+		return APP->scene->rack->getTopCable(ports[i])->color;
 	}
 };
 
@@ -327,23 +337,22 @@ struct LA108 : SchemeModuleWidget {
 		this->box.size = Vec(300, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		{
-			LA_Display * display = new LA_Display();
-			display->module = module;
-			display->box.pos = Vec(42, 15);
-			display->box.size = Vec(box.size.x - 44, 280);
-			addChild(display);
-		}
-		{
-			LA_Measure * display = new LA_Measure();
-			display->module = module;
-			display->box.pos = Vec(213, 297);
-			display->box.size = Vec(54, 16);
-			addChild(display);
-		}
+		LA_Display * display = new LA_Display();
+		display->module = module;
+		display->box.pos = Vec(42, 15);
+		display->box.size = Vec(box.size.x - 44, 280);
+		addChild(display);
+
+		LA_Measure * measure = new LA_Measure();
+		measure->module = module;
+		measure->box.pos = Vec(213, 297);
+		measure->box.size = Vec(54, 16);
+		addChild(measure);
 
 		for (int i = 0; i < 8; i++) {
-			addInput(createInputCentered<BluePort>(Vec(16.5, 32.5 + 35 * i), module, LA_108::INPUT_1 + i));
+			PortWidget *port = createInputCentered<BluePort>(Vec(16.5, 32.5 + 35 * i), module, LA_108::INPUT_1 + i);
+			addInput(port);
+			display->ports[i] = port;
 			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(31.5, 23.5 + 35 * i), module, LA_108::LIGHT_1 + i));
 		}
 
@@ -365,6 +374,15 @@ struct LA108 : SchemeModuleWidget {
 		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
 		if (dsMod) {
 			dsMod->appendContextMenu(menu);
+			EventWidgetMenuItem *vmi = createMenuItem<EventWidgetMenuItem>("Match Cable Colors");
+			vmi->stepHandler = [=]() {
+				vmi->rightText = CHECKMARK(module->params[LA_108::PARAM_COLORS].getValue());
+			};
+			vmi->clickHandler = [=]() {
+				bool val = module->params[LA_108::PARAM_COLORS].getValue();
+				module->params[LA_108::PARAM_COLORS].setValue(!val);
+			};
+			menu->addChild(vmi);
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
