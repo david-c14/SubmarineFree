@@ -1,6 +1,8 @@
 # Changelog
 
 ## v1.0.4
+- 03-Sep-2019 EO-102 Add menu option to match trace colors to cables
+- 03-Sep-2019 LA-108 Add menu option to match trace colors to cables
 - 03-Sep-2019 WM-101 Add color collections
 - 25-Aug-2019 WM-101 Add ability to color a single wire
 - 17-Aug-2019 WM-101 Allow redo cable changes to maintain original color
