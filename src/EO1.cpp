@@ -480,6 +480,8 @@ struct EO102 : SchemeModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(376, 320), module, EO_102::PARAM_INDEX_3));
 	}
 	void appendContextMenu(Menu *menu) override {
+		if (!module)
+			return;
 		menu->addChild(new MenuSeparator);
 		EventWidgetMenuItem *vmi = createMenuItem<EventWidgetMenuItem>("Match Cable Colors");
 		vmi->stepHandler = [=]() {
