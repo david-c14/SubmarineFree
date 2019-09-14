@@ -287,7 +287,6 @@ struct MouseTransformWidget:Widget {
 	void onHoverText(const event::HoverText &e) override;
 	void onHoverScroll(const event::HoverScroll &e) override;
 	void onDragHover(const event::DragHover &e) override;
-	void onPathDrop(const event::PathDrop &e) override;
 };
 
 //////////////////
