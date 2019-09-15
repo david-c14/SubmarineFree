@@ -1,6 +1,8 @@
 # Changelog
 
 ## v1.0.4
+- 15-Sep-2019 Add TF-102 and TD-316 devices
+- 15-Sep-2019 Add expander backplane to TF-1xx and TD-1xx devices
 - 14-Sep-2019 Bug fix #40 - TD-202 Text difficult to erase
 - 03-Sep-2019 EO-102 Add menu option to match trace colors to cables
 - 03-Sep-2019 LA-108 Add menu option to match trace colors to cables

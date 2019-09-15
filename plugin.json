@@ -272,6 +272,12 @@
 			"tags": ["VISUAL"]
 		},
 		{
+			"slug":"TD-316",
+			"name":"TD-316",
+			"description": "TD-316 Text Display",
+			"tags": ["VISUAL"]
+		},
+		{
 			"slug":"TF-101",
 			"name":"TF-101",
 			"description": "TF-101 Text Display Format Control",
