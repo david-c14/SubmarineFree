@@ -1,8 +1,6 @@
 #include "../SubmarineFree.hpp"
 #include "window.hpp"
 
-#define COLOR_EQ(x,y) (((x).a == (y).a) && ((x).r == (y).r) && ((x).g == (y).g) && ((x).b == (y).b))
-
 int SubText::getTextPosition(Vec mousePos) {
     bndSetFont(font->handle);
     int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,

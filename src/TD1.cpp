@@ -20,7 +20,31 @@ struct TD_116 : Module {
 		config(0, 1, 1, 0);
 		outPort.size(1);
 	}
+	void processExpander(float *message) {
+		NVGcolor newFg = nvgRGBf(message[0], message[1], message[2]);
+		NVGcolor newBg = nvgRGBf(message[3], message[4], message[5]);
+		int newSize = clamp(message[6], 6.0f, 26.0f);
+		if (!COLOR_EQ(newFg, fg))
+			isDirtyC = true;
+		if (!COLOR_EQ(newBg, bg))
+			isDirtyC = true;
+		if (newSize != fontSize)
+			isDirtyC = true;
+		fg = newFg;
+		bg = newBg;
+		fontSize = newSize;
+	}
 	void process(const ProcessArgs &args) override {
+		if (leftExpander.module) {
+			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
+				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
+			}
+		}
+		if (rightExpander.module) {
+			if ((rightExpander.module->model == modelTF101) || (rightExpander.module->model == modelTF102)) {
+				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
+			}
+		}
 		inPort.process();
 		outPort.process();
 	}

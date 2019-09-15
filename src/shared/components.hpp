@@ -13,6 +13,8 @@
 #define SUBLIGHTBLUETRANS nvgRGBA(0x29,0xb2,0xef,0xc0)
 #define SUBLIGHTREDTRANS nvgRGBA(0xed,0x2c,0x24,0xc0)
 
+#define COLOR_EQ(x,y) (((x).a == (y).a) && ((x).r == (y).r) && ((x).g == (y).g) && ((x).b == (y).b))
+
 //////////////////
 // Ports
 //////////////////

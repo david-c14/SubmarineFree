@@ -65,6 +65,7 @@ extern Model *modelSS221;
 extern Model *modelTD116;
 extern Model *modelTD202;
 extern Model *modelTF101;
+extern Model *modelTF102;
 extern Model *modelTM105;
 
 extern Model *modelWK101;
@@ -82,6 +83,6 @@ extern Model *modelXF202;
 extern Model *modelXG104;
 extern Model *modelXG106;
 
-#include "ComponentLibrary/components.hpp"
+#include "shared/components.hpp"
 
 #define SUBMENU "\xe2\x96\xb6"

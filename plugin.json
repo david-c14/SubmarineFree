@@ -278,6 +278,12 @@
 			"tags": ["VISUAL"]
 		},
 		{
+			"slug":"TF-102",
+			"name":"TF-102",
+			"description": "TF-102 Text Display Format Control",
+			"tags": ["VISUAL"]
+		},
+		{
 			"slug":"TM-105",
 			"name":"TM-105",
 			"description": "TM-105 Torpedo Message Merge",
