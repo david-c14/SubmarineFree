@@ -8,12 +8,18 @@ struct TD_316 : Module {
 		config(0, 0, 0, 0);
 	}
 	void processExpander(float *message) {
-		if (!std::isnan(message[0]))
+		if (!std::isnan(message[0])) {
 			fg = nvgRGBf(message[0], message[1], message[2]);
-		if (!std::isnan(message[3]))
+			fgDirty = true;
+		}
+		if (!std::isnan(message[3])) {
 			bg = nvgRGBf(message[3], message[4], message[5]);
-		if (!std::isnan(message[6]))
+			bgDirty = true;
+		}
+		if (!std::isnan(message[6])) {
 			fontSize = clamp(message[6], 6.0f, 26.0f);
+			fontSizeDirty = true;
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		if (leftExpander.module) {
@@ -35,6 +41,9 @@ struct TD_316 : Module {
 	int fontSize = 12;
 	NVGcolor fg = SUBLIGHTBLUE;
 	NVGcolor bg = nvgRGB(0,0,0);
+	bool fgDirty = false;
+	bool bgDirty = false;
+	bool fontSizeDirty = false;
 };
 
 struct TDText : SubText {
@@ -105,9 +114,18 @@ struct TD316 : SchemeModuleWidget {
 		if (!tdModule) {
 			return;
 		}
-		textField->fontSize = tdModule->fontSize;
-		textField->color = tdModule->fg;
-		textField->bgColor = tdModule->bg;
+		if (tdModule->fontSizeDirty) {
+			textField->fontSize = tdModule->fontSize;
+			tdModule->fontSizeDirty = false;
+		}
+		if (tdModule->fgDirty) {
+			textField->color = tdModule->fg;
+			tdModule->fgDirty = false;
+		}
+		if (tdModule->bgDirty) {
+			textField->bgColor = tdModule->bg;
+			tdModule->bgDirty = false;
+		}
 		if (tdModule->reset) {
 			textField->fontSize = 12;
 			textField->text = "";

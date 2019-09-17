@@ -28,6 +28,10 @@ struct TDVText : SubText {
 };
 
 struct TD_202 : Module {
+	NVGcolor fg;
+	NVGcolor bg;
+	bool fgDirty = false;
+	bool bgDirty = false;
 	TD_202() : Module() {
 		config(0, 0, 0, 0);
 	}
@@ -35,6 +39,28 @@ struct TD_202 : Module {
 	void onReset() override {
 		reset = 1;
 		Module::onReset();
+	}
+	void processExpander(float *message) {
+		if (!std::isnan(message[0])) {
+			fg = nvgRGBf(message[0], message[1], message[2]);
+			fgDirty = true;
+		}
+		if (!std::isnan(message[3])) {
+			bg = nvgRGBf(message[3], message[4], message[5]);
+			bgDirty = true;
+		}
+	}
+	void process(const ProcessArgs &args) override {
+		if (leftExpander.module) {
+			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
+				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
+			}
+		}
+		if (rightExpander.module) {
+			if ((rightExpander.module->model == modelTF101) || (rightExpander.module->model == modelTF102)) {
+				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
+			}
+		}
 	}
 };
 
@@ -91,6 +117,14 @@ struct TD202 : SchemeModuleWidget {
 			textField->color = SUBLIGHTBLUE;
 			textField->bgColor = nvgRGBA(0, 0, 0, 0);
 			tdModule->reset = 0;
+		}
+		if (tdModule->fgDirty) {
+			textField->color = tdModule->fg;
+			tdModule->fgDirty = false;
+		}
+		if (tdModule->bgDirty) {
+			textField->bgColor = tdModule->bg;
+			tdModule->bgDirty = false;
 		}
 	}
 

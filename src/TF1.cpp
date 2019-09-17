@@ -39,10 +39,10 @@ struct TF : Module  {
 		NUM_LIGHTS
 	};
 
-	float prevValues[7];
+	float prevValues[7] {NAN,NAN,NAN,NAN,NAN,NAN,NAN};
 	int isDirty = false;
 	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);	
-	float messages[2][7];
+	float messages[2][7] = {{NAN,NAN,NAN,NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN,NAN,NAN,NAN}};
 	TF() : Module() {
 		config(hasParams * NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		if (hasParams) {
