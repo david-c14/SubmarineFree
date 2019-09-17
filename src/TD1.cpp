@@ -21,18 +21,24 @@ struct TD_116 : Module {
 		outPort.size(1);
 	}
 	void processExpander(float *message) {
-		NVGcolor newFg = nvgRGBf(message[0], message[1], message[2]);
-		NVGcolor newBg = nvgRGBf(message[3], message[4], message[5]);
-		int newSize = clamp(message[6], 6.0f, 26.0f);
-		if (!COLOR_EQ(newFg, fg))
-			isDirtyC = true;
-		if (!COLOR_EQ(newBg, bg))
-			isDirtyC = true;
-		if (newSize != fontSize)
-			isDirtyC = true;
-		fg = newFg;
-		bg = newBg;
-		fontSize = newSize;
+		if (!std::isnan(message[0])) {
+			NVGcolor newFg = nvgRGBf(message[0], message[1], message[2]);
+			if (!COLOR_EQ(newFg, fg))
+				isDirtyC = true;
+			fg = newFg;
+		}
+		if (!std::isnan(message[3])) {
+			NVGcolor newBg = nvgRGBf(message[3], message[4], message[5]);
+			if (!COLOR_EQ(newBg, bg))
+				isDirtyC = true;
+			bg = newBg;
+		}
+		if (!std::isnan(message[6])) {
+			int newSize = clamp(message[6], 6.0f, 26.0f);
+			if (newSize != fontSize)
+				isDirtyC = true;
+			fontSize = newSize;
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		if (leftExpander.module) {

@@ -8,9 +8,12 @@ struct TD_316 : Module {
 		config(0, 0, 0, 0);
 	}
 	void processExpander(float *message) {
-		fg = nvgRGBf(message[0], message[1], message[2]);
-		bg = nvgRGBf(message[3], message[4], message[5]);
-		fontSize = clamp(message[6], 6.0f, 26.0f);
+		if (!std::isnan(message[0]))
+			fg = nvgRGBf(message[0], message[1], message[2]);
+		if (!std::isnan(message[3]))
+			bg = nvgRGBf(message[3], message[4], message[5]);
+		if (!std::isnan(message[6]))
+			fontSize = clamp(message[6], 6.0f, 26.0f);
 	}
 	void process(const ProcessArgs &args) override {
 		if (leftExpander.module) {

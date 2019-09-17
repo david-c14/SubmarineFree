@@ -79,17 +79,40 @@ struct TF : Module  {
 		if (isDirty) {
 			isDirty = false;
 			json_t *rootJ = json_object();
-			json_object_set_new(rootJ, "fg", json_string(encodeColor(prevValues[0], prevValues[1], prevValues[2]).c_str()));
-			json_object_set_new(rootJ, "bg", json_string(encodeColor(prevValues[3], prevValues[4], prevValues[5]).c_str()));
-			json_object_set_new(rootJ, "size", json_real(prevValues[6]));
+			if (hasParams || inputs[INPUT_FG_RED].isConnected() || inputs[INPUT_FG_GREEN].isConnected() || inputs[INPUT_FG_BLUE].isConnected())
+				json_object_set_new(rootJ, "fg", json_string(encodeColor(prevValues[0], prevValues[1], prevValues[2]).c_str()));
+			if (hasParams || inputs[INPUT_BG_RED].isConnected() || inputs[INPUT_BG_GREEN].isConnected() || inputs[INPUT_BG_BLUE].isConnected())
+				json_object_set_new(rootJ, "bg", json_string(encodeColor(prevValues[3], prevValues[4], prevValues[5]).c_str()));
+			if (hasParams || inputs[INPUT_FONT_SIZE].isConnected())
+				json_object_set_new(rootJ, "size", json_real(prevValues[6]));
 			outPort.send("SubmarineFree", "TDNotesColor", rootJ);
 		}
 		outPort.process();
 		float *message = (float *)(leftExpander.producerMessage);
-		for (unsigned int i = 0; i < 7; i++) {
-			message[i] = prevValues[i];
+		if (hasParams || inputs[INPUT_FG_RED].isConnected() || inputs[INPUT_FG_GREEN].isConnected() || inputs[INPUT_FG_BLUE].isConnected()) {
+			message[0] = prevValues[0];
+			message[1] = prevValues[1];
+			message[2] = prevValues[2];
+		}
+		else {
+			message[0] = NAN;
+		}
+		if (hasParams || inputs[INPUT_BG_RED].isConnected() || inputs[INPUT_BG_GREEN].isConnected() || inputs[INPUT_BG_BLUE].isConnected()) {
+			message[3] = prevValues[3];
+			message[4] = prevValues[4];
+			message[5] = prevValues[5];
+		}
+		else {
+			message[3] = NAN;
+		}
+		if (hasParams || inputs[INPUT_FONT_SIZE].isConnected()) {
+			message[6] = prevValues[6];
+		}
+		else {
+			message[6] = NAN;
 		}
 		leftExpander.messageFlipRequested = true;
+		rightExpander.messageFlipRequested = true;
 	}
 	std::string encodeColor(float r, float g, float b) {
 		std::string out;
