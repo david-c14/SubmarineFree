@@ -38,7 +38,7 @@ struct TD_316 : Module {
 		Module::onReset();
 	}
 	int reset = 0;
-	int fontSize = 12;
+	float fontSize = 12.0f;
 	NVGcolor fg = SUBLIGHTBLUE;
 	NVGcolor bg = nvgRGB(0,0,0);
 	bool fgDirty = false;

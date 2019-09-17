@@ -254,7 +254,7 @@ struct SchemeModuleWidget : app::ModuleWidget {
 
 struct SubText : LedDisplayTextField {
 	NVGcolor bgColor = nvgRGB(0x00, 0x00, 0x00);
-	int fontSize = 12;
+	float fontSize = 12.0f;
 	SubText() {
 		color = SUBLIGHTBLUE;
 	}

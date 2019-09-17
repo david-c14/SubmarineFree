@@ -68,7 +68,7 @@ struct TD_116 : Module {
 	}
 	std::string text;
 	int reset = 0;
-	int fontSize = 12;
+	float fontSize = 12.0f;
 	NVGcolor fg = SUBLIGHTBLUE;
 	NVGcolor bg = nvgRGB(0,0,0);
 	int isDirty = false;
