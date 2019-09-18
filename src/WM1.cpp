@@ -214,33 +214,6 @@ struct EditPanel : BackPanel {
 	}
 };
 
-struct EventParamField : ui::TextField {
-	std::function<void(std::string)> changeHandler;
-	void step() override {
-		// Keep selected
-		APP->event->setSelected(this);
-		TextField::step();
-	}
-
-	void setText(std::string text) {
-		this->text = text;
-		selectAll();
-	}
-
-	void onSelectKey(const event::SelectKey &e) override {
-		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
-			if (changeHandler) {
-				changeHandler(text);
-			}
-			ui::MenuOverlay *overlay = getAncestorOfType<ui::MenuOverlay>();
-			overlay->requestDelete();
-			e.consume(this);
-		}
-		if (!e.getTarget())
-			TextField::onSelectKey(e);
-	}
-};
-
 struct WireButton : EventWidgetButtonBase {
 	NVGcolor color;
 	EventWidgetCheckBox *checkBox;

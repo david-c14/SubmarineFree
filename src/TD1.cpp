@@ -87,8 +87,8 @@ struct TDText : SubText {
 		}
 	}
 	void foregroundMenu(Menu *menu) override {
-		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
 		SubText::foregroundMenu(menu);
+		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
 	}
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
@@ -220,8 +220,5 @@ struct TD116 : SchemeModuleWidget {
 		drawText(vg, 210, 36, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC OUT");
 	}
 };
-
-
-
 
 Model *modelTD116 = createModel<TD_116, TD116>("TD-116");

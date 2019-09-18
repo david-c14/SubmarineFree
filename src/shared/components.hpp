@@ -374,6 +374,13 @@ struct EventWidgetMenuItem : MenuItem {
 	void step() override;
 };
 
+struct EventParamField : ui::TextField {
+	std::function<void(std::string)> changeHandler;
+	void step() override;
+	void setText(std::string text);
+	void onSelectKey(const event::SelectKey &e) override;
+};
+
 //////////////////
 // SizeableModuleWidget
 //////////////////

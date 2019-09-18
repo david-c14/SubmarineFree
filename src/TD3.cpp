@@ -51,8 +51,8 @@ struct TDText : SubText {
 		color = SUBLIGHTBLUE;
 	}
 	void foregroundMenu(Menu *menu) override {
-		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
 		SubText::foregroundMenu(menu);
+		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
 	}
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {

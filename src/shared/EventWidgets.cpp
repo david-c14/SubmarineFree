@@ -257,3 +257,27 @@ void EventWidgetMenuItem::step() {
 	}
 	MenuItem::step();
 }
+
+void EventParamField::step() {
+	// Keep selected
+	APP->event->setSelected(this);
+	TextField::step();
+}
+
+void EventParamField::setText(std::string text) {
+	this->text = text;
+	selectAll();
+}
+
+void EventParamField::onSelectKey(const event::SelectKey &e) {
+	if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
+		if (changeHandler) {
+			changeHandler(text);
+		}
+		ui::MenuOverlay *overlay = getAncestorOfType<ui::MenuOverlay>();
+		overlay->requestDelete();
+		e.consume(this);
+	}
+	if (!e.getTarget())
+		TextField::onSelectKey(e);
+}
