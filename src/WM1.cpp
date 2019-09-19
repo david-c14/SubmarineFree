@@ -1384,7 +1384,7 @@ struct WM101 : SizeableModuleWidget {
 		Menu *menu = createMenu();
 		MenuLabel *label = new MenuLabel;
 		char str[40];
-		snprintf(str, 40, "Shortcut Key F%d", cb->index() + 1);
+		snprintf(str, 40, "Shortcut Key Ctrl-F%d", cb->index() + 1);
 		label->text = str;
 		menu->addChild(label);
 		EventParamField *paramField = new EventParamField();
