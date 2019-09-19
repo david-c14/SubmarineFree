@@ -691,6 +691,22 @@ struct WM101 : SizeableModuleWidget {
 	~WM101() {
 		this->_delete();
 	}
+	void onHoverKey(const event::HoverKey &e) override {
+		ModuleWidget::onHoverKey(e);
+		if (e.isConsumed())
+			return;
+		if (e.action == GLFW_PRESS) {
+			if ((e.key >= GLFW_KEY_F1) && (e.key <= GLFW_KEY_F25)) {
+				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+					ColorCollectionButton *collection = findCollectionButton(e.key - GLFW_KEY_F1);	
+					if (collection) {
+						applyCollection(collection);
+					}
+					e.consume(this);
+				}
+			}
+		}
+	}
 	void varyCheckChanged() {
 		bool selected = varyCheck->selected;
 		saveSettings();
