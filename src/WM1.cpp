@@ -1382,6 +1382,11 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void addCollectionMenu(ColorCollectionButton *cb) {
 		Menu *menu = createMenu();
+		MenuLabel *label = new MenuLabel;
+		char str[40];
+		snprintf(str, 40, "Shortcut Key F%d", cb->index() + 1);
+		label->text = str;
+		menu->addChild(label);
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
 		paramField->setText(cb->name);
