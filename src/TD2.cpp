@@ -9,6 +9,7 @@ struct TDVText : SubText {
 		color = SUBLIGHTBLUE;
 		bgColor = nvgRGBA(0, 0, 0, 0);
 		fontSize = 28;
+		textMenu = false;
 	}
 	void onButton(const event::Button &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {

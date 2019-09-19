@@ -12,7 +12,9 @@
 	}
 
 #endif
+#include <stdio.h>
 
+int main(int argc, char *argv[]) {
 
 	//  Misc.
 	bool HW_MMX;
@@ -84,7 +86,7 @@
 
 		if (osUsesXSAVE_XRSTORE && HW_AVX)
 		{
-			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+			unsigned long long xcrFeatureMask = _xgetbv(0);
 			OS_AVX = (xcrFeatureMask & 0x6) == 0x6;
 		}
 	}
@@ -151,4 +153,5 @@
 	if (OS_AVX) printf("OS-AVX ");
 	printf("\n");
 
-
+	return 0;
+}

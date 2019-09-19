@@ -35,6 +35,25 @@ void SubText::draw(const DrawArgs &args) {
 }
 
 void SubText::appendContextMenu(Menu *menu) {
+	if (textMenu) {
+		MenuLabel *label = new MenuLabel();
+		label->text = "Text Size:";
+		menu->addChild(label);
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		char str[20];
+		snprintf(str, 20, "%0.3f", fontSize);
+		paramField->setText(str);
+		paramField->changeHandler = [=](std::string text) {
+			try {
+				fontSize = clamp(stof(text, NULL), 6.0f, 26.0f);
+			}
+			catch (...) {
+			}
+		};
+		menu->addChild(paramField);
+		menu->addChild(new MenuSeparator);
+	}
 	EventWidgetMenuItem *fp = createMenuItem<EventWidgetMenuItem>("Foreground");
 	fp->rightText = SUBMENU;
 	fp->childMenuHandler = [=]() {
@@ -76,24 +95,26 @@ MenuItem *SubText::createBackgroundMenuItem(std::string label, NVGcolor color) {
 }
 
 void SubText::foregroundMenu(Menu *menu) {
-	EventParamField *paramField = new EventParamField();
-	paramField->box.size.x = 100;
-	paramField->setText(color::toHexString(color));
-	paramField->changeHandler = [=](std::string text) {
-		if (text[0] != '#')
-			return;
-		for (unsigned int i = 1; i < 7; i++) {
-			if (text.length() <= i)
+	if (colorMenu) {
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		paramField->setText(color::toHexString(color));
+		paramField->changeHandler = [=](std::string text) {
+			if (text[0] != '#')
 				return;
-			if (!( (text[i] >= '0' && text[i] <= '9') ||
-				(text[i] >= 'A' && text[i] <= 'F') ||
-				(text[i] >= 'a' && text[i] <= 'f')))
-				return;
-		}
-		this->color = color::fromHexString(text);
-	};
-	menu->addChild(paramField);
-	menu->addChild(new MenuSeparator);
+			for (unsigned int i = 1; i < 7; i++) {
+				if (text.length() <= i)
+					return;
+				if (!( (text[i] >= '0' && text[i] <= '9') ||
+					(text[i] >= 'A' && text[i] <= 'F') ||
+					(text[i] >= 'a' && text[i] <= 'f')))
+					return;
+			}
+			this->color = color::fromHexString(text);
+		};
+		menu->addChild(paramField);
+		menu->addChild(new MenuSeparator);
+	}
 	menu->addChild(createForegroundMenuItem("Blue", SUBLIGHTBLUE));
 	menu->addChild(createForegroundMenuItem("Yellow", nvgRGB(0xc9, 0xb7, 0x0e)));
 	menu->addChild(createForegroundMenuItem("Red", nvgRGB(0xff, 0x13, 0x13)));
@@ -104,24 +125,26 @@ void SubText::foregroundMenu(Menu *menu) {
 }
 
 void SubText::backgroundMenu(Menu *menu) {
-	EventParamField *paramField = new EventParamField();
-	paramField->box.size.x = 100;
-	paramField->setText(color::toHexString(bgColor));
-	paramField->changeHandler = [=](std::string text) {
-		if (text[0] != '#')
-			return;
-		for (unsigned int i = 1; i < 7; i++) {
-			if (text.length() <= i)
+	if (colorMenu) {
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		paramField->setText(color::toHexString(bgColor));
+		paramField->changeHandler = [=](std::string text) {
+			if (text[0] != '#')
 				return;
-			if (!( (text[i] >= '0' && text[i] <= '9') ||
-				(text[i] >= 'A' && text[i] <= 'F') ||
-				(text[i] >= 'a' && text[i] <= 'f')))
-				return;
-		}
-		this->bgColor = color::fromHexString(text);
-	};
-	menu->addChild(paramField);
-	menu->addChild(new MenuSeparator);
+			for (unsigned int i = 1; i < 7; i++) {
+				if (text.length() <= i)
+					return;
+				if (!( (text[i] >= '0' && text[i] <= '9') ||
+					(text[i] >= 'A' && text[i] <= 'F') ||
+					(text[i] >= 'a' && text[i] <= 'f')))
+					return;
+			}
+			this->bgColor = color::fromHexString(text);
+		};
+		menu->addChild(paramField);
+		menu->addChild(new MenuSeparator);
+	}
 	menu->addChild(createBackgroundMenuItem("None", nvgRGBA(0, 0, 0, 0)));
 	menu->addChild(createBackgroundMenuItem("Black", nvgRGB(0, 0, 0)));
 	menu->addChild(createBackgroundMenuItem("White", nvgRGB(0xff, 0xff, 0xff)));
