@@ -704,6 +704,14 @@ struct WM101 : SizeableModuleWidget {
 					}
 					e.consume(this);
 				}
+				if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+					WireButton *button = findWireButton(e.key - GLFW_KEY_F1);
+					if (button) {
+						button->checkBox->selected = !button->checkBox->selected;
+						updateWireButtonCheckBox(button);
+					}
+					e.consume(this);
+				}
 			}
 		}
 	}
@@ -1382,11 +1390,6 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void addCollectionMenu(ColorCollectionButton *cb) {
 		Menu *menu = createMenu();
-		MenuLabel *label = new MenuLabel;
-		char str[40];
-		snprintf(str, 40, "Shortcut Key Ctrl-F%d", cb->index() + 1);
-		label->text = str;
-		menu->addChild(label);
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
 		paramField->setText(cb->name);
@@ -1400,6 +1403,12 @@ struct WM101 : SizeableModuleWidget {
 		am->clickHandler = [=]() {
 			this->applyCollection(cb);
 		};
+		unsigned int index = cb->index();
+		if (index < 25) {
+			char str[40];
+			snprintf(str, 40, RACK_MOD_CTRL_NAME "-F%d", cb->index() + 1);
+			am->rightText = str;
+		}
 		menu->addChild(am);
 
 		EventWidgetMenuItem *dm = new EventWidgetMenuItem();
@@ -1441,9 +1450,6 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void addWireMenu(WireButton *wb) {
 		Menu *menu = createMenu();
-		MenuLabel *label = new MenuLabel();
-		label->text = "Color: " + color::toHexString(wb->color);
-		menu->addChild(label);
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
 		paramField->setText(color::toHexString(wb->color));
