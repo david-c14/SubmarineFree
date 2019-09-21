@@ -1544,7 +1544,7 @@ struct WM101 : SizeableModuleWidget {
 			menu->addChild(md);
 		}
 		EventWidgetMenuItem *dm = new EventWidgetMenuItem();
-		dm->text = "Delete Wire...";
+		dm->text = "Delete Color...";
 		dm->clickHandler = [=]() {
 			this->deleteDialog(wb);
 		};

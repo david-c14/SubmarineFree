@@ -1,6 +1,8 @@
 # Changelog
 
 ## v1.0.4
+- 21-Sep-2019 Add Shift-F keys for WM-101 selection
+- 20-Sep-2019 Add Ctrl-F keys for WM-101 collections
 - 15-Sep-2019 Add TF-102 and TD-316 devices
 - 15-Sep-2019 Add expander backplane to TF-1xx and TD-1xx devices
 - 14-Sep-2019 Bug fix #40 - TD-202 Text difficult to erase
