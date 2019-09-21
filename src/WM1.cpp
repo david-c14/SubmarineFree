@@ -1410,6 +1410,24 @@ struct WM101 : SizeableModuleWidget {
 			am->rightText = str;
 		}
 		menu->addChild(am);
+		
+		if (cb->index() > 0) {
+			EventWidgetMenuItem *um = new EventWidgetMenuItem();
+			um->text = "Move Up";
+			um->clickHandler = [=]() {
+				this->swapCollection(cb, true);
+			};
+			menu->addChild(um);
+		}
+
+		if (cb->index() < collectionScrollWidget->container->children.size() - 1) {
+			EventWidgetMenuItem *um = new EventWidgetMenuItem();
+			um->text = "Move Down";
+			um->clickHandler = [=]() {
+				this->swapCollection(cb, false);
+			};
+			menu->addChild(um);
+		}
 
 		EventWidgetMenuItem *dm = new EventWidgetMenuItem();
 		dm->text = "Delete Collection...";
@@ -1417,6 +1435,42 @@ struct WM101 : SizeableModuleWidget {
 			this->deleteCollectionDialog(cb);
 		};
 		menu->addChild(dm);
+	}
+	unsigned int swapCollectionCore(ColorCollectionButton *cb, bool up) {
+		unsigned int index = cb->index();
+		ColorCollectionButton *cb2 = findCollectionButton(index + (up?-1:+1));
+		if (cb2) {
+			std::string name = cb->name;
+			cb->name = cb2->name;
+			cb2->name = name;
+			std::vector<NVGcolor> colors = cb->colors;
+			cb->colors = cb2->colors;
+			cb2->colors = colors;	
+		}
+		saveSettings();
+		return index;
+	}
+	void swapCollection(ColorCollectionButton *cb, bool up) {
+		unsigned int index = swapCollectionCore(cb, up);
+		APP->history->push(new EventWidgetAction(
+			up?"Move Collection Up":"Move Collection Down",
+			[index, up]() {
+				if (masterWireManager) {
+					ColorCollectionButton *btn = masterWireManager->findCollectionButton(index - 1);
+					if (btn) {
+						masterWireManager->swapCollectionCore(btn, !up);
+					}
+				}
+			},
+			[index, up]() {
+				if (masterWireManager) {
+					ColorCollectionButton *btn = masterWireManager->findCollectionButton(index);
+					if (btn) {
+						masterWireManager->swapCollectionCore(btn, up);
+					}
+				}
+			}
+		));
 	}
 	void changeCollectionName(ColorCollectionButton *cb, std::string text) {
 		if (cb->name == text)
