@@ -20,10 +20,14 @@ Or perhaps you just want all of the wires to be pink to celebrate Valentine's Da
 
 The top-most checkbox in the list allows you to select / deselect all the colors.
 
+For the first 25 colors in the list, you can use Shift-Fxx to quickly select or deselect the checkbox on the color. You need to be hovering over the WM-101 device in the rack. Use Shift-F1 for the first color, Shift-F2 for the second and so on.
+
 At the top of the list to the left of centre is a plus icon. This will take you to the editing page to create a new wire color which will
 be placed an the bottom of the list when you save it.
 
 To the right of center at the top is the collections icon. This takes you to the collections page where you can rename, delete or use collections. A collection is a quick way of switching between color sets. To create a collection, choose some colors on the colors page, and then choose to 'Save Collection' using the main menu.
+
+For the first 25 collections in the list, you can use Ctrl-Fxx or Cmd-Fxx to switch to that collection. Use Ctrl/Cmd-F1 for the first collection, Ctrl/Cmd-F2 for the second collection etc.
 
 To the right at the top is a menu icon. This menu gives direct access to some quick settings, or to the full settings page using the Settings option.
 
