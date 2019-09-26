@@ -325,6 +325,7 @@ struct EO_Display : TransparentWidget {
 			if (module->inputs[EO_102::INPUT_1 + i].isConnected()) {
 				if (module->params[EO_102::PARAM_COLORS].getValue()) {
 					col = APP->scene->rack->getTopCable(ports[i])->color;
+					col.a = 1.0f;
 				}
 				drawTrace(args.vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].getValue(), module->params[EO_102::PARAM_SCALE_1 + i].getValue(), col, module->traceMode[i]); 
 			}

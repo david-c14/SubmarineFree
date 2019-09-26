@@ -287,7 +287,9 @@ struct LA_Display : TransparentWidget {
 	NVGcolor getColor(int i) {
 		if (!module->params[LA_108::PARAM_COLORS].getValue())
 			return SUBLIGHTBLUETRANS;
-		return APP->scene->rack->getTopCable(ports[i])->color;
+		NVGcolor col = APP->scene->rack->getTopCable(ports[i])->color;
+		col.a = 1.0f;
+		return col;
 	}
 };
 
