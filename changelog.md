@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.5
+- 25-Sep-2019 Bug fix - Scopes should not have transparent cables when matching colors
+
 ## v1.0.4
 - 21-Sep-2019 Add Shift-F keys for WM-101 selection
 - 20-Sep-2019 Add Ctrl-F keys for WM-101 collections
