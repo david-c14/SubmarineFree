@@ -162,7 +162,7 @@ struct RedKnob : K {
 	}
 };
 
-struct LightSlider : LightKnob {
+struct SubLightSlider : LightKnob {
 	void draw(const DrawArgs &args) override;
 	void onDragMove(const event::DragMove &e) override;
 };

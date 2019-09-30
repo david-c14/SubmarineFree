@@ -7,7 +7,7 @@
 
 #include "../SubmarineFree.hpp"
 #include "color.hpp"
-	void LightSlider::draw(const DrawArgs &args) {
+	void SubLightSlider::draw(const DrawArgs &args) {
 		float offset = rescale(paramQuantity->getValue(), paramQuantity->getMinValue(), paramQuantity->getMaxValue(), 0, box.size.y - 12);
 		NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
 		
@@ -50,7 +50,7 @@
 	}
 	}
 
-	void LightSlider::onDragMove(const event::DragMove &e) {
+	void SubLightSlider::onDragMove(const event::DragMove &e) {
 		event::DragMove e2 = e;
 		e2.mouseDelta = Vec(e.mouseDelta.x, -e.mouseDelta.y);
 		LightKnob::onDragMove(e2);
