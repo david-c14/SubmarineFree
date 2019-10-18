@@ -870,7 +870,7 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void colorCable(Widget *widget, history::ComplexAction *complex) {
 		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
-		if (cable->cable->id > -1 && !complex && redoCheck->selected)
+		if (cable->cable->id > -1 && !complex && redoCheck->selected && !wirePanel->visible)
 			return;
 		NVGcolor oldColor = cable->color;
 		if (wirePanel->visible) {
