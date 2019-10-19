@@ -1,6 +1,8 @@
 # Changelog
 
-## v1.0.5
+## v1.1.0
+- 19-Oct-2019 Relicenced to GPL-3.0
+- 18-Oct-2019 Bug fix - Color 1 wire not working responding to existing cables
 - 25-Sep-2019 Bug fix - Scopes should not have transparent cables when matching colors
 
 ## v1.0.4

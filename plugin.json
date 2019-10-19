@@ -3,7 +3,7 @@
 	"name": "Submarine (Free)",
 	"author": "carbon14",
         "brand": "Submarine",
-	"license": "BSD-3-Clause",
+	"license": "GPL-3.0-only",
 	"authorUrl": "https://vcvrack.submarine.org.uk",
         "authorEmail": "carbon14@submarine.org.uk",
 	"sourceUrl": "https://github.com/david-c14/SubmarineFree",
@@ -11,7 +11,7 @@
 	"donateUrl": "https://www.paypal.me/SubmarineFree",
         "pluginUrl": "https://github.com/david-c14/SubmarineFree/blob/master/README.md",
 	"changelogUrl": "https://github.com/david-c14/SubmarineFree/blob/master/changelog.md",
-	"version": "1.0.4",
+	"version": "1.1.0",
 	"modules": [
 		{
 			"slug":"AG-104",
