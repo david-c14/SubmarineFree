@@ -2,69 +2,7 @@
 
 #include "SubmarineFree.hpp"
 
-struct PO_Util {
-	static constexpr float deg0   = 0.0f;
-	static constexpr float deg30  =         M_PI / 6.0f;
-	static constexpr float deg45  =         M_PI / 4.0f;
-	static constexpr float deg60  =         M_PI / 3.0f;
-	static constexpr float deg90  =         M_PI / 2.0f;
-	static constexpr float deg120 = 2.0f  * M_PI / 3.0f;
-	static constexpr float deg135 = 3.0f  * M_PI / 4.0f;
-	static constexpr float deg150 = 5.0f  * M_PI / 6.0f;
-	static constexpr float ph0 = 0.0f;
-	static constexpr float ph30 = 1.0f / 12.0f;
-	static constexpr float ph45 = 0.125f;
-	static constexpr float ph60 = 1.0f / 6.0f;
-	static constexpr float ph90 = 0.25f;
-	static constexpr float ph120 = 1.0f / 3.0f;
-	static constexpr float ph135 = 0.375f;
-	static constexpr float ph150 = 5.0f / 12.0f;
-	static constexpr float ph180 = 0.5f;
-	static constexpr float ph210 = 7.0f / 12.0f;
-	static constexpr float ph225 = 0.625;
-	static constexpr float ph240 = 2.0f / 3.0f;
-	static constexpr float ph270 = 0.75f;
-	static constexpr float ph300 = 5.0f / 6.0f;
-	static constexpr float ph315 = 0.875f;
-	static constexpr float ph330 = 11.0f / 12.0f;
-
-	float sin(float phase);
-	float tri(float phase);
-	float saw(float phase);
-	float sqr(float phase);
-	float rsn(float phase);
-};
-
-float PO_Util::sin(float phase) {
-	return 5.0f * sinf(phase);
-}
-
-float PO_Util::tri(float phase) {
-	phase -= floor(phase);
-	if (phase < 0.25f)
-		return 20.0f * phase;
-	if (phase < 0.75f)
-		return 20.0f * (0.5f - phase);
-	return 20.0f * (phase - 1.0f);
-}
-
-float PO_Util::saw(float phase) {
-	phase -= floor(phase);
-	if (phase < 0.5f)
-		return 10.0f * phase;
-	return 10.0f * (phase - 1.0f);
-}
-
-float PO_Util::sqr(float phase) {
-	phase -= floor(phase);
-	return (phase < 0.5f)?5.0f:-5.0f;
-}
-
-float PO_Util::rsn(float phase) {
-	return 10.0f * fabs(sinf(phase)) - 5.0f; 
-}
-
-struct PO_204 : Module, PO_Util {
+struct PO_204 : Module {
 	
 	enum ParamIds {
 		PARAM_TUNE,
@@ -125,12 +63,195 @@ struct PO_204 : Module, PO_Util {
 	float baseFreq = 261.626f;
 };
 
+static inline __m128 truncx(__m128 x) {
+	return (_mm_cvtepi32_ps(_mm_cvttps_epi32(x)));
+}
+
+static inline __m128 fmodx(__m128 x) {
+	return _mm_sub_ps(x, truncx(x));
+}
+
+static inline __m128 sin_ps(__m128 x) { // any x
+	__m128 xmm1, xmm3, sign_bit, y;
+
+	__m128i emm0, emm2;
+
+	/* scale by eight */
+	const __m128 mEight = _mm_set_ps1(8.0f); // 8
+	y = _mm_mul_ps(x, mEight);
+
+	/* store the integer part of y in mm0 */
+	emm2 = _mm_cvttps_epi32(y);
+	/* j=(j+1) & (~1) (see the cephes sources) */
+	emm2 = _mm_add_epi32(emm2, _mm_set1_epi32(1));
+	emm2 = _mm_and_si128(emm2, _mm_set1_epi32(~1));
+	y = _mm_cvtepi32_ps(emm2);
+
+	/* get the swap sign flag */
+	emm0 = _mm_and_si128(emm2, _mm_set1_epi32(4));
+	emm0 = _mm_slli_epi32(emm0, 29);
+	/* get the polynom selection mask
+	   there is one polynom for 0 <= x <= Pi/4
+	   and another one for Pi/4<x<=Pi/2
+
+	   Both branches will be computed.
+	*/
+	emm2 = _mm_and_si128(emm2, _mm_set1_epi32(2));
+	emm2 = _mm_cmpeq_epi32(emm2, _mm_setzero_si128());
+
+	sign_bit = _mm_castsi128_ps(emm0);
+	__m128 poly_mask = _mm_castsi128_ps(emm2);
+
+	xmm1 = _mm_set_ps1(-0.125f);
+	xmm1 = _mm_mul_ps(y, xmm1);
+	x = _mm_add_ps(x, xmm1);
+
+	/* Evaluate the first polynom  (0 <= x <= 0.125) */
+	__m128 z = _mm_mul_ps(x, x);
+	y = _mm_set_ps1(3.01223206859383e2f);
+	y = _mm_mul_ps(y, z);
+	y = _mm_add_ps(y, _mm_set_ps1(-4.2728406033469e2f));
+	y = _mm_mul_ps(y, z);
+	y = _mm_add_ps(y, _mm_set_ps1(3.24696970113341e2f));
+	y = _mm_mul_ps(y, z);
+	y = _mm_add_ps(y, _mm_set_ps1(-9.86960440108936e1f));
+	y = _mm_mul_ps(y, z);
+	y = _mm_add_ps(y, _mm_set_ps1(5.0));
+
+	/* Evaluate the second polynom  (0.125 <= x <= 0.25) */
+
+	__m128 y2 = _mm_set_ps1(-3.83529298765307e2f);
+	y2 = _mm_mul_ps(y2, z);
+	y2 = _mm_add_ps(y2, _mm_set_ps1(4.08026246380375e2f));
+	y2 = _mm_mul_ps(y2, z);
+	y2 = _mm_add_ps(y2, _mm_set_ps1(-2.06708511201999e2f));
+	y2 = _mm_mul_ps(y2, z);
+	y2 = _mm_add_ps(y2, _mm_set_ps1(3.14159265358979e1f));
+	y2 = _mm_mul_ps(y2, x);
+
+	/* select the correct result from the two polynoms */
+	xmm3 = poly_mask;
+	y2 = _mm_and_ps(xmm3, y2); //, xmm3);
+	y = _mm_andnot_ps(xmm3, y);
+	y = _mm_add_ps(y, y2);
+	/* update the sign */
+	y = _mm_xor_ps(y, sign_bit);
+	return y;
+}
+
+
+static inline void sseProcess(float phase, float ports[]) {
+	//Calculate wave from param and input clamp to 0-10 and separate into int and remainder
+	__m128 wave = _mm_add_ps(_mm_load_ps(ports + 16), _mm_load_ps(ports + 20));
+	wave = _mm_max_ps(wave, _mm_set_ps1(0.0f));
+	wave = _mm_min_ps(wave, _mm_set_ps1(10.0f)); 
+	__m128i waveType = _mm_cvttps_epi32(wave);
+	wave = _mm_sub_ps(wave, _mm_cvtepi32_ps(waveType));
+
+	//Calculate multiplier from param and input (scaled to 0-10V) clamp between 1 and 16 and floor
+	__m128 mult = _mm_add_ps(_mm_mul_ps(_mm_load_ps(ports + 12), _mm_set_ps1(1.6f)),_mm_load_ps(ports+8));
+	mult = _mm_max_ps(mult, _mm_set_ps1(1.0f));
+	mult = _mm_min_ps(mult, _mm_set_ps1(16.0f));
+	mult = truncx(mult); 
+	
+	//Calculate phase from base phase, param and input (scaled to +/- 2 cycles), multiply by the multiplier and fmod
+	__m128 offset = _mm_add_ps(_mm_set_ps1(phase), _mm_add_ps(_mm_mul_ps(_mm_load_ps(ports + 4), _mm_set_ps1(0.4f)), _mm_load_ps(ports)));
+	offset = fmodx(_mm_mul_ps(offset, mult));
+
+	// Sine wave
+	__m128 workingWave = sin_ps(offset); 
+
+	__m128 iWave = _mm_sub_ps(_mm_set_ps1(1.0f), wave);
+	__m128 mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(5)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(0))));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(10))));
+	__m128 output = _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask);
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(4)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(9))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
+
+	// Half sine wave
+	__m128 v5 = _mm_set_ps1(5.0f);
+	__m128 sign = _mm_set_ps1(-0.0f);
+	workingWave = _mm_andnot_ps(sign, workingWave);
+	workingWave = _mm_add_ps(workingWave, workingWave);
+	workingWave = _mm_sub_ps(workingWave, v5);
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(2)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(9))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(1)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(8))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
+
+	// Sawtooth wave
+	offset = _mm_mul_ps(offset, v5);
+	offset = _mm_add_ps(offset, offset);
+	mask = _mm_cmpgt_ps(offset, v5);
+	workingWave = _mm_sub_ps(offset, _mm_and_ps(mask, _mm_set_ps1(10.0f)));
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(1)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(7))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(0)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(6))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
+	
+	// Triangle wave
+	workingWave = _mm_add_ps(offset, offset);
+	workingWave = _mm_sub_ps(workingWave, v5);
+	workingWave = _mm_andnot_ps(sign, workingWave);
+	workingWave = _mm_sub_ps(workingWave, _mm_set_ps1(10.0f));
+	workingWave = _mm_andnot_ps(sign, workingWave);
+	workingWave = _mm_sub_ps(workingWave, v5);
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(3)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(6))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(2)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(5))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
+
+	// Square wave
+	mask = _mm_and_ps(sign, workingWave);
+	workingWave = _mm_xor_ps(mask, v5);
+	
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(4)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(8))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
+
+	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(3)));
+	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(7))));
+	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
+
+	_mm_store_ps(ports, output);
+}
+
+
 void PO_204::process(const ProcessArgs &args) {
-	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].getValue() + 3.0f * dsp::quadraticBipolar(params[PARAM_FINE].getValue())) / 12.0f + (inputs[INPUT_TUNE].isConnected()?inputs[INPUT_TUNE].getVoltage():0.0f));
-	float deltaTime = freq / args.sampleRate;
+	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].getValue() + 3.0f * dsp::quadraticBipolar(params[PARAM_FINE].getValue())) * (1.0f / 12.0f) + (inputs[INPUT_TUNE].isConnected()?inputs[INPUT_TUNE].getVoltage():0.0f));
+	float deltaTime = freq * args.sampleTime;
 	phase += deltaTime;
-	double intPart;
-	phase = modf(phase, &intPart); 
+	while(phase > 1.0f)
+		phase -= 1.0f;
+	alignas(16) float ports[24];
+	for (int i = 0; i < 4; i++) {
+		ports[0 + i] = params[PARAM_PHASE_1 + i].getValue();
+		ports[4 + i] = inputs[INPUT_PHASE_1 + i].isConnected()?inputs[INPUT_PHASE_1 + i].getVoltage():0.0f;
+		ports[8 + i] = params[PARAM_MULT_1 + i].getValue();
+		ports[12 + i] = inputs[INPUT_MULT_1 + i].isConnected()?inputs[INPUT_MULT_1 + i].getVoltage():0.0f;
+		ports[16 + i] = params[PARAM_WAVE_1 + i].getValue();
+		ports[20 + i] = inputs[INPUT_WAVE_1 + i].isConnected()?inputs[INPUT_WAVE_1 + i].getVoltage():0.0f;
+	}
+	sseProcess(phase + 5, ports);
+	for (int i = 0; i < 4; i++) {
+		outputs[OUTPUT_1 + i].setVoltage(ports[i]);
+	}
+/*
 	for (int i = 0; i < 4; i++) {
 		if (outputs[OUTPUT_1 + i].isConnected()) {
 			float offset = phase + params[PARAM_PHASE_1 + i].getValue();
@@ -190,6 +311,7 @@ void PO_204::process(const ProcessArgs &args) {
 			outputs[OUTPUT_1 + i].setVoltage(w1 * (1.0f - wave) + w2 * wave);
 		}	
 	}
+*/
 }
 
 struct PO204 : SchemeModuleWidget {
