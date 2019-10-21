@@ -251,67 +251,6 @@ void PO_204::process(const ProcessArgs &args) {
 	for (int i = 0; i < 4; i++) {
 		outputs[OUTPUT_1 + i].setVoltage(ports[i]);
 	}
-/*
-	for (int i = 0; i < 4; i++) {
-		if (outputs[OUTPUT_1 + i].isConnected()) {
-			float offset = phase + params[PARAM_PHASE_1 + i].getValue();
-			if (inputs[INPUT_PHASE_1 + i].isConnected())
-				offset += inputs[INPUT_PHASE_1 + i].getVoltage() * 0.4f;
-			offset *= floor(clamp(params[PARAM_MULT_1 + i].getValue() + (inputs[INPUT_MULT_1 + i].isConnected()?inputs[INPUT_MULT_1 + i].getVoltage():0.0f) * 16.0f / 10.0f, 1.0f, 16.5f));
-			float wave = params[PARAM_WAVE_1 + i].getValue() + (inputs[INPUT_WAVE_1 + i].isConnected()?inputs[INPUT_WAVE_1 + i].getVoltage():0.0f);
-			double waveSection;
-			wave = modf(clamp(wave, 0.0f, 10.0f), &waveSection);		
-			float w1 = 0.0f;
-			float w2 = 0.0f;
-			switch ((int)waveSection) {
-				case 0:
-					w1 = PO_Util::sin(offset * 2 * M_PI);
-					w2 = PO_Util::saw(offset);
-					break;
-				case 1:
-					w1 = PO_Util::saw(offset);
-					w2 = PO_Util::rsn(offset * 2 * M_PI);
-					break;
-				case 2:
-					w1 = PO_Util::rsn(offset * 2 * M_PI);
-					w2 = PO_Util::tri(offset);
-					break;
-				case 3:
-					w1 = PO_Util::tri(offset);
-					w2 = PO_Util::sqr(offset);
-					break;
-				case 4:
-					w1 = PO_Util::sqr(offset);
-					w2 = PO_Util::sin(offset * 2 * M_PI);
-					break;
-				case 5:
-					w1 = PO_Util::sin(offset * 2 * M_PI);
-					w2 = PO_Util::tri(offset);
-					break;
-				case 6:
-					w1 = PO_Util::tri(offset);
-					w2 = PO_Util::saw(offset);
-					break;
-				case 7:
-					w1 = PO_Util::saw(offset);
-					w2 = PO_Util::sqr(offset);
-					break;
-				case 8:
-					w1 = PO_Util::sqr(offset);
-					w2 = PO_Util::rsn(offset * 2 * M_PI);
-					break;
-				case 9:
-					w1 = PO_Util::rsn(offset * 2 * M_PI);
-					w2 = PO_Util::sin(offset * 2 * M_PI);
-					break;
-				default:
-					w2 = w1 = PO_Util::sin(offset * 2 * M_PI);
-					break;
-			}
-			outputs[OUTPUT_1 + i].setVoltage(w1 * (1.0f - wave) + w2 * wave);
-		}	
-	}
-*/
 }
 
 struct PO204 : SchemeModuleWidget {
