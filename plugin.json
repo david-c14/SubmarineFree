@@ -27,32 +27,32 @@
 		},
 		{
 			"slug":"A0-106",
-			"name":"A0-106",
-			"description": "A0-106 Arithmetic Operators",
+			"name":"AO-106",
+			"description": "AO-106 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
 		{
 			"slug":"A0-112",
-			"name":"A0-112",
-			"description": "A0-112 Arithmetic Operators",
+			"name":"AO-112",
+			"description": "AO-112 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
 		{
 			"slug":"A0-118",
-			"name":"A0-118",
-			"description": "A0-118 Arithmetic Operators",
+			"name":"AO-118",
+			"description": "AO-118 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
 		{
 			"slug":"A0-124",
-			"name":"A0-124",
-			"description": "A0-124 Arithmetic Operators",
+			"name":"AO-124",
+			"description": "AO-124 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
 		{
 			"slug":"A0-136",
-			"name":"A0-136",
-			"description": "A0-136 Arithmetic Operators",
+			"name":"AO-136",
+			"description": "AO-136 Arithmetic Operators",
 			"tags": ["UTILITY", "MULTIPLE"]
 		},
 		{
@@ -209,6 +209,12 @@
 			"slug":"PG-112",
 			"name":"PG-112",
 			"description": "PG-112 Pulse Generators",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"PL-105",
+			"name":"PL-105",
+			"description": "PL-105 Programmable Logic Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
