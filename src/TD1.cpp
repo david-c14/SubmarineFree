@@ -75,9 +75,9 @@ struct TD_116 : Module {
 	int isDirtyC = false;
 };
 
-struct TDText : SubText {
+struct TD1Text : SubText {
 	TD_116 *tdModule;
-	TDText() {
+	TD1Text() {
 		color = SUBLIGHTBLUE;
 	}
 	void onChange(const event::Change &e) override {
@@ -138,7 +138,7 @@ void TDInput::received(std::string pluginName, std::string moduleName, json_t *r
 }
 
 struct TD116 : SchemeModuleWidget {
-	TDText *textField;
+	TD1Text *textField;
 
 	TD116(TD_116 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(240, 380);
@@ -147,7 +147,7 @@ struct TD116 : SchemeModuleWidget {
 		addInput(createInputCentered<BlackPort>(Vec(16.5,31.5), module, 0));
 		addOutput(createOutputCentered<BlackPort>(Vec(223.5,31.5), module, 0));	
 
-		textField = createWidget<TDText>(mm2px(Vec(3.39962, 15.8373)));
+		textField = createWidget<TD1Text>(mm2px(Vec(3.39962, 15.8373)));
 		textField->box.size = mm2px(Vec(74.480, 102.753));
 		textField->multiline = true;
 		textField->tdModule = module;

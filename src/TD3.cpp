@@ -46,8 +46,8 @@ struct TD_316 : Module {
 	bool fontSizeDirty = false;
 };
 
-struct TDText : SubText {
-	TDText() {
+struct TD3Text : SubText {
+	TD3Text() {
 		color = SUBLIGHTBLUE;
 	}
 	void foregroundMenu(Menu *menu) override {
@@ -67,13 +67,13 @@ struct TDText : SubText {
 };
 
 struct TD316 : SchemeModuleWidget {
-	TDText *textField;
+	TD3Text *textField;
 
 	TD316(TD_316 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(240, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		textField = createWidget<TDText>(Vec(4, 18));
+		textField = createWidget<TD3Text>(Vec(4, 18));
 		textField->box.size = Vec(232, 344);
 		textField->multiline = true;
 		addChild(textField);
