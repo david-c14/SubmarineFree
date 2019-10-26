@@ -9,7 +9,7 @@
 
 ## Basic Operation
 
-A Flip-Flop or Toggle Latch changes its state from 0 to 1 or back again every time that it is triggered. It is designed to take digital signals, but it will happily accept analog sygnalse. The Flip-Flop devices are triggered by a rising edge on the input signal and the output changes to a high level signal if it was previously low, or to a low level signal if it was previously high.
+A Flip-Flop or Toggle Latch changes its state from 0 to 1 or back again every time that it is triggered. It is designed to take digital signals, but it will happily accept analog signal. The Flip-Flop devices are triggered by a rising edge on the input signal and the output changes to a high level signal if it was previously low, or to a low level signal if it was previously high.
 
 ## Cascades
 
