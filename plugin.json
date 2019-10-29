@@ -130,7 +130,7 @@
 		{
 			"slug":"DO-105",
 			"name":"DO-105",
-			"description": "DO-105 Programmable Logic Gates",
+			"description": "DO-105 Digital Operators",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
