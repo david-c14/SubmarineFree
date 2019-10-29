@@ -128,6 +128,12 @@
 			"tags": ["DIGITAL", "NOISE", "MULTIPLE"]
 		},
 		{
+			"slug":"DO-105",
+			"name":"DO-105",
+			"description": "DO-105 Programmable Logic Gates",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
 			"slug":"EO-102",
 			"name":"EO-102",
 			"description": "EO-102 Envelope Oscilloscope",
@@ -209,12 +215,6 @@
 			"slug":"PG-112",
 			"name":"PG-112",
 			"description": "PG-112 Pulse Generators",
-			"tags": ["LOGIC", "MULTIPLE"]
-		},
-		{
-			"slug":"PL-105",
-			"name":"PL-105",
-			"description": "PL-105 Programmable Logic Gates",
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{

@@ -31,6 +31,8 @@ extern Model *modelBP132;
 
 extern Model *modelDN112;
 
+extern Model *modelDO105;
+
 extern Model *modelEO102;
 
 extern Model *modelFF110;
@@ -51,8 +53,6 @@ extern Model *modelOG106;
 
 extern Model *modelPG104;
 extern Model *modelPG112;
-
-extern Model *modelPL105;
 
 extern Model *modelPO101;
 extern Model *modelPO102;

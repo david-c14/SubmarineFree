@@ -1,6 +1,8 @@
 # Changelog
 
 ## v1.1.0
+- 27-Oct-2019 Fix typo in manual (courtesy of kant)
+- 22-Oct-2019 Bug fix #48 - Conflicting class names
 - 19-Oct-2019 PO-xxx devices moved to SIMD code
 - 19-Oct-2019 Relicenced to GPL-3.0
 - 18-Oct-2019 Bug fix - Color 1 wire not working responding to existing cables
