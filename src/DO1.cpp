@@ -6,11 +6,30 @@ namespace {
 
 	struct Functor {
 		std::string name;
+		std::function<void (const Widget::DrawArgs &)> draw;
 	};
-		
+
 	std::vector<Functor> functions {
-		{ "Short Circuit" }, // Short Circuit
-		{ "NOT Gate" }, // NOT Gate
+		{ // Short Circuit
+			"Short Circuit",
+			[](const Widget::DrawArgs &args) {
+				nvgFontSize(args.vg, 16);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 30, 30, "0", NULL);
+			}
+		},
+		{ // NOT Gate
+			"NOT Gate",
+			[](const Widget::DrawArgs &args) {
+				nvgFontSize(args.vg, 16);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 30, 30, "1", NULL);
+			}
+		},
 	};
 
 	struct PLGateKnob : Knob {
@@ -29,12 +48,7 @@ namespace {
 				if (val >= functions.size()) {
 					val = functions.size() - 1;
 				}
-				
-				nvgFontSize(args.vg, 16);
-				nvgFontFaceId(args.vg, gScheme.font()->handle);
-				nvgFillColor(args.vg, SUBLIGHTBLUE);
-				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-				nvgText(args.vg, 30, 30, functions[val].name.c_str(), NULL);
+				functions[val].draw(args);
 			}
 		}
 	};
