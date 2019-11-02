@@ -32,6 +32,13 @@ namespace {
 		},
 	};
 
+	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color) {
+		nvgFillColor(vg, color);
+		nvgBeginPath(vg);
+		nvgCircle(vg, x, y, 4);
+		nvgFill(vg);
+	}
+
 	struct PLGateKnob : Knob {
 		Module *module;
 		int index;
@@ -40,7 +47,6 @@ namespace {
 			box.size.y = 60;
 			snap = true;
 			smooth = false;
-			speed = 0.5f;
 		}
 		void draw(const DrawArgs &args) override {
 			if (module) {
@@ -50,6 +56,41 @@ namespace {
 				}
 				functions[val].draw(args);
 			}
+		}
+	};
+
+	struct PLConnectorKnob : Knob {
+		Module *module;
+		int index;
+		PLConnectorKnob() {
+			box.size.x = 8;
+			box.size.y = 8;
+			snap = true;
+			smooth = false;
+		}
+	};
+
+	struct PLFixedConnectorKnob : PLConnectorKnob {
+		void draw(const DrawArgs &args) override {
+			if (module) {
+				drawConnector(args.vg, box.size.x / 2.0f, box.size.y / 2.0f, nvgRGB(0xff, 0xff, 0xff));
+			}
+		}
+	};
+	
+	struct PLBackground : OpaqueWidget {
+		void draw(const DrawArgs &args) override {
+			nvgFillColor(args.vg, nvgRGB(0,0,0));
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+			nvgFill(args.vg);
+			drawConnector(args.vg, box.size.x / 12.0f * 1, 5, nvgRGB(0x22, 0x22, 0x22));
+			drawConnector(args.vg, box.size.x / 12.0f * 3, 5, nvgRGB(0xff, 0x00, 0x00));
+			drawConnector(args.vg, box.size.x / 12.0f * 5, 5, nvgRGB(0xff, 0xff, 0x00));
+			drawConnector(args.vg, box.size.x / 12.0f * 7, 5, nvgRGB(0x00, 0x00, 0xff));
+			drawConnector(args.vg, box.size.x / 12.0f * 9, 5, nvgRGB(0x00, 0xff, 0xff));
+			drawConnector(args.vg, box.size.x / 12.0f * 11, 5, nvgRGB(0xff, 0xff, 0xff));
+			Widget::draw(args);
 		}
 	};
 }
@@ -104,9 +145,22 @@ struct DOWidget : SchemeModuleWidget {
 			addInput(createInputCentered<BluePort>(Vec(15 + ix * 30, 30), module, DO1<x,y>::INPUT_1 + ix));
 			addOutput(createOutputCentered<BluePort>(Vec(15 + ix * 30, 350), module, DO1<x,y>::OUTPUT_1 + ix));
 		}
+		PLBackground *background = new PLBackground();
+		background->box.pos = Vec(5, 45);
+		background->box.size = Vec(box.size.x - 10, box.size.y - 90);
+		addChild(background);
+		float posDiff = background->box.size.x / x;
+		float pos = posDiff / 2;
+		for (unsigned int ix = 0; ix < x; ix++) {
+			PLFixedConnectorKnob *knob = createParamCentered<PLFixedConnectorKnob>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
+			knob->module = module;
+			knob->index = DO1<x,y>::PARAM_CONNECTOR_OUT_1 + ix;
+			background->addChild(knob);
+			pos = pos + posDiff;
+		}
 		collectionScrollWidget = new ScrollWidget();
-		collectionScrollWidget->box.pos = Vec(10,45);
-		collectionScrollWidget->box.size = Vec(box.size.x - 20, box.size.y - 90);
+		collectionScrollWidget->box.pos = Vec(5,55);
+		collectionScrollWidget->box.size = Vec(box.size.x - 10, box.size.y - 110);
 		addChild(collectionScrollWidget);
 		for (unsigned int iy = 0; iy < y; iy++) {
 			PLGateKnob *knob = createParamCentered<PLGateKnob>(Vec(60, 80 * iy), module, DO1<x,y>::PARAM_GATE_1 + iy);
