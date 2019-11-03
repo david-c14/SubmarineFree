@@ -4,6 +4,13 @@
 
 namespace {
 
+	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color) {
+		nvgFillColor(vg, color);
+		nvgBeginPath(vg);
+		nvgCircle(vg, x, y, 4);
+		nvgFill(vg);
+	}
+
 	struct Functor {
 		std::string name;
 		std::function<void (const Widget::DrawArgs &)> draw;
@@ -18,6 +25,7 @@ namespace {
 				nvgFillColor(args.vg, SUBLIGHTBLUE);
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 				nvgText(args.vg, 30, 30, "0", NULL);
+				drawConnector(args.vg, 50, 30, nvgRGB(0xff, 0xff, 0xff));
 			}
 		},
 		{ // NOT Gate
@@ -28,16 +36,10 @@ namespace {
 				nvgFillColor(args.vg, SUBLIGHTBLUE);
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 				nvgText(args.vg, 30, 30, "1", NULL);
+				drawConnector(args.vg, 50, 30, nvgRGB(0xff, 0xff, 0xff));
 			}
 		},
 	};
-
-	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color) {
-		nvgFillColor(vg, color);
-		nvgBeginPath(vg);
-		nvgCircle(vg, x, y, 4);
-		nvgFill(vg);
-	}
 
 	struct PLGateKnob : Knob {
 		Module *module;
@@ -61,6 +63,7 @@ namespace {
 
 	struct PLConnectorKnob : Knob {
 		Module *module;
+		ScrollWidget *scrollWidget;
 		int index;
 		PLConnectorKnob() {
 			box.size.x = 8;
@@ -70,26 +73,52 @@ namespace {
 		}
 	};
 
+	template <unsigned int x, unsigned int y>
 	struct PLFixedConnectorKnob : PLConnectorKnob {
 		void draw(const DrawArgs &args) override {
 			if (module) {
 				drawConnector(args.vg, box.size.x / 2.0f, box.size.y / 2.0f, nvgRGB(0xff, 0xff, 0xff));
+				unsigned int val = (unsigned int)APP->engine->getParam(module, index);
+				if (val > (x + y + 1)) {
+					val = (x + y + 1);
+				}
+				float destX = 0;
+				float destY = 0;
+				if (val < (x + 2)) {
+					destX = (scrollWidget->box.size.x / (x * 2 + 4.0f)) * (val * 2 + 1) - box.pos.x;
+					destY = box.pos.y - scrollWidget->box.size.y - parent->box.size.y + 4;
+				}
+				else {
+					destX = 50.f - box.pos.x;
+					destY = -4 - scrollWidget->box.size.y + (val - x - 2) * 80 + scrollWidget->container->box.pos.y;
+					DEBUG("%f %f %f %f", box.pos.y, scrollWidget->box.size.y, (val - x -2) * 80, scrollWidget->container->box.pos.y);
+				}
+				nvgBeginPath(args.vg);
+				nvgMoveTo(args.vg, 4, 4);
+				nvgLineTo(args.vg, destX, destY);
+				nvgStrokeColor(args.vg, nvgRGBAf(0.2f, 0.2f, 0.2f, 0.5f));
+				nvgStrokeWidth(args.vg, 3);
+				nvgStroke(args.vg);
+				nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, 0.5f));
+				nvgStrokeWidth(args.vg, 2);
+				nvgStroke(args.vg);
 			}
 		}
 	};
 	
+	template<unsigned int x, unsigned int y>
 	struct PLBackground : OpaqueWidget {
 		void draw(const DrawArgs &args) override {
 			nvgFillColor(args.vg, nvgRGB(0,0,0));
 			nvgBeginPath(args.vg);
 			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
 			nvgFill(args.vg);
-			drawConnector(args.vg, box.size.x / 12.0f * 1, 5, nvgRGB(0x22, 0x22, 0x22));
-			drawConnector(args.vg, box.size.x / 12.0f * 3, 5, nvgRGB(0xff, 0x00, 0x00));
-			drawConnector(args.vg, box.size.x / 12.0f * 5, 5, nvgRGB(0xff, 0xff, 0x00));
-			drawConnector(args.vg, box.size.x / 12.0f * 7, 5, nvgRGB(0x00, 0x00, 0xff));
-			drawConnector(args.vg, box.size.x / 12.0f * 9, 5, nvgRGB(0x00, 0xff, 0xff));
-			drawConnector(args.vg, box.size.x / 12.0f * 11, 5, nvgRGB(0xff, 0xff, 0xff));
+			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 1, 5, nvgRGB(0x22, 0x22, 0x22));
+			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 3, 5, nvgRGB(0xff, 0x00, 0x00));
+			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 5, 5, nvgRGB(0xff, 0xff, 0x00));
+			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 7, 5, nvgRGB(0x00, 0x00, 0xff));
+			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 9, 5, nvgRGB(0x00, 0xff, 0xff));
+			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 11, 5, nvgRGB(0xff, 0xff, 0xff));
 			Widget::draw(args);
 		}
 	};
@@ -121,14 +150,14 @@ struct DO1 : Module {
 	DO1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int ix = 0; ix < x; ix++) {
-			configParam(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + 4.0f * y, 0.0f, "Connection" );
+			configParam(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, "Connection" );
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			configParam(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate" );
-			configParam(PARAM_CONNECTOR_1 + 4 * iy, 0.0f, 1 + x + 4 * iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_2 + 4 * iy, 0.0f, 1 + x + 4 * iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + 4 * iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_4 + 4 * iy, 0.0f, 1 + x + 4 * iy, 0.0f, "Connection");
+			configParam(PARAM_CONNECTOR_1 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
+			configParam(PARAM_CONNECTOR_2 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
+			configParam(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
+			configParam(PARAM_CONNECTOR_4 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
 		}
 	}
 	void process(const ProcessArgs &args) override {
@@ -145,20 +174,21 @@ struct DOWidget : SchemeModuleWidget {
 			addInput(createInputCentered<BluePort>(Vec(15 + ix * 30, 30), module, DO1<x,y>::INPUT_1 + ix));
 			addOutput(createOutputCentered<BluePort>(Vec(15 + ix * 30, 350), module, DO1<x,y>::OUTPUT_1 + ix));
 		}
-		PLBackground *background = new PLBackground();
+		PLBackground<x,y> *background = new PLBackground<x,y>();
 		background->box.pos = Vec(5, 45);
 		background->box.size = Vec(box.size.x - 10, box.size.y - 90);
 		addChild(background);
+		collectionScrollWidget = new ScrollWidget();
 		float posDiff = background->box.size.x / x;
 		float pos = posDiff / 2;
 		for (unsigned int ix = 0; ix < x; ix++) {
-			PLFixedConnectorKnob *knob = createParamCentered<PLFixedConnectorKnob>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
+			PLFixedConnectorKnob<x,y> *knob = createParamCentered<PLFixedConnectorKnob<x,y>>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
 			knob->module = module;
+			knob->scrollWidget = collectionScrollWidget;
 			knob->index = DO1<x,y>::PARAM_CONNECTOR_OUT_1 + ix;
 			background->addChild(knob);
 			pos = pos + posDiff;
 		}
-		collectionScrollWidget = new ScrollWidget();
 		collectionScrollWidget->box.pos = Vec(5,55);
 		collectionScrollWidget->box.size = Vec(box.size.x - 10, box.size.y - 110);
 		addChild(collectionScrollWidget);
