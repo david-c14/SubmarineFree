@@ -41,6 +41,14 @@ namespace {
 		},
 	};
 
+	struct PLConnectorRenderer : TransparentWidget {
+		std::function<void (const Widget::DrawArgs &)> drawLambda;
+		void draw(const DrawArgs &args) override {
+			drawLambda(args);
+			Widget::draw(args);
+		}
+	};
+
 	struct PLGateKnob : Knob {
 		Module *module;
 		int index;
@@ -78,6 +86,7 @@ namespace {
 		void draw(const DrawArgs &args) override {
 			if (module) {
 				drawConnector(args.vg, box.size.x / 2.0f, box.size.y / 2.0f, nvgRGB(0xff, 0xff, 0xff));
+	/*
 				unsigned int val = (unsigned int)APP->engine->getParam(module, index);
 				if (val > (x + y + 1)) {
 					val = (x + y + 1);
@@ -91,7 +100,6 @@ namespace {
 				else {
 					destX = 50.f - box.pos.x;
 					destY = -4 - scrollWidget->box.size.y + (val - x - 2) * 80 + scrollWidget->container->box.pos.y;
-					DEBUG("%f %f %f %f", box.pos.y, scrollWidget->box.size.y, (val - x -2) * 80, scrollWidget->container->box.pos.y);
 				}
 				nvgBeginPath(args.vg);
 				nvgMoveTo(args.vg, 4, 4);
@@ -102,6 +110,7 @@ namespace {
 				nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, 0.5f));
 				nvgStrokeWidth(args.vg, 2);
 				nvgStroke(args.vg);
+*/
 			}
 		}
 	};
@@ -167,6 +176,7 @@ struct DO1 : Module {
 template <unsigned int x, unsigned int y>
 struct DOWidget : SchemeModuleWidget {
 	ScrollWidget *collectionScrollWidget;
+	PLBackground<x,y> *background;
 	DOWidget(DO1<x,y> *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(x * 30, 380);
 		addChild(new SchemePanel(this->box.size));
@@ -174,7 +184,7 @@ struct DOWidget : SchemeModuleWidget {
 			addInput(createInputCentered<BluePort>(Vec(15 + ix * 30, 30), module, DO1<x,y>::INPUT_1 + ix));
 			addOutput(createOutputCentered<BluePort>(Vec(15 + ix * 30, 350), module, DO1<x,y>::OUTPUT_1 + ix));
 		}
-		PLBackground<x,y> *background = new PLBackground<x,y>();
+		background = new PLBackground<x,y>();
 		background->box.pos = Vec(5, 45);
 		background->box.size = Vec(box.size.x - 10, box.size.y - 90);
 		addChild(background);
@@ -197,6 +207,48 @@ struct DOWidget : SchemeModuleWidget {
 			knob->module = module;
 			knob->index = DO1<x,y>::PARAM_GATE_1 + iy;
 			collectionScrollWidget->container->addChild(knob);
+		}
+		PLConnectorRenderer *renderer = new PLConnectorRenderer();
+		renderer->box.pos = background->box.pos;
+		renderer->box.size = background->box.size;
+		renderer->drawLambda = [this](const DrawArgs &args) {
+			this->drawConnectors(args);
+		};
+		addChild(renderer);
+	}
+
+	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy) {
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, sx, sy);
+		nvgLineTo(args.vg, dx, dy);
+		nvgStrokeColor(args.vg, nvgRGBAf(0.2f, 0.2f, 0.2f, 0.5f));
+		nvgStrokeWidth(args.vg, 3);
+		nvgStroke(args.vg);
+		nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, 0.5f));
+		nvgStrokeWidth(args.vg, 2);
+		nvgStroke(args.vg);
+	}
+	void drawConnectors(const DrawArgs &args) {
+		// outputConnectors
+		float posDiff = background->box.size.x / x;
+		float pos = posDiff / 2;
+		for (unsigned int i = 0; i < x; i++) {
+			float startX = pos;
+			float startY = background->box.size.y - 5;
+			unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_OUT_1 + i);
+			if (val > (x + y + 1)) {
+				val = (x + y + 1);
+			}
+			float destX = 0;
+			float destY = 0;
+			if (val < x + 2) {
+				destX = background->box.size.x / (x + 2);
+				destX /= 2;
+				destX *= (val * 2 + 1);
+				destY = 5;
+			}
+			drawWire(args, startX, startY, destX, destY);
+			pos += posDiff;
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
