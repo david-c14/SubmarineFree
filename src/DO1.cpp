@@ -13,30 +13,31 @@ namespace {
 
 	struct Functor {
 		std::string name;
-		std::function<void (const Widget::DrawArgs &)> draw;
+		std::function<void (const Widget::DrawArgs &, Vec size)> draw;
 	};
 
 	std::vector<Functor> functions {
 		{ // Short Circuit
 			"Short Circuit",
-			[](const Widget::DrawArgs &args) {
+			[](const Widget::DrawArgs &args, Vec size) {
+				
 				nvgFontSize(args.vg, 16);
 				nvgFontFaceId(args.vg, gScheme.font()->handle);
 				nvgFillColor(args.vg, SUBLIGHTBLUE);
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 				nvgText(args.vg, 30, 30, "0", NULL);
-				drawConnector(args.vg, 50, 30, nvgRGB(0xff, 0xff, 0xff));
+				drawConnector(args.vg, size.x - 5, size.y / 2, nvgRGB(0xff, 0xff, 0xff));
 			}
 		},
 		{ // NOT Gate
 			"NOT Gate",
-			[](const Widget::DrawArgs &args) {
+			[](const Widget::DrawArgs &args, Vec size) {
 				nvgFontSize(args.vg, 16);
 				nvgFontFaceId(args.vg, gScheme.font()->handle);
 				nvgFillColor(args.vg, SUBLIGHTBLUE);
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 				nvgText(args.vg, 30, 30, "1", NULL);
-				drawConnector(args.vg, 50, 30, nvgRGB(0xff, 0xff, 0xff));
+				drawConnector(args.vg, size.x - 5, size.y / 2, nvgRGB(0xff, 0xff, 0xff));
 			}
 		},
 	};
@@ -53,7 +54,7 @@ namespace {
 		Module *module;
 		int index;
 		PLGateKnob() {
-			box.size.x = 60;
+			box.size.x = 86;
 			box.size.y = 60;
 			snap = true;
 			smooth = false;
@@ -64,57 +65,26 @@ namespace {
 				if (val >= functions.size()) {
 					val = functions.size() - 1;
 				}
-				functions[val].draw(args);
+				functions[val].draw(args, box.size);
 			}
 		}
 	};
 
 	struct PLConnectorKnob : Knob {
 		Module *module;
-		ScrollWidget *scrollWidget;
-		int index;
 		PLConnectorKnob() {
-			box.size.x = 8;
-			box.size.y = 8;
+			box.size.x = 10;
+			box.size.y = 10;
 			snap = true;
 			smooth = false;
 		}
-	};
-
-	template <unsigned int x, unsigned int y>
-	struct PLFixedConnectorKnob : PLConnectorKnob {
 		void draw(const DrawArgs &args) override {
 			if (module) {
 				drawConnector(args.vg, box.size.x / 2.0f, box.size.y / 2.0f, nvgRGB(0xff, 0xff, 0xff));
-	/*
-				unsigned int val = (unsigned int)APP->engine->getParam(module, index);
-				if (val > (x + y + 1)) {
-					val = (x + y + 1);
-				}
-				float destX = 0;
-				float destY = 0;
-				if (val < (x + 2)) {
-					destX = (scrollWidget->box.size.x / (x * 2 + 4.0f)) * (val * 2 + 1) - box.pos.x;
-					destY = box.pos.y - scrollWidget->box.size.y - parent->box.size.y + 4;
-				}
-				else {
-					destX = 50.f - box.pos.x;
-					destY = -4 - scrollWidget->box.size.y + (val - x - 2) * 80 + scrollWidget->container->box.pos.y;
-				}
-				nvgBeginPath(args.vg);
-				nvgMoveTo(args.vg, 4, 4);
-				nvgLineTo(args.vg, destX, destY);
-				nvgStrokeColor(args.vg, nvgRGBAf(0.2f, 0.2f, 0.2f, 0.5f));
-				nvgStrokeWidth(args.vg, 3);
-				nvgStroke(args.vg);
-				nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, 0.5f));
-				nvgStrokeWidth(args.vg, 2);
-				nvgStroke(args.vg);
-*/
 			}
 		}
 	};
-	
+
 	template<unsigned int x, unsigned int y>
 	struct PLBackground : OpaqueWidget {
 		void draw(const DrawArgs &args) override {
@@ -192,10 +162,8 @@ struct DOWidget : SchemeModuleWidget {
 		float posDiff = background->box.size.x / x;
 		float pos = posDiff / 2;
 		for (unsigned int ix = 0; ix < x; ix++) {
-			PLFixedConnectorKnob<x,y> *knob = createParamCentered<PLFixedConnectorKnob<x,y>>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
+			PLConnectorKnob *knob = createParamCentered<PLConnectorKnob>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
 			knob->module = module;
-			knob->scrollWidget = collectionScrollWidget;
-			knob->index = DO1<x,y>::PARAM_CONNECTOR_OUT_1 + ix;
 			background->addChild(knob);
 			pos = pos + posDiff;
 		}
@@ -203,10 +171,17 @@ struct DOWidget : SchemeModuleWidget {
 		collectionScrollWidget->box.size = Vec(box.size.x - 10, box.size.y - 110);
 		addChild(collectionScrollWidget);
 		for (unsigned int iy = 0; iy < y; iy++) {
-			PLGateKnob *knob = createParamCentered<PLGateKnob>(Vec(60, 80 * iy), module, DO1<x,y>::PARAM_GATE_1 + iy);
+			PLGateKnob *knob = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
 			knob->module = module;
 			knob->index = DO1<x,y>::PARAM_GATE_1 + iy;
 			collectionScrollWidget->container->addChild(knob);
+		}
+		for (unsigned int iy = 0; iy < y; iy++) {
+			for (unsigned int ix = 0; ix < 4; ix++) {
+				PLConnectorKnob *knob = createParamCentered<PLConnectorKnob>(Vec(5, (iy + 1) * 80.0f + ix * 14.0f - 21.0f), module, DO1<x, y>::PARAM_CONNECTOR_1 + iy * 4 + ix);
+				knob->module = module;
+				collectionScrollWidget->container->addChild(knob);	
+			}
 		}
 		PLConnectorRenderer *renderer = new PLConnectorRenderer();
 		renderer->box.pos = background->box.pos;
@@ -229,26 +204,42 @@ struct DOWidget : SchemeModuleWidget {
 		nvgStroke(args.vg);
 	}
 	void drawConnectors(const DrawArgs &args) {
-		// outputConnectors
-		float posDiff = background->box.size.x / x;
-		float pos = posDiff / 2;
-		for (unsigned int i = 0; i < x; i++) {
-			float startX = pos;
-			float startY = background->box.size.y - 5;
-			unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_OUT_1 + i);
+		for (unsigned int i = 0; i < x + 4 * y; i++) {
+			float startX = 0;
+			float startY = 0;
+			float destX = 0;
+			float destY = 0;
+			float scissorTop = args.clipBox.pos.y;
+			float scissorBottom = args.clipBox.size.y;
+			if (i < 4 * y) {
+				startX = 5;
+				startY = (i / 4) * 80.0f + collectionScrollWidget->container->box.pos.y;
+				startY += (i % 4) * 14.0f + 69.0f;
+				scissorBottom -= 10;
+			}
+			else {
+				startX = (background->box.size.x / (x * 2)) * ((i - 4 * y) * 2 + 1);
+				startY = background->box.size.y - 5;
+			}
+			unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_1 + i);
 			if (val > (x + y + 1)) {
 				val = (x + y + 1);
 			}
-			float destX = 0;
-			float destY = 0;
 			if (val < x + 2) {
 				destX = background->box.size.x / (x + 2);
 				destX /= 2;
 				destX *= (val * 2 + 1);
 				destY = 5;
 			}
+			else {
+				destX = 90.0f; 
+				destY = 10 + 80 * (val - x - 1) + collectionScrollWidget->container->box.pos.y;
+				scissorTop += 10;
+				scissorBottom -= 10;
+			}
+			nvgScissor(args.vg, args.clipBox.pos.x, scissorTop, args.clipBox.size.x, scissorBottom);
 			drawWire(args, startX, startY, destX, destY);
-			pos += posDiff;
+			nvgResetScissor(args.vg);
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
