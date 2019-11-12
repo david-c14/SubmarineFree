@@ -1,8 +1,10 @@
-//SubTag TM TW W8
+//SubTag DS TM TW W8
 
-#include "SubmarineFree.hpp"
+#include "DS.hpp"
 
 namespace {
+
+	typedef uint16_t status_t;
 
 	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color) {
 		nvgFillColor(vg, color);
@@ -14,6 +16,16 @@ namespace {
 	struct Functor {
 		std::string name;
 		std::function<void (const Widget::DrawArgs &, Vec size)> draw;
+		std::function<status_t (status_t a,
+					status_t b,
+					status_t c,
+					status_t d,
+					status_t &a0,
+					status_t &b0,
+					status_t &c0,
+					status_t &d0)> process;
+		
+
 	};
 
 	std::vector<Functor> functions {
@@ -27,6 +39,16 @@ namespace {
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 				nvgText(args.vg, 30, 30, "0", NULL);
 				drawConnector(args.vg, size.x - 5, size.y / 2, nvgRGB(0xff, 0xff, 0xff));
+			},
+			[] (status_t a,
+				status_t b,
+				status_t c,
+				status_t d,
+				status_t a0,
+				status_t b0,
+				status_t c0,
+				status_t d0) -> status_t {
+				return a;
 			}
 		},
 		{ // NOT Gate
@@ -38,6 +60,16 @@ namespace {
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 				nvgText(args.vg, 30, 30, "1", NULL);
 				drawConnector(args.vg, size.x - 5, size.y / 2, nvgRGB(0xff, 0xff, 0xff));
+			},
+			[] (status_t a,
+				status_t b,
+				status_t c,
+				status_t d,
+				status_t a0,
+				status_t b0,
+				status_t c0,
+				status_t d0) -> status_t {
+				return ~a;
 			}
 		},
 	};
@@ -104,7 +136,7 @@ namespace {
 }
 
 template <unsigned int x, unsigned int y>
-struct DO1 : Module {
+struct DO1 : DS_Module {
 	enum ParamIds {
 		PARAM_GATE_1,
 		PARAM_CONNECTOR_1 = y,
@@ -126,7 +158,21 @@ struct DO1 : Module {
 		NUM_LIGHTS
 	};
 
-	DO1() : Module() {
+	enum StatusIds {
+		STATUS_ALL_ZEROES,
+		STATUS_A,
+		STATUS_ALL_ONES = STATUS_A + x,
+		STATUS_OUT,
+		STATUS_A0 = STATUS_OUT + y,
+		STATUS_B0 = STATUS_A0 + y,
+		STATUS_C0 = STATUS_B0 + y,
+		STATUS_D0 = STATUS_C0 + y,
+		NUM_STATUS
+	};
+
+	status_t statuses[NUM_STATUS];
+
+	DO1() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int ix = 0; ix < x; ix++) {
 			configParam(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, "Connection" );
@@ -138,8 +184,40 @@ struct DO1 : Module {
 			configParam(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
 			configParam(PARAM_CONNECTOR_4 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
 		}
+		statuses[STATUS_ALL_ZEROES] = 0;
+		statuses[STATUS_ALL_ONES] = ~statuses[STATUS_ALL_ZEROES];
 	}
 	void process(const ProcessArgs &args) override {
+		for (unsigned int ix = 0; ix < x; ix++) {
+			statuses[STATUS_A + ix] = 0;
+			for (unsigned int iy = 0; iy < 16; iy++) {
+				statuses[STATUS_A + ix] <<= 1;
+				statuses[STATUS_A + ix] += (inputs[INPUT_1 + ix].getPolyVoltage(iy) > midpoint());
+			}
+		}
+		for (unsigned int iy = 0; iy < y; iy++) {
+			unsigned int gate = params[PARAM_GATE_1 + iy].getValue();
+			if (gate >= functions.size()) {
+				gate = functions.size() - 1;
+			}
+			status_t in[4];
+			for (unsigned int ix = 0; ix < 4; ix++) {
+				unsigned int val = params[PARAM_CONNECTOR_1 + ix + 4 * iy].getValue();
+				if (val > x + iy + 1)
+					val = x + iy + 1;
+				in[ix] = statuses[STATUS_ALL_ZEROES + val];
+			}
+			statuses[STATUS_OUT + iy] = functions[gate].process(in[0], in[1], in[2], in[3], statuses[STATUS_A0 + iy], statuses[STATUS_B0 + iy], statuses[STATUS_C0 + iy], statuses[STATUS_D0 + iy]);
+		}
+		for (unsigned int ix = 0; ix < x; ix++) {
+			outputs[OUTPUT_1 + ix].setChannels(16);
+			unsigned int val = params[PARAM_CONNECTOR_OUT_1 + ix].getValue();
+			if (val > 1 + x + y)
+				val = 1 + x + y;
+			for (unsigned int iy = 0; iy < 16; iy++) {
+				outputs[OUTPUT_1 + ix].setVoltage(((statuses[STATUS_ALL_ZEROES + val] >> (15-iy)) & 0x1)?voltage1:voltage0, iy);
+			}
+		}
 	}
 };
 
@@ -204,6 +282,8 @@ struct DOWidget : SchemeModuleWidget {
 		nvgStroke(args.vg);
 	}
 	void drawConnectors(const DrawArgs &args) {
+		if (!module)
+			return;
 		for (unsigned int i = 0; i < x + 4 * y; i++) {
 			float startX = 0;
 			float startY = 0;
@@ -246,6 +326,13 @@ struct DOWidget : SchemeModuleWidget {
 		char workingSpace[10];
 		snprintf(workingSpace, 10, "DO-1%02d", y);
 		drawBase(vg, workingSpace);
+	}
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
+		if (dsMod) {
+			dsMod->appendContextMenu(menu);
+		}
 	}
 };
 
