@@ -29,49 +29,9 @@ namespace {
 	};
 
 	std::vector<Functor> functions {
-		{ // Short Circuit
-			"Short Circuit",
-			[](const Widget::DrawArgs &args, Vec size) {
-				
-				nvgFontSize(args.vg, 16);
-				nvgFontFaceId(args.vg, gScheme.font()->handle);
-				nvgFillColor(args.vg, SUBLIGHTBLUE);
-				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-				nvgText(args.vg, 30, 30, "0", NULL);
-				drawConnector(args.vg, size.x - 5, size.y / 2, nvgRGB(0xff, 0xff, 0xff));
-			},
-			[] (status_t a,
-				status_t b,
-				status_t c,
-				status_t d,
-				status_t a0,
-				status_t b0,
-				status_t c0,
-				status_t d0) -> status_t {
-				return a;
-			}
-		},
-		{ // NOT Gate
-			"NOT Gate",
-			[](const Widget::DrawArgs &args, Vec size) {
-				nvgFontSize(args.vg, 16);
-				nvgFontFaceId(args.vg, gScheme.font()->handle);
-				nvgFillColor(args.vg, SUBLIGHTBLUE);
-				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-				nvgText(args.vg, 30, 30, "1", NULL);
-				drawConnector(args.vg, size.x - 5, size.y / 2, nvgRGB(0xff, 0xff, 0xff));
-			},
-			[] (status_t a,
-				status_t b,
-				status_t c,
-				status_t d,
-				status_t a0,
-				status_t b0,
-				status_t c0,
-				status_t d0) -> status_t {
-				return ~a;
-			}
-		},
+#include "GATE_SC"
+,
+#include "GATE_NOT"
 	};
 
 	struct PLConnectorRenderer : TransparentWidget {
@@ -274,10 +234,10 @@ struct DOWidget : SchemeModuleWidget {
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, sx, sy);
 		nvgLineTo(args.vg, dx, dy);
-		nvgStrokeColor(args.vg, nvgRGBAf(0.2f, 0.2f, 0.2f, 0.5f));
+		nvgStrokeColor(args.vg, nvgRGBAf(0.2f, 0.2f, 0.2f, 0.1f));
 		nvgStrokeWidth(args.vg, 3);
 		nvgStroke(args.vg);
-		nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, 0.5f));
+		nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, 0.1f));
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
 	}
