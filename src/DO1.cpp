@@ -29,9 +29,9 @@ namespace {
 	};
 
 	std::vector<Functor> functions {
-#include "GATE_SC"
+#include "gates/ShortCircuit"
 ,
-#include "GATE_NOT"
+#include "gates/NOT"
 	};
 
 	struct PLConnectorRenderer : TransparentWidget {
