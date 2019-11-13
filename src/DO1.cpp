@@ -122,12 +122,14 @@ namespace {
 			for (unsigned int ix = 0; ix < x + 2; ix++) {
 				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, nvgRGB(colors[ix * 3], colors[ix * 3 + 1], colors[ix * 3 + 2]));
 			}
-			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 1, 5, nvgRGB(0x22, 0x22, 0x22));
-			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 3, 5, nvgRGB(0xff, 0x00, 0x00));
-			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 5, 5, nvgRGB(0xff, 0xff, 0x00));
-			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 7, 5, nvgRGB(0x00, 0x00, 0xff));
-			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 9, 5, nvgRGB(0x00, 0xff, 0xff));
-			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 11, 5, nvgRGB(0xff, 0xff, 0xff));
+			nvgStrokeWidth(args.vg, 2);
+			for (unsigned int ix = 0; ix < x; ix++) {
+				nvgStrokeColor(args.vg, nvgRGB(colors[ix * 3 + 3], colors[ix * 3 + 4], colors[ix * 3 + 5]));
+				nvgBeginPath(args.vg);
+				nvgMoveTo(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 3), 5);
+				nvgLineTo(args.vg, 15 + ix * 30 - box.pos.x, 30 - box.pos.y);
+				nvgStroke(args.vg);
+			}
 			Widget::draw(args);
 		}
 	};
@@ -227,10 +229,6 @@ struct DOWidget : SchemeModuleWidget {
 	DOWidget(DO1<x,y> *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(x * 30, 380);
 		addChild(new SchemePanel(this->box.size));
-		for (unsigned int ix = 0; ix < x; ix++) {
-			addInput(createInputCentered<BluePort>(Vec(15 + ix * 30, 30), module, DO1<x,y>::INPUT_1 + ix));
-			addOutput(createOutputCentered<BluePort>(Vec(15 + ix * 30, 350), module, DO1<x,y>::OUTPUT_1 + ix));
-		}
 		background = new PLBackground<x,y>();
 		background->box.pos = Vec(5, 45);
 		background->box.size = Vec(box.size.x - 10, box.size.y - 90);
@@ -267,12 +265,17 @@ struct DOWidget : SchemeModuleWidget {
 			this->drawConnectors(args);
 		};
 		addChild(renderer);
+		for (unsigned int ix = 0; ix < x; ix++) {
+			addInput(createInputCentered<BluePort>(Vec(15 + ix * 30, 30), module, DO1<x,y>::INPUT_1 + ix));
+			addOutput(createOutputCentered<BluePort>(Vec(15 + ix * 30, 350), module, DO1<x,y>::OUTPUT_1 + ix));
+		}
 	}
 
 	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade) {
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, sx, sy);
 		nvgLineTo(args.vg, dx, dy);
+		nvgLineCap(args.vg, NVG_ROUND);
 		nvgStrokeColor(args.vg, nvgRGBAf(0.2f, 0.2f, 0.2f, fade));
 		nvgStrokeWidth(args.vg, 3);
 		nvgStroke(args.vg);
@@ -284,6 +287,14 @@ struct DOWidget : SchemeModuleWidget {
 	void drawConnectors(const DrawArgs &args) {
 		if (!module)
 			return;
+		for (unsigned int i = 0; i < x; i++) {
+			nvgBeginPath(args.vg);
+			nvgStrokeWidth(args.vg, 2);
+			nvgStrokeColor(args.vg, nvgRGB(255, 255, 255));
+			nvgMoveTo(args.vg, (background->box.size.x / (x * 2)) * (i * 2 + 1), background->box.size.y - 5);
+			nvgLineTo(args.vg, 15 + i * 30 - background->box.pos.x, 350 - background->box.pos.y);
+			nvgStroke(args.vg);
+		}
 		for (unsigned int i = 0; i < x + 4 * y; i++) {
 			float startX = 0;
 			float startY = 0;
@@ -312,7 +323,7 @@ struct DOWidget : SchemeModuleWidget {
 				destY = 5;
 			}
 			else {
-				destX = 90.0f; 
+				destX = 91.0f; 
 				destY = 10 + 80 * (val - x - 1) + collectionScrollWidget->container->box.pos.y;
 				scissorTop += 10;
 				scissorBottom -= 10;
