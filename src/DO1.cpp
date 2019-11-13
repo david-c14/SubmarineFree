@@ -4,6 +4,20 @@
 
 namespace {
 
+	unsigned char colors[11 * 3] = {
+		16, 15, 18,
+		201, 185, 15,
+		12, 142, 21, 
+		201, 24, 71,
+		9, 134, 173,
+		255, 255, 255,
+		255, 174, 201,
+		185, 00, 183,
+		128, 128, 128,
+		255, 153, 65,
+		255, 174, 201
+	};
+
 	typedef uint16_t status_t;
 
 	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color) {
@@ -105,12 +119,15 @@ namespace {
 			nvgBeginPath(args.vg);
 			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
 			nvgFill(args.vg);
-			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 1, 5, nvgRGB(0x22, 0x22, 0x22));
-			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 3, 5, nvgRGB(0xff, 0x00, 0x00));
-			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 5, 5, nvgRGB(0xff, 0xff, 0x00));
-			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 7, 5, nvgRGB(0x00, 0x00, 0xff));
-			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 9, 5, nvgRGB(0x00, 0xff, 0xff));
-			drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 11, 5, nvgRGB(0xff, 0xff, 0xff));
+			for (unsigned int ix = 0; ix < x + 2; ix++) {
+				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, nvgRGB(colors[ix * 3], colors[ix * 3 + 1], colors[ix * 3 + 2]));
+			}
+			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 1, 5, nvgRGB(0x22, 0x22, 0x22));
+			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 3, 5, nvgRGB(0xff, 0x00, 0x00));
+			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 5, 5, nvgRGB(0xff, 0xff, 0x00));
+			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 7, 5, nvgRGB(0x00, 0x00, 0xff));
+			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 9, 5, nvgRGB(0x00, 0xff, 0xff));
+			//drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * 11, 5, nvgRGB(0xff, 0xff, 0xff));
 			Widget::draw(args);
 		}
 	};
@@ -252,7 +269,7 @@ struct DOWidget : SchemeModuleWidget {
 		addChild(renderer);
 	}
 
-	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, float fade) {
+	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade) {
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, sx, sy);
 		nvgLineTo(args.vg, dx, dy);
@@ -260,6 +277,7 @@ struct DOWidget : SchemeModuleWidget {
 		nvgStrokeWidth(args.vg, 3);
 		nvgStroke(args.vg);
 		nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, fade));
+		nvgStrokeColor(args.vg, color);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
 	}
@@ -300,7 +318,9 @@ struct DOWidget : SchemeModuleWidget {
 				scissorBottom -= 10;
 			}
 			nvgScissor(args.vg, args.clipBox.pos.x, scissorTop, args.clipBox.size.x, scissorBottom);
-			drawWire(args, startX, startY, destX, destY, knobs[i]->fade);
+			NVGcolor color = nvgRGB(colors[val * 3], colors[val * 3 + 1], colors[val * 3 + 2]);
+			color.a = knobs[i]->fade;
+			drawWire(args, startX, startY, destX, destY, color, knobs[i]->fade);
 			nvgResetScissor(args.vg);
 		}
 	}
