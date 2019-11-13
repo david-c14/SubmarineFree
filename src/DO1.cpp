@@ -32,6 +32,12 @@ namespace {
 #include "gates/ShortCircuit"
 ,
 #include "gates/NOT"
+,
+#include "gates/2-AND"
+,
+#include "gates/3-AND"
+,
+#include "gates/4-AND"
 	};
 
 	struct PLConnectorRenderer : TransparentWidget {
