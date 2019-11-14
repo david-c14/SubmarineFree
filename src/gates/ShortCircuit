@@ -12,7 +12,6 @@
 		nvgLineTo(args.vg, size.x - 5, lower);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);	
-		drawConnector(args.vg, size.x - 5, lower, nvgRGB(0xff, 0xff, 0xff));
 	},
 	[] (status_t a,
 		status_t b,
