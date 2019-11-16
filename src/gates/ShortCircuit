@@ -1,15 +1,9 @@
 { // Short Circuit
 	"Short Circuit",
 	[](const Widget::DrawArgs &args, Vec size) {
-		float upper = size.y / 8;
-		float lower = size.y / 2;
-		float center = size.x / 2;
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);	
-		nvgMoveTo(args.vg, -5, upper);
-		nvgLineTo(args.vg, center, upper);
-		nvgLineTo(args.vg, center, lower);
-		nvgLineTo(args.vg, size.x - 5, lower);
+		drawInput1of1(args.vg, 81.0f);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);	
 	},
@@ -17,10 +11,10 @@
 		status_t b,
 		status_t c,
 		status_t d,
-		status_t a0,
-		status_t b0,
-		status_t c0,
-		status_t d0) -> status_t {
+		status_t &a0,
+		status_t &b0,
+		status_t &c0,
+		status_t &d0) -> status_t {
 		return a;
 	}
 }

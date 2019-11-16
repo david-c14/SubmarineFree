@@ -1,22 +1,14 @@
 {
 	"4 Input AND Gate",
 	[](const Widget::DrawArgs &args, Vec size) {
-		float upper = size.y / 8;
-		float lower = size.y / 2;
-		float left  = 20;
-		float center = size.x / 2;
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, -5, upper);
-		nvgLineTo(args.vg, left, upper);
-		nvgLineTo(args.vg, left, lower);
-		nvgLineTo(args.vg, center - 10, lower);
-		nvgMoveTo(args.vg, center - 10, lower + 12);
-		nvgLineTo(args.vg, center - 10, lower - 12);
-		nvgLineTo(args.vg, center + 10, lower);
-		nvgLineTo(args.vg, center - 10, lower + 12);
-		nvgMoveTo(args.vg, center + 10, lower);
-		nvgLineTo(args.vg, size.x - 5, lower);
+		drawInput1of4(args.vg, 33);
+		drawInput2of4(args.vg, 33);
+		drawInput3of4(args.vg, 33);
+		drawInput4of4(args.vg, 33);
+		drawAnd(args.vg);
+		drawOutput(args.vg, 54);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
 	},
@@ -24,10 +16,10 @@
 		status_t b,
 		status_t c,
 		status_t d,
-		status_t a0,
-		status_t b0,
-		status_t c0,
-		status_t d0) -> status_t {
+		status_t &a0,
+		status_t &b0,
+		status_t &c0,
+		status_t &d0) -> status_t {
 		return a & b & c & d; 
 	}
 }

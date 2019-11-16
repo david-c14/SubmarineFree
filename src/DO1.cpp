@@ -27,6 +27,87 @@ namespace {
 		nvgFill(vg);
 	}
 
+	inline void drawOutput(NVGcontext *vg, float leftPos) {
+		nvgMoveTo(vg, leftPos, 30);
+		nvgLineTo(vg, 81, 30);
+	}
+
+	inline void drawInput1of1(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 8);
+		nvgLineTo(vg, 20, 8);
+		nvgLineTo(vg, 20, 30);
+		nvgLineTo(vg, rightPos, 30);
+	}
+
+	inline void drawInput1of2(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 8);
+		nvgLineTo(vg, 23, 8);
+		nvgLineTo(vg, 23, 26);
+		nvgLineTo(vg, rightPos, 26);
+	}
+	
+	inline void drawInput2of2(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 23);
+		nvgLineTo(vg, 17, 23);
+		nvgLineTo(vg, 17, 34);
+		nvgLineTo(vg, rightPos, 34);
+	}
+
+	inline void drawInput1of3(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 8);
+		nvgLineTo(vg, 23, 8);
+		nvgLineTo(vg, 23, 24);
+		nvgLineTo(vg, rightPos, 24);
+	}
+
+	inline void drawInput2of3(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 23);
+		nvgLineTo(vg, 17, 23);
+		nvgLineTo(vg, 17, 30);
+		nvgLineTo(vg, rightPos, 30);
+	}
+
+	inline void drawInput3of3(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 37);
+		nvgLineTo(vg, 17, 37);
+		nvgLineTo(vg, 17, 36);
+		nvgLineTo(vg, rightPos, 36);
+	}
+
+	inline void drawInput1of4(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 8);
+		nvgLineTo(vg, 23, 8);
+		nvgLineTo(vg, 23, 21);
+		nvgLineTo(vg, rightPos, 21);
+	}
+	
+	inline void drawInput2of4(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 23);
+		nvgLineTo(vg, 17, 23);
+		nvgLineTo(vg, 17, 27);
+		nvgLineTo(vg, rightPos, 27);
+	}
+	
+	inline void drawInput3of4(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 37);
+		nvgLineTo(vg, 17, 37);
+		nvgLineTo(vg, 17, 33);
+		nvgLineTo(vg, rightPos, 33);
+	}
+	
+	inline void drawInput4of4(NVGcontext *vg, float rightPos) {
+		nvgMoveTo(vg, -5, 51);
+		nvgLineTo(vg, 23, 51);
+		nvgLineTo(vg, 23, 39);
+		nvgLineTo(vg, rightPos, 39);
+	}
+	
+	inline void drawAnd(NVGcontext *vg) {
+		nvgMoveTo(vg, 33.0f, 18.0f);
+		nvgBezierTo(vg, 61.0f, 18.0f, 61.0f, 42.0f, 33.0f, 42.0f);
+		nvgLineTo(vg, 33.0f, 18.0f);
+	}
+
 	struct Functor {
 		std::string name;
 		std::function<void (const Widget::DrawArgs &, Vec size)> draw;
@@ -170,7 +251,7 @@ struct DO1 : DS_Module {
 		NUM_STATUS
 	};
 
-	status_t statuses[NUM_STATUS];
+	status_t statuses[NUM_STATUS] = { 0 };
 
 	DO1() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -186,6 +267,7 @@ struct DO1 : DS_Module {
 		}
 		statuses[STATUS_ALL_ZEROES] = 0;
 		statuses[STATUS_ALL_ONES] = ~statuses[STATUS_ALL_ZEROES];
+		DEBUG("%p", &statuses[STATUS_A0]);
 	}
 	void process(const ProcessArgs &args) override {
 		for (unsigned int ix = 0; ix < x; ix++) {
@@ -278,10 +360,9 @@ struct DOWidget : SchemeModuleWidget {
 		nvgMoveTo(args.vg, sx, sy);
 		nvgLineTo(args.vg, dx, dy);
 		nvgLineCap(args.vg, NVG_ROUND);
-		nvgStrokeColor(args.vg, nvgRGBAf(0.2f, 0.2f, 0.2f, fade));
+		nvgStrokeColor(args.vg, nvgRGBAf(color.r / 2.0f, color.g / 2.0f, color.b / 2.0f, fade));
 		nvgStrokeWidth(args.vg, 3);
 		nvgStroke(args.vg);
-		nvgStrokeColor(args.vg, nvgRGBAf(1.0f, 1.0f, 1.0f, fade));
 		nvgStrokeColor(args.vg, color);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
