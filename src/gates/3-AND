@@ -11,14 +11,7 @@
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
 	},
-	[] (status_t a,
-		status_t b,
-		status_t c,
-		status_t d,
-		status_t &a0,
-		status_t &b0,
-		status_t &c0,
-		status_t &d0) -> status_t {
+	LAMBDA_HEADER {
 		return a & b & c;
 	}
 }

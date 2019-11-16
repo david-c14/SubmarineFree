@@ -123,6 +123,8 @@ namespace {
 
 	};
 
+#define LAMBDA_HEADER [] (status_t a, status_t b, status_t c, status_t d, status_t &a0, status_t &b0, status_t &c0, status_t &d0) -> status_t
+
 	std::vector<Functor> functions {
 #include "gates/ShortCircuit"
 ,
@@ -134,6 +136,8 @@ namespace {
 ,
 #include "gates/4-AND"
 	};
+
+#undef LAMBDA_HEADER
 
 	struct PLConnectorRenderer : TransparentWidget {
 		std::function<void (const Widget::DrawArgs &)> drawLambda;
