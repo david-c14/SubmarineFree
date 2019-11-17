@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.0
+- 17-Nov-2019 Fix module id on LA-108 front panel
 - 27-Oct-2019 Fix typo in manual (courtesy of kant)
 - 22-Oct-2019 Bug fix #48 - Conflicting class names
 - 19-Oct-2019 PO-xxx devices moved to SIMD code
