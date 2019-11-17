@@ -405,3 +405,19 @@ struct MinButton : EventWidgetButtonBase {
 	MinButton();
 	void draw(const DrawArgs &args) override;
 };
+
+//////////////////
+// TooltipKnob
+//////////////////
+
+struct SubTooltip : ui::Tooltip {
+	std::function<void()> stepLambda;
+	void step() override; 
+};
+
+struct TooltipKnob : Knob
+{
+	std::function<std::string()> getText;
+	void onEnter(const event::Enter &e) override;
+	void onLeave(const event::Leave &e) override;
+};

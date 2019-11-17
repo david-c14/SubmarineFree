@@ -187,7 +187,7 @@ namespace {
 		}
 	};
 
-	struct PLGateKnob : Knob {
+	struct PLGateKnob : TooltipKnob {
 		Module *module;
 		int index;
 		PLGateKnob() {
@@ -378,6 +378,9 @@ struct DOWidget : SchemeModuleWidget {
 			PLGateKnob *knob = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
 			knob->module = module;
 			knob->index = DO1<x,y>::PARAM_GATE_1 + iy;
+			knob->getText = [&knob]()->std::string {
+				return this->getGateText(knob);
+			};
 			collectionScrollWidget->container->addChild(knob);
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
@@ -398,6 +401,16 @@ struct DOWidget : SchemeModuleWidget {
 			addInput(createInputCentered<BluePort>(Vec(15 + ix * 30, 30), module, DO1<x,y>::INPUT_1 + ix));
 			addOutput(createOutputCentered<BluePort>(Vec(15 + ix * 30, 350), module, DO1<x,y>::OUTPUT_1 + ix));
 		}
+	}
+
+	std::string getGateText(PLGateKnob *knob) {
+		if (!module)
+			return std::string("Browser");
+		unsigned int val = (unsigned int)APP->engine->getParam(module, knob->index);
+		if (val >= functions.size()) {
+			val = functions.size() - 1;
+		}
+		return functions[val].name;
 	}
 
 	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade) {
