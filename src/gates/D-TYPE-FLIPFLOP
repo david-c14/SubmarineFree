@@ -1,0 +1,25 @@
+{
+	"D-Type Flip-flop",
+	[](const Widget::DrawArgs &args, Vec size) {
+		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
+		nvgBeginPath(args.vg);
+		drawInput1of1(args.vg, 30);
+		drawBox(args.vg);
+		drawOutput(args.vg, 60);
+		nvgStrokeWidth(args.vg, 2);
+		nvgStroke(args.vg);
+		nvgFontFaceId(args.vg, gScheme.font(args.vg));
+		nvgFontSize(args.vg, 8 * 90 / SVG_DPI);
+		nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+		nvgFillColor(args.vg, SUBLIGHTBLUE);
+		nvgText(args.vg, 32, 30, ">", NULL);
+		nvgFontSize(args.vg, 10 * 90 / SVG_DPI);
+		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+		nvgText(args.vg, 50, 30, "D", NULL); 
+	},
+	LAMBDA_HEADER {
+		b0 ^= ((a0 ^ a) & a);
+		a0 = a;
+		return b0;
+	}
+}

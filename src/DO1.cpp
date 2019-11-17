@@ -128,6 +128,10 @@ namespace {
 		nvgEllipse(vg, xPos, 30, 4, 4);
 	}
 
+	inline void drawBox(NVGcontext *vg) {
+		nvgRect(vg, 30, 10, 30, 40);
+	}
+
 	struct Functor {
 		std::string name;
 		std::function<void (const Widget::DrawArgs &, Vec size)> draw;
@@ -169,6 +173,8 @@ namespace {
 #include "gates/NOR"
 ,
 #include "gates/XNOR"
+,
+#include "gates/D-TYPE-FLIPFLOP"
 	};
 
 #undef LAMBDA_HEADER
