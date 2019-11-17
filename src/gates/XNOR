@@ -14,6 +14,6 @@
 		nvgStroke(args.vg);
 	},
 	LAMBDA_HEADER {
-		return ~(a | b | c | d); 
+		return ~(a ^ b ^ c ^ d); 
 	}
 }
