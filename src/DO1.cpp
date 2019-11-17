@@ -308,7 +308,10 @@ struct DO1 : DS_Module {
 		DEBUG("%p", &statuses[STATUS_A0]);
 	}
 	void process(const ProcessArgs &args) override {
+		unsigned int maxPoly = 1;
 		for (unsigned int ix = 0; ix < x; ix++) {
+			unsigned int channels = inputs[INPUT_1 + ix].getChannels();
+			maxPoly = (maxPoly > channels)?maxPoly:channels;
 			statuses[STATUS_A + ix] = 0;
 			for (unsigned int iy = 0; iy < 16; iy++) {
 				statuses[STATUS_A + ix] <<= 1;
@@ -330,7 +333,7 @@ struct DO1 : DS_Module {
 			statuses[STATUS_OUT + iy] = functions[gate].process(in[0], in[1], in[2], in[3], statuses[STATUS_A0 + iy], statuses[STATUS_B0 + iy], statuses[STATUS_C0 + iy], statuses[STATUS_D0 + iy]);
 		}
 		for (unsigned int ix = 0; ix < x; ix++) {
-			outputs[OUTPUT_1 + ix].setChannels(16);
+			outputs[OUTPUT_1 + ix].setChannels(maxPoly);
 			unsigned int val = params[PARAM_CONNECTOR_OUT_1 + ix].getValue();
 			if (val > 1 + x + y)
 				val = 1 + x + y;
