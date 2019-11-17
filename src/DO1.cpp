@@ -103,9 +103,29 @@ namespace {
 	}
 	
 	inline void drawAnd(NVGcontext *vg) {
-		nvgMoveTo(vg, 33.0f, 18.0f);
-		nvgBezierTo(vg, 61.0f, 18.0f, 61.0f, 42.0f, 33.0f, 42.0f);
-		nvgLineTo(vg, 33.0f, 18.0f);
+		nvgMoveTo(vg, 33, 18);
+		nvgBezierTo(vg, 61, 18, 61, 42, 33, 42);
+		nvgLineTo(vg, 33, 18);
+	}
+
+	inline void drawOr(NVGcontext *vg) {
+		nvgMoveTo(vg, 33, 18);
+		nvgQuadTo(vg, 45, 18, 55, 30);
+		nvgQuadTo(vg, 45, 42, 33, 42);
+		nvgQuadTo(vg, 36, 30, 33, 18);
+	}
+
+	inline void drawXor(NVGcontext *vg) {
+		nvgMoveTo(vg, 33, 17);
+		nvgQuadTo(vg, 36, 30, 33, 43);
+		nvgMoveTo(vg, 37, 18);
+		nvgQuadTo(vg, 49, 18, 59, 30);
+		nvgQuadTo(vg, 49, 42, 37, 42);
+		nvgQuadTo(vg, 40, 30, 37, 18);
+	}
+
+	inline void drawNot(NVGcontext *vg, float xPos) {
+		nvgEllipse(vg, xPos, 30, 4, 4);
 	}
 
 	struct Functor {
@@ -135,6 +155,20 @@ namespace {
 #include "gates/3-AND"
 ,
 #include "gates/4-AND"
+,
+#include "gates/OR"
+,
+#include "gates/XOR"
+,
+#include "gates/2-NAND"
+,
+#include "gates/3-NAND"
+,
+#include "gates/4-NAND"
+,
+#include "gates/NOR"
+,
+#include "gates/XNOR"
 	};
 
 #undef LAMBDA_HEADER

@@ -1,0 +1,19 @@
+{
+	"4 Input NAND Gate",
+	[](const Widget::DrawArgs &args, Vec size) {
+		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
+		nvgBeginPath(args.vg);
+		drawInput1of4(args.vg, 33);
+		drawInput2of4(args.vg, 33);
+		drawInput3of4(args.vg, 33);
+		drawInput4of4(args.vg, 33);
+		drawAnd(args.vg);
+		drawNot(args.vg, 59);
+		drawOutput(args.vg, 63);
+		nvgStrokeWidth(args.vg, 2);
+		nvgStroke(args.vg);
+	},
+	LAMBDA_HEADER {
+		return ~(a & b & c & d); 
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"4 Input NOR Gate",
+	[](const Widget::DrawArgs &args, Vec size) {
+		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
+		nvgBeginPath(args.vg);
+		drawInput1of4(args.vg, 33);
+		drawInput2of4(args.vg, 35);
+		drawInput3of4(args.vg, 35);
+		drawInput4of4(args.vg, 33);
+		drawOr(args.vg);
+		drawNot(args.vg, 60);
+		drawOutput(args.vg, 64);
+		nvgStrokeWidth(args.vg, 2);
+		nvgStroke(args.vg);
+	},
+	LAMBDA_HEADER {
+		return ~(a | b | c | d); 
+	}
+}
