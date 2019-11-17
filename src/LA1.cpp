@@ -388,7 +388,7 @@ struct LA108 : SchemeModuleWidget {
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
-		drawBase(vg, "LA_108");
+		drawBase(vg, "LA-108");
 		
 		//Scope
 		nvgFillColor(vg, nvgRGB(0x00, 0x00, 0x00));
