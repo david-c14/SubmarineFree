@@ -378,8 +378,8 @@ struct DOWidget : SchemeModuleWidget {
 			PLGateKnob *knob = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
 			knob->module = module;
 			knob->index = DO1<x,y>::PARAM_GATE_1 + iy;
-			knob->getText = [&knob]()->std::string {
-				return this->getGateText(knob);
+			knob->getText = [=]()->std::string {
+				return this->getGateText(iy);
 			};
 			collectionScrollWidget->container->addChild(knob);
 		}
@@ -403,10 +403,10 @@ struct DOWidget : SchemeModuleWidget {
 		}
 	}
 
-	std::string getGateText(PLGateKnob *knob) {
+	std::string getGateText(unsigned int index) {
 		if (!module)
 			return std::string("Browser");
-		unsigned int val = (unsigned int)APP->engine->getParam(module, knob->index);
+		unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_GATE_1 + index);
 		if (val >= functions.size()) {
 			val = functions.size() - 1;
 		}

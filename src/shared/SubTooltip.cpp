@@ -4,17 +4,18 @@
 void SubTooltip::step() {
 	if (stepLambda != NULL)
 		stepLambda();
-	Tooltip::step();
+	//Tooltip::step();
 }
 
 void TooltipKnob::onEnter(const event::Enter &e) {
 	if (settings::paramTooltip && !tooltip) {
 		SubTooltip *stt = new SubTooltip();
 		tooltip = stt;
-		stt->stepLambda = [&]() {
+		stt->stepLambda = [=]() {
 			tooltip->text = "";
 			if (this->getText != NULL)
 				tooltip->text = this->getText();
+			stt->Tooltip::step();
 			tooltip->box.pos = this->getAbsoluteOffset(this->box.size).round();
 		};
 		APP->scene->addChild(tooltip);
