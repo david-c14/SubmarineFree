@@ -17,6 +17,39 @@ namespace {
 		255, 153, 65,
 		255, 174, 201
 	};
+	
+	/*
+	Suggested list of colors.
+	Look for these in UserSettings/SubmarineFree/DO-1xx.json
+	If the file does not exist, write one using this list
+	Load the file into the array (above) of colors, so that the user can edit the list if they want to.
+#201e24
+#c9b70e
+#0c8e15
+#c91847
+#0986ad
+#ffffff
+#911eb4
+#f032e6
+#a9a9a9
+#800000
+#9A6324
+#808000
+#469990
+#5050C5
+#FF4173
+#f58231
+#FFFF28
+#bfef45
+#64DC73
+#42d4f4
+#2828FF
+#fabebe
+#ffd8b1
+#fffac8
+#aaffc3
+#e6beff
+	*/
 
 	typedef uint16_t status_t;
 
