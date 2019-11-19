@@ -4,52 +4,82 @@
 
 namespace {
 
-	unsigned char colors[11 * 3] = {
-		32, 30, 36,
-		201, 185, 15,
-		12, 142, 21, 
-		201, 24, 71,
-		9, 134, 173,
-		255, 255, 255,
-		255, 174, 201,
-		185, 00, 183,
-		128, 128, 128,
-		255, 153, 65,
-		255, 174, 201
-	};
-	
-	/*
-	Suggested list of colors.
-	Look for these in UserSettings/SubmarineFree/DO-1xx.json
-	If the file does not exist, write one using this list
-	Load the file into the array (above) of colors, so that the user can edit the list if they want to.
-#201e24
-#c9b70e
-#0c8e15
-#c91847
-#0986ad
-#ffffff
-#911eb4
-#f032e6
-#a9a9a9
-#800000
-#9A6324
-#808000
-#469990
-#5050C5
-#FF4173
-#f58231
-#FFFF28
-#bfef45
-#64DC73
-#42d4f4
-#2828FF
-#fabebe
-#ffd8b1
-#fffac8
-#aaffc3
-#e6beff
-	*/
+	NVGcolor colors[26];
+
+// Based on - Set of 22 Simple, Distinct Colors
+// Thanks to Sacha Trubtskoy
+// https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/	
+
+	json_t *saveJson() {
+		json_t *settings = json_object();
+		json_t *arr = json_array();
+		json_array_append_new(arr, json_string("#201e24"));
+		json_array_append_new(arr, json_string("#c9b70e"));
+		json_array_append_new(arr, json_string("#0c8e15"));
+		json_array_append_new(arr, json_string("#c91847"));
+		json_array_append_new(arr, json_string("#0986ad"));
+		json_array_append_new(arr, json_string("#ffffff"));
+		json_array_append_new(arr, json_string("#911eb4"));
+		json_array_append_new(arr, json_string("#f032e6"));
+		json_array_append_new(arr, json_string("#a9a9a9"));
+		json_array_append_new(arr, json_string("#800000"));
+		json_array_append_new(arr, json_string("#9A6324"));
+		json_array_append_new(arr, json_string("#808000"));
+		json_array_append_new(arr, json_string("#469990"));
+		json_array_append_new(arr, json_string("#5050C5"));
+		json_array_append_new(arr, json_string("#FF4173"));
+		json_array_append_new(arr, json_string("#f58231"));
+		json_array_append_new(arr, json_string("#FFFF28"));
+		json_array_append_new(arr, json_string("#bfef45"));
+		json_array_append_new(arr, json_string("#64DC73"));
+		json_array_append_new(arr, json_string("#42d4f4"));
+		json_array_append_new(arr, json_string("#2828FF"));
+		json_array_append_new(arr, json_string("#fabebe"));
+		json_array_append_new(arr, json_string("#ffd8b1"));
+		json_array_append_new(arr, json_string("#fffac8"));
+		json_array_append_new(arr, json_string("#aaffc3"));
+		json_array_append_new(arr, json_string("#e6beff"));
+		json_object_set_new(settings, "colors", arr);
+		system::createDirectory(asset::user("SubmarineFree"));
+		std::string settingsFilename = asset::user("SubmarineFree/DO-1xx.json");
+		FILE *file = fopen(settingsFilename.c_str(), "w");
+		if (file) {
+			json_dumpf(settings, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+			fclose(file);
+		}
+		return settings;
+	}
+
+	void loadJson() {
+		json_t *settings;
+		json_error_t error;
+		FILE *file = fopen(asset::user("SubmarineFree/DO-1xx.json").c_str(), "r");
+		if (file) {
+			settings = json_loadf(file, 0, &error);
+			fclose(file);
+		}
+		else {
+			settings = saveJson();
+		}
+		if (!settings) {
+			WARN("Submarine Free DO-1xx: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+			return;
+		}
+		json_t *arr = json_object_get(settings, "colors");
+		if (arr) {
+			int size = json_array_size(arr);
+			if (size > 26)
+				size = 26;
+			for (int i = 0; i < size; i++) {
+				json_t *j1 = json_array_get(arr, i);
+				if (j1) {
+					colors[i] = color::fromHexString(json_string_value(j1));
+				}
+			}
+		}
+		json_decref(settings);
+	}
+
 
 	typedef uint16_t status_t;
 
@@ -238,7 +268,7 @@ namespace {
 				functions[val].draw(args, box.size);
 				unsigned int i = box.pos.y / 80;
 				i += 6;
-				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, nvgRGB(colors[i * 3], colors[i * 3 + 1], colors[i * 3 + 2]));
+				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, colors[i]);
 			}
 		}
 	};
@@ -278,11 +308,11 @@ namespace {
 			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
 			nvgFill(args.vg);
 			for (unsigned int ix = 0; ix < x + 2; ix++) {
-				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, nvgRGB(colors[ix * 3], colors[ix * 3 + 1], colors[ix * 3 + 2]));
+				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, colors[ix]);
 			}
 			nvgStrokeWidth(args.vg, 2);
 			for (unsigned int ix = 0; ix < x; ix++) {
-				nvgStrokeColor(args.vg, nvgRGB(colors[ix * 3 + 3], colors[ix * 3 + 4], colors[ix * 3 + 5]));
+				nvgStrokeColor(args.vg, colors[ix + 1]);
 				nvgBeginPath(args.vg);
 				nvgMoveTo(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 3), 5);
 				nvgLineTo(args.vg, 15 + ix * 30 - box.pos.x, 30 - box.pos.y);
@@ -344,7 +374,7 @@ struct DO1 : DS_Module {
 		}
 		statuses[STATUS_ALL_ZEROES] = 0;
 		statuses[STATUS_ALL_ONES] = ~statuses[STATUS_ALL_ZEROES];
-		DEBUG("%p", &statuses[STATUS_A0]);
+		loadJson();
 	}
 	void process(const ProcessArgs &args) override {
 		unsigned int maxPoly = 1;
@@ -541,7 +571,7 @@ struct DOWidget : SchemeModuleWidget {
 				scissorBottom -= 10;
 			}
 			nvgScissor(args.vg, args.clipBox.pos.x, scissorTop, args.clipBox.size.x, scissorBottom);
-			NVGcolor color = nvgRGB(colors[val * 3], colors[val * 3 + 1], colors[val * 3 + 2]);
+			NVGcolor color = colors[val];
 			float fade = val?knobs[i]->fade:0.0f;
 			drawWire(args, startX, startY, destX, destY, color, fade);
 			nvgResetScissor(args.vg);
