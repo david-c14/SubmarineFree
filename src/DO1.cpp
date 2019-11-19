@@ -409,24 +409,28 @@ struct DOWidget : SchemeModuleWidget {
 		}
 	}
 
-	std::string getGateText(unsigned int index) {
-		if (!module)
-			return std::string("Browser");
+	std::string getGateName(unsigned int index) {
 		unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_GATE_1 + index);
 		if (val >= functions.size()) {
 			val = functions.size() - 1;
 		}
-		return string::f("Gate %d: ", index + 1) + functions[val].name;
+		return functions[val].name;
+	}
+
+	std::string getGateText(unsigned int index) {
+		if (!module)
+			return std::string("Browser");
+		return string::f("Gate %d: ", index + 1) + getGateName(index);
 	}
 
 	std::string getConnectorNameText(unsigned int index) {
 		unsigned int gate = index / 4;
 		unsigned connector = index % 4;
 		if (gate < y) {
-			return string::f("Connector %d.%d", gate + 1, connector + 1);
+			return string::f("Connector %d.%d \xe2\x86\xa3 ", gate + 1, connector + 1);
 		}
 		index -= (y * 4);
-		return string::f("Output connector %c", 'A' + index);
+		return string::f("Output connector %c \xe2\x86\xa3 ", 'A' + index);
 	}
 
 	std::string getConnectorText(unsigned int index) {
@@ -437,12 +441,12 @@ struct DOWidget : SchemeModuleWidget {
 		if (val > x + y + 1)
 			val = x + y + 1;
 		if (val == 0)
-			return connectorName + std::string(" : FALSE");
+			return connectorName + std::string("Low");
 		if (val == x + 1)
-			return connectorName + std::string(" : TRUE");
+			return connectorName + std::string("High");
 		if (val < x + 1)
-			return connectorName + string::f(" : INPUT %c", '@' + val);
-		return connectorName + string::f(" : GATE %d", val - x -1);
+			return connectorName + string::f("Input connector %c", '@' + val);
+		return connectorName + string::f("Gate %d: ", val - x -1) + getGateName(val - x - 2);
 	}
 
 	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade) {
