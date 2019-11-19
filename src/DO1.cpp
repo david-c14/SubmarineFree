@@ -210,7 +210,7 @@ namespace {
 		}
 	};
 
-	struct PLConnectorKnob : Knob {
+	struct PLConnectorKnob : TooltipKnob {
 		Module *module;
 		float fade = 0.1f;
 		PLConnectorKnob() {
@@ -368,6 +368,9 @@ struct DOWidget : SchemeModuleWidget {
 		for (unsigned int ix = 0; ix < x; ix++) {
 			knobs[ix + 4 * y] = createParamCentered<PLConnectorKnob>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
 			knobs[ix + 4 * y]->module = module;
+			knobs[ix + 4 * y]->getText = [=]()->std::string {
+				return this->getConnectorText(ix + 4 * y);
+			};
 			background->addChild(knobs[ix + 4 * y]);
 			pos = pos + posDiff;
 		}
@@ -387,6 +390,9 @@ struct DOWidget : SchemeModuleWidget {
 			for (unsigned int ix = 0; ix < 4; ix++) {
 				knobs[4 * iy + ix] = createParamCentered<PLConnectorKnob>(Vec(5, (iy + 1) * 80.0f + ix * 14.0f - 21.0f), module, DO1<x, y>::PARAM_CONNECTOR_1 + iy * 4 + ix);
 				knobs[4 * iy + ix]->module = module;
+				knobs[4 * iy + ix]->getText = [=]()->std::string {
+					return this->getConnectorText(4 * iy + ix);
+				};
 				collectionScrollWidget->container->addChild(knobs[4 * iy + ix]);	
 			}
 		}
@@ -410,7 +416,33 @@ struct DOWidget : SchemeModuleWidget {
 		if (val >= functions.size()) {
 			val = functions.size() - 1;
 		}
-		return functions[val].name;
+		return string::f("Gate %d: ", index + 1) + functions[val].name;
+	}
+
+	std::string getConnectorNameText(unsigned int index) {
+		unsigned int gate = index / 4;
+		unsigned connector = index % 4;
+		if (gate < y) {
+			return string::f("Connector %d.%d", gate + 1, connector + 1);
+		}
+		index -= (y * 4);
+		return string::f("Output connector %c", 'A' + index);
+	}
+
+	std::string getConnectorText(unsigned int index) {
+		if (!module)
+			return std::string("Browser");
+		std::string connectorName = getConnectorNameText(index);
+		unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_1 + index);	
+		if (val > x + y + 1)
+			val = x + y + 1;
+		if (val == 0)
+			return connectorName + std::string(" : FALSE");
+		if (val == x + 1)
+			return connectorName + std::string(" : TRUE");
+		if (val < x + 1)
+			return connectorName + string::f(" : INPUT %c", '@' + val);
+		return connectorName + string::f(" : GATE %d", val - x -1);
 	}
 
 	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade) {
