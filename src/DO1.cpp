@@ -197,6 +197,7 @@ namespace {
 
 	struct Functor {
 		std::string name;
+		std::string truthTable;
 		std::function<void (const Widget::DrawArgs &, Vec size)> draw;
 		std::function<status_t (status_t a,
 					status_t b,
@@ -250,6 +251,26 @@ namespace {
 		}
 	};
 
+	struct PLTruthTable : MenuEntry {
+		std::string table;
+		unsigned int inputs = 0;
+		unsigned int others = 0;
+		unsigned int rows = 0;
+		PLTruthTable(std::string tableValue) {
+			table = tableValue;
+			inputs = table[0] - '0';
+			others = table[1] - '0';
+			rows = table[2] - '0';
+			if (rows > 9) 
+				rows -= 7;
+			box.size.x = 20 * (inputs + others);
+			box.size.y = 20 * rows;
+		}
+		void draw(const DrawArgs &args) override {
+			Widget::draw(args);
+		}
+	};
+
 	struct PLGateKnob : TooltipKnob {
 		Module *module;
 		int index;
@@ -269,6 +290,19 @@ namespace {
 				unsigned int i = box.pos.y / 80;
 				i += 6;
 				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, colors[i]);
+			}
+		}
+		void onButton(const event::Button &e) override {
+			if (module) {
+				if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+					e.consume(this);
+					unsigned int val = (unsigned int)APP->engine->getParam(module, index);
+					if (val >= functions.size()) {
+						val = functions.size() - 1;
+					}
+					Menu *menu = createMenu();
+					menu->addChild(new PLTruthTable(functions[val].truthTable));
+				}
 			}
 		}
 	};
