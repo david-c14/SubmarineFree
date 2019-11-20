@@ -242,6 +242,16 @@ namespace {
 
 #undef LAMBDA_HEADER
 
+	/* -- Example string tokeniser for Truth Tables (c/o StackOverflow)
+stringstream ss( "1,1,1,1, or something else ,1,1,1,0" );
+vector<string> result;
+
+while( ss.good() )
+{
+    string substr;
+    getline( ss, substr, ',' );
+    result.push_back( substr );
+}	*/
 	struct PLConnectorRenderer : TransparentWidget {
 		std::function<void (const Widget::DrawArgs &)> drawLambda;
 		void draw(const DrawArgs &args) override {
