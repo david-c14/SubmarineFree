@@ -6,8 +6,8 @@ namespace {
 
 	NVGcolor colors[26];
 
-// Based on - Set of 22 Simple, Distinct Colors
-// Thanks to Sacha Trubtskoy
+// Based on - Set of 20 Simple, Distinct Colors
+// Thanks to Sacha Trubetskoy
 // https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/	
 
 	json_t *saveJson() {
