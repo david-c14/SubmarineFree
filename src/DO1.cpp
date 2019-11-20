@@ -243,16 +243,6 @@ namespace {
 
 #undef LAMBDA_HEADER
 
-	/* -- Example string tokeniser for Truth Tables (c/o StackOverflow)
-stringstream ss( "1,1,1,1, or something else ,1,1,1,0" );
-vector<string> result;
-
-while( ss.good() )
-{
-    string substr;
-    getline( ss, substr, ',' );
-    result.push_back( substr );
-}	*/
 	struct PLConnectorRenderer : TransparentWidget {
 		std::function<void (const Widget::DrawArgs &)> drawLambda;
 		void draw(const DrawArgs &args) override {
@@ -266,6 +256,7 @@ while( ss.good() )
 		unsigned int inputs = 0;
 		unsigned int others = 0;
 		unsigned int rows = 0;
+		std::vector<std::string> entries;
 		PLTruthTable(std::string tableValue) {
 			table = tableValue;
 			inputs = table[0] - '0';
@@ -273,10 +264,27 @@ while( ss.good() )
 			rows = table[2] - '0';
 			if (rows > 9) 
 				rows -= 7;
-			box.size.x = 20 * (inputs + others);
-			box.size.y = 20 * rows;
+			box.size.x = 20 * (inputs + others) + 7;
+			box.size.y = 20 * rows + 7;
+			std::stringstream ss(table);
+			while (ss.good()) {
+				std::string substr;
+				std::getline(ss, substr, ',');
+				entries.push_back(substr);
+			}
+			assert(entries.size() == 1 + (inputs + others) * rows);
 		}
 		void draw(const DrawArgs &args) override {
+			nvgBeginPath(args.vg);
+			nvgStrokeColor(args.vg, color::alpha(bndGetTheme()->menuTheme.textColor, 0.25));
+			nvgStrokeWidth(args.vg, 1.0f);
+			nvgMoveTo(args.vg, 0, 23.5);
+			nvgLineTo(args.vg, box.size.x, 23.5);
+			nvgMoveTo(args.vg, inputs * 20 + 3.5, 0);
+			nvgLineTo(args.vg, inputs * 20 + 3.5, box.size.y);
+			nvgStroke(args.vg);
+			NVGcolor rightColor = bndGetTheme()->menuTheme.textColor;
+			bndIconLabelValue(args.vg, 0, 0, 20, 20, -1, rightColor, BND_LEFT, 13, "A", NULL);
 			Widget::draw(args);
 		}
 	};
