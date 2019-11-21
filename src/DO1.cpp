@@ -259,32 +259,52 @@ namespace {
 		std::vector<std::string> entries;
 		PLTruthTable(std::string tableValue) {
 			table = tableValue;
-			inputs = table[0] - '0';
-			others = table[1] - '0';
-			rows = table[2] - '0';
+			std::stringstream ss(table);
+			std::string tableSize;
+			std::getline(ss, tableSize, ',');
+			
+			inputs = tableSize[0] - '0';
+			others = tableSize[1] - '0';
+			rows = tableSize[2] - '0';
 			if (rows > 9) 
 				rows -= 7;
-			box.size.x = 20 * (inputs + others) + 7;
-			box.size.y = 20 * rows + 7;
-			std::stringstream ss(table);
+			box.size.x = 40 * (inputs + others) + 7;
+			box.size.y = 25 * rows + 7;
 			while (ss.good()) {
 				std::string substr;
 				std::getline(ss, substr, ',');
 				entries.push_back(substr);
 			}
-			assert(entries.size() == 1 + (inputs + others) * rows);
+			//assert(entries.size() == (inputs + others) * rows);
+			if (entries.size() != (inputs + others) * rows) {
+				WARN("Invalid Truth Table");
+			}
 		}
 		void draw(const DrawArgs &args) override {
 			nvgBeginPath(args.vg);
 			nvgStrokeColor(args.vg, color::alpha(bndGetTheme()->menuTheme.textColor, 0.25));
 			nvgStrokeWidth(args.vg, 1.0f);
-			nvgMoveTo(args.vg, 0, 23.5);
-			nvgLineTo(args.vg, box.size.x, 23.5);
-			nvgMoveTo(args.vg, inputs * 20 + 3.5, 0);
-			nvgLineTo(args.vg, inputs * 20 + 3.5, box.size.y);
+			nvgMoveTo(args.vg, 0, 28.5);
+			nvgLineTo(args.vg, box.size.x, 28.5);
+			nvgMoveTo(args.vg, inputs * 40 + 3.5, 0);
+			nvgLineTo(args.vg, inputs * 40 + 3.5, box.size.y);
 			nvgStroke(args.vg);
 			NVGcolor rightColor = bndGetTheme()->menuTheme.textColor;
-			bndIconLabelValue(args.vg, 0, 0, 20, 20, -1, rightColor, BND_LEFT, 13, "A", NULL);
+			unsigned int x = 0;
+			unsigned int y = 0;
+			for (std::string item : entries) {
+				bndIconLabelValue(args.vg, x, y + 3, 40, 25, -1, rightColor, BND_CENTER, 13, item.c_str(), NULL);
+				x += 40;
+				if (x >= inputs * 40) 
+					x += 7;
+				if (x > (inputs + others) * 40) {
+					y += 25;
+					x = 0;
+				}
+				if (y == 25)
+					y += 7;
+			}			
+
 			Widget::draw(args);
 		}
 	};
@@ -320,8 +340,10 @@ namespace {
 					}
 					Menu *menu = createMenu();
 					menu->addChild(new PLTruthTable(functions[val].truthTable));
+					return;
 				}
 			}
+			Knob::onButton(e);
 		}
 	};
 
