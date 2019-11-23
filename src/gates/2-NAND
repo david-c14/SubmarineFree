@@ -1,6 +1,12 @@
 {
 	"NAND Gate",
-	"214,0,0,0,0,1,0,1,0,0,1,1,1",
+	"215,"
+	A	B	O
+	ZE	ZE	ON
+	ZE	ON	ON
+	ON	ZE	ON
+	ON	ON	ZE
+	,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);

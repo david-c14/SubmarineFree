@@ -1,6 +1,12 @@
 {
 	"AND Gate",
-	"215,A,B,O,0,0,0,0,1,0,1,0,0,1,1,1",
+	"215,"
+	A	B	O
+	ZE	ZE	ZE
+	ZE	ON	ZE
+	ON	ZE	ZE
+	ON	ON	ON
+	,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);

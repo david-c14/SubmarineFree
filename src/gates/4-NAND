@@ -1,6 +1,13 @@
 {
 	"4 Input NAND Gate",
-	"214,0,0,0,0,1,0,1,0,0,1,1,1",
+	"416,"
+	A	B	C	D	O
+	ZE	X	X	X	ON
+	X	ZE	X	X	ON
+	X	X	ZE	X	ON
+	X	X	X	ZE	ON
+	ON	ON	ON	ON	ZE
+	,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);

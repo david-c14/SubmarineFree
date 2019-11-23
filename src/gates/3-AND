@@ -1,6 +1,16 @@
 {
 	"3 Input AND Gate",
-	"319,A,B,C,O,0,0,0,0,0,0,1,0,0,1,0,0,0,1,1,0,1,0,0,0,1,0,1,0,1,1,0,0,1,1,1,1",
+	"319,"
+	A	B	C	O
+	ZE	ZE	ZE	ZE
+	ZE	ZE	ON	ZE
+	ZE	ON	ZE	ZE
+	ZE	ON	ON	ZE
+	ON	ZE	ZE	ZE
+	ON	ZE	ON	ZE
+	ON	ON	ZE	ZE
+	ON	ON	ON	ON
+	,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);

@@ -1,6 +1,11 @@
 { // NOT Gate
 	"NOT Gate",
-	"214,0,0,0,0,1,0,1,0,0,1,1,1",
+	"113,"
+	A	O
+	
+	ZE	ON
+	ON	ZE
+	,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);

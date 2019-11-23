@@ -1,6 +1,12 @@
 {
 	"D-Type Flip-flop",
-	"214,0,0,0,0,1,0,1,0,0,1,1,1",
+	"114,"
+	A1	O1
+	
+	A0	O0
+	DN	O0
+	UP	NT O0
+,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);

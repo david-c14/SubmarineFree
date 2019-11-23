@@ -213,6 +213,22 @@ namespace {
 
 #define LAMBDA_HEADER [] (status_t a, status_t b, status_t c, status_t d, status_t &a0, status_t &b0, status_t &c0, status_t &d0) -> status_t
 
+#define A "A,"
+#define A0 "A\xE2\x82\x80,"
+#define A1 "A\xE2\x82\x81,"
+#define B "B,"
+#define C "C,"
+#define D "D,"
+#define O "O,"
+#define O0 "O\xE2\x82\x80,"
+#define O1 "O\xE2\x82\x81,"
+#define NT "^"
+#define ON "1,"
+#define ZE "0,"
+#define X "\xC3\x97,"
+#define UP "\xE2\x86\x91,"
+#define DN "\xE2\x86\x93,"
+
 	std::vector<Functor> functions {
 #include "gates/NC"
 ,
@@ -238,9 +254,26 @@ namespace {
 ,
 #include "gates/XNOR"
 ,
+#include "gates/XOR"
+,
 #include "gates/D-TYPE-FLIPFLOP"
 	};
 
+#undef A
+#undef A0
+#undef A1
+#undef B
+#undef C
+#undef D
+#undef O
+#undef O0
+#undef O1
+#undef NT
+#undef ON
+#undef ZE
+#undef X
+#undef UP
+#undef DN
 #undef LAMBDA_HEADER
 
 	struct PLConnectorRenderer : TransparentWidget {
@@ -275,9 +308,10 @@ namespace {
 				std::getline(ss, substr, ',');
 				entries.push_back(substr);
 			}
+			entries.pop_back();
 			//assert(entries.size() == (inputs + others) * rows);
 			if (entries.size() != (inputs + others) * rows) {
-				WARN("Invalid Truth Table");
+				WARN("Invalid Truth Table: %s", tableValue.c_str());
 			}
 		}
 		void draw(const DrawArgs &args) override {
@@ -289,11 +323,21 @@ namespace {
 			nvgMoveTo(args.vg, inputs * 40 + 3.5, 0);
 			nvgLineTo(args.vg, inputs * 40 + 3.5, box.size.y);
 			nvgStroke(args.vg);
-			NVGcolor rightColor = bndGetTheme()->menuTheme.textColor;
+			NVGcolor rightColor = bndGetTheme()->regularTheme.textColor;
+			nvgStrokeColor(args.vg, rightColor);
 			unsigned int x = 0;
 			unsigned int y = 0;
 			for (std::string item : entries) {
-				bndIconLabelValue(args.vg, x, y + 3, 40, 25, -1, rightColor, BND_CENTER, 13, item.c_str(), NULL);
+				if (item[0] == '^') {
+					bndIconLabelValue(args.vg, x, y + 3, 40, 25, -1, rightColor, BND_CENTER, 13, item.c_str() + 1, NULL);
+					nvgBeginPath(args.vg);
+					nvgMoveTo(args.vg, x + 13, y + 5.5);
+					nvgLineTo(args.vg, x + 27, y + 5.5);
+					nvgStroke(args.vg);
+				}
+				else {
+					bndIconLabelValue(args.vg, x, y + 3, 40, 25, -1, rightColor, BND_CENTER, 13, item.c_str(), NULL);
+				}
 				x += 40;
 				if (x >= inputs * 40) 
 					x += 7;
@@ -339,6 +383,10 @@ namespace {
 						val = functions.size() - 1;
 					}
 					Menu *menu = createMenu();
+					MenuLabel *menuLabel = new MenuLabel();
+					menuLabel->text = functions[val].name;
+					menu->addChild(menuLabel);
+					menu->addChild(new MenuSeparator());
 					menu->addChild(new PLTruthTable(functions[val].truthTable));
 					return;
 				}

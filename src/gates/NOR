@@ -1,6 +1,25 @@
 {
 	"4 Input NOR Gate",
-	"214,0,0,0,0,1,0,1,0,0,1,1,1",
+	"41H,"
+	A	B	C	D	O
+
+	ZE	ZE	ZE	ZE	ON
+	ZE	ZE	ZE	ON	ZE
+	ZE	ZE	ON	ZE	ZE
+	ZE	ZE	ON	ON	ZE
+	ZE	ON	ZE	ZE	ZE
+	ZE	ON	ZE	ON	ZE
+	ZE	ON	ON	ZE	ZE
+	ZE	ON	ON	ON	ZE
+	ON	ZE	ZE	ZE	ZE
+	ON	ZE	ZE	ON	ZE
+	ON	ZE	ON	ZE	ZE
+	ON	ZE	ON	ON	ZE
+	ON	ON	ZE	ZE	ZE
+	ON	ON	ZE	ON	ZE
+	ON	ON	ON	ZE	ZE
+	ON	ON	ON	ON	ZE
+	,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
 		nvgBeginPath(args.vg);
