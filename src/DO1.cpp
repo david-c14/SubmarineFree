@@ -219,6 +219,8 @@ namespace {
 #define B "B,"
 #define C "C,"
 #define D "D,"
+#define S "S,"
+#define R "R,"
 #define O "O,"
 #define O0 "O\xE2\x82\x80,"
 #define O1 "O\xE2\x82\x81,"
@@ -257,6 +259,8 @@ namespace {
 #include "gates/XOR"
 ,
 #include "gates/D-TYPE-FLIPFLOP"
+,
+#include "gates/SR-FLIPFLOP"
 	};
 
 #undef A
@@ -265,6 +269,8 @@ namespace {
 #undef B
 #undef C
 #undef D
+#undef S
+#undef R
 #undef O
 #undef O0
 #undef O1
