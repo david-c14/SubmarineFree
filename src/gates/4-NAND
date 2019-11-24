@@ -2,10 +2,21 @@
 	"4 Input NAND Gate",
 	"416,"
 	A	B	C	D	O
-	ZE	X	X	X	ON
-	X	ZE	X	X	ON
-	X	X	ZE	X	ON
-	X	X	X	ZE	ON
+	ZE	ZE	ZE	ZE	ON
+	ZE	ZE	ZE	ON	ON
+	ZE	ZE	ON	ZE	ON
+	ZE	ZE	ON	ON	ON
+	ZE	ON	ZE	ZE	ON
+	ZE	ON	ZE	ON	ON
+	ZE	ON	ON	ZE	ON
+	ZE	ON	ON	ON	ON
+	ON	ZE	ZE	ZE	ON
+	ON	ZE	ZE	ON	ON
+	ON	ZE	ON	ZE	ON
+	ON	ZE	ON	ON	ON
+	ON	ON	ZE	ZE	ON
+	ON	ON	ZE	ON	ON
+	ON	ON	ON	ZE	ON
 	ON	ON	ON	ON	ZE
 	,
 	[](const Widget::DrawArgs &args, Vec size) {
