@@ -1,6 +1,6 @@
 {
 	"4 Input NAND Gate",
-	"416,"
+	"41H,"
 	A	B	C	D	O
 	ZE	ZE	ZE	ZE	ON
 	ZE	ZE	ZE	ON	ON

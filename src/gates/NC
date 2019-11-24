@@ -1,8 +1,9 @@
 { // Not Connected
 	"Not Connected",
-	"012,"
-	O
-	ZE
+	"412,"
+	A	B	C	D	O
+
+	X	X	X	X	ZE
 	,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgFontFaceId(args.vg, gScheme.font(args.vg));
