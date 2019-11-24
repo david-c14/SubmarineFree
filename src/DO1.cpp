@@ -714,3 +714,6 @@ struct DOWidget : SchemeModuleWidget {
 };
 
 Model *modelDO105 = createModel<DO1<4,5>, DOWidget<4,5>>("DO-105");
+Model *modelDO110 = createModel<DO1<4,10>, DOWidget<4,10>>("DO-110");
+Model *modelDO115 = createModel<DO1<4,15>, DOWidget<4,15>>("DO-115");
+Model *modelDO120 = createModel<DO1<4,20>, DOWidget<4,20>>("DO-120");

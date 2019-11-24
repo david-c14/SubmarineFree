@@ -134,6 +134,24 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"DO-110",
+			"name":"DO-110",
+			"description": "DO-110 Digital Operators",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"DO-115",
+			"name":"DO-115",
+			"description": "DO-115 Digital Operators",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"DO-120",
+			"name":"DO-120",
+			"description": "DO-120 Digital Operators",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
 			"slug":"EO-102",
 			"name":"EO-102",
 			"description": "EO-102 Envelope Oscilloscope",
