@@ -219,6 +219,7 @@ namespace {
 #define B "B,"
 #define C "C,"
 #define D "D,"
+#define E "E,"
 #define S "S,"
 #define R "R,"
 #define O "O,"
@@ -261,6 +262,8 @@ namespace {
 #include "gates/D-TYPE-FLIPFLOP"
 ,
 #include "gates/SR-FLIPFLOP"
+,
+#include "gates/D-TYPE-LATCH"
 	};
 
 #undef A
@@ -269,6 +272,7 @@ namespace {
 #undef B
 #undef C
 #undef D
+#undef E
 #undef S
 #undef R
 #undef O
