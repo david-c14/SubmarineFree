@@ -220,6 +220,8 @@ namespace {
 #define C "C,"
 #define D "D,"
 #define E "E,"
+#define E0 "E\xE2\x82\x80,"
+#define E1 "E\xE2\x82\x81,"
 #define S "S,"
 #define R "R,"
 #define O "O,"
@@ -264,6 +266,8 @@ namespace {
 #include "gates/SR-FLIPFLOP"
 ,
 #include "gates/D-TYPE-LATCH"
+,
+#include "gates/LATCH"
 	};
 
 #undef A
@@ -273,6 +277,8 @@ namespace {
 #undef C
 #undef D
 #undef E
+#undef E0
+#undef E1
 #undef S
 #undef R
 #undef O
