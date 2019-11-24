@@ -268,6 +268,8 @@ namespace {
 #include "gates/D-TYPE-LATCH"
 ,
 #include "gates/LATCH"
+,
+#include "gates/DELAY"
 	};
 
 #undef A
