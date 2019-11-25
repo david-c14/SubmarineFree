@@ -218,6 +218,8 @@ namespace {
 #define A1 "A\xE2\x82\x81,"
 #define B "B,"
 #define C "C,"
+#define C0 "C\xE2\x82\x80,"
+#define C1 "C\xE2\x82\x81,"
 #define D "D,"
 #define E "E,"
 #define E0 "E\xE2\x82\x80,"
@@ -270,6 +272,8 @@ namespace {
 #include "gates/LATCH"
 ,
 #include "gates/DELAY"
+,
+#include "gates/CLK-DELAY"
 	};
 
 #undef A
@@ -277,6 +281,8 @@ namespace {
 #undef A1
 #undef B
 #undef C
+#undef C0
+#undef C1
 #undef D
 #undef E
 #undef E0
