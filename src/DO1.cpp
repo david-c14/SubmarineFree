@@ -221,6 +221,8 @@ namespace {
 #define C0 "C\xE2\x82\x80,"
 #define C1 "C\xE2\x82\x81,"
 #define D "D,"
+#define D0 "D\xE2\x82\x80,"
+#define D1 "D\xE2\x82\x81,"
 #define E "E,"
 #define E0 "E\xE2\x82\x80,"
 #define E1 "E\xE2\x82\x81,"
@@ -269,6 +271,8 @@ namespace {
 ,
 #include "gates/D-TYPE-LATCH"
 ,
+#include "gates/SR-LATCH"
+,
 #include "gates/LATCH"
 ,
 #include "gates/DELAY"
@@ -284,6 +288,8 @@ namespace {
 #undef C0
 #undef C1
 #undef D
+#undef D0
+#undef D1
 #undef E
 #undef E0
 #undef E1

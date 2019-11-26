@@ -1,9 +1,9 @@
 {
 	"1 Sample Delay",
 	"112,"
-	A1	O1
+	D1	O1
 	
-	X	A0
+	X	D0
 ,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
@@ -16,8 +16,12 @@
 		nvgFontFaceId(args.vg, gScheme.font(args.vg));
 		nvgFontSize(args.vg, 8 * 90 / SVG_DPI);
 		nvgFillColor(args.vg, SUBLIGHTBLUE);
+		nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+		nvgText(args.vg, 32, 30, "D", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 45, 30, "DELAY", NULL);
+		nvgText(args.vg, 45, 45, "DELAY", NULL);
+		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
+		nvgText(args.vg, 58, 30, "O", NULL);
 	},
 	LAMBDA_HEADER {
 		b = a0;
