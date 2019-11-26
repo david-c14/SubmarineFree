@@ -172,12 +172,13 @@ struct CandyCanleWidget : CableWidget {
 	}
 };
 
-struct SS2019 : SchemeModuleWidget {
+struct XX219 : SchemeModuleWidget {
 
-	SS2019(Module *module) : SchemeModuleWidget(module) {
+	XX219(Module *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(15, 380);
+		addChild(new SchemePanel(this->box.size));
 	}
-	~SS2019() {
+	~XX219() {
 		this->_delete();
 	}
 	void step() override {
@@ -226,7 +227,7 @@ struct SS2019 : SchemeModuleWidget {
 		nvgSave(vg);
 		nvgTranslate(vg, 1, 377);
 		nvgRotate(vg, -M_PI / 2.0f);
-		drawText(vg, 0, 0, NVG_ALIGN_LEFT | NVG_ALIGN_TOP, 12, gScheme.getAlternative(module), "submarine");
+		drawText(vg, 0, 0, NVG_ALIGN_LEFT | NVG_ALIGN_TOP, 12, gScheme.getAlternative(module), "submarine     SECRET SANTA 2019");
 		nvgRestore(vg);	
   }
 	void addMenuItem(Menu *menu, const char *label) {
@@ -245,4 +246,4 @@ struct SS2019 : SchemeModuleWidget {
 	}
 };
 
-Model *modelSS2019 = createModel<Module, SS2019>("SecretSanta2019");
+Model *modelXX219 = createModel<Module, XX219>("XX-219");

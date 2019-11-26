@@ -89,6 +89,8 @@ extern Model *modelXF202;
 extern Model *modelXG104;
 extern Model *modelXG106;
 
+extern Model *modelXX219;
+
 #include "shared/components.hpp"
 
 #define SUBMENU "\xe2\x96\xb6"
