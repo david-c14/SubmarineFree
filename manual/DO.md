@@ -1,9 +1,9 @@
 # Digital Operators
 ### [Part of the Digital Suite](DS.md)
-#### DO-105 Digital Operators
-#### DO-110 Digital Operators
-#### DO-115 Digital Operators
-#### DO-120 Digital Operators
+#### DO-105 5 Gate Digital Operators
+#### DO-110 10 Gate Digital Operators
+#### DO-115 15 Gate Digital Operators
+#### DO-120 20 Gate Digital Operators
 
 
 ![View of the Digital Operators](DO.png "Digital Operators")
