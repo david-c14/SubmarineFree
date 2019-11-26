@@ -17,7 +17,7 @@ Free plugins for VCV Rack
 ###### [0.6.2](https://github.com/david-c14/SubmarineFree/issues/4)
 
 # License
-Source code licensed under BSD-3-Clause by carbon14 (David O'Rourke)
+Source code licensed under GPL-3.0 by carbon14 (David O'Rourke)
 
 All graphics in res/ and src/res are © 2018 by carbon14 (David O'Rourke)
 
