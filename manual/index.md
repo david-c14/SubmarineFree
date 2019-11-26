@@ -12,6 +12,9 @@ Bucket Brigade Sample and Hold
 # [BP](BP.md)
 Blanking plates
 
+# [DO](DO.md)
+Digital Operators
+
 # [DN](DN.md)
 Digital Noise Source
 
