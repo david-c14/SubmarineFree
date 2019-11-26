@@ -1,7 +1,7 @@
 {
 	"NAND Gate",
 	"215,"
-	A	B	O
+	A	B	Q
 	ZE	ZE	ON
 	ZE	ON	ON
 	ON	ZE	ON

@@ -1,7 +1,7 @@
 { // NOT Gate
 	"NOT Gate",
 	"113,"
-	A	O
+	A	Q
 	
 	ZE	ON
 	ON	ZE

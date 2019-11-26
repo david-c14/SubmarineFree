@@ -228,9 +228,9 @@ namespace {
 #define E1 "E\xE2\x82\x81,"
 #define S "S,"
 #define R "R,"
-#define O "O,"
-#define O0 "O\xE2\x82\x80,"
-#define O1 "O\xE2\x82\x81,"
+#define Q "Q,"
+#define Q0 "Q\xE2\x82\x80,"
+#define Q1 "Q\xE2\x82\x81,"
 #define NT "^"
 #define ON "1,"
 #define ZE "0,"
@@ -295,9 +295,9 @@ namespace {
 #undef E1
 #undef S
 #undef R
-#undef O
-#undef O0
-#undef O1
+#undef Q
+#undef Q0
+#undef Q1
 #undef NT
 #undef ON
 #undef ZE

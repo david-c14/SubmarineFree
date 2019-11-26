@@ -1,9 +1,9 @@
 {
 	"SR-Type Flip-flop",
 	"214,"
-	S	R	O1
+	S	R	Q1
 	
-	ZE	ZE	O0
+	ZE	ZE	Q0
 	ZE	ON	ZE
 	ON	X	ON
 ,
@@ -23,7 +23,7 @@
 		nvgText(args.vg, 32, 25, "S", NULL);
 		nvgText(args.vg, 32, 35, "R", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 58, 30, "O", NULL);
+		nvgText(args.vg, 58, 30, "Q", NULL);
 	},
 	LAMBDA_HEADER {
 		a0 &= (~b);

@@ -1,11 +1,11 @@
 {
 	"D-Type Flip-flop",
 	"114,"
-	C1	O1
+	C1	Q1
 	
-	C0	O0
-	DN	O0
-	UP	NT O0
+	C0	Q0
+	DN	Q0
+	UP	NT Q0
 ,
 	[](const Widget::DrawArgs &args, Vec size) {
 		nvgStrokeColor(args.vg, SUBLIGHTBLUE);
@@ -19,9 +19,9 @@
 		nvgFontSize(args.vg, 8 * 90 / SVG_DPI);
 		nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 		nvgFillColor(args.vg, SUBLIGHTBLUE);
-		nvgText(args.vg, 32, 30, "C>", NULL);
+		nvgText(args.vg, 32, 30, ">C", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 58, 30, "O", NULL);
+		nvgText(args.vg, 58, 30, "Q", NULL);
 	},
 	LAMBDA_HEADER {
 		b0 ^= ((a0 ^ a) & a);

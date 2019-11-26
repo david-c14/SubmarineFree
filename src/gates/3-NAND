@@ -1,7 +1,7 @@
 {
 	"3 Input NAND Gate",
 	"319,"
-	A	B	C	O
+	A	B	C	Q
 	ZE	ZE	ZE	ON
 	ZE	ZE	ON	ON
 	ZE	ON	ZE	ON

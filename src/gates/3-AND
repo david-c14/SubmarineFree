@@ -1,7 +1,7 @@
 {
 	"3 Input AND Gate",
 	"319,"
-	A	B	C	O
+	A	B	C	Q
 	ZE	ZE	ZE	ZE
 	ZE	ZE	ON	ZE
 	ZE	ON	ZE	ZE

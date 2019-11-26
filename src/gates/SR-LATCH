@@ -1,11 +1,11 @@
 {
 	"SR-Type Latch",
 	"316,"
-	S	R	E1	O1
+	S	R	E1	Q1
 	
-	X	X	E0	O0
-	X	X	DN	O0
-	ZE	ZE	UP	O0
+	X	X	E0	Q0
+	X	X	DN	Q0
+	ZE	ZE	UP	Q0
 	ZE	ON	UP	ZE
 	ON	X	UP	ON
 ,
@@ -25,9 +25,9 @@
 		nvgFillColor(args.vg, SUBLIGHTBLUE);
 		nvgText(args.vg, 32, 20, "S", NULL);
 		nvgText(args.vg, 32, 30, "R", NULL);
-		nvgText(args.vg, 32, 40, "E>", NULL);
+		nvgText(args.vg, 32, 40, ">E", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 58, 30, "O", NULL);
+		nvgText(args.vg, 58, 30, "Q", NULL);
 	},
 	LAMBDA_HEADER {
 		d = (c ^ c0) & c;

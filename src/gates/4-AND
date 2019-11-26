@@ -1,7 +1,7 @@
 {
 	"4 Input AND Gate",
 	"41H,"
-	A	B	C	D	O
+	A	B	C	D	Q
 	ZE	ZE	ZE	ZE	ZE
 	ZE	ZE	ZE	ON	ZE
 	ZE	ZE	ON	ZE	ZE

@@ -1,9 +1,9 @@
 {
 	"Level Triggered D-Type Latch",
 	"214,"
-	D	E	O1
+	D	E	Q1
 	
-	X	ZE	O0
+	X	ZE	Q0
 	ZE	ON	ZE
 	ON	ON	ON
 ,
@@ -23,7 +23,7 @@
 		nvgText(args.vg, 32, 25, "D", NULL);
 		nvgText(args.vg, 32, 35, "E", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 58, 30, "O", NULL);
+		nvgText(args.vg, 58, 30, "Q", NULL);
 	},
 	LAMBDA_HEADER {
 		a0 = (a0 & ~b) | (a & b);

@@ -1,10 +1,10 @@
 {
 	"Clocked Delay",
 	"225,"
-	C1	D	A1	O1
+	C1	D	A1	Q1
 	
-	C0	X	A0	O0
-	DN	X	A0	O0
+	C0	X	A0	Q0
+	DN	X	A0	Q0
 	UP	ZE	ZE	A0
 	UP	ON	ON	A0
 ,
@@ -21,12 +21,12 @@
 		nvgFontSize(args.vg, 8 * 90 / SVG_DPI);
 		nvgFillColor(args.vg, SUBLIGHTBLUE);
 		nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 32, 25, "C>", NULL);
+		nvgText(args.vg, 32, 25, ">C", NULL);
 		nvgText(args.vg, 32, 35, "D", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
 		nvgText(args.vg, 45, 45, "DELAY", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 58, 30, "O", NULL);
+		nvgText(args.vg, 58, 30, "Q", NULL);
 	},
 	LAMBDA_HEADER {
 		d = (a ^ a0) & a;

@@ -1,7 +1,7 @@
 {
 	"1 Sample Delay",
 	"112,"
-	D1	O1
+	D1	Q
 	
 	X	D0
 ,
@@ -21,7 +21,7 @@
 		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
 		nvgText(args.vg, 45, 45, "DELAY", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 58, 30, "O", NULL);
+		nvgText(args.vg, 58, 30, "Q", NULL);
 	},
 	LAMBDA_HEADER {
 		b = a0;

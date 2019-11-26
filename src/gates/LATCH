@@ -1,10 +1,10 @@
 {
 	"Edge Triggered D-Type Latch",
 	"215,"
-	D	E1	O1
+	D	E1	Q1
 	
-	X	E0	O0
-	X	DN	O0
+	X	E0	Q0
+	X	DN	Q0
 	ZE	UP	ZE
 	ON	UP	ON
 ,
@@ -22,9 +22,9 @@
 		nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 		nvgFillColor(args.vg, SUBLIGHTBLUE);
 		nvgText(args.vg, 32, 25, "D", NULL);
-		nvgText(args.vg, 32, 35, "E>", NULL);
+		nvgText(args.vg, 32, 35, ">E", NULL);
 		nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, 58, 30, "O", NULL);
+		nvgText(args.vg, 58, 30, "Q", NULL);
 	},
 	LAMBDA_HEADER {
 		c = b & (b ^ b0);
