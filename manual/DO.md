@@ -29,6 +29,10 @@ You can drag these in the same way to control where these outputs are routed fro
 You cannot route from an output of a gate to the inputs of a gate earlier in the chain. Feedback loops are not supported directly within 
 the routing of the device.  But you can connect a cable directly between the device output and the device input if you wish to incorporate feedback.
 
+## Truth Tables
+
+If you right click on a gate, a truth table will be displayed to help you understand the connections to and from the gate.
+
 ## Signal Range
 
 The voltage range of the digital gates can be configured from the context menu. The device will output at the full range of the configured settings. The inputs will measure a logical high signal anywhere above the midpoint of the configured range.
