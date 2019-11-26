@@ -1,6 +1,8 @@
 # Changelog
 
 ## v1.1.0
+- 26-Nov-2019 Add Secret Santa 2019
+- 26-Nov-2019 Add DO-1xx Digital Operator Devices
 - 17-Nov-2019 Fix module id on LA-108 front panel
 - 27-Oct-2019 Fix typo in manual (courtesy of kant)
 - 22-Oct-2019 Bug fix #48 - Conflicting class names
