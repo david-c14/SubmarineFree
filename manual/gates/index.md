@@ -1,6 +1,25 @@
 # Logic Gates
 
+#### Conventions used in the truth tables
+
+Across the top, the truth table shows the inputs, internal states, and outputs of the gate in that order. 
+
+| | |
+|-|-|
+| A | An input, typically for a gate where the inputs are interchangeable |
+| B | ... |
+| C | ... |
+| D | An input. Either the 4th input where the inputs are interchangeable, or an input carrying data |
+| E | An *Enable* input. Typically if a gate has an *Enable* input, its state will not change unless *E* is high |
+
+## N/C
+
+When no gate is selected, the DO-1xx device shows N/C which is short for Not Connected. The output is always 0 (false)
+
 ## NOT gate
+
+The NOT gate has a single input A. The output Q is always the logical inverse of A. So when A is 1 (true) then Q is 0 (false);
+and when A is 0 (false) then Q is 1 (true)
 
 | A | Q |
 |---|---|
@@ -38,7 +57,7 @@
 ## 4-input AND gate
 
 | A | B | C | D | Q |
-|===|===|===|===|===|
+|---|---|---|---|---|
 | 0 | 0 | 0 | 0 | 0 |
 | 0 | 0 | 0 | 1 | 0 |
 | 0 | 0 | 1 | 0 | 0 |
@@ -87,8 +106,54 @@
 ## 4-input NAND gate
 
 | A | B | C | D | Q |
-|===|===|===|===|===|
+|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 1 |
+| 0 | 0 | 0 | 1 | 1 |
+| 0 | 0 | 1 | 0 | 1 |
+| 0 | 0 | 1 | 1 | 1 |
+| 0 | 1 | 0 | 0 | 1 |
+| 0 | 1 | 0 | 1 | 1 |
+| 0 | 1 | 1 | 0 | 1 |
+| 0 | 1 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 0 | 1 |
+| 1 | 0 | 0 | 1 | 1 |
+| 1 | 0 | 1 | 0 | 1 |
+| 1 | 0 | 1 | 1 | 1 |
+| 1 | 1 | 0 | 0 | 1 |
+| 1 | 1 | 0 | 1 | 1 |
+| 1 | 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 | 0 |
+
+![timing diagram for 4-input NAND gate](4-NAND_timing.png "4-input NAND")
+
+## OR gate
+
+| A | B | C | D | Q |
+|---|---|---|---|---|
 | 0 | 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 1 | 1 |
+| 0 | 0 | 1 | 0 | 1 |
+| 0 | 0 | 1 | 1 | 1 |
+| 0 | 1 | 0 | 0 | 1 |
+| 0 | 1 | 0 | 1 | 1 |
+| 0 | 1 | 1 | 0 | 1 |
+| 0 | 1 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 0 | 1 |
+| 1 | 0 | 0 | 1 | 1 |
+| 1 | 0 | 1 | 0 | 1 |
+| 1 | 0 | 1 | 1 | 1 |
+| 1 | 1 | 0 | 0 | 1 |
+| 1 | 1 | 0 | 1 | 1 |
+| 1 | 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 | 1 |
+
+![timing diagram for OR gate](OR_timing.png "OR")
+
+## NOR gate
+
+| A | B | C | D | Q |
+|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 1 |
 | 0 | 0 | 0 | 1 | 0 |
 | 0 | 0 | 1 | 0 | 0 |
 | 0 | 0 | 1 | 1 | 0 |
@@ -103,22 +168,52 @@
 | 1 | 1 | 0 | 0 | 0 |
 | 1 | 1 | 0 | 1 | 0 |
 | 1 | 1 | 1 | 0 | 0 |
-| 1 | 1 | 1 | 1 | 1 |
-
-![timing diagram for 4-input NAND gate](4-NAND_timing.png "4-input NAND")
-
-## OR gate
-
-![timing diagram for OR gate](OR_timing.png "OR")
-
-## NOR gate
+| 1 | 1 | 1 | 1 | 0 |
 
 ![timing diagram for NOR gate](NOR_timing.png "NOR")
 
 ## XOR gate
 
+| A | B | C | D | Q |
+|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 0 |
+| 0 | 0 | 0 | 1 | 1 |
+| 0 | 0 | 1 | 0 | 1 |
+| 0 | 0 | 1 | 1 | 0 |
+| 0 | 1 | 0 | 0 | 1 |
+| 0 | 1 | 0 | 1 | 0 |
+| 0 | 1 | 1 | 0 | 0 |
+| 0 | 1 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 0 | 1 |
+| 1 | 0 | 0 | 1 | 0 |
+| 1 | 0 | 1 | 0 | 0 |
+| 1 | 0 | 1 | 1 | 1 |
+| 1 | 1 | 0 | 0 | 0 |
+| 1 | 1 | 0 | 1 | 1 |
+| 1 | 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 | 0 |
+
 ![timing diagram for XOR gate](XOR_timing.png "XOR")
 
 ## XNOR gate
+
+| A | B | C | D | Q |
+|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 1 |
+| 0 | 0 | 0 | 1 | 0 |
+| 0 | 0 | 1 | 0 | 0 |
+| 0 | 0 | 1 | 1 | 1 |
+| 0 | 1 | 0 | 0 | 0 |
+| 0 | 1 | 0 | 1 | 1 |
+| 0 | 1 | 1 | 0 | 1 |
+| 0 | 1 | 1 | 1 | 0 |
+| 1 | 0 | 0 | 0 | 0 |
+| 1 | 0 | 0 | 1 | 1 |
+| 1 | 0 | 1 | 0 | 1 |
+| 1 | 0 | 1 | 1 | 0 |
+| 1 | 1 | 0 | 0 | 1 |
+| 1 | 1 | 0 | 1 | 0 |
+| 1 | 1 | 1 | 0 | 0 |
+| 1 | 1 | 1 | 1 | 1 |
 
 ![timing diagram for XNOR gate](XNOR_timing.png "XNOR")
