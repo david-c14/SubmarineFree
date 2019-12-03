@@ -234,3 +234,13 @@ and when A is 0 (false) then Q is 1 (true)
 | &#xD7; | D&#x2080; |
 
 ![timing_diagram_for_DELAY](DELAY_timing.png "DELAY")
+
+### SR-FLIPFLOP
+
+| S | R | Q&#x2081; |
+|---|---|---|
+| 0 | 0 | Q&#x2080; |
+| 0 | 1 | 0 |
+| 1 | &#xD7; | 1 |
+
+![timing diagram for SR-FLIPFLOP](SR-FLIPFLOP_timing.png "SR-FLIPFLOP")
