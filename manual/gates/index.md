@@ -7,11 +7,20 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 | | |
 |-|-|
 | A | An input, typically for a gate where the inputs are interchangeable |
-| B | ... |
-| C | ... |
+| B | An input, typically for a gate where the inputs are interchangeable |
+| C | An input, typically for a gate where the inputs are interchangeable |
 | D | An input. Either the 4th input where the inputs are interchangeable, or an input carrying data |
 | E | An *Enable* input. Typically if a gate has an *Enable* input, its state will not change unless *E* is high |
-
+| Q | The output of the logic gate |
+| 0 | A value of 0, logical false |
+| 1 | A value of 1, logical true |
+| &#xD7; | Either a 0 or a 1, false or true |
+| &#x203E; | A line over a symbol indicates the logical inverse of that value |
+| &#x2191; | An upwards arrow indicates that the gate responds to a rising edge. Where the input goes from 0 to 1 |
+| &#x2193; | A downwards arrow indicates that the gate responds to a falling edge. Where the input goes from 1 to 0 |
+| &#x2080; | A tiny 0 after a value indicates the value in the *previous* sample |
+| &#x2081; | A tiny 1 after a value indicates the value in *this* sample | 
+ 
 ## N/C
 
 When no gate is selected, the DO-1xx device shows N/C which is short for Not Connected. The output is always 0 (false)
