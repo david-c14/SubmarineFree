@@ -237,9 +237,7 @@ namespace scheme {
 }
 
 struct SchemeModuleWidget : app::ModuleWidget {
-	SchemeModuleWidget(Module *module): ModuleWidget() {
-		setModule(module);
-	}
+	SchemeModuleWidget() {}
 	void appendContextMenu(Menu *menu) override;
 	void drawBackground(NVGcontext *vg);
 	void drawLogo(NVGcontext *vg, float left, float top, float scale, float rotate);
@@ -391,7 +389,7 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 	bool stabilized = false;
 	float fullSize = 0;
 	SchemePanel *panel;
-	SizeableModuleWidget(Module *module, float size);
+	SizeableModuleWidget(float size);
 	void Resize();
 	void Minimize(bool minimize);
 	void ShiftOthers(float delta);

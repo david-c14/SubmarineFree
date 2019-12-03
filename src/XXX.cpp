@@ -174,7 +174,8 @@ struct CandyCanleWidget : CableWidget {
 
 struct XX219 : SchemeModuleWidget {
 
-	XX219(Module *module) : SchemeModuleWidget(module) {
+	XX219(Module *module) {
+		setModule(module);
 		this->box.size = Vec(15, 380);
 		addChild(new SchemePanel(this->box.size));
 	}

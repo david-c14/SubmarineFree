@@ -365,7 +365,8 @@ struct WM101 : SizeableModuleWidget {
 	ScrollWidget *collectionScrollWidget;
 	
 	ScrollWidget *scrollWidget;
-	WM101(Module *module) : SizeableModuleWidget(module, 150) {
+	WM101(Module *module) : SizeableModuleWidget(150) {
+		setModule(module);
 		minButton = new MinButton();
 		minButton->box.pos = Vec(140,180);
 		minButton->mw = this;
