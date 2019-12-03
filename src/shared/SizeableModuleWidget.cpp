@@ -1,7 +1,7 @@
 #include <settings.hpp>
 #include "../SubmarineFree.hpp"
 
-SizeableModuleWidget::SizeableModuleWidget(Module *module, float size) : SchemeModuleWidget(module) {
+SizeableModuleWidget::SizeableModuleWidget(float size) {
 	fullSize = size;
 	this->box.size = Vec(fullSize, 380);
 	panel = new SchemePanel(this->box.size);

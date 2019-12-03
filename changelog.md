@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.1
+- 03-Dec-2019 Remove unnecessary base constructor calls
+
 ## v1.1.0
 - 26-Nov-2019 Add Secret Santa 2019
 - 26-Nov-2019 Add DO-1xx Digital Operator Devices

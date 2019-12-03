@@ -565,7 +565,8 @@ void AlgorithmMenu::onAction(const event::Action &e) {
 
 template <unsigned int x, unsigned int y>
 struct AOWidget : SchemeModuleWidget {
-	AOWidget(AO1<x,y> *module) : SchemeModuleWidget(module) {
+	AOWidget(AO1<x,y> *module) {
+		setModule(module);
 		this->box.size = Vec(y * 90 + 75, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (unsigned int ix = 0; ix < x; ix++) {

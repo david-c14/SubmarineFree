@@ -384,7 +384,7 @@ void PO_101::process(const ProcessArgs &args) {
 }
 
 struct PO_Layout : SchemeModuleWidget {
-	PO_Layout(PO_101 *module) : SchemeModuleWidget(module) {}
+	PO_Layout() {};
 	void Layout() {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(85, 58), module, PO_101::PARAM_FINE));
 		addParam(createParamCentered<NarrowKnob<SnapKnob<MedKnob<LightKnob>>>>(Vec(140, 58), module, PO_101::PARAM_WAVE));
@@ -468,7 +468,8 @@ struct PO_Layout : SchemeModuleWidget {
 };
 
 struct PO101 : PO_Layout {
-	PO101(PO_101 *module) : PO_Layout(module) {
+	PO101(PO_101 *module) {
+		setModule(module);
 		this->box.size = Vec(180, 380);
 		addChild(new SchemePanel(this->box.size));
 		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE));
@@ -481,7 +482,8 @@ struct PO101 : PO_Layout {
 };
 
 struct PO102 : PO_Layout {
-	PO102(PO_102 *module) : PO_Layout(module) {
+	PO102(PO_102 *module) {
+		setModule(module);
 		this->box.size = Vec(180, 380);
 		addChild(new SchemePanel(this->box.size));
 		addParam(createParam<MedKnob<LightKnob>>(Vec(11, 39), module, PO_101::PARAM_TUNE));

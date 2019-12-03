@@ -45,7 +45,8 @@ struct DN_1 : DS_Module {
 };
 
 struct DN112 : SchemeModuleWidget {
-	DN112(DN_1<12> *module) : SchemeModuleWidget(module) {
+	DN112(DN_1<12> *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 

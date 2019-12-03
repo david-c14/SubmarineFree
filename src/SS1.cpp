@@ -10,7 +10,8 @@ struct SS_112 : Module {
 };
 
 struct SS112 : SchemeModuleWidget {
-	SS112(SS_112 *module) : SchemeModuleWidget(module) {
+	SS112(SS_112 *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_112::deviceCount; i++) {
@@ -50,7 +51,8 @@ struct SS_208 : Module {
 };
 
 struct SS208 : SchemeModuleWidget {
-	SS208(SS_208 *module) : SchemeModuleWidget(module) {
+	SS208(SS_208 *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_208::deviceCount; i++) {
@@ -101,7 +103,8 @@ struct SS_212 : Module {
 };
 
 struct SS212 : SchemeModuleWidget {
-	SS212(SS_212 *module) : SchemeModuleWidget(module) {
+	SS212(SS_212 *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_212::deviceCount; i++) {
@@ -162,7 +165,8 @@ struct SS_221 : Module {
 };
 
 struct SS221 : SchemeModuleWidget {
-	SS221(SS_221 *module) : SchemeModuleWidget(module) {
+	SS221(SS_221 *module) {
+		setModule(module);
 		this->box.size = Vec(75, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (int i = 0; i < SS_221::deviceCount; i++) {
@@ -211,7 +215,8 @@ struct SS_220 : Module {
 };
 
 struct SS220 : SchemeModuleWidget {
-	SS220(SS_220 *module) : SchemeModuleWidget(module) {
+	SS220(SS_220 *module) {
+		setModule(module);
 		this->box.size = Vec(300, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (int j = 0; j < SS_220::deviceSetCount; j++) {

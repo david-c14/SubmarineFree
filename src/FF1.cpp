@@ -85,7 +85,8 @@ struct FF_1 : DS_Module {
 };
 
 struct FF110 : SchemeModuleWidget {
-	FF110(FF_1<10> *module) : SchemeModuleWidget(module) {
+	FF110(FF_1<10> *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
@@ -118,7 +119,8 @@ struct FF110 : SchemeModuleWidget {
 };
 
 struct FF120 : SchemeModuleWidget {
-	FF120(FF_1<20> *module) : SchemeModuleWidget(module) {
+	FF120(FF_1<20> *module) {
+		setModule(module);
 		this->box.size = Vec(60, 380);
 		addChild(new SchemePanel(this->box.size));
 

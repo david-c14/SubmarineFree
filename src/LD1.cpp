@@ -98,7 +98,8 @@ struct LDParentMenuItem : MenuItem {
 
 struct LD103 : SchemeModuleWidget {
 	static const int deviceCount = 3;	
-	LD103(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
+	LD103(LD_1<deviceCount> *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
@@ -148,7 +149,8 @@ struct LD103 : SchemeModuleWidget {
 
 struct LD106 : SchemeModuleWidget {
 	static const int deviceCount = 6;	
-	LD106(LD_1<deviceCount> *module) : SchemeModuleWidget(module) {
+	LD106(LD_1<deviceCount> *module) {
+		setModule(module);
 		this->box.size = Vec(90, 380);
 		addChild(new SchemePanel(this->box.size));
 

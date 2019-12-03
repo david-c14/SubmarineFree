@@ -2,7 +2,8 @@
 
 template <int x>
 struct BP1 : SchemeModuleWidget {
-	BP1(Module *module) : SchemeModuleWidget(module) {
+	BP1(Module *module) {
+		setModule(module);
 		SchemePanel *panel = new SchemePanel(Vec(x * 15, 380));
 		addChild(panel);
 		this->box.size = Vec(x * 15, 380);

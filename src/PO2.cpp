@@ -254,7 +254,8 @@ void PO_204::process(const ProcessArgs &args) {
 }
 
 struct PO204 : SchemeModuleWidget {
-	PO204(PO_204 *module) : SchemeModuleWidget(module) {
+	PO204(PO_204 *module) {
+		setModule(module);
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(79, 38), module, PO_204::PARAM_TUNE));

@@ -140,7 +140,8 @@ void TDInput::received(std::string pluginName, std::string moduleName, json_t *r
 struct TD116 : SchemeModuleWidget {
 	TD1Text *textField;
 
-	TD116(TD_116 *module) : SchemeModuleWidget(module) {
+	TD116(TD_116 *module) {
+		setModule(module);
 		this->box.size = Vec(240, 380);
 		addChild(new SchemePanel(this->box.size));
 

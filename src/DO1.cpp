@@ -570,7 +570,8 @@ struct DOWidget : SchemeModuleWidget {
 	ScrollWidget *collectionScrollWidget;
 	PLConnectorKnob *knobs[x + 4 * y];
 	PLBackground<x,y> *background;
-	DOWidget(DO1<x,y> *module) : SchemeModuleWidget(module) {
+	DOWidget(DO1<x,y> *module) {
+		setModule(module);
 		this->box.size = Vec(x * 30, 380);
 		addChild(new SchemePanel(this->box.size));
 		background = new PLBackground<x,y>();
