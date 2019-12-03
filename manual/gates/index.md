@@ -14,12 +14,12 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 | Q | The output of the logic gate |
 | 0 | A value of 0, logical false |
 | 1 | A value of 1, logical true |
-| &#xD7; | Either a 0 or a 1, false or true |
-| &#x203E; | A line over a symbol indicates the logical inverse of that value |
-| &#x2191; | An upwards arrow indicates that the gate responds to a rising edge. Where the input goes from 0 to 1 |
-| &#x2193; | A downwards arrow indicates that the gate responds to a falling edge. Where the input goes from 1 to 0 |
-| &#x2080; | A tiny 0 after a value indicates the value in the *previous* sample |
-| &#x2081; | A tiny 1 after a value indicates the value in *this* sample | 
+| &#x2715; | Either a 0 or a 1, false or true |
+| N&#x305; | A line over a symbol indicates the logical inverse of that value |
+| &#x1f809; | An upwards arrow indicates that the gate responds to a rising edge. Where the input goes from 0 to 1 |
+| &#x1f80b; | A downwards arrow indicates that the gate responds to a falling edge. Where the input goes from 1 to 0 |
+| N&#x2080; | A tiny 0 after a value indicates the value in the *previous* sample |
+| N&#x2081; | A tiny 1 after a value indicates the value in *this* sample | 
  
 ### N/C
 
@@ -231,7 +231,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 | D&#x2081; | Q |
 |---|---|
-| &#xD7; | D&#x2080; |
+| &#x2715; | D&#x2080; |
 
 ![timing_diagram_for_DELAY](DELAY_timing.png "DELAY")
 
@@ -241,7 +241,7 @@ and when A is 0 (false) then Q is 1 (true)
 |---|---|---|
 | 0 | 0 | Q&#x2080; |
 | 0 | 1 | 0 |
-| 1 | &#xD7; | 1 |
+| 1 | &#x2715; | 1 |
 
 ![timing diagram for SR-FLIPFLOP](SR-FLIPFLOP_timing.png "SR-FLIPFLOP")
 
@@ -249,9 +249,9 @@ and when A is 0 (false) then Q is 1 (true)
 
 | C&#x2081; | D | A&#x2081; | Q&#x2081; |
 |---|---|---|---|
-| C&#x2080; | &#xD7; | A&#x2080; | Q&#x2080; |
-| &#x2193; | &#xD7; | A&#x2080; | Q&#x2080; |
-| &#x2191; | 0 | 0 | A&#x2080; |
-| &#x2191; | 1 | 1 | A&#x2080; |
+| C&#x2080; | &#x2715; | A&#x2080; | Q&#x2080; |
+| &#x1f80b; | &#x2715; | A&#x2080; | Q&#x2080; |
+| &#x1f809; | 0 | 0 | A&#x2080; |
+| &#x1F809; | 1 | 1 | A&#x2080; |
 
 ![timing diagram for CLK-DELAY](CLK-DELAY_timing.png "CLK-DELAY")
