@@ -21,11 +21,11 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 | &#x2080; | A tiny 0 after a value indicates the value in the *previous* sample |
 | &#x2081; | A tiny 1 after a value indicates the value in *this* sample | 
  
-## N/C
+### N/C
 
 When no gate is selected, the DO-1xx device shows N/C which is short for Not Connected. The output is always 0 (false)
 
-## NOT gate
+### NOT gate
 
 The NOT gate has a single input A. The output Q is always the logical inverse of A. So when A is 1 (true) then Q is 0 (false);
 and when A is 0 (false) then Q is 1 (true)
@@ -37,7 +37,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for NOT gate](NOT_timing.png "NOT")
 
-## AND gate
+### AND gate
 
 | A | B | Q |
 |---|---|---|
@@ -48,7 +48,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for AND gate](2-AND_timing.png "AND")
 
-## 3-input AND gate
+### 3-input AND gate
 
 | A | B | C | Q |
 |---|---|---|---|
@@ -63,7 +63,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for 3-input AND gate](3-AND_timing.png "3-input AND")
 
-## 4-input AND gate
+### 4-input AND gate
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -86,7 +86,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for 4-input AND gate](4-AND_timing.png "4-input AND")
 
-## NAND gate
+### NAND gate
 
 | A | B | Q |
 |---|---|---|
@@ -112,7 +112,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for 3-input NAND gate](3-NAND_timing.png "3-input NAND")
 
-## 4-input NAND gate
+### 4-input NAND gate
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -135,7 +135,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for 4-input NAND gate](4-NAND_timing.png "4-input NAND")
 
-## OR gate
+### OR gate
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -158,7 +158,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for OR gate](OR_timing.png "OR")
 
-## NOR gate
+### NOR gate
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -181,7 +181,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for NOR gate](NOR_timing.png "NOR")
 
-## XOR gate
+### XOR gate
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -204,7 +204,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for XOR gate](XOR_timing.png "XOR")
 
-## XNOR gate
+### XNOR gate
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -226,3 +226,11 @@ and when A is 0 (false) then Q is 1 (true)
 | 1 | 1 | 1 | 1 | 1 |
 
 ![timing diagram for XNOR gate](XNOR_timing.png "XNOR")
+
+### DELAY
+
+| D&#x2081; | Q |
+|---|---|
+| &#xD7; | D&#x2080; |
+
+![timing_diagram_for_DELAY](DELAY_timing.png "DELAY")
