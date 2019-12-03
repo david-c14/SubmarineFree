@@ -17,6 +17,8 @@ The DO-1xx providers 4 polyphonic inputs and 4 polyphonic outputs. Between the t
 The scrollable display in the centre of the device presents between 5 and 20 selectable gates, according to the model of the device. 
 Each gate can be swapped out by clicking on the gate and dragging the mouse up/down as you would a knob.
 
+[Details of the available gates](gates/index.md)
+
 ## Routing
 
 Gates have between 1 and 4 inputs. To the left of each gate there are 4 pads. By clicking on the pad and dragging the mouse up/down, 
