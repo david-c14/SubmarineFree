@@ -8,9 +8,11 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 |-|-|
 | A | An input, typically for a gate where the inputs are interchangeable |
 | B | An input, typically for a gate where the inputs are interchangeable |
-| C | An input, typically for a gate where the inputs are interchangeable |
+| C | An input, typically for a gate where the inputs are interchangeable, or an input representing a clock |
 | D | An input. Either the 4th input where the inputs are interchangeable, or an input carrying data |
 | E | An *Enable* input. Typically if a gate has an *Enable* input, its state will not change unless *E* is high |
+| R | A *Reset* input. Representing a signal to reset the output to 0 (false) |
+| S | A *Set* input. Representing a signal to set the output to 1 (true) |
 | Q | The output of the logic gate |
 | 0 | A value of 0, logical false |
 | 1 | A value of 1, logical true |
