@@ -244,3 +244,14 @@ and when A is 0 (false) then Q is 1 (true)
 | 1 | &#xD7; | 1 |
 
 ![timing diagram for SR-FLIPFLOP](SR-FLIPFLOP_timing.png "SR-FLIPFLOP")
+
+### CLK-DELAY
+
+| C&#x2081; | D | A&#x2081; | Q&#x2081; |
+|---|---|---|---|
+| C&#x2080; | &#xD7; | A&#x2080; | Q&#x2080; |
+| &#x2193; | &#xD7; | A&#x2080; | Q&#x2080; |
+| &#x2191; | 0 | 0 | A&#x2080; |
+| &#x2191; | 1 | 1 | A&#x2080; |
+
+![timing diagram for CLK-DELAY](CLK-DELAY_timing.png "CLK-DELAY")
