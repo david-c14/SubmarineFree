@@ -257,3 +257,23 @@ and when A is 0 (false) then Q is 1 (true)
 | &#x1F809; | 1 | 1 | A&#x2080; |
 
 ![timing diagram for CLK-DELAY](CLK-DELAY_timing.png "CLK-DELAY")
+
+### D-TYPE-FLIPFLOP
+
+| C&#x2081; | Q&#x2081; |
+|---|---|
+| C&#x2080; | Q&#x2080; |
+| &#x1f80b; | Q&#x2080; |
+| &#x1f809; | Q&#x305;&#x2080; |
+
+![timing diagram for D-TYPE-FLIPFLOP](D-TYPE-FLIPFLOP_timing.png "D-TYPE-FLIPFLOP")
+
+### D-TYPE-LATCH
+
+| D | E | Q&#x2081; |
+|---|---|---:
+| &#x2715; | 0 | Q&#x2080; |
+| 0 | 1 | 0 |
+| 1 | 1 | 1 |
+
+![timing diagram for D-TYPE-LATCH](D-TYPE-LATCH_timing.png "D-TYPE-LATCH")
