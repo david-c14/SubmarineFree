@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.1
+- 07-Dec-2019 Make DO-1xx connectors scrolling consistent between connectors and across devices
 - 07-Dec-2019 Bug fix #54 - DN-112 does not produce maximal sequence
 - 03-Dec-2019 Remove unnecessary base constructor calls
 
