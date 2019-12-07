@@ -254,6 +254,12 @@
 			"tags": ["OSCILLATOR", "QUAD", "DIGITAL"]
 		},
 		{
+			"slug":"SN-101",
+			"name":"SN-101",
+			"description": "SN-101 Smooth Noise Generator",
+			"tags": ["OSCILLATOR", "NOISE"]
+		},
+		{
 			"slug":"SS-112",
 			"name":"SS-112",
 			"description": "SS-112 12 Input Sinks",
