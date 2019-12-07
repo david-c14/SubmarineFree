@@ -37,7 +37,7 @@ struct DN_1 : DS_Module {
 				unsigned int lsb = lfsr[i] & 1;
 				lfsr[i] >>= 1;
 				if (lsb)
-					lfsr[i] ^= 0xc3000000u;	
+					lfsr[i] ^= 0xa3000000u;	
 				outputs[OUTPUT_1 + i].setVoltage(lsb?voltage1:voltage0);
 			}
 		}
