@@ -587,6 +587,7 @@ struct DOWidget : SchemeModuleWidget {
 			knobs[ix + 4 * y]->getText = [=]()->std::string {
 				return this->getConnectorText(ix + 4 * y);
 			};
+			knobs[ix + 4 * y]->speed = 20.0f / (2 + x + 4 * y);
 			background->addChild(knobs[ix + 4 * y]);
 			pos = pos + posDiff;
 		}
@@ -609,6 +610,7 @@ struct DOWidget : SchemeModuleWidget {
 				knobs[4 * iy + ix]->getText = [=]()->std::string {
 					return this->getConnectorText(4 * iy + ix);
 				};
+				knobs[4 * iy + ix]->speed = 20.0f / (4 * iy + x + 2);
 				collectionScrollWidget->container->addChild(knobs[4 * iy + ix]);	
 			}
 		}
