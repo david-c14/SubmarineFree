@@ -229,13 +229,15 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for XNOR gate](XNOR_timing.png "XNOR")
 
-### DELAY
+### D-TYPE-FLIPFLOP
 
-| D&#x2081; | Q |
+| C&#x2081; | Q&#x2081; |
 |---|---|
-| &#x2715; | D&#x2080; |
+| C&#x2080; | Q&#x2080; |
+| &#x1f80b; | Q&#x2080; |
+| &#x1f809; | Q&#x305;&#x2080; |
 
-![timing_diagram_for_DELAY](DELAY_timing.png "DELAY")
+![timing diagram for D-TYPE-FLIPFLOP](D-TYPE-FLIPFLOP_timing.png "D-TYPE-FLIPFLOP")
 
 ### SR-FLIPFLOP
 
@@ -247,27 +249,6 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for SR-FLIPFLOP](SR-FLIPFLOP_timing.png "SR-FLIPFLOP")
 
-### CLK-DELAY
-
-| C&#x2081; | D | A&#x2081; | Q&#x2081; |
-|---|---|---|---|
-| C&#x2080; | &#x2715; | A&#x2080; | Q&#x2080; |
-| &#x1f80b; | &#x2715; | A&#x2080; | Q&#x2080; |
-| &#x1f809; | 0 | 0 | A&#x2080; |
-| &#x1F809; | 1 | 1 | A&#x2080; |
-
-![timing diagram for CLK-DELAY](CLK-DELAY_timing.png "CLK-DELAY")
-
-### D-TYPE-FLIPFLOP
-
-| C&#x2081; | Q&#x2081; |
-|---|---|
-| C&#x2080; | Q&#x2080; |
-| &#x1f80b; | Q&#x2080; |
-| &#x1f809; | Q&#x305;&#x2080; |
-
-![timing diagram for D-TYPE-FLIPFLOP](D-TYPE-FLIPFLOP_timing.png "D-TYPE-FLIPFLOP")
-
 ### D-TYPE-LATCH
 
 | D | E | Q&#x2081; |
@@ -277,17 +258,6 @@ and when A is 0 (false) then Q is 1 (true)
 | 1 | 1 | 1 |
 
 ![timing diagram for D-TYPE-LATCH](D-TYPE-LATCH_timing.png "D-TYPE-LATCH")
-
-### LATCH
-
-| D | E&#x2081; | Q&#x2081; |
-|---|---|---|
-| &#x2715; | E&#x2080; | Q&#x2080; |
-| &#x2715; | &#x1f80b; | Q&#x2080; |
-| 0 | &#x1f809; | 0 |
-| 1 | &#x1f809; | 1 |
-
-![timing diagram for LATCH](LATCH_timing.png "LATCH")
 
 ### SR-LATCH
 
@@ -300,3 +270,33 @@ and when A is 0 (false) then Q is 1 (true)
 | 1 | &#x2715; | &#x1f809; | 1 |
 
 ![timing diagram for SR-LATCH](SR-LATCH_timing.png "SR-LATCH")
+
+### LATCH
+
+| D | E&#x2081; | Q&#x2081; |
+|---|---|---|
+| &#x2715; | E&#x2080; | Q&#x2080; |
+| &#x2715; | &#x1f80b; | Q&#x2080; |
+| 0 | &#x1f809; | 0 |
+| 1 | &#x1f809; | 1 |
+
+![timing diagram for LATCH](LATCH_timing.png "LATCH")
+
+### DELAY
+
+| D&#x2081; | Q |
+|---|---|
+| &#x2715; | D&#x2080; |
+
+![timing_diagram_for_DELAY](DELAY_timing.png "DELAY")
+
+### CLK-DELAY
+
+| C&#x2081; | D | A&#x2081; | Q&#x2081; |
+|---|---|---|---|
+| C&#x2080; | &#x2715; | A&#x2080; | Q&#x2080; |
+| &#x1f80b; | &#x2715; | A&#x2080; | Q&#x2080; |
+| &#x1f809; | 0 | 0 | A&#x2080; |
+| &#x1F809; | 1 | 1 | A&#x2080; |
+
+![timing diagram for CLK-DELAY](CLK-DELAY_timing.png "CLK-DELAY")
