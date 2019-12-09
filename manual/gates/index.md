@@ -271,9 +271,32 @@ and when A is 0 (false) then Q is 1 (true)
 ### D-TYPE-LATCH
 
 | D | E | Q&#x2081; |
-|---|---|---:
+|---|---|---|
 | &#x2715; | 0 | Q&#x2080; |
 | 0 | 1 | 0 |
 | 1 | 1 | 1 |
 
 ![timing diagram for D-TYPE-LATCH](D-TYPE-LATCH_timing.png "D-TYPE-LATCH")
+
+### LATCH
+
+| D | E&#x2081; | Q&#x2081; |
+|---|---|---|
+| &#x2715; | E&#x2080; | Q&#x2080; |
+| &#x2715; | &#x1f80b; | Q&#x2080; |
+| 0 | &#x1f809; | 0 |
+| 1 | &#x1f809; | 1 |
+
+![timing diagram for LATCH](LATCH_timing.png "LATCH")
+
+### SR-LATCH
+
+| S | R | E&#x2081; | Q&#x2081; |
+|---|---|---|---|
+| &#x2715; | &#x2715; | E&#x2080; | Q&#x2080; |
+| &#x2715; | &#x2715; | &#x1f80b; | Q&#x2080; |
+| 0 | 0 | &#x1f809; | Q&#x2080; |
+| 0 | 1 | &#x1f809; | 0 |
+| 1 | &#x2715; | &#x1f809; | 1 |
+
+![timing diagram for SR-LATCH](SR-LATCH_timing.png "SR-LATCH")
