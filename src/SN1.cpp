@@ -2,6 +2,20 @@
 
 #include "SubmarineFree.hpp"
 
+namespace {
+	struct Gridcell {
+		float llx;// x-coord lower left
+		float lrx;// x-coord lower right
+		float ulx;// x-coord upper left
+		float urx;// x-coord upper right
+		float lly;// y-coord lower left
+		float lry;// y-coord lower right
+		float uly;// y-coord upper left
+		float ury;// y-coord upper right
+	};
+	const unsigned int maxGridWidth = 32;
+}
+
 struct SN_1 : Module {
 	enum ParamIds {
 		NUM_PARAMS
@@ -17,11 +31,48 @@ struct SN_1 : Module {
 		NUM_LIGHTS
 	};
 
+	alignas(64) Gridcell grid[maxGridWidth];
+	__m128i lfsr;
+	float sineLookup[32];
+
 	SN_1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		initLFSR(lfsr);
 	}
 
 	void process(const ProcessArgs &args) override {
+	}
+
+	inline void initLFSR(__m128i &lfsr) {
+	}
+
+	inline void advanceLFSR(__m128i &lfsr) {
+	}
+	
+	inline void shiftGridRows() {
+		memcpy((void *)(&grid) + 2 * sizeof(float), &grid), sizeof(grid) - 2 * sizeof(float));
+	}
+	
+	inline void initGridRow() {
+		uint_16t randomValues[maxGridWidth];
+		for (unsigned int i = 0; i < maxGridWidth; i += 8) {
+			advanceLFSR(lfsr);
+			advanceLFSR(lfsr);
+			advanceLFSR(lfsr);
+			advanceLFSR(lfsr);
+			advanceLFSR(lfsr);
+			_mm_store_pi(lfsr, randomValues + i);
+		}
+		for (unsigned int i = 0; i < maxGridWidth; i++) {
+			grid[i].ulx = sineLookup(randomValues[i] & 0x1f);
+			randomValues[i] += 8;
+			grid[i].uly = sineLookup(randomValues[i] & 0x1f);
+		}
+		for (unsigned int i = 0; i < maxGridWidth; i++) {
+			unsigned int j = (i + 1) % maxGridWidth;
+			grid[i].urx = grid[j].ulx;
+			grid[i].ury = grid[j].uly;
+		}
 	}
 };
 
