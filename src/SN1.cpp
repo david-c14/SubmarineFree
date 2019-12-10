@@ -1,8 +1,13 @@
 //SubTag W2
 
 #include "SubmarineFree.hpp"
+#include <random>
+#include <chrono>
 
 namespace {
+
+	static std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
+
 	struct Gridcell {
 		float llx;// x-coord lower left
 		float lrx;// x-coord lower right
@@ -13,7 +18,43 @@ namespace {
 		float uly;// y-coord upper left
 		float ury;// y-coord upper right
 	};
+
 	const unsigned int maxGridWidth = 32;
+
+	float sineLookup[32] = {
+		0.098017140329561f,
+		0.290284677254462f,
+		0.471396736825998f,
+		0.634393284163645f,
+		0.773010453362737f,
+		0.881921264348355f,
+		0.956940335732209f,
+		0.995184726672197f,
+		0.995184726672197f,
+		0.956940335732209f,
+		0.881921264348355f,
+		0.773010453362737f,
+		0.634393284163645f,
+		0.471396736825998f,
+		0.290284677254462f,
+		0.098017140329561f,
+		-0.098017140329561f,
+		-0.290284677254462f,
+		-0.471396736825998f,
+		-0.634393284163645f,
+		-0.773010453362737f,
+		-0.881921264348355f,
+		-0.956940335732209f,
+		-0.995184726672197f,
+		-0.995184726672197f,
+		-0.956940335732209f,
+		-0.881921264348355f,
+		-0.773010453362737f,
+		-0.634393284163646f,
+		-0.471396736825998f,
+		-0.290284677254462f,
+		-0.098017140329561f
+	};
 }
 
 struct SN_1 : Module {
@@ -33,40 +74,50 @@ struct SN_1 : Module {
 
 	alignas(64) Gridcell grid[maxGridWidth];
 	__m128i lfsr;
-	float sineLookup[32];
+	float x = 0.0f;
+	float y = 0.0f;
 
 	SN_1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		initLFSR(lfsr);
-	}
-
-	void process(const ProcessArgs &args) override {
+		initGridRow();
+		shiftGridRows();
+		initGridRow();
 	}
 
 	inline void initLFSR(__m128i &lfsr) {
+		alignas(16) uint16_t seeds[8];
+		std::uniform_int_distribution<int> distribution(1, 0xffffu);
+		for (unsigned int i = 0; i < 8; i++) {
+			seeds[i] = distribution(generator);
+		}
+		lfsr = _mm_load_si128((__m128i *)(seeds));
 	}
 
 	inline void advanceLFSR(__m128i &lfsr) {
+		__m128i mask = _mm_set1_epi16(0x0u);
+		mask = _mm_cmpgt_epi16(mask, lfsr);
+		mask = _mm_and_si128(mask, _mm_set1_epi16(0x100Bu));
+		lfsr = _mm_slli_epi16(lfsr, 1);
+		lfsr = _mm_xor_si128(lfsr, mask);
 	}
 	
 	inline void shiftGridRows() {
-		memcpy((void *)(&grid) + 2 * sizeof(float), &grid), sizeof(grid) - 2 * sizeof(float));
+		std::memmove(grid, (uint8_t *)(grid) + 2 * sizeof(float), sizeof(grid) - 2 * sizeof(float));
 	}
 	
 	inline void initGridRow() {
-		uint_16t randomValues[maxGridWidth];
+		alignas(16) uint16_t randomValues[maxGridWidth];
 		for (unsigned int i = 0; i < maxGridWidth; i += 8) {
-			advanceLFSR(lfsr);
-			advanceLFSR(lfsr);
-			advanceLFSR(lfsr);
-			advanceLFSR(lfsr);
-			advanceLFSR(lfsr);
-			_mm_store_pi(lfsr, randomValues + i);
+			for (unsigned int x = 0; x < 5; x++) {
+				advanceLFSR(lfsr);
+			}
+			_mm_store_si128((__m128i *)(randomValues + i), lfsr);
 		}
 		for (unsigned int i = 0; i < maxGridWidth; i++) {
-			grid[i].ulx = sineLookup(randomValues[i] & 0x1f);
+			grid[i].ulx = sineLookup[randomValues[i] & 0x1f];
 			randomValues[i] += 8;
-			grid[i].uly = sineLookup(randomValues[i] & 0x1f);
+			grid[i].uly = sineLookup[randomValues[i] & 0x1f];
 		}
 		for (unsigned int i = 0; i < maxGridWidth; i++) {
 			unsigned int j = (i + 1) % maxGridWidth;
@@ -75,52 +126,6 @@ struct SN_1 : Module {
 		}
 	}
 };
-
-/*
-
-inline __m128i advanceLFSR(__m128i &lfsr) {
-	__m128i mask = _mm_set1_epi16(0x0u);
-	mask = _mm_cmpgt_epi16(mask, lfsr);
-	mask = _mm_and_si128(mask, _mm_set1_epi16(0x100Bu));
-	lfsr = _mm_slli_epi16(lfsr, 1);
-	lfsr = _mm_xor_si128(lfsr, mask);
-
-
-0.098017140329561
-0.290284677254462
-0.471396736825998
-0.634393284163645
-0.773010453362737
-0.881921264348355
-0.956940335732209
-0.995184726672197
-0.995184726672197
-0.956940335732209
-0.881921264348355
-0.773010453362737
-0.634393284163645
-0.471396736825998
-0.290284677254462
-0.098017140329561
--0.098017140329561
--0.290284677254462
--0.471396736825998
--0.634393284163645
--0.773010453362737
--0.881921264348355
--0.956940335732209
--0.995184726672197
--0.995184726672197
--0.956940335732209
--0.881921264348355
--0.773010453362737
--0.634393284163646
--0.471396736825998
--0.290284677254462
--0.098017140329561
-
-
-*/
 
 struct SN101 : SchemeModuleWidget {
 	SN101(SN_1 *module) : SchemeModuleWidget(module) {
