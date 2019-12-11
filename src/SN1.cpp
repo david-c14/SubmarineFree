@@ -59,9 +59,12 @@ namespace {
 
 struct SN_1 : Module {
 	enum ParamIds {
+		PARAM_FREQ,
+		PARAM_LENGTH,
 		NUM_PARAMS
 	};
 	enum InputIds {
+		INPUT_FREQ,
 		NUM_INPUTS
 	};
 	enum OutputIds {
@@ -79,6 +82,8 @@ struct SN_1 : Module {
 
 	SN_1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configParam(PARAM_FREQ, -54.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
+		configParam(PARAM_LENGTH, 2.0f, 32.0f, 32.0f, "Cycle Length");
 		initLFSR(lfsr);
 		initGridRow();
 		shiftGridRows();
@@ -125,6 +130,17 @@ struct SN_1 : Module {
 			grid[i].ury = grid[j].uly;
 		}
 	}
+
+	void process(const ProcessArgs &args) override {
+		float baseFreq = 261.626f;
+		float freq = baseFreq * powf(2.0f, params[PARAM_FREQ].getValue() * (1.0f / 12.0f) + (inputs[INPUT_FREQ].isConnected()?inputs[INPUT_FREQ].getVoltage():0.0f));
+		float deltaTime = freq * args.sampleTime;
+		x = x + deltaTime;
+		int max = clamp(params[PARAM_LENGTH].getValue(), 2.0f, 32.0f);
+		while (x > max)
+			x -= max;
+		outputs[OUTPUT_1].setVoltage(x,0);
+	}
 };
 
 struct SN101 : SchemeModuleWidget {
@@ -132,43 +148,14 @@ struct SN101 : SchemeModuleWidget {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		addOutput(createOutputCentered<BluePort>(Vec(15,45.5), module, SN_1::OUTPUT_1));
+		addInput(createInputCentered<SilverPort>(Vec(15,31.5), module, SN_1::INPUT_FREQ));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 70), module, SN_1::PARAM_FREQ));
+		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 110), module, SN_1::PARAM_LENGTH));
+		addOutput(createOutputCentered<SilverPort>(Vec(15,350), module, SN_1::OUTPUT_1));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SN-101");
-		nvgStrokeWidth(vg, 1);
-		nvgStrokeColor(vg, gScheme.getAlternative(module));
-		nvgLineCap(vg, NVG_ROUND);
-		nvgLineJoin(vg, NVG_ROUND);
-		for (int i = 0; i < 5; i++) {
-			nvgBeginPath(vg);
-			nvgMoveTo(vg, 74.5, 45.5 + i * 58);
-			nvgLineTo(vg, 74.5, 74.5 + i * 58);
-			nvgLineTo(vg, 29.5, 74.5 + i * 58);
-			nvgLineTo(vg, 29.5, 103.5 + i * 58);
-			nvgLineTo(vg, 38.5, 103.5 + i * 58);	
-			nvgStroke(vg);
-		}
-		nvgStrokeColor(vg, gScheme.getContrast(module));
-		for (int i = 0; i < 6; i++) {
-			nvgBeginPath(vg);
-			nvgMoveTo(vg, 16, 31.5 + i * 58);
-			nvgLineTo(vg, 34, 31.5 + i * 58);
-			nvgLineTo(vg, 34, 42.5 + i * 58);
-			nvgLineTo(vg, 39, 42.5 + i * 58);
-			nvgMoveTo(vg, 16, 59.5 + i * 58);
-			nvgLineTo(vg, 34, 59.5 + i * 58);
-			nvgLineTo(vg, 34, 48.5 + i * 58);
-			nvgLineTo(vg, 39, 48.5 + i * 58);
-			nvgMoveTo(vg, 55, 45.5 + i * 58);
-			nvgLineTo(vg, 74, 45.5 + i * 58);
-			nvgMoveTo(vg, 39, 34.5 + i * 58);
-			nvgLineTo(vg, 39, 56.5 + i * 58);
-			nvgLineTo(vg, 43.5, 56.5 + i * 58);
-			nvgArc(vg, 43.5, 45.5 + i * 58, 11, M_PI / 2.0f, -M_PI / 2.0f, NVG_CCW);
-			nvgClosePath(vg);
-			nvgStroke(vg);
-		}
+		drawText(vg, 16, 55, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "FREQ.");
 	}
 };
 
