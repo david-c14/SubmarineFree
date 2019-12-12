@@ -77,13 +77,14 @@ struct SN_1 : Module {
 
 	alignas(64) Gridcell grid[maxGridWidth];
 	__m128i lfsr;
+	int effectiveGridWidth = maxGridWidth;
 	float x = 0.0f;
 	float y = 0.0f;
 
 	SN_1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_FREQ, -54.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
-		configParam(PARAM_LENGTH, 2.0f, 32.0f, 32.0f, "Cycle Length");
+		configParam(PARAM_LENGTH, 2.0f, maxGridWidth, effectiveGridWidth, "Cycle Length");
 		initLFSR(lfsr);
 		initGridRow();
 		shiftGridRows();
@@ -131,31 +132,50 @@ struct SN_1 : Module {
 		}
 	}
 
+	void resetY() {
+		y = y - (int)y;
+		shiftGridRows();
+		initGridRow();
+	}
+
+	void resetX() {
+		effectiveGridWidth = clamp(params[PARAM_LENGTH].getValue(), 2.0f, maxGridWidth);
+		while (x > effectiveGridWidth)
+			x -= effectiveGridWidth;
+	}
+
 	void process(const ProcessArgs &args) override {
 		float baseFreq = 261.626f;
 		float freq = baseFreq * powf(2.0f, params[PARAM_FREQ].getValue() * (1.0f / 12.0f) + (inputs[INPUT_FREQ].isConnected()?inputs[INPUT_FREQ].getVoltage():0.0f));
 		float deltaTime = freq * args.sampleTime;
 		x = x + deltaTime;
-		int max = clamp(params[PARAM_LENGTH].getValue(), 2.0f, 32.0f);
-		while (x > max)
-			x -= max;
+		while (x > effectiveGridWidth)
+			resetX();
 		outputs[OUTPUT_1].setVoltage(x,0);
 	}
 };
 
 struct SN101 : SchemeModuleWidget {
+	LightKnob *lengthKnob;
 	SN101(SN_1 *module) : SchemeModuleWidget(module) {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
 		addInput(createInputCentered<SilverPort>(Vec(15,31.5), module, SN_1::INPUT_FREQ));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 70), module, SN_1::PARAM_FREQ));
-		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 110), module, SN_1::PARAM_LENGTH));
+		lengthKnob = createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 110), module, SN_1::PARAM_LENGTH);
+		addParam(lengthKnob);
 		addOutput(createOutputCentered<SilverPort>(Vec(15,350), module, SN_1::OUTPUT_1));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SN-101");
 		drawText(vg, 16, 55, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "FREQ.");
+	}
+	void step() override {
+		if (module) {
+			lengthKnob->color = (APP->engine->getParam(module, SN_1::PARAM_LENGTH) == dynamic_cast<SN_1 *>(module)->effectiveGridWidth)?SUBLIGHTBLUE:SUBLIGHTRED;
+		}	
+		SchemeModuleWidget::step();
 	}
 };
 
