@@ -1,4 +1,23 @@
 # Logic Gates
+[N/C](#nc)  
+[NOT gate](#not)  
+[AND gate](#and)  
+[3-input AND gate](#3and)  
+[4-input AND gate](#4and)  
+[OR gate](#or)  
+[XOR gate](#xor)  
+[NAND gate](#nand)  
+[3-input NAND gate](#3nand)  
+[4-input NAND gate](#4nand)  
+[NOR gate](#nor)  
+[XNOR gate](#xnor)  
+[D-TYPE-FLIPFLOP](#dtypeflipflop)  
+[SR-FLIPFLOP](#srflipflop)  
+[D-TYPE-LATCH](#dtypelatch)  
+[SR-LATCH](#srlatch)  
+[LATCH](#latch)  
+[DELAY](#delay)  
+[CLK-DELAY](#clkdelay)  
 
 #### Conventions used in the truth tables
 
@@ -22,10 +41,14 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 | &#x1f80b; | A downwards arrow indicates that the gate responds to a falling edge. Where the input goes from 1 to 0 |
 | N&#x2080; | A tiny 0 after a value indicates the value in the *previous* sample |
 | N&#x2081; | A tiny 1 after a value indicates the value in *this* sample | 
- 
+
+<a name="nc" />
+
 ### N/C
 
 When no gate is selected, the DO-1xx device shows N/C which is short for Not Connected. The output is always 0 (false)
+
+<a name="nor" />
 
 ### NOT gate
 
@@ -39,6 +62,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for NOT gate](NOT_timing.png "NOT")
 
+<a name="and" />
+
 ### AND gate
 
 | A | B | Q |
@@ -49,6 +74,8 @@ and when A is 0 (false) then Q is 1 (true)
 | 1 | 1 | 1 |
 
 ![timing diagram for AND gate](2-AND_timing.png "AND")
+
+<a name="3and" />
 
 ### 3-input AND gate
 
@@ -64,6 +91,8 @@ and when A is 0 (false) then Q is 1 (true)
 | 1 | 1 | 1 | 1 |
 
 ![timing diagram for 3-input AND gate](3-AND_timing.png "3-input AND")
+
+<a name="4and" />
 
 ### 4-input AND gate
 
@@ -88,54 +117,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for 4-input AND gate](4-AND_timing.png "4-input AND")
 
-### NAND gate
-
-| A | B | Q |
-|---|---|---|
-| 0 | 0 | 1 |
-| 0 | 1 | 1 |
-| 1 | 0 | 1 |
-| 1 | 1 | 0 |
-
-![timing diagram for NAND gate](2-NAND_timing.png "NAND")
-
-## 3-input NAND gate
-
-| A | B | C | Q |
-|---|---|---|---|
-| 0 | 0 | 0 | 1 |
-| 0 | 0 | 1 | 1 |
-| 0 | 1 | 0 | 1 |
-| 0 | 1 | 1 | 1 |
-| 1 | 0 | 0 | 1 |
-| 1 | 0 | 1 | 1 |
-| 1 | 1 | 0 | 1 |
-| 1 | 1 | 1 | 0 |
-
-![timing diagram for 3-input NAND gate](3-NAND_timing.png "3-input NAND")
-
-### 4-input NAND gate
-
-| A | B | C | D | Q |
-|---|---|---|---|---|
-| 0 | 0 | 0 | 0 | 1 |
-| 0 | 0 | 0 | 1 | 1 |
-| 0 | 0 | 1 | 0 | 1 |
-| 0 | 0 | 1 | 1 | 1 |
-| 0 | 1 | 0 | 0 | 1 |
-| 0 | 1 | 0 | 1 | 1 |
-| 0 | 1 | 1 | 0 | 1 |
-| 0 | 1 | 1 | 1 | 1 |
-| 1 | 0 | 0 | 0 | 1 |
-| 1 | 0 | 0 | 1 | 1 |
-| 1 | 0 | 1 | 0 | 1 |
-| 1 | 0 | 1 | 1 | 1 |
-| 1 | 1 | 0 | 0 | 1 |
-| 1 | 1 | 0 | 1 | 1 |
-| 1 | 1 | 1 | 0 | 1 |
-| 1 | 1 | 1 | 1 | 0 |
-
-![timing diagram for 4-input NAND gate](4-NAND_timing.png "4-input NAND")
+<a name="or" />
 
 ### OR gate
 
@@ -160,28 +142,7 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for OR gate](OR_timing.png "OR")
 
-### NOR gate
-
-| A | B | C | D | Q |
-|---|---|---|---|---|
-| 0 | 0 | 0 | 0 | 1 |
-| 0 | 0 | 0 | 1 | 0 |
-| 0 | 0 | 1 | 0 | 0 |
-| 0 | 0 | 1 | 1 | 0 |
-| 0 | 1 | 0 | 0 | 0 |
-| 0 | 1 | 0 | 1 | 0 |
-| 0 | 1 | 1 | 0 | 0 |
-| 0 | 1 | 1 | 1 | 0 |
-| 1 | 0 | 0 | 0 | 0 |
-| 1 | 0 | 0 | 1 | 0 |
-| 1 | 0 | 1 | 0 | 0 |
-| 1 | 0 | 1 | 1 | 0 |
-| 1 | 1 | 0 | 0 | 0 |
-| 1 | 1 | 0 | 1 | 0 |
-| 1 | 1 | 1 | 0 | 0 |
-| 1 | 1 | 1 | 1 | 0 |
-
-![timing diagram for NOR gate](NOR_timing.png "NOR")
+<a name="xor" />
 
 ### XOR gate
 
@@ -206,6 +167,88 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for XOR gate](XOR_timing.png "XOR")
 
+<a name="nand" />
+
+### NAND gate
+
+| A | B | Q |
+|---|---|---|
+| 0 | 0 | 1 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+![timing diagram for NAND gate](2-NAND_timing.png "NAND")
+
+<a name="3nand" />
+
+## 3-input NAND gate
+
+| A | B | C | Q |
+|---|---|---|---|
+| 0 | 0 | 0 | 1 |
+| 0 | 0 | 1 | 1 |
+| 0 | 1 | 0 | 1 |
+| 0 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 1 |
+| 1 | 0 | 1 | 1 |
+| 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 0 |
+
+![timing diagram for 3-input NAND gate](3-NAND_timing.png "3-input NAND")
+
+<a name="4nand" />
+
+### 4-input NAND gate
+
+| A | B | C | D | Q |
+|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 1 |
+| 0 | 0 | 0 | 1 | 1 |
+| 0 | 0 | 1 | 0 | 1 |
+| 0 | 0 | 1 | 1 | 1 |
+| 0 | 1 | 0 | 0 | 1 |
+| 0 | 1 | 0 | 1 | 1 |
+| 0 | 1 | 1 | 0 | 1 |
+| 0 | 1 | 1 | 1 | 1 |
+| 1 | 0 | 0 | 0 | 1 |
+| 1 | 0 | 0 | 1 | 1 |
+| 1 | 0 | 1 | 0 | 1 |
+| 1 | 0 | 1 | 1 | 1 |
+| 1 | 1 | 0 | 0 | 1 |
+| 1 | 1 | 0 | 1 | 1 |
+| 1 | 1 | 1 | 0 | 1 |
+| 1 | 1 | 1 | 1 | 0 |
+
+![timing diagram for 4-input NAND gate](4-NAND_timing.png "4-input NAND")
+
+<a name="nor" />
+
+### NOR gate
+
+| A | B | C | D | Q |
+|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 1 |
+| 0 | 0 | 0 | 1 | 0 |
+| 0 | 0 | 1 | 0 | 0 |
+| 0 | 0 | 1 | 1 | 0 |
+| 0 | 1 | 0 | 0 | 0 |
+| 0 | 1 | 0 | 1 | 0 |
+| 0 | 1 | 1 | 0 | 0 |
+| 0 | 1 | 1 | 1 | 0 |
+| 1 | 0 | 0 | 0 | 0 |
+| 1 | 0 | 0 | 1 | 0 |
+| 1 | 0 | 1 | 0 | 0 |
+| 1 | 0 | 1 | 1 | 0 |
+| 1 | 1 | 0 | 0 | 0 |
+| 1 | 1 | 0 | 1 | 0 |
+| 1 | 1 | 1 | 0 | 0 |
+| 1 | 1 | 1 | 1 | 0 |
+
+![timing diagram for NOR gate](NOR_timing.png "NOR")
+
+<a name="xnor" />
+
 ### XNOR gate
 
 | A | B | C | D | Q |
@@ -229,6 +272,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for XNOR gate](XNOR_timing.png "XNOR")
 
+<a name="dtypeflipflop" />
+
 ### D-TYPE-FLIPFLOP
 
 | C&#x2081; | Q&#x2081; |
@@ -238,6 +283,8 @@ and when A is 0 (false) then Q is 1 (true)
 | &#x1f809; | Q&#x305;&#x2080; |
 
 ![timing diagram for D-TYPE-FLIPFLOP](D-TYPE-FLIPFLOP_timing.png "D-TYPE-FLIPFLOP")
+
+<a name="srflipflop" />
 
 ### SR-FLIPFLOP
 
@@ -249,6 +296,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for SR-FLIPFLOP](SR-FLIPFLOP_timing.png "SR-FLIPFLOP")
 
+<a name="dtypelatch" />
+
 ### D-TYPE-LATCH
 
 | D | E | Q&#x2081; |
@@ -258,6 +307,8 @@ and when A is 0 (false) then Q is 1 (true)
 | 1 | 1 | 1 |
 
 ![timing diagram for D-TYPE-LATCH](D-TYPE-LATCH_timing.png "D-TYPE-LATCH")
+
+<a name="srlatch" />
 
 ### SR-LATCH
 
@@ -271,6 +322,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for SR-LATCH](SR-LATCH_timing.png "SR-LATCH")
 
+<a name="latch" />
+
 ### LATCH
 
 | D | E&#x2081; | Q&#x2081; |
@@ -282,6 +335,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ![timing diagram for LATCH](LATCH_timing.png "LATCH")
 
+<a name="delay" />
+
 ### DELAY
 
 | D&#x2081; | Q |
@@ -289,6 +344,8 @@ and when A is 0 (false) then Q is 1 (true)
 | &#x2715; | D&#x2080; |
 
 ![timing_diagram_for_DELAY](DELAY_timing.png "DELAY")
+
+<a name="clkdelay" />
 
 ### CLK-DELAY
 
