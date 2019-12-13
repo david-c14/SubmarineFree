@@ -66,6 +66,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ### AND gate
 
+The AND gate has two inputs A and B. The output Q is 1 (true) if and only if BOTH A and B are 1 (true)
+
 | A | B | Q |
 |---|---|---|
 | 0 | 0 | 0 |
@@ -78,6 +80,8 @@ and when A is 0 (false) then Q is 1 (true)
 <a name="3and" />
 
 ### 3-input AND gate
+
+The 3-input AND gate has three inputs A, B and C. The output Q is 1 (true) if and only if ALL OF A, B and C are 1 (true)
 
 | A | B | C | Q |
 |---|---|---|---|
@@ -95,6 +99,8 @@ and when A is 0 (false) then Q is 1 (true)
 <a name="4and" />
 
 ### 4-input AND gate
+
+The 4-input AND gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ALL OF A, B, C and D are 1 (true)
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -171,6 +177,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ### NAND gate
 
+The NAND gate has two inputs A and B. The output Q is 1 (true) if and only if ANY OF A or B are 0 (false)
+
 | A | B | Q |
 |---|---|---|
 | 0 | 0 | 1 |
@@ -183,6 +191,8 @@ and when A is 0 (false) then Q is 1 (true)
 <a name="3nand" />
 
 ## 3-input NAND gate
+
+The 3-input NAND gate has three inputs A, B and C. The output Q is 1 (true) if and only if ANY OF A, B or C are 0 (false)
 
 | A | B | C | Q |
 |---|---|---|---|
@@ -200,6 +210,8 @@ and when A is 0 (false) then Q is 1 (true)
 <a name="4nand" />
 
 ### 4-input NAND gate
+
+The 4-input NAND gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ANY OF A, B, C or D are 0 (false)
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
