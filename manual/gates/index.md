@@ -298,6 +298,8 @@ If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 ### D-TYPE-FLIPFLOP
 
+The D-TYPE flipflop has a single edge-triggered input C (clock). The output Q changes whenever the input C rises. i.e. when input C changes from 0 (false) to 1 (true); at that point if Q is 0 (false) it will change to 1 (true), if Q is 1 (true) it will change to 0 (false) 
+
 | C&#x2081; | Q&#x2081; |
 |---|---|
 | C&#x2080; | Q&#x2080; |
@@ -309,6 +311,8 @@ If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
 <a name="srflipflop" />
 
 ### SR-FLIPFLOP
+
+The SR flipflop has two inputs S (set) and R (reset). The output Q is 1 (true) if S is 1 (true). The output Q is 0 (false) if S is 0 (false) AND R is 1 (true). If both S and R are 0 (false), then Q will remain unchanged.
 
 | S | R | Q&#x2081; |
 |---|---|---|
@@ -322,6 +326,8 @@ If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 ### D-TYPE-LATCH
 
+The D-Type Latch has two inputs D (data) and E (enable). The output Q will be equal to the input D while E is 1 (true). When E is 0 (false) Q will remain unchanged irrespective of the state of D.
+
 | D | E | Q&#x2081; |
 |---|---|---|
 | &#x2715; | 0 | Q&#x2080; |
@@ -333,6 +339,8 @@ If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
 <a name="srlatch" />
 
 ### SR-LATCH
+
+The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E (enable). The output Q will remain unchanged while E is 0 (false). When E rises, i.e. when E changes from 0 (false) to 1 (true) the output Q may be changed. If S is 1 (true) when E rises, then Q will be 1 (true). If S is 0 (false) and R is 1 (true) when E rises, then Q will be 0 (false).
 
 | S | R | E&#x2081; | Q&#x2081; |
 |---|---|---|---|
