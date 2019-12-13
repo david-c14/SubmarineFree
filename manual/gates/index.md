@@ -127,6 +127,8 @@ The 4-input AND gate has four inputs A, B, C and D. The output Q is 1 (true) if 
 
 ### OR gate
 
+The OR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ANY OF A, B, C or D are 1 (true)
+
 | A | B | C | D | Q |
 |---|---|---|---|---|
 | 0 | 0 | 0 | 0 | 0 |
@@ -151,6 +153,9 @@ The 4-input AND gate has four inputs A, B, C and D. The output Q is 1 (true) if 
 <a name="xor" />
 
 ### XOR gate
+
+The XOR gate has four inputs A, B, C and D. The output Q is (true) if and only if EITHER 1 or 3 OF A, B, C or D are 1 (true).
+If 0, 2 or 4 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
@@ -238,6 +243,8 @@ The 4-input NAND gate has four inputs A, B, C and D. The output Q is 1 (true) if
 
 ### NOR gate
 
+The NOR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ALL OF A, B, C and D are 0 (false)
+
 | A | B | C | D | Q |
 |---|---|---|---|---|
 | 0 | 0 | 0 | 0 | 1 |
@@ -262,6 +269,9 @@ The 4-input NAND gate has four inputs A, B, C and D. The output Q is 1 (true) if
 <a name="xnor" />
 
 ### XNOR gate
+
+The XOR gate has four inputs A, B, C and D. The output Q is (true) if and only if EITHER 0, 2 or 4 OF A, B, C or D are 1 (true).
+If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 | A | B | C | D | Q |
 |---|---|---|---|---|
