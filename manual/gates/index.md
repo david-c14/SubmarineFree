@@ -48,7 +48,7 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 
 When no gate is selected, the DO-1xx device shows N/C which is short for Not Connected. The output is always 0 (false)
 
-<a name="nor" />
+<a name="not" />
 
 ### NOT gate
 
