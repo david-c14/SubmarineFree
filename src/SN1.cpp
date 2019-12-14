@@ -123,9 +123,21 @@ struct SN_1 : Module {
 	}
 
 	void resetX() {
-		effectiveGridWidth = clamp(params[PARAM_LENGTH].getValue(), 2.0f, maxGridWidth);
-		while (x > effectiveGridWidth)
-			x -= effectiveGridWidth;
+		int newEffectiveGridWidth = clamp(params[PARAM_LENGTH].getValue(), 2.0f, maxGridWidth);
+		if (effectiveGridWidth != newEffectiveGridWidth) {
+			grid[effectiveGridWidth].lrx = grid[(effectiveGridWidth + 1) % maxGridWidth].llx;
+			grid[effectiveGridWidth].urx = grid[(effectiveGridWidth + 1) % maxGridWidth].ulx;
+			grid[effectiveGridWidth].lry = grid[(effectiveGridWidth + 1) % maxGridWidth].lly;
+			grid[effectiveGridWidth].ury = grid[(effectiveGridWidth + 1) % maxGridWidth].uly;
+			effectiveGridWidth = newEffectiveGridWidth;
+			grid[effectiveGridWidth].lrx = grid[0].llx;
+			grid[effectiveGridWidth].urx = grid[0].ulx;
+			grid[effectiveGridWidth].lry = grid[0].lly;
+			grid[effectiveGridWidth].ury = grid[0].uly;
+		}
+		int intX = (int)x;
+		x -= intX;
+		x += intX % effectiveGridWidth;
 	}
 
 	void process(const ProcessArgs &args) override {
