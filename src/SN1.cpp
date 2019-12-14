@@ -21,39 +21,23 @@ namespace {
 
 	const unsigned int maxGridWidth = 32;
 
-	float sineLookup[32] = {
-		0.098017140329561f,
-		0.290284677254462f,
-		0.471396736825998f,
-		0.634393284163645f,
-		0.773010453362737f,
-		0.881921264348355f,
-		0.956940335732209f,
-		0.995184726672197f,
-		0.995184726672197f,
-		0.956940335732209f,
-		0.881921264348355f,
-		0.773010453362737f,
-		0.634393284163645f,
-		0.471396736825998f,
-		0.290284677254462f,
-		0.098017140329561f,
-		-0.098017140329561f,
-		-0.290284677254462f,
-		-0.471396736825998f,
-		-0.634393284163645f,
-		-0.773010453362737f,
-		-0.881921264348355f,
-		-0.956940335732209f,
-		-0.995184726672197f,
-		-0.995184726672197f,
-		-0.956940335732209f,
-		-0.881921264348355f,
-		-0.773010453362737f,
-		-0.634393284163646f,
-		-0.471396736825998f,
-		-0.290284677254462f,
-		-0.098017140329561f
+	float sineLookup[16] = {
+		0.195090322016128f,
+		0.555570233019602f,
+		0.831469612302545f,
+		0.980785280403230f,
+		0.980785280403230f,
+		0.831469612302545f,
+		0.555570233019602f,
+		0.195090322016128f,
+		-0.195090322016128f,
+		-0.555570233019602f,
+		-0.831469612302545f,
+		-0.980785280403230f,
+		-0.980785280403230f,
+		-0.831469612302545f,
+		-0.555570233019602f,
+		-0.195090322016128f
 	};
 }
 
@@ -115,15 +99,15 @@ struct SN_1 : Module {
 	inline void initGridRow() {
 		alignas(16) uint16_t randomValues[maxGridWidth];
 		for (unsigned int i = 0; i < maxGridWidth; i += 8) {
-			for (unsigned int x = 0; x < 5; x++) {
+			for (unsigned int x = 0; x < 4; x++) {
 				advanceLFSR(lfsr);
 			}
 			_mm_store_si128((__m128i *)(randomValues + i), lfsr);
 		}
 		for (unsigned int i = 0; i < maxGridWidth; i++) {
-			grid[i].ulx = sineLookup[randomValues[i] & 0x1f];
-			randomValues[i] += 8;
-			grid[i].uly = sineLookup[randomValues[i] & 0x1f];
+			grid[i].ulx = sineLookup[randomValues[i] & 0xf];
+			randomValues[i] += 4;
+			grid[i].uly = sineLookup[randomValues[i] & 0xf];
 		}
 		for (unsigned int i = 0; i < maxGridWidth; i++) {
 			unsigned int j = (i + 1) % maxGridWidth;
