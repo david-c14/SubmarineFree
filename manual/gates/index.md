@@ -44,6 +44,8 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 
 <a name="nc" />
 
+---
+
 ### N/C
 
 ![N/C](NC.png "N/C")
@@ -51,6 +53,8 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 When no gate is selected, the DO-1xx device shows N/C which is short for Not Connected. The output is always 0 (false)
 
 <a name="not" />
+
+---
 
 ### NOT gate
 
@@ -68,6 +72,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 <a name="and" />
 
+---
+
 ### AND gate
 
 ![AND gate](2-AND.png "AND")
@@ -84,6 +90,8 @@ The AND gate has two inputs A and B. The output Q is 1 (true) if and only if BOT
 ![timing diagram for AND gate](2-AND_timing.png "AND")
 
 <a name="3and" />
+
+---
 
 ### 3-input AND gate
 
@@ -105,6 +113,8 @@ The 3-input AND gate has three inputs A, B and C. The output Q is 1 (true) if an
 ![timing diagram for 3-input AND gate](3-AND_timing.png "3-input AND")
 
 <a name="4and" />
+
+---
 
 ### 4-input AND gate
 
@@ -135,6 +145,8 @@ The 4-input AND gate has four inputs A, B, C and D. The output Q is 1 (true) if 
 
 <a name="or" />
 
+---
+
 ### OR gate
 
 ![OR gate](OR.png "OR")
@@ -163,6 +175,8 @@ The OR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only 
 ![timing diagram for OR gate](OR_timing.png "OR")
 
 <a name="xor" />
+
+---
 
 ### XOR gate
 
@@ -194,6 +208,8 @@ If 0, 2 or 4 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 <a name="nand" />
 
+---
+
 ### NAND gate
 
 ![NAND gate](2-NAND.png "NAND")
@@ -211,7 +227,9 @@ The NAND gate has two inputs A and B. The output Q is 1 (true) if and only if AN
 
 <a name="3nand" />
 
-## 3-input NAND gate
+---
+
+### 3-input NAND gate
 
 ![3-input NAND gate](3-NAND.png "3-input NAND")
 
@@ -231,6 +249,8 @@ The 3-input NAND gate has three inputs A, B and C. The output Q is 1 (true) if a
 ![timing diagram for 3-input NAND gate](3-NAND_timing.png "3-input NAND")
 
 <a name="4nand" />
+
+---
 
 ### 4-input NAND gate
 
@@ -261,6 +281,8 @@ The 4-input NAND gate has four inputs A, B, C and D. The output Q is 1 (true) if
 
 <a name="nor" />
 
+---
+
 ### NOR gate
 
 ![NOR gate](NOR.png "NOR")
@@ -289,6 +311,8 @@ The NOR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only
 ![timing diagram for NOR gate](NOR_timing.png "NOR")
 
 <a name="xnor" />
+
+---
 
 ### XNOR gate
 
@@ -320,6 +344,8 @@ If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 <a name="dtypeflipflop" />
 
+---
+
 ### D-TYPE-FLIPFLOP
 
 ![D-TYPE-FLIPFLOP](D-TYPE-FLIPFLOP.png "D-TYPE-FLIPFLOP")
@@ -335,6 +361,8 @@ The D-TYPE flipflop has a single edge-triggered input C (clock). The output Q ch
 ![timing diagram for D-TYPE-FLIPFLOP](D-TYPE-FLIPFLOP_timing.png "D-TYPE-FLIPFLOP")
 
 <a name="srflipflop" />
+
+---
 
 ### SR-FLIPFLOP
 
@@ -352,6 +380,8 @@ The SR flipflop has two inputs S (set) and R (reset). The output Q is 1 (true) i
 
 <a name="dtypelatch" />
 
+---
+
 ### D-TYPE-LATCH
 
 ![D-TYPE-LATCH](D-TYPE-LATCH.png "D-TYPE-LATCH")
@@ -367,6 +397,8 @@ The D-Type Latch has two inputs D (data) and E (enable). The output Q will be eq
 ![timing diagram for D-TYPE-LATCH](D-TYPE-LATCH_timing.png "D-TYPE-LATCH")
 
 <a name="srlatch" />
+
+---
 
 ### SR-LATCH
 
@@ -386,6 +418,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 
 <a name="latch" />
 
+---
+
 ### LATCH
 
 ![LATCH gate](LATCH.png "LATCH")
@@ -401,6 +435,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 
 <a name="delay" />
 
+---
+
 ### DELAY
 
 ![DELAY gate](DELAY.png "DELAY")
@@ -412,6 +448,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 ![timing_diagram_for_DELAY](DELAY_timing.png "DELAY")
 
 <a name="clkdelay" />
+
+---
 
 ### CLK-DELAY
 
