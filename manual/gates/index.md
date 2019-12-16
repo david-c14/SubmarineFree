@@ -46,11 +46,15 @@ Across the top, the truth table shows the inputs, internal states, and outputs o
 
 ### N/C
 
+![N/C](NC.png "N/C")
+
 When no gate is selected, the DO-1xx device shows N/C which is short for Not Connected. The output is always 0 (false)
 
 <a name="not" />
 
 ### NOT gate
+
+![NOT gate](NOT.png "NOT")
 
 The NOT gate has a single input A. The output Q is always the logical inverse of A. So when A is 1 (true) then Q is 0 (false);
 and when A is 0 (false) then Q is 1 (true)
@@ -66,6 +70,8 @@ and when A is 0 (false) then Q is 1 (true)
 
 ### AND gate
 
+![AND gate](2-AND.png "AND")
+
 The AND gate has two inputs A and B. The output Q is 1 (true) if and only if BOTH A and B are 1 (true)
 
 | A | B | Q |
@@ -80,6 +86,8 @@ The AND gate has two inputs A and B. The output Q is 1 (true) if and only if BOT
 <a name="3and" />
 
 ### 3-input AND gate
+
+![3-input AND gate](3-AND.png "3-input AND")
 
 The 3-input AND gate has three inputs A, B and C. The output Q is 1 (true) if and only if ALL OF A, B and C are 1 (true)
 
@@ -99,6 +107,8 @@ The 3-input AND gate has three inputs A, B and C. The output Q is 1 (true) if an
 <a name="4and" />
 
 ### 4-input AND gate
+
+![4-input AND gate](4-AND.png "4-input AND")
 
 The 4-input AND gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ALL OF A, B, C and D are 1 (true)
 
@@ -127,6 +137,8 @@ The 4-input AND gate has four inputs A, B, C and D. The output Q is 1 (true) if 
 
 ### OR gate
 
+![OR gate](OR.png "OR")
+
 The OR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ANY OF A, B, C or D are 1 (true)
 
 | A | B | C | D | Q |
@@ -153,6 +165,8 @@ The OR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only 
 <a name="xor" />
 
 ### XOR gate
+
+![XOR gate](XOR.png "XOR")
 
 The XOR gate has four inputs A, B, C and D. The output Q is (true) if and only if EITHER 1 or 3 OF A, B, C or D are 1 (true).
 If 0, 2 or 4 of A, B, C or D are 1 (true) then Q will be 0 (false)
@@ -182,6 +196,8 @@ If 0, 2 or 4 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 ### NAND gate
 
+![NAND gate](2-NAND.png "NAND")
+
 The NAND gate has two inputs A and B. The output Q is 1 (true) if and only if ANY OF A or B are 0 (false)
 
 | A | B | Q |
@@ -196,6 +212,8 @@ The NAND gate has two inputs A and B. The output Q is 1 (true) if and only if AN
 <a name="3nand" />
 
 ## 3-input NAND gate
+
+![3-input NAND gate](3-NAND.png "3-input NAND")
 
 The 3-input NAND gate has three inputs A, B and C. The output Q is 1 (true) if and only if ANY OF A, B or C are 0 (false)
 
@@ -215,6 +233,8 @@ The 3-input NAND gate has three inputs A, B and C. The output Q is 1 (true) if a
 <a name="4nand" />
 
 ### 4-input NAND gate
+
+![4-input NAND gate](4-NAND.png "4-input NAND")
 
 The 4-input NAND gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ANY OF A, B, C or D are 0 (false)
 
@@ -243,6 +263,8 @@ The 4-input NAND gate has four inputs A, B, C and D. The output Q is 1 (true) if
 
 ### NOR gate
 
+![NOR gate](NOR.png "NOR")
+
 The NOR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only if ALL OF A, B, C and D are 0 (false)
 
 | A | B | C | D | Q |
@@ -269,6 +291,8 @@ The NOR gate has four inputs A, B, C and D. The output Q is 1 (true) if and only
 <a name="xnor" />
 
 ### XNOR gate
+
+![XNOR gate](XNOR.png "XNOR")
 
 The XOR gate has four inputs A, B, C and D. The output Q is (true) if and only if EITHER 0, 2 or 4 OF A, B, C or D are 1 (true).
 If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
@@ -298,6 +322,8 @@ If 1 or 3 of A, B, C or D are 1 (true) then Q will be 0 (false)
 
 ### D-TYPE-FLIPFLOP
 
+![D-TYPE-FLIPFLOP](D-TYPE-FLIPFLOP.png "D-TYPE-FLIPFLOP")
+
 The D-TYPE flipflop has a single edge-triggered input C (clock). The output Q changes whenever the input C rises. i.e. when input C changes from 0 (false) to 1 (true); at that point if Q is 0 (false) it will change to 1 (true), if Q is 1 (true) it will change to 0 (false) 
 
 | C&#x2081; | Q&#x2081; |
@@ -311,6 +337,8 @@ The D-TYPE flipflop has a single edge-triggered input C (clock). The output Q ch
 <a name="srflipflop" />
 
 ### SR-FLIPFLOP
+
+![SR-FLIPFLOP](SR-FLIPFLOP.png "SR-FLIPFLOP")
 
 The SR flipflop has two inputs S (set) and R (reset). The output Q is 1 (true) if S is 1 (true). The output Q is 0 (false) if S is 0 (false) AND R is 1 (true). If both S and R are 0 (false), then Q will remain unchanged.
 
@@ -326,6 +354,8 @@ The SR flipflop has two inputs S (set) and R (reset). The output Q is 1 (true) i
 
 ### D-TYPE-LATCH
 
+![D-TYPE-LATCH](D-TYPE-LATCH.png "D-TYPE-LATCH")
+
 The D-Type Latch has two inputs D (data) and E (enable). The output Q will be equal to the input D while E is 1 (true). When E is 0 (false) Q will remain unchanged irrespective of the state of D.
 
 | D | E | Q&#x2081; |
@@ -339,6 +369,8 @@ The D-Type Latch has two inputs D (data) and E (enable). The output Q will be eq
 <a name="srlatch" />
 
 ### SR-LATCH
+
+![SR-LATCH](SR-LATCH.png "SR-LATCH")
 
 The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E (enable). The output Q will remain unchanged while E is 0 (false). When E rises, i.e. when E changes from 0 (false) to 1 (true) the output Q may be changed. If S is 1 (true) when E rises, then Q will be 1 (true). If S is 0 (false) and R is 1 (true) when E rises, then Q will be 0 (false).
 
@@ -356,6 +388,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 
 ### LATCH
 
+![LATCH gate](LATCH.png "LATCH")
+
 | D | E&#x2081; | Q&#x2081; |
 |---|---|---|
 | &#x2715; | E&#x2080; | Q&#x2080; |
@@ -369,6 +403,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 
 ### DELAY
 
+![DELAY gate](DELAY.png "DELAY")
+
 | D&#x2081; | Q |
 |---|---|
 | &#x2715; | D&#x2080; |
@@ -378,6 +414,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 <a name="clkdelay" />
 
 ### CLK-DELAY
+
+![CLK-DELAY gate](CLK-DELAY.png "CLK-DELAY")
 
 | C&#x2081; | D | A&#x2081; | Q&#x2081; |
 |---|---|---|---|
