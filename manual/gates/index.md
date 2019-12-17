@@ -404,7 +404,7 @@ The D-Type Latch has two inputs D (data) and E (enable). The output Q will be eq
 
 ![SR-LATCH](SR-LATCH.png "SR-LATCH")
 
-The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E (enable). The output Q will remain unchanged while E is 0 (false). When E rises, i.e. when E changes from 0 (false) to 1 (true) the output Q may be changed. If S is 1 (true) when E rises, then Q will be 1 (true). If S is 0 (false) and R is 1 (true) when E rises, then Q will be 0 (false).
+The SR Latch has three inputs S (set), R (reset) and an edge triggered intput E (enable). The output Q will remain unchanged while E is 0 (false). When E rises, i.e. when E changes from 0 (false) to 1 (true) the output Q may be changed. If S is 1 (true) when E rises, then Q will be 1 (true). If S is 0 (false) and R is 1 (true) when E rises, then Q will be 0 (false).
 
 | S | R | E&#x2081; | Q&#x2081; |
 |---|---|---|---|
@@ -424,6 +424,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 
 ![LATCH gate](LATCH.png "LATCH")
 
+The Latch has two inputs D (data) and E (enable). When E is 0 (false) the output Q will remain unchanged. When E is 1 (true) the output Q will be the same as input D.
+
 | D | E&#x2081; | Q&#x2081; |
 |---|---|---|
 | &#x2715; | E&#x2080; | Q&#x2080; |
@@ -441,6 +443,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 
 ![DELAY gate](DELAY.png "DELAY")
 
+The Delay has one input D (data). The output Q will be the same as the input D but delayed by exactly one sample.
+
 | D&#x2081; | Q |
 |---|---|
 | &#x2715; | D&#x2080; |
@@ -454,6 +458,8 @@ The SR Latch has three inputs S (set), R (reset) and and edge triggered intput E
 ### CLK-DELAY
 
 ![CLK-DELAY gate](CLK-DELAY.png "CLK-DELAY")
+
+The Clocked-Delay has two inputs C (clock) and D (data). It also has an internal register A. When the input C rises from 0 (false) to 1 (true) the output Q takes on the value of register A; AND at the same time the register A takes on the value of input D. Output Q will remain unchanged until the next time that C rises from 0 (false) to 1 (true).
 
 | C&#x2081; | D | A&#x2081; | Q&#x2081; |
 |---|---|---|---|
