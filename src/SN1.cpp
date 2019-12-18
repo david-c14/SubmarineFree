@@ -66,6 +66,7 @@ struct SN_1 : Module {
 	int effectiveGridWidth = maxGridWidth;
 	float x = 0.0f;
 	float y = 0.0f;
+	float maxOutput = 0.0f;
 
 	SN_1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -161,8 +162,8 @@ struct SN_1 : Module {
 		int cell = (int)x;
 		float xoffset = x - cell;
 
-		__m128 dvX = _mm_set_ps(xoffset, xoffset - 1.0f, xoffset, xoffset - 1.0f);
-		__m128 dvY = _mm_set_ps(y, y, y - 1.0f, y - 1.0f);
+		__m128 dvX = _mm_set_ps(xoffset - 1.0f, xoffset, xoffset - 1.0f, xoffset);
+		__m128 dvY = _mm_set_ps(y - 1.0f, y - 1.0f, y, y);
 
 		dvY = _mm_mul_ps(dvY, _mm_set1_ps(0.5f));
 		dvX = _mm_sub_ps(dvX, dvY);
@@ -177,9 +178,14 @@ struct SN_1 : Module {
 		dvX = _mm_mul_ps(dvX, dvX);
 		dvX = _mm_mul_ps(dvX, dvX);
 		dvX = _mm_mul_ps(dvX, dot);
-		float output[4];
+		alignas(16) float output[4];
 		_mm_store_ps(output, dvX);
 		output[0] += (output[1] + output[2] + output[3]);
+		
+		if (output[0] > maxOutput) {
+			maxOutput = output[0];
+			DEBUG("%f", maxOutput);
+		}
 
 		outputs[OUTPUT_1].setVoltage(80.0f * output[0],0);
 	}
