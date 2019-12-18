@@ -19,7 +19,7 @@ namespace {
 		float ury;// y-coord upper right
 	};
 
-	const unsigned int maxGridWidth = 32;
+	const unsigned int maxGridWidth = 16;
 
 	float sineLookup[16] = {
 		0.195090322016128f,
@@ -46,6 +46,7 @@ struct SN_1 : Module {
 		PARAM_FREQ,
 		PARAM_EVOL,
 		PARAM_LENGTH,
+		PARAM_DEPTH,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -73,6 +74,7 @@ struct SN_1 : Module {
 		configParam(PARAM_FREQ, -54.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
 		configParam(PARAM_EVOL, 0.0f, 1.0f, 0.0f, "Evolution");
 		configParam(PARAM_LENGTH, 2.0f, maxGridWidth, effectiveGridWidth, "Cycle Length");
+		configParam(PARAM_DEPTH, 1.0f, 5.0f, 1.0f, "Depth");
 		initLFSR(lfsr);
 		initGridRow();
 		shiftGridRows();
@@ -159,35 +161,43 @@ struct SN_1 : Module {
 		if (y >= 1)
 			resetY();	
 
-		int cell = (int)x;
-		float xoffset = x - cell;
+		unsigned int depth = (unsigned int)clamp(params[PARAM_DEPTH].getValue(), 1.0f, 5.0f);
+		float output = 0;
 
-		__m128 dvX = _mm_set_ps(xoffset - 1.0f, xoffset, xoffset - 1.0f, xoffset);
-		__m128 dvY = _mm_set_ps(y - 1.0f, y - 1.0f, y, y);
+		for (unsigned int i = 1; i <= depth; i++) {
 
-		dvY = _mm_mul_ps(dvY, _mm_set1_ps(0.5f));
-		dvX = _mm_sub_ps(dvX, dvY);
-		dvY = _mm_mul_ps(dvY, _mm_set1_ps(1.73205080757f));
+			float xoffset = (x * i);
+			int cell = (int)xoffset;
+			xoffset = xoffset - cell;
+			cell %= effectiveGridWidth;
 
-		__m128 dot = _mm_add_ps(_mm_mul_ps(dvX, _mm_load_ps(&(grid[cell].llx))), _mm_mul_ps(dvY, _mm_load_ps(&(grid[cell].lly))));
+			__m128 dvX = _mm_set_ps(xoffset - 1.0f, xoffset, xoffset - 1.0f, xoffset);
+			__m128 dvY = _mm_set_ps(y - 1.0f, y - 1.0f, y, y);
 
-		dvX = _mm_mul_ps(dvX, dvX);
-		dvY = _mm_mul_ps(dvY, dvY);
-		dvX = _mm_sub_ps(_mm_set1_ps(0.75f), _mm_add_ps(dvX, dvY));
-		dvX = _mm_max_ps(dvX, _mm_set1_ps(0.0f));
-		dvX = _mm_mul_ps(dvX, dvX);
-		dvX = _mm_mul_ps(dvX, dvX);
-		dvX = _mm_mul_ps(dvX, dot);
-		alignas(16) float output[4];
-		_mm_store_ps(output, dvX);
-		output[0] += (output[1] + output[2] + output[3]);
+			dvY = _mm_mul_ps(dvY, _mm_set1_ps(0.5f));
+			dvX = _mm_sub_ps(dvX, dvY);
+			dvY = _mm_mul_ps(dvY, _mm_set1_ps(1.73205080757f));
+
+			__m128 dot = _mm_add_ps(_mm_mul_ps(dvX, _mm_load_ps(&(grid[cell].llx))), _mm_mul_ps(dvY, _mm_load_ps(&(grid[cell].lly))));
+
+			dvX = _mm_mul_ps(dvX, dvX);
+			dvY = _mm_mul_ps(dvY, dvY);
+			dvX = _mm_sub_ps(_mm_set1_ps(0.75f), _mm_add_ps(dvX, dvY));
+			dvX = _mm_max_ps(dvX, _mm_set1_ps(0.0f));
+			dvX = _mm_mul_ps(dvX, dvX);
+			dvX = _mm_mul_ps(dvX, dvX);
+			dvX = _mm_mul_ps(dvX, dot);
+			alignas(16) float nodes[4];
+			_mm_store_ps(nodes, dvX);
+			output += (nodes[0] + nodes[1] + nodes[2] + nodes[3]) / i;
 		
-		if (output[0] > maxOutput) {
-			maxOutput = output[0];
+		}
+		if (output > maxOutput) {
+			maxOutput = output;
 			DEBUG("%f", maxOutput);
 		}
 
-		outputs[OUTPUT_1].setVoltage(80.0f * output[0],0);
+		outputs[OUTPUT_1].setVoltage(80.0f * output,0);
 	}
 };
 
@@ -203,6 +213,7 @@ struct SN101 : SchemeModuleWidget {
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 150), module, SN_1::PARAM_EVOL));
 		lengthKnob = createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 190), module, SN_1::PARAM_LENGTH);
 		addParam(lengthKnob);
+		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 230), module, SN_1::PARAM_DEPTH));
 		addOutput(createOutputCentered<SilverPort>(Vec(15,350), module, SN_1::OUTPUT_1));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
