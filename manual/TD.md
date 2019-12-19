@@ -10,7 +10,7 @@ The TD-116 is a text display on which you can make notes or put text into the vi
 
 The TD-116 features [Torpedo](https://github.com/david-c14/Torpedo) input and ouput ports. Changes to the text are sent through the output port, which allows you to capture the text in any suitable Torpedo device. 
 
-Text or formatting information can be sent into the TD-116 through the Torpedo input port, allowing you to change the text or formatting programmatically. Formatting can also be acheived through the context menu, or by using an extension device.
+Text or formatting information can be sent into the TD-116 through the Torpedo input port, allowing you to change the text or formatting programmatically. Formatting can also be achieved through the context menu, or by using an extension device.
 
 The TD-316 is a similar device to the TD-116 but with a 20% larger text display. Although the TD-316 does not feature Torpedo ports, it can still be formatted using the context menu or an extension device.
 
