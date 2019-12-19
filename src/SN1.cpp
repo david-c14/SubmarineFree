@@ -39,6 +39,41 @@ namespace {
 		-0.555570233019602f,
 		-0.195090322016128f
 	};
+
+	float normaliserLookup[32] = {
+		1.0f / (0.01247338367 * (1.0f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f)),
+		1.0f / (0.01247338367 * (1.0f + 0.25f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.25f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f + 0.25f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f + 0.25f)),
+		1.0f / (0.01247338367 * (1.0f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.25f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.25f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f + 0.25f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f + 0.25f + 0.2f)),
+		1.0f / (0.01247338367 * (1.0f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.25f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.25f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f + 0.25f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f + 0.25f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.2f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.2f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f + 0.2f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f + 0.2f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.25f + 0.2f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.25f + 0.2f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.3333333333f + 0.25f + 0.2f + 0.125f)),
+		1.0f / (0.01247338367 * (1.0f + 0.5f + 0.3333333333f + 0.25f + 0.2f + 0.125f))
+	};
 }
 
 struct SN_1 : Module {
@@ -46,7 +81,11 @@ struct SN_1 : Module {
 		PARAM_FREQ,
 		PARAM_EVOL,
 		PARAM_LENGTH,
-		PARAM_DEPTH,
+		PARAM_HARM_2,
+		PARAM_HARM_3,
+		PARAM_HARM_4,
+		PARAM_HARM_5,
+		PARAM_HARM_8,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -64,7 +103,7 @@ struct SN_1 : Module {
 
 	alignas(64) Gridcell grid[maxGridWidth];
 	__m128i lfsr;
-	int effectiveGridWidth = maxGridWidth;
+	int effectiveGridWidth = 4.0f;
 	float x = 0.0f;
 	float y = 0.0f;
 	float maxOutput = 0.0f;
@@ -74,7 +113,11 @@ struct SN_1 : Module {
 		configParam(PARAM_FREQ, -54.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
 		configParam(PARAM_EVOL, 0.0f, 1.0f, 0.0f, "Evolution");
 		configParam(PARAM_LENGTH, 2.0f, maxGridWidth, effectiveGridWidth, "Cycle Length");
-		configParam(PARAM_DEPTH, 1.0f, 5.0f, 1.0f, "Depth");
+		configParam(PARAM_HARM_2, 0.0f, 1.0f, 0.0f, "2x Harmonic");
+		configParam(PARAM_HARM_3, 0.0f, 1.0f, 0.0f, "3x Harmonic");
+		configParam(PARAM_HARM_4, 0.0f, 1.0f, 0.0f, "4x Harmonic");
+		configParam(PARAM_HARM_5, 0.0f, 1.0f, 0.0f, "5x Harmonic");
+		configParam(PARAM_HARM_8, 0.0f, 1.0f, 0.0f, "8x Harmonic");
 		initLFSR(lfsr);
 		initGridRow();
 		shiftGridRows();
@@ -147,6 +190,32 @@ struct SN_1 : Module {
 		x -= intX;
 		x += intX % effectiveGridWidth;
 	}
+	inline float noiseFunction(float xoffset)
+	{
+		int cell = (int)xoffset;
+		xoffset = xoffset - cell;
+		cell %= effectiveGridWidth;
+
+		__m128 dvX = _mm_set_ps(xoffset - 1.0f, xoffset, xoffset - 1.0f, xoffset);
+		__m128 dvY = _mm_set_ps(y - 1.0f, y - 1.0f, y, y);
+
+		dvY = _mm_mul_ps(dvY, _mm_set1_ps(0.5f));
+		dvX = _mm_sub_ps(dvX, dvY);
+		dvY = _mm_mul_ps(dvY, _mm_set1_ps(1.73205080757f));
+
+		__m128 dot = _mm_add_ps(_mm_mul_ps(dvX, _mm_load_ps(&(grid[cell].llx))), _mm_mul_ps(dvY, _mm_load_ps(&(grid[cell].lly))));
+
+		dvX = _mm_mul_ps(dvX, dvX);
+		dvY = _mm_mul_ps(dvY, dvY);
+		dvX = _mm_sub_ps(_mm_set1_ps(0.75f), _mm_add_ps(dvX, dvY));
+		dvX = _mm_max_ps(dvX, _mm_set1_ps(0.0f));
+		dvX = _mm_mul_ps(dvX, dvX);
+		dvX = _mm_mul_ps(dvX, dvX);
+		dvX = _mm_mul_ps(dvX, dot);
+		alignas(16) float nodes[4];
+		_mm_store_ps(nodes, dvX);
+		return (nodes[0] + nodes[1] + nodes[2] + nodes[3]);
+	}
 
 	void process(const ProcessArgs &args) override {
 		float baseFreq = 261.626f;
@@ -161,43 +230,35 @@ struct SN_1 : Module {
 		if (y >= 1)
 			resetY();	
 
-		unsigned int depth = (unsigned int)clamp(params[PARAM_DEPTH].getValue(), 1.0f, 5.0f);
-		float output = 0;
-
-		for (unsigned int i = 1; i <= depth; i++) {
-
-			float xoffset = (x * i);
-			int cell = (int)xoffset;
-			xoffset = xoffset - cell;
-			cell %= effectiveGridWidth;
-
-			__m128 dvX = _mm_set_ps(xoffset - 1.0f, xoffset, xoffset - 1.0f, xoffset);
-			__m128 dvY = _mm_set_ps(y - 1.0f, y - 1.0f, y, y);
-
-			dvY = _mm_mul_ps(dvY, _mm_set1_ps(0.5f));
-			dvX = _mm_sub_ps(dvX, dvY);
-			dvY = _mm_mul_ps(dvY, _mm_set1_ps(1.73205080757f));
-
-			__m128 dot = _mm_add_ps(_mm_mul_ps(dvX, _mm_load_ps(&(grid[cell].llx))), _mm_mul_ps(dvY, _mm_load_ps(&(grid[cell].lly))));
-
-			dvX = _mm_mul_ps(dvX, dvX);
-			dvY = _mm_mul_ps(dvY, dvY);
-			dvX = _mm_sub_ps(_mm_set1_ps(0.75f), _mm_add_ps(dvX, dvY));
-			dvX = _mm_max_ps(dvX, _mm_set1_ps(0.0f));
-			dvX = _mm_mul_ps(dvX, dvX);
-			dvX = _mm_mul_ps(dvX, dvX);
-			dvX = _mm_mul_ps(dvX, dot);
-			alignas(16) float nodes[4];
-			_mm_store_ps(nodes, dvX);
-			output += (nodes[0] + nodes[1] + nodes[2] + nodes[3]) / i;
-		
+		float output = noiseFunction(x);
+		int normaliser = 0;
+		if (params[PARAM_HARM_2].getValue()) {
+			output += noiseFunction(x * 2) * 0.5f;
+			normaliser += 1;
 		}
+		if (params[PARAM_HARM_3].getValue()) {
+			output += noiseFunction(x * 3) * 0.33333333333f;
+			normaliser += 2;
+		}
+		if (params[PARAM_HARM_4].getValue()) {
+			output += noiseFunction(x * 4) * 0.25f;
+			normaliser += 4;
+		}
+		if (params[PARAM_HARM_5].getValue()) {
+			output += noiseFunction(x * 5) * 0.2f;
+			normaliser += 8;
+		}
+		if (params[PARAM_HARM_8].getValue()) {
+			output += noiseFunction(x * 8) * 0.125f;
+			normaliser += 16;
+		}
+
 		if (output > maxOutput) {
 			maxOutput = output;
-			DEBUG("%f", maxOutput);
+			DEBUG("%f", 5.0f / maxOutput);
 		}
 
-		outputs[OUTPUT_1].setVoltage(80.0f * output,0);
+		outputs[OUTPUT_1].setVoltage(normaliserLookup[normaliser] * output,0);
 	}
 };
 
@@ -209,16 +270,29 @@ struct SN101 : SchemeModuleWidget {
 
 		addInput(createInputCentered<SilverPort>(Vec(15,31.5), module, SN_1::INPUT_FREQ));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 70), module, SN_1::PARAM_FREQ));
-		addInput(createInputCentered<SilverPort>(Vec(15,111.5), module, SN_1::INPUT_EVOL));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 150), module, SN_1::PARAM_EVOL));
-		lengthKnob = createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 190), module, SN_1::PARAM_LENGTH);
+
+		addInput(createInputCentered<SilverPort>(Vec(15,101.5), module, SN_1::INPUT_EVOL));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 140), module, SN_1::PARAM_EVOL));
+		lengthKnob = createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 170), module, SN_1::PARAM_LENGTH);
 		addParam(lengthKnob);
-		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(15, 230), module, SN_1::PARAM_DEPTH));
+		addParam(createParamCentered<LightButton>(Vec(20, 210), module, SN_1::PARAM_HARM_2));
+		addParam(createParamCentered<LightButton>(Vec(20, 230), module, SN_1::PARAM_HARM_3));
+		addParam(createParamCentered<LightButton>(Vec(20, 250), module, SN_1::PARAM_HARM_4));
+		addParam(createParamCentered<LightButton>(Vec(20, 270), module, SN_1::PARAM_HARM_5));
+		addParam(createParamCentered<LightButton>(Vec(20, 290), module, SN_1::PARAM_HARM_8));
 		addOutput(createOutputCentered<SilverPort>(Vec(15,350), module, SN_1::OUTPUT_1));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "SN-101");
 		drawText(vg, 16, 55, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "FREQ.");
+		drawText(vg, 16, 125, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "EVOL.");
+		drawText(vg, 16, 195, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "LEN.");
+		drawText(vg, 7, 210, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "2x");
+		drawText(vg, 7, 230, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "3x");
+		drawText(vg, 7, 250, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "4x");
+		drawText(vg, 7, 270, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "5x");
+		drawText(vg, 7, 290, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "8x");
+		drawText(vg, 16, 333, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
 	}
 	void step() override {
 		if (module) {
