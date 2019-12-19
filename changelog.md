@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.1
+- 19-Dec-2019 Two typos in the manual kindly corrected by Darío Hereñú
 - 17-Dec-2019 Improve Manual for DO-1xx devices
 - 07-Dec-2019 Make DO-1xx connectors scrolling consistent between connectors and across devices
 - 07-Dec-2019 Bug fix #54 - DN-112 does not produce maximal sequence
