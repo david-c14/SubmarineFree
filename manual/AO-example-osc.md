@@ -24,7 +24,7 @@ The sixth block multiplies the signal by 5 to give the final -5V to +5V sine wav
 
 The complicated part of this patch is in the first block where the algorithm is 2<sup>x+c</sup>. Where does this value of C = -7.52 come from?
 
-To acheive our basic requirement of 1v/oct, we need to raise 2 to the power of the CV input. For each increase 1V increase in the CV, 
+To achieve our basic requirement of 1v/oct, we need to raise 2 to the power of the CV input. For each increase 1V increase in the CV, 
 the resulting value doubles, just like the frequency doubling as we move up an octave. But we have some further requirements.
 
 We want our signal frequency to be middle C (261.6Hz) when the CV is at 0V, so we should multiply our power of 2 by 261.6. 
