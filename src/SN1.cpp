@@ -106,7 +106,6 @@ struct SN_1 : Module {
 	int effectiveGridWidth = 4.0f;
 	float x = 0.0f;
 	float y = 0.0f;
-	float maxOutput = 0.0f;
 
 	SN_1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -174,6 +173,9 @@ struct SN_1 : Module {
 	}
 
 	void resetX() {
+		int intX = (int)x;
+		x -= intX;
+		x += intX % effectiveGridWidth;
 		int newEffectiveGridWidth = clamp(params[PARAM_LENGTH].getValue(), 2.0f, maxGridWidth);
 		if (effectiveGridWidth != newEffectiveGridWidth) {
 			grid[(effectiveGridWidth - 1)].lrx = grid[effectiveGridWidth % maxGridWidth].llx;
@@ -186,9 +188,6 @@ struct SN_1 : Module {
 			grid[(effectiveGridWidth - 1)].lry = grid[0].lly;
 			grid[(effectiveGridWidth - 1)].ury = grid[0].uly;
 		}
-		int intX = (int)x;
-		x -= intX;
-		x += intX % effectiveGridWidth;
 	}
 	inline float noiseFunction(float xoffset)
 	{
@@ -251,11 +250,6 @@ struct SN_1 : Module {
 		if (params[PARAM_HARM_8].getValue()) {
 			output += noiseFunction(x * 8) * 0.125f;
 			normaliser += 16;
-		}
-
-		if (output > maxOutput) {
-			maxOutput = output;
-			DEBUG("%f", 5.0f / maxOutput);
 		}
 
 		outputs[OUTPUT_1].setVoltage(normaliserLookup[normaliser] * output,0);
