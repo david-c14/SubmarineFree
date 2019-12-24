@@ -1,7 +1,7 @@
 # Smooth Noise
 #### SN-101 Smooth Noise Oscillator 
 
-![View of the Smooth Noise Oscillator](SN-101.png "Smooth Noise Oscillator")
+![View of the Smooth Noise Oscillator](SN.png "Smooth Noise Oscillator")
 
 ## Basic Operation
 
