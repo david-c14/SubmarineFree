@@ -45,6 +45,9 @@ Pulse Generators
 # [PO](PO.md)
 Phased Oscillators
 
+# [SN](SN.md)
+Smooth Noise
+
 # [SS](SS.md)
 Voltage Sources and Sinks
 
