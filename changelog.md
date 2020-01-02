@@ -1,6 +1,8 @@
 # Changelog
 
 ## v1.1.1
+- 02-Jan-2020 Secret Santa 2019 is now obsolete
+- 02-Jan-2020 Make WK-XXX case insensitive when searching for Scala files
 - 24-Dec-2019 Add Smooth Noise SN-101 module
 - 19-Dec-2019 Two typos in the manual kindly corrected by Darío Hereñú
 - 17-Dec-2019 Improve Manual for DO-1xx devices
