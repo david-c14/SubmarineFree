@@ -1,5 +1,7 @@
 on:
   push:
+    branches:
+    - master
 name: Build Master
 env:
   PLUGIN_BUILD_VERSION: 1.1.1
@@ -8,7 +10,7 @@ jobs:
     name: Build Linux
     runs-on: ubuntu-latest
     env:
-      DIST_ASSET_NAME: SubmarineFree-${{ PLUGIN_BUILD_VERSION }}-lin.zip
+      DIST_ASSET_NAME: SubmarineFree-${{PLUGIN_BUILD_VERSION}}-lin.zip
     steps:
     - uses: actions/checkout@master
     - name: Build Linux
