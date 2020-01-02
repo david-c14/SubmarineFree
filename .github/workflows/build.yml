@@ -5,7 +5,6 @@ on:
 name: Build Master
 env:
   PLUGIN_BUILD_VERSION: 1.1.0
-  DIST_ASSET_NAME: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
 jobs:
   buildLinux:
     name: Build Linux
