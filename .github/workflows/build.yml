@@ -5,12 +5,11 @@ on:
 name: Build Master
 env:
   PLUGIN_BUILD_VERSION: 1.1.0
+  DIST_ASSET_NAME: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
 jobs:
   buildLinux:
     name: Build Linux
     runs-on: ubuntu-latest
-    env:
-      DIST_ASSET_NAME: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
     steps:
     - uses: actions/checkout@master
     - name: Build Linux
