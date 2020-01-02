@@ -1,3 +1,6 @@
+on:
+  schedule:
+    - cron: '*/15 * * * *'
 name: Build Master
 jobs:
   buildLinux:
@@ -8,28 +11,28 @@ jobs:
     - name: Build Linux
       uses: ./.github/actions/build_linux
       env:
-        RACK_SDK_VERSION: 1.1.4
-    - name: Upload Linux Release
-      uses: ./.github/actions/update_asset
-      env:
-        ASSET_PATH: dist/SubmarineFree-1.1.1-lin.zip
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        RELEASE_TAG: latest
-  buildWindows:
-    name: Build Windows
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Build Windows
-      uses: ./.github/actions/build_win
-      env:
-        RACK_SDK_VERSION: 1.1.4
-    - name: Upload Windows Release
-      uses: ./.github/actions/update_asset
-      env:
-        ASSET_PATH: dist/SubmarineFree-1.1.1-win.zip
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        RELEASE_TAG: latest
+        RACK_SDK_VERSION: 1.1.6
+    #- name: Upload Linux Release
+    #  uses: ./.github/actions/update_asset
+    #  env:
+    #    ASSET_PATH: dist/SubmarineFree-1.1.1-lin.zip
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #    RELEASE_TAG: latest
+  #buildWindows:
+  #  name: Build Windows
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #  - uses: actions/checkout@master
+  #  - name: Build Windows
+  #    uses: ./.github/actions/build_win
+  #    env:
+  #      RACK_SDK_VERSION: 1.1.4
+    #- name: Upload Windows Release
+    #  uses: ./.github/actions/update_asset
+    #  env:
+    #    ASSET_PATH: dist/SubmarineFree-1.1.1-win.zip
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #    RELEASE_TAG: latest
 # TODO: This doesn't work :(
 #  buildOsx:
 #    name: Build OSX
