@@ -193,7 +193,7 @@ void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
 	std::list<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
 	for (auto entry : dirList) {
 		if (system::isDirectory(entry)) continue;
-		if (string::filenameExtension(entry).compare("scl")) continue;
+		if (string::lowercase(string::filenameExtension(entry)).compare("scl")) continue;
 		loadScalaFile(entry);
 	}
 }
