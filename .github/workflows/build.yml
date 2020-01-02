@@ -20,7 +20,7 @@ jobs:
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
-        name: ${{ $PLUGIN_BUILD_VERSION }}
+        name: ${{ env['PLUGIN_BUILD_VERSION'] }}
         path: ./dist/SubmarineFree-1.1.0-lin.zip
     #- name: Upload Linux Release
     #  uses: ./.github/actions/update_asset
