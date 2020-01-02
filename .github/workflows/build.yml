@@ -4,13 +4,13 @@ on:
     - master
 name: Build Master
 env:
-  PLUGIN_BUILD_VERSION: 1.1.1
+  PLUGIN_BUILD_VERSION: 1.1.0
 jobs:
   buildLinux:
     name: Build Linux
     runs-on: ubuntu-latest
     env:
-      DIST_ASSET_NAME: SubmarineFree-1.1.1-lin.zip
+      DIST_ASSET_NAME: SubmarineFree-1.1.0-lin.zip
     steps:
     - uses: actions/checkout@master
     - name: Build Linux
@@ -21,7 +21,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with: 
         name: $PLUGIN_BUILD_VERSION
-        path: ./dist/SubmarineFree-1.1.1-lin.zip
+        path: ./dist/SubmarineFree-1.1.0-lin.zip
     #- name: Upload Linux Release
     #  uses: ./.github/actions/update_asset
     #  env:
