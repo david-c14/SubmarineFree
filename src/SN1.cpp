@@ -258,7 +258,8 @@ struct SN_1 : Module {
 
 struct SN101 : SchemeModuleWidget {
 	LightKnob *lengthKnob;
-	SN101(SN_1 *module) : SchemeModuleWidget(module) {
+	SN101(SN_1 *module) : SchemeModuleWidget() {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
