@@ -10,7 +10,7 @@ jobs:
     name: Build Linux
     runs-on: ubuntu-latest
     env:
-      DIST_ASSET_NAME: SubmarineFree-1.1.0-lin.zip
+      DIST_ASSET_NAME: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
     steps:
     - uses: actions/checkout@master
     - name: Build Linux
@@ -20,8 +20,8 @@ jobs:
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
-        name: ${{ env['PLUGIN_BUILD_VERSION'] }}
-        path: ./dist/SubmarineFree-1.1.0-lin.zip
+        name: ${{ env['DIST_ASSET_NAME'] }}
+        path: ./dist/${{ env['DIST_ASSET_NAME'] }}
     #- name: Upload Linux Release
     #  uses: ./.github/actions/update_asset
     #  env:
