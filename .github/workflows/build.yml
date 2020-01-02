@@ -12,6 +12,11 @@ jobs:
       uses: ./.github/actions/build_linux
       env:
         RACK_SDK_VERSION: 1.1.6
+    - name: Save artifact
+      uses: actions/upload-artifact@v1
+      with: 
+        name: SubmarineFree-1.1.0-lin.zip
+        path: ./dist/SubmarineFree-1.1.0-lin.zip
     #- name: Upload Linux Release
     #  uses: ./.github/actions/update_asset
     #  env:
