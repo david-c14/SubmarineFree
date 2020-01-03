@@ -26,7 +26,7 @@ jobs:
     ##    ASSET_PATH: dist/SubmarineFree-1.1.1-lin.zip
     ##    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     ##    RELEASE_TAG: latest
-  buildWindows:
+  #buildWindows:
     #name: Build Windows
     #runs-on: ubuntu-latest
     #steps:
