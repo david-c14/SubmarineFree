@@ -56,7 +56,7 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
-        path: ./lin.zip 
+        path: ./dist 
     #- name: Download Windows
     #  uses: actions/download-artifact@v1
     #  with:
@@ -65,7 +65,9 @@ jobs:
     - name: pwd
       run: pwd
     - name: list
-      run: ls
+      run: ls -al
+    - name: list2
+      run: ls -al dist
     - name: Combine
       #uses: ./.github/actions/combine_dist
       run: unzip lin.zip -d ./Rack
