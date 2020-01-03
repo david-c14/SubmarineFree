@@ -70,7 +70,7 @@ jobs:
       run: ls -al dist
     - name: Combine
       #uses: ./.github/actions/combine_dist
-      run: unzip lin.zip -d ./Rack
+      run: unzip dist/lin.zip -d ./Rack
     - name: Combine2
       run: unzip win.zip -d ./Rack
     - name: Combine3
