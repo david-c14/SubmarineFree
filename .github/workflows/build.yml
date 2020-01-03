@@ -63,7 +63,7 @@ jobs:
         name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-win.zip
         path: ./dist 
     - name: Unzip
-      run: unzip dist/*.zip -d ./dist
+      run: unzip "dist/*.zip" -d ./dist
     - name: Remove Zipfiles
       run: rm dist/*.zip
     - name: Combine
