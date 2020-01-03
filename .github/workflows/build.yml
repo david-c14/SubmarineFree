@@ -6,20 +6,20 @@ name: Build Master
 env:
   PLUGIN_BUILD_VERSION: 1.1.0
 jobs:
-  #buildLinux:
-    #name: Build Linux
-    #runs-on: ubuntu-latest
-    #steps:
-    #- uses: actions/checkout@master
-    #- name: Build Linux
-    #  uses: ./.github/actions/build_linux
-    #  env:
-    #    RACK_SDK_VERSION: 1.1.6
-    #- name: Save artifact
-    #  uses: actions/upload-artifact@v1
-    #  with: 
-    #    name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
-    #    path: ./dist/SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
+  buildLinux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build Linux
+      uses: ./.github/actions/build_linux
+      env:
+        RACK_SDK_VERSION: 1.1.6
+    - name: Save artifact
+      uses: actions/upload-artifact@v1
+      with: 
+        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
+        path: ./dist/SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
     ##- name: Upload Linux Release
     ##  uses: ./.github/actions/update_asset
     ##  env:
@@ -46,6 +46,27 @@ jobs:
     #    ASSET_PATH: dist/SubmarineFree-1.1.1-win.zip
     #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #    RELEASE_TAG: latest
+  combineDist:
+    name: Combine Distributions
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Linux
+      uses: actions/download-artifact@v1
+      with:
+        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
+        path: ./lin.zip 
+    - name: Download Windows
+      uses: actions/download-artifact@v1
+      with:
+        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-win.zip
+        path: ./win.zip 
+    - name: Combine
+      uses: ./.github/actions/combine_dist
+    - name: Save artifact 
+      uses: actions/upload-artifact@v1
+      with:
+        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}.zip
+        path: ./combined.zip 
 # TODO: This doesn't work :(
 #  buildOsx:
 #    name: Build OSX
