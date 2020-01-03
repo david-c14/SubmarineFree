@@ -15,7 +15,7 @@ RUN apt-get install -y unzip zip
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
 
-ADD lin.zip /lin.zip
-ADD win.zip /win.zip
+ADD lin.zip lin.zip
+ADD win.zip win.zip
 
 ENTRYPOINT ["/entrypoint.sh"]
