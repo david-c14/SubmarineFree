@@ -62,11 +62,9 @@ jobs:
     #  with:
     #    name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-win.zip
     #    path: ./win.zip 
-    - name: pwd
-      run: pwd
+    - name: unzip
+      run: unzip dist/*.zip -d ./dist
     - name: list
-      run: ls -al
-    - name: list2
       run: ls -al dist
     - name: Combine
       #uses: ./.github/actions/combine_dist
