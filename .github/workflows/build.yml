@@ -63,7 +63,12 @@ jobs:
         name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-win.zip
         path: ./win.zip 
     - name: Combine
-      uses: ./.github/actions/combine_dist
+      #uses: ./.github/actions/combine_dist
+      run: unzip lin.zip -d ./Rack
+    - name: Combine2
+      run: unzip win.zip -d ./Rack
+    - name: Combine3
+      run: zip -q -9 -r combined.zip ./Rack
     - name: Save artifact 
       uses: actions/upload-artifact@v1
       with:
