@@ -67,7 +67,7 @@ jobs:
     - name: Remove Zipfiles
       run: rm dist/*.zip
     - name: Combine
-      run: zip -q -9 -r SubmarineFree-${{ env['PLUGIN_BUILD_VERSION] }}.zip ./dist/SubmarineFree
+      run: zip -q -9 -r SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}.zip ./dist/SubmarineFree
     - name: Save artifact 
       uses: actions/upload-artifact@v1
       with:
