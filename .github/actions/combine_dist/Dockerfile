@@ -15,7 +15,7 @@ RUN apt-get install -y unzip zip
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod a+x /entrypoint.sh
 
-ADD lin.zip /home/runner/work/SubmarineFree/SubmarineFree/lin.zip
-ADD win.zip /home/runner/work/SubmarineFree/SubmarineFree/win.zip
+ADD /home/runner/work/SubmarineFree/SubmarineFree/lin.zip /lin.zip
+ADD /home/runner/work/SubmarineFree/SubmarineFree/win.zip /win.zip
 
 ENTRYPOINT ["/entrypoint.sh"]
