@@ -49,6 +49,7 @@ jobs:
   combineDist:
     name: Combine Distributions
     runs-on: ubuntu-latest
+    needs: [buildLinux, buildWindows]
     steps:
     - name: Download Linux
       uses: actions/download-artifact@v1
