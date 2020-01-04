@@ -137,7 +137,8 @@ struct RGBLight : GrayModuleLightWidget {
 
 
 struct TF101 : SchemeModuleWidget {
-	TF101(TF<true> *module) : SchemeModuleWidget(module) {
+	TF101(TF<true> *module) {
+		setModule(module);
 		this->box.size = Vec(90, 380);
 		addChild(new SchemePanel(this->box.size));
 
@@ -190,7 +191,8 @@ struct TF101 : SchemeModuleWidget {
 };
 
 struct TF102 : SchemeModuleWidget {
-	TF102(TF<false> *module) : SchemeModuleWidget(module) {
+	TF102(TF<false> *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 

@@ -193,7 +193,7 @@ void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
 	std::list<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
 	for (auto entry : dirList) {
 		if (system::isDirectory(entry)) continue;
-		if (string::filenameExtension(entry).compare("scl")) continue;
+		if (string::lowercase(string::filenameExtension(entry)).compare("scl")) continue;
 		loadScalaFile(entry);
 	}
 }
@@ -321,7 +321,8 @@ struct WK_Param : MedKnob<LightKnob> {
 };
 
 struct WK101 : SchemeModuleWidget {
-	WK101(WK_101 *module) : SchemeModuleWidget(module) {
+	WK101(WK_101 *module) {
+		setModule(module);
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
 
@@ -624,7 +625,8 @@ void WK205_InputPort::received(std::string pluginName, std::string moduleName, j
 }
 
 struct WK205 : SchemeModuleWidget {
-	WK205(WK_205 *module) : SchemeModuleWidget(module) {
+	WK205(WK_205 *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 

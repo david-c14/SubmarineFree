@@ -68,7 +68,8 @@ struct TD_202 : Module {
 struct TD202 : SchemeModuleWidget {
 	TDVText *textField;
 
-	TD202(Module *module) : SchemeModuleWidget(module) {
+	TD202(Module *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 

@@ -424,7 +424,8 @@ struct EO_Measure_Vert : EO_Measure {
 
 struct EO102 : SchemeModuleWidget {
 	LightButton *paramRun;
-	EO102(EO_102 *module) : SchemeModuleWidget(module) {
+	EO102(EO_102 *module) {
+		setModule(module);
 		this->box.size = Vec(405, 380);
 		addChild(new SchemePanel(this->box.size));
 

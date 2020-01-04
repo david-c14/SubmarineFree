@@ -335,7 +335,8 @@ struct LA_Measure : TransparentWidget {
 
 struct LA108 : SchemeModuleWidget {
 	LightButton *resetButton;
-	LA108(LA_108 *module) : SchemeModuleWidget(module) {
+	LA108(LA_108 *module) {
+		setModule(module);
 		this->box.size = Vec(300, 380);
 		addChild(new SchemePanel(this->box.size));
 

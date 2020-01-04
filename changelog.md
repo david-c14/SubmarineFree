@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.1
+- 02-Jan-2020 Secret Santa 2019 is now obsolete
+- 02-Jan-2020 Make WK-XXX case insensitive when searching for Scala files
+- 24-Dec-2019 Add Smooth Noise SN-101 module
+- 19-Dec-2019 Two typos in the manual kindly corrected by Darío Hereñú
+- 17-Dec-2019 Improve Manual for DO-1xx devices
+- 07-Dec-2019 Make DO-1xx connectors scrolling consistent between connectors and across devices
+- 07-Dec-2019 Bug fix #54 - DN-112 does not produce maximal sequence
+- 03-Dec-2019 Remove unnecessary base constructor calls
+
 ## v1.1.0
 - 26-Nov-2019 Add Secret Santa 2019
 - 26-Nov-2019 Add DO-1xx Digital Operator Devices

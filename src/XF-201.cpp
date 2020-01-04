@@ -61,7 +61,8 @@ void XF_201::process(const ProcessArgs &args) {
 }
 
 struct XF201 : SchemeModuleWidget {
-	XF201(XF_201 *module) : SchemeModuleWidget(module) {
+	XF201(XF_201 *module) {
+		setModule(module);
 		XF_LightKnob *fader;
 		this->box.size = Vec(120, 380);
 		addChild(new SchemePanel(this->box.size));
@@ -122,7 +123,8 @@ struct XF201 : SchemeModuleWidget {
 };
 
 struct XF301 : SchemeModuleWidget {
-	XF301(XF_201 *module) : SchemeModuleWidget(module) {
+	XF301(XF_201 *module) {
+		setModule(module);
 		XF_LightKnob *fader;
 		this->box.size = Vec(120, 380);
 		addChild(new SchemePanel(this->box.size));

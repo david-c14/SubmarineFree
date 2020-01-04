@@ -44,7 +44,8 @@ struct PG_1 : DS_Module {
 };
 
 struct PG104 : SchemeModuleWidget {
-	PG104(PG_1<4> *module) : SchemeModuleWidget(module) {
+	PG104(PG_1<4> *module) { 
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
@@ -79,7 +80,8 @@ struct PG104 : SchemeModuleWidget {
 };
 
 struct PG112 : SchemeModuleWidget {
-	PG112(PG_1<12> *module) : SchemeModuleWidget(module) {
+	PG112(PG_1<12> *module) { 
+		setModule(module);
 		this->box.size = Vec(120, 380);
 		addChild(new SchemePanel(this->box.size));
 

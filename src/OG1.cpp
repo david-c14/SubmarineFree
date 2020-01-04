@@ -41,7 +41,8 @@ struct OG_1 : DS_Module {
 };
 
 struct OG104 : SchemeModuleWidget {
-	OG104(OG_1<4> *module) : SchemeModuleWidget(module) {
+	OG104(OG_1<4> *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
@@ -79,7 +80,8 @@ struct OG104 : SchemeModuleWidget {
 };
 
 struct OG106 : SchemeModuleWidget {
-	OG106(OG_1<6> *module) : SchemeModuleWidget(module) {
+	OG106(OG_1<6> *module) {
+		setModule(module);
 		this->box.size = Vec(90, 380);
 		addChild(new SchemePanel(this->box.size));
 

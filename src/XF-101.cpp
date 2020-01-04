@@ -60,7 +60,8 @@ void XF_101::process(const ProcessArgs &args) {
 }
 
 struct XF101 : SchemeModuleWidget {
-	XF101(XF_101 *module) : SchemeModuleWidget(module) {
+	XF101(XF_101 *module) {
+		setModule(module);
 		XF_LightKnob *fader;
 		this->box.size = Vec(180, 380);
 		addChild(new SchemePanel(this->box.size));

@@ -111,7 +111,8 @@ void TM_105::process(const ProcessArgs &args) {
 }
 
 struct TM105 : SchemeModuleWidget {
-	TM105(TM_105 *module) : SchemeModuleWidget(module) {
+	TM105(TM_105 *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 		for (unsigned int i = 0; i < 5; i++) {

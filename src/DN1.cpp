@@ -37,7 +37,7 @@ struct DN_1 : DS_Module {
 				unsigned int lsb = lfsr[i] & 1;
 				lfsr[i] >>= 1;
 				if (lsb)
-					lfsr[i] ^= 0xc3000000u;	
+					lfsr[i] ^= 0xa3000000u;	
 				outputs[OUTPUT_1 + i].setVoltage(lsb?voltage1:voltage0);
 			}
 		}
@@ -45,7 +45,8 @@ struct DN_1 : DS_Module {
 };
 
 struct DN112 : SchemeModuleWidget {
-	DN112(DN_1<12> *module) : SchemeModuleWidget(module) {
+	DN112(DN_1<12> *module) {
+		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 

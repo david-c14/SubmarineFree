@@ -69,7 +69,8 @@ struct TD3Text : SubText {
 struct TD316 : SchemeModuleWidget {
 	TD3Text *textField;
 
-	TD316(TD_316 *module) : SchemeModuleWidget(module) {
+	TD316(TD_316 *module) {
+		setModule(module);
 		this->box.size = Vec(240, 380);
 		addChild(new SchemePanel(this->box.size));
 

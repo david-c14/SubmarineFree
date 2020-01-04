@@ -2,7 +2,7 @@
 #### PO-101 Phased VCO
 #### PO-102 Phased LFO
 
-![View of the Phase VCO](PO-101.png "Phased VCO")
+![View of the Phased VCO](PO-101.png "Phased VCO")
 
 ## Basic Operation
 
