@@ -5,7 +5,9 @@ Free plugins for VCV Rack
 
 # [Manual](https://github.com/david-c14/SubmarineFree/blob/master/manual/index.md)
 
-# [Builds](https://github.com/david-c14/SubmarineFree/releases/tag/v1.0.2)
+# [Builds](https://github.com/david-c14/SubmarineFree/releases/tag/v1.1.1)
+###### [1.1.1](https://github.com/david-c14/SubmarineFree/releases/tag/v1.1.1)
+###### [1.1.0](https://github.com/david-c14/SubmarineFree/releases/tag/v1.1.0)
 ###### [1.0.2](https://github.com/david-c14/SubmarineFree/releases/tag/v1.0.2)
 ###### [1.0.1](https://github.com/david-c14/SubmarineFree/releases/tag/v1.0.1)
 ###### [0.6.8](https://github.com/david-c14/SubmarineFree/releases/tag/v0.6.8)
