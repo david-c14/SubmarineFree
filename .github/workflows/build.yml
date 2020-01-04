@@ -4,7 +4,8 @@ on:
     - master
 name: Build Master
 env:
-  PLUGIN_BUILD_VERSION: 1.1.0
+  PLUGIN_BUILD_VERSION: 1.1.1
+  RACK_SDK_VERSION: 1.1.6
 jobs:
   buildLinux:
     name: Build Linux
@@ -13,8 +14,6 @@ jobs:
     - uses: actions/checkout@master
     - name: Build Linux
       uses: ./.github/actions/build_linux
-      env:
-        RACK_SDK_VERSION: 1.1.6
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
@@ -27,8 +26,6 @@ jobs:
     - uses: actions/checkout@master
     - name: Build Windows
       uses: ./.github/actions/build_win
-      env:
-        RACK_SDK_VERSION: 1.1.6
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
@@ -41,8 +38,6 @@ jobs:
     - uses: actions/checkout@master
     - name: Build OSX
       uses: ./.github/actions/build_osx
-      env:
-        RACK_SDK_VERSION: 1.1.6
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
