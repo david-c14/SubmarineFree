@@ -12,24 +12,10 @@ SOURCES += $(wildcard src/*.cpp) $(wildcard src/shared/*.cpp)
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin is automatically added.
-DISTRIBUTABLES += $(wildcard LICENSE*) Scala manual WK_Custom.tunings.template
+DISTRIBUTABLES += $(wildcard LICENSE*) Scala manual WK_Custom.tunings.template gpl-3.0.txt changelog.md
 
 # If RACK_DIR is not defined when calling the Makefile, default to two levels above
 RACK_DIR ?= ../..
 
 # Include the VCV Rack plugin Makefile framework
 include $(RACK_DIR)/plugin.mk
-
-# Make resources
-
-RESOURCES += $(subst src/res/,res/,$(wildcard src/res/*.svg))
-
-res: $(RESOURCES)
-	
-%.svg: ../src/res/%.svg
-ifeq (${SVG_TOOL},inkscape)
-	inkscape -z -T -l=$@ $<
-else
-	touch $@
-endif
-
