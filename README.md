@@ -1,4 +1,4 @@
-# SubmarineFree
+# SubmarineFree ![](https://github.com/david-c14/SubmarineFree/workflows/Build%20Master/badge.svg)
 Free plugins for VCV Rack
 
 [.plan (what I'm working on)](https://github.com/david-c14/SubmarineFree/issues/23)
