@@ -1,10 +1,8 @@
 on:
-  push:
-    branches:
-    - master
+  release:
+    types: [published]
 name: Build Master
 env:
-  PLUGIN_BUILD_VERSION: 1.1.1
   RACK_SDK_VERSION: 1.1.6
 jobs:
   buildLinux:
@@ -12,65 +10,76 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Set Name
+      run: echo ::set-env name=PLUGIN_BUILD_NAME::$(jq -r .slug plugin.json)-$(jq -r .version plugin.json)-lin
     - name: Build Linux
       uses: ./.github/actions/build_linux
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
-        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
-        path: ./dist/SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
+        name: ${{ env['PLUGIN_BUILD_NAME'] }}.zip
+        path: ./dist/${{ env['PLUGIN_BUILD_NAME'] }}.zip
   buildWindows:
     name: Build Windows
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Set Name
+      run: echo ::set-env name=PLUGIN_BUILD_NAME::$(jq -r .slug plugin.json)-$(jq -r .version plugin.json)-win
     - name: Build Windows
       uses: ./.github/actions/build_win
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
-        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-win.zip
-        path: ./dist/SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-win.zip
+        name: ${{ env['PLUGIN_BUILD_NAME'] }}.zip
+        path: ./dist/${{ env['PLUGIN_BUILD_NAME'] }}.zip
   buildOsx:
     name: Build OSX
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Set Name
+      run: echo ::set-env name=PLUGIN_BUILD_NAME::$(jq -r .slug plugin.json)-$(jq -r .version plugin.json)-mac
     - name: Build OSX
       uses: ./.github/actions/build_osx
     - name: Save artifact
       uses: actions/upload-artifact@v1
       with: 
-        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-mac.zip
-        path: ./dist/SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-mac.zip
+        name: ${{ env['PLUGIN_BUILD_NAME'] }}.zip
+        path: ./dist/${{ env['PLUGIN_BUILD_NAME'] }}.zip
   combineDist:
     name: Combine Distributions
     runs-on: ubuntu-latest
     needs: [buildLinux, buildWindows, buildOsx]
     steps:
+    - uses: actions/checkout@master
+    - name: Set Slug
+      run: echo ::set-env name=PLUGIN_BUILD_SLUG::$(jq -r .slug plugin.json)
+    - name: Set Name
+      run: echo ::set-env name=PLUGIN_BUILD_NAME::${{ env['PLUGIN_BUILD_SLUG'] }}-$(jq -r .version plugin.json)
     - name: Download Linux
       uses: actions/download-artifact@v1
       with:
-        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-lin.zip
+        name: ${{ env['PLUGIN_BUILD_NAME'] }}-lin.zip
         path: ./dist 
     - name: Download Windows
       uses: actions/download-artifact@v1
       with:
-        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-win.zip
+        name: ${{ env['PLUGIN_BUILD_NAME'] }}-win.zip
         path: ./dist 
     - name: Download Osx
       uses: actions/download-artifact@v1
       with:
-        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}-mac.zip
+        name: ${{ env['PLUGIN_BUILD_NAME'] }}-mac.zip
         path: ./dist 
     - name: Unzip
       run: unzip -o "dist/*.zip" -d ./dist
     - name: Remove Zipfiles
       run: rm dist/*.zip
     - name: Combine
-      run: cd dist && zip -q -9 -r SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}.zip ./SubmarineFree
+      run: cd dist && zip -q -9 -r ${{ env['PLUGIN_BUILD_NAME'] }}.zip ./${{ env['PLUGIN_BUILD_SLUG'] }}
     - name: Save artifact 
       uses: actions/upload-artifact@v1
       with:
-        name: SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}.zip
-        path: ./dist/SubmarineFree-${{ env['PLUGIN_BUILD_VERSION'] }}.zip
+        name: ${{ env['PLUGIN_BUILD_NAME'] }}.zip
+        path: ./dist/${{ env['PLUGIN_BUILD_NAME'] }}.zip
