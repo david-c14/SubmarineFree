@@ -1,4 +1,4 @@
-# SubmarineFree ![](https://github.com/david-c14/SubmarineFree/workflows/Release/badge.svg) ![](https://github.com/david-c14/SubmarineFree/workflows/Develop/badge.svg) ![](https://img.shields.io/github/v/release/david-c14/SubmarineFree?logo=github) ![](https://img.shields.io/github/release-date/david-c14/SubmarineFree?logo=github)
+# SubmarineFree ![](https://github.com/david-c14/SubmarineFree/workflows/Release/badge.svg) ![](https://github.com/david-c14/SubmarineFree/workflows/Develop/badge.svg)
 Free plugins for VCV Rack
 
 [.plan (what I'm working on)](https://github.com/david-c14/SubmarineFree/issues/23)
