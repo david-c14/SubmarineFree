@@ -2,7 +2,7 @@ on:
   push:
     branches:
     - develop
-name: Release
+name: Develop
 env:
   RACK_SDK_VERSION: 1.1.6
 jobs:
