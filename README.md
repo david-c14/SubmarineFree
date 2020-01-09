@@ -9,7 +9,7 @@ Free plugins for VCV Rack
 
 # [Releases ![](https://img.shields.io/github/v/release/david-c14/SubmarineFree?label=Latest) ![](https://img.shields.io/github/release-date/david-c14/SubmarineFree?label=Released)](https://github.com/david-c14/SubmarineFree/releases)
 
-# [License](gpl-3.0.txt) ![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)
+# [License ![](https://img.shields.io/badge/License-GPLv3-blue.svg) ](gpl-3.0.txt)
 Source code licensed under GPL-3.0 by carbon14 (David O'Rourke)
 
 Some portions of this source code are based on code © 2016 by Andrew Belt
