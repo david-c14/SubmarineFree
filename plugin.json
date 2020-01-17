@@ -11,7 +11,7 @@
 	"donateUrl": "https://www.paypal.me/SubmarineFree",
         "pluginUrl": "https://github.com/david-c14/SubmarineFree/blob/master/README.md",
 	"changelogUrl": "https://github.com/david-c14/SubmarineFree/blob/master/changelog.md",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"modules": [
 		{
 			"slug":"AG-104",
