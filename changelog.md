@@ -1,5 +1,7 @@
 # Changelog
 
+## v1.1.2
+
 ## v1.1.1
 - 02-Jan-2020 Secret Santa 2019 is now obsolete
 - 02-Jan-2020 Make WK-XXX case insensitive when searching for Scala files
