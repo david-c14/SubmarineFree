@@ -3,7 +3,7 @@
 #include <cmath>
 #include "SubmarineFree.hpp"
 
-namespace SubmarineAO {
+namespace {
 
 	static float FunctorClipboard = NAN;
 
@@ -375,51 +375,51 @@ namespace SubmarineAO {
 #undef F
 #undef LAM
 
-} // end namespace SubmarineA0
-
-struct AOFuncDisplay : Knob {
-	Module *module;
-	int index;
-	AOFuncDisplay() {
-		box.size.x = 80;
-		box.size.y = 15;
-		snap = true;
-		smooth = false;
-		speed = 0.5f;
-	}
-	void draw(const DrawArgs &args) override {
-		if (module) {
-			nvgFontSize(args.vg, 16);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-			nvgText(args.vg, 41.5, 13, SubmarineAO::functions[APP->engine->getParam(module, index)].name.c_str(), NULL);
+	struct AOFuncDisplay : Knob {
+		Module *module;
+		int index;
+		AOFuncDisplay() {
+			box.size.x = 80;
+			box.size.y = 15;
+			snap = true;
+			smooth = false;
+			speed = 0.5f;
 		}
-	}
-	void onButton(const event::Button &e) override;
-};
-
-struct AOConstDisplay : Knob {
-	Module *module;
-	int index;
-	AOConstDisplay() {
-		box.size.x = 80;
-		box.size.y = 15;
-		snap = true;
-		speed = 0.005;
-	}
-	void draw(const DrawArgs &args) override {
-		if (module) {
-			char mtext[41];
-			sprintf(mtext, "C=%4.2f", ((int)APP->engine->getParam(module, index))/100.0f);
-			nvgFontSize(args.vg, 16);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-			nvgText(args.vg, 41.5, 13, mtext, NULL);
+		void draw(const DrawArgs &args) override {
+			if (module) {
+				nvgFontSize(args.vg, 16);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 41.5, 13, functions[APP->engine->getParam(module, index)].name.c_str(), NULL);
+			}
 		}
-	}
-};
+		void onButton(const event::Button &e) override;
+	};
+
+	struct AOConstDisplay : Knob {
+		Module *module;
+		int index;
+		AOConstDisplay() {
+			box.size.x = 80;
+			box.size.y = 15;
+			snap = true;
+			speed = 0.005;
+		}
+		void draw(const DrawArgs &args) override {
+			if (module) {
+				char mtext[41];
+				sprintf(mtext, "C=%4.2f", ((int)APP->engine->getParam(module, index))/100.0f);
+				nvgFontSize(args.vg, 16);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 41.5, 13, mtext, NULL);
+			}
+		}
+	};
+
+} // end namespace
 
 template <unsigned int x, unsigned int y>
 struct AO1 : Module {
@@ -446,7 +446,7 @@ struct AO1 : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int ix = 0; ix < x; ix++) {
 			for (unsigned int iy = 0; iy < y; iy++) {
-				configParam(PARAM_FUNC_1 + ix + iy * x, 0.0f, SubmarineAO::functions.size() - 1.0f, 0.0f, "Algorithm" );
+				configParam(PARAM_FUNC_1 + ix + iy * x, 0.0f, functions.size() - 1.0f, 0.0f, "Algorithm" );
 				configParam(PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f, "Constant", "", 0.f, 0.01f);
 			}
 		}
@@ -460,10 +460,10 @@ struct AO1 : Module {
 			float vy = inputs[INPUT_Y_1 + iy].getVoltage();
 			for (unsigned int ix = 0; ix < x; ix++) {
 				unsigned int f = params[PARAM_FUNC_1 + ix + iy * x].getValue();
-				if (f >= SubmarineAO::functions.size())
-					f = SubmarineAO::functions.size() - 1;
+				if (f >= functions.size())
+					f = functions.size() - 1;
 				if (f > 0)
-					vy = vx[ix] = SubmarineAO::functions[f].func(vx[ix], vy, ((int)params[PARAM_CONST_1 + ix + iy * x].getValue())/100.0f);
+					vy = vx[ix] = functions[f].func(vx[ix], vy, ((int)params[PARAM_CONST_1 + ix + iy * x].getValue())/100.0f);
 				// if f is equal to 0, then both x and y pass (crossing) through the module unchanged.
 			}
 			outputs[OUTPUT_Y_1 + iy].setVoltage(std::isfinite(vy)?vy:0.0f);
@@ -474,94 +474,97 @@ struct AO1 : Module {
 	}
 };
 
-struct AlgorithmMenu : MenuItem {
-	Module *module;
-	int index;
-	unsigned int algorithm;
-	void onAction(const event::Action &e) override;
-};
+namespace {
 
-struct CategoryMenu : MenuItem {
-	Module *module;
-	int index;
-	unsigned int category;
-	Menu *createChildMenu() override {
-		Menu *menu = new Menu();
-		for (unsigned int i = 1; i < SubmarineAO::functions.size(); i++) {
-			if (SubmarineAO::functions[i].category == category) {
-				AlgorithmMenu *am = new AlgorithmMenu();
-				am->module = module;
-				am->index = index;
-				am->algorithm = i;
-				am->text = SubmarineAO::functions[i].name;
-				menu->addChild(am);
+	struct AlgorithmMenu : MenuItem {
+		Module *module;
+		int index;
+		unsigned int algorithm;
+		void onAction(const event::Action &e) override;
+	};
+
+	struct CategoryMenu : MenuItem {
+		Module *module;
+		int index;
+		unsigned int category;
+		Menu *createChildMenu() override {
+			Menu *menu = new Menu();
+			for (unsigned int i = 1; i < functions.size(); i++) {
+				if (functions[i].category == category) {
+					AlgorithmMenu *am = new AlgorithmMenu();
+					am->module = module;
+					am->index = index;
+					am->algorithm = i;
+					am->text = functions[i].name;
+					menu->addChild(am);
+				}
 			}
+			return menu;
 		}
-		return menu;
-	}
-};
+	};
 
-struct FCopyMenu : MenuItem {
-	Module *module;
-	int index;
-	void onAction(const event::Action &e) override {
-		SubmarineAO::FunctorClipboard = APP->engine->getParam(module, index);
-	}
-};
+	struct FCopyMenu : MenuItem {
+		Module *module;
+		int index;
+		void onAction(const event::Action &e) override {
+			FunctorClipboard = APP->engine->getParam(module, index);
+		}
+	};
+	
+	struct FPasteMenu : MenuItem {
+		Module *module;
+		int index;
+		void onAction(const event::Action &e) override {
+			if (!std::isnan(FunctorClipboard))
+				APP->engine->setParam(module, index, FunctorClipboard);
+		}
+	};
 
-struct FPasteMenu : MenuItem {
-	Module *module;
-	int index;
-	void onAction(const event::Action &e) override {
-		if (!std::isnan(SubmarineAO::FunctorClipboard))
-			APP->engine->setParam(module, index, SubmarineAO::FunctorClipboard);
-	}
-};
-
-void AOFuncDisplay::onButton(const event::Button &e) {
-	if (module) {
-		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-			e.consume(this);
-			Menu *menu = createMenu();
-			FCopyMenu *cm = new FCopyMenu();
-			cm->module = module;
-			cm->index = index;
-			cm->text = "Copy";
-			menu->addChild(cm);
-			if (!std::isnan(SubmarineAO::FunctorClipboard)) {
-				FPasteMenu *pm = new FPasteMenu();
-				pm->module = module;
-				pm->index = index;
-				pm->text = "Paste";
-				menu->addChild(pm);
-			}
-			menu->addChild(new MenuEntry);
-			
-			AlgorithmMenu *item = new AlgorithmMenu();
-			item->module = module;
-			item->index = index;
-			item->algorithm = 0;
-			item->text = SubmarineAO::categories[0];
-			menu->addChild(item);	
-			for (unsigned int i = 1; i < SubmarineAO::categories.size(); i++) {
-				CategoryMenu *cm = new CategoryMenu();
+	void AOFuncDisplay::onButton(const event::Button &e) {
+		if (module) {
+			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+				e.consume(this);
+				Menu *menu = createMenu();
+				FCopyMenu *cm = new FCopyMenu();
 				cm->module = module;
 				cm->index = index;
-				cm->category = i;
-				cm->text = SubmarineAO::categories[i];
-				cm->rightText = SUBMENU;
+				cm->text = "Copy";
 				menu->addChild(cm);
+				if (!std::isnan(FunctorClipboard)) {
+					FPasteMenu *pm = new FPasteMenu();
+					pm->module = module;
+					pm->index = index;
+					pm->text = "Paste";
+					menu->addChild(pm);
+				}
+				menu->addChild(new MenuEntry);
+				
+				AlgorithmMenu *item = new AlgorithmMenu();
+				item->module = module;
+				item->index = index;
+				item->algorithm = 0;
+				item->text = categories[0];
+				menu->addChild(item);	
+				for (unsigned int i = 1; i < categories.size(); i++) {
+					CategoryMenu *cm = new CategoryMenu();
+					cm->module = module;
+					cm->index = index;
+					cm->category = i;
+					cm->text = categories[i];
+					cm->rightText = SUBMENU;
+					menu->addChild(cm);
+				}
+				return;
 			}
-			return;
 		}
+		Knob::onButton(e);
 	}
-	Knob::onButton(e);
-}
-
-void AlgorithmMenu::onAction(const event::Action &e) {
-	APP->engine->setParam(module, index, algorithm);
-}
-
+	
+	void AlgorithmMenu::onAction(const event::Action &e) {
+		APP->engine->setParam(module, index, algorithm);
+	}
+	
+} // end namespace
 
 template <unsigned int x, unsigned int y>
 struct AOWidget : SchemeModuleWidget {

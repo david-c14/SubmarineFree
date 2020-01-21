@@ -52,12 +52,10 @@ struct XF_101 : XF {
 		configParam(PARAM_FADE_1, 0.0f, 10.0f, 5.0f, "A/B blend", "%", 0.f, 10.f );
 	}
 
-	void process(const ProcessArgs &args) override;
+	void process(const ProcessArgs &args) override {
+		crossFade(&controls[0]);
+	}
 };
-
-void XF_101::process(const ProcessArgs &args) {
-	crossFade(&controls[0]);
-}
 
 struct XF101 : SchemeModuleWidget {
 	XF101(XF_101 *module) {

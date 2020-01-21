@@ -127,14 +127,15 @@ struct TF : Module  {
 	}
 };
 
-struct RGBLight : GrayModuleLightWidget {
-	RGBLight() {
-		addBaseColor(nvgRGB(0xff, 0x00, 0x00));
-		addBaseColor(nvgRGB(0x00, 0xff, 0x00));
-		addBaseColor(nvgRGB(0x00, 0x00, 0xff));
-	}
-};
-
+namespace {
+	struct RGBLight : GrayModuleLightWidget {
+		RGBLight() {
+			addBaseColor(nvgRGB(0xff, 0x00, 0x00));
+			addBaseColor(nvgRGB(0x00, 0xff, 0x00));
+			addBaseColor(nvgRGB(0x00, 0x00, 0xff));
+		}
+	};
+} // end namespace
 
 struct TF101 : SchemeModuleWidget {
 	TF101(TF<true> *module) {

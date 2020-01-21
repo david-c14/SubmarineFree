@@ -5,17 +5,20 @@
 
 struct TM_105;
 
-struct TM_105InPort : Torpedo::RawInputPort {
-	TM_105 *tmModule;
-	TM_105InPort(TM_105 *module, unsigned int portNum) : RawInputPort((Module *)module, portNum) {tmModule = module;}
-	void received(std::string appId, std::string message) override;
-	void error(unsigned int errorType) override;
-};
+namespace {
 
-struct TM_Msg {
-	std::string appId;
-	std::string msg;
-};
+	struct TM_105InPort : Torpedo::RawInputPort {
+		TM_105 *tmModule;
+		TM_105InPort(TM_105 *module, unsigned int portNum) : RawInputPort((Module *)module, portNum) {tmModule = module;}
+		void received(std::string appId, std::string message) override;
+		void error(unsigned int errorType) override;
+	};
+
+	struct TM_Msg {
+		std::string appId;
+		std::string msg;
+	};
+} // end namespace
 
 struct TM_105 : Module  {
 	enum ParamIds {
@@ -72,20 +75,22 @@ struct TM_105 : Module  {
 	void process(const ProcessArgs &args) override;
 };
 
-void TM_105InPort::received(std::string appId, std::string msg) {
-	if (tmModule->count >= 5) {
-		return;
+namespace {
+	void TM_105InPort::received(std::string appId, std::string msg) {
+		if (tmModule->count >= 5) {
+			return;
+		}
+		unsigned int newPos = (tmModule->index + tmModule->count) % 5; 
+		tmModule->queue[newPos].appId.assign(appId);
+		tmModule->queue[newPos].msg.assign(msg);
+		tmModule->count++;
+		tmModule->msgPulses[_portNum - TM_105::INPUT_1].trigger(0.1f);
 	}
-	unsigned int newPos = (tmModule->index + tmModule->count) % 5; 
-	tmModule->queue[newPos].appId.assign(appId);
-	tmModule->queue[newPos].msg.assign(msg);
-	tmModule->count++;
-	tmModule->msgPulses[_portNum - TM_105::INPUT_1].trigger(0.1f);
-}
 
-void TM_105InPort::error(unsigned int errorType) {
-	tmModule->errPulses[_portNum - TM_105::INPUT_1].trigger(0.1f);
-}
+	void TM_105InPort::error(unsigned int errorType) {
+		tmModule->errPulses[_portNum - TM_105::INPUT_1].trigger(0.1f);
+	}
+} // end namespace
 
 void TM_105::process(const ProcessArgs &args) {
 	inPort1.process();
