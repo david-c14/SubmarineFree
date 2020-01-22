@@ -53,12 +53,11 @@ struct XF_201 : XF {
 			controls[i].correlator = &correlators[i];
 		}
 	}
-	void process(const ProcessArgs &args) override;
-};
 
-void XF_201::process(const ProcessArgs &args) {
-	crossFade(&controls[0]);
-}
+	void process(const ProcessArgs &args) override {
+		crossFade(&controls[0]);
+	}
+};
 
 struct XF201 : SchemeModuleWidget {
 	XF201(XF_201 *module) {
