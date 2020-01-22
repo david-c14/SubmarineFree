@@ -69,18 +69,17 @@ struct XF_102 : XF {
 			controls[i + deviceCount].correlator = &correlators[x];
 		}
 	}
-	void process(const ProcessArgs &args) override;
-};
 
-void XF_102::process(const ProcessArgs &args) {
-	if (params[PARAM_LINK_1].getValue() > 0.5f) {
-		crossFade(&controls[2]);
+	void process(const ProcessArgs &args) override {
+		if (params[PARAM_LINK_1].getValue() > 0.5f) {
+			crossFade(&controls[2]);
+		}
+		else {
+			crossFade(&controls[0]);
+			crossFade(&controls[1]);
+		}
 	}
-	else {
-		crossFade(&controls[0]);
-		crossFade(&controls[1]);
-	}
-}
+};
 
 struct XF102 : SchemeModuleWidget {
 	XF102(XF_102 *module) {

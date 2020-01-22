@@ -70,25 +70,24 @@ struct XF_104 : XF {
 			controls[i + deviceCount].correlator = &correlators[x];
 		}
 	}
-	void process(const ProcessArgs &args) override;
-};
 
-void XF_104::process(const ProcessArgs &args) {
-	if (params[PARAM_LINK_1].getValue() > 0.5f) {
-		crossFade(&controls[4]);
+	void process(const ProcessArgs &args) override {
+		if (params[PARAM_LINK_1].getValue() > 0.5f) {
+			crossFade(&controls[4]);
+		}
+		else {
+			crossFade(&controls[0]);
+			crossFade(&controls[1]);
+		}
+		if (params[PARAM_LINK_2].getValue() > 0.5f) {
+			crossFade(&controls[5]);
+		}
+		else {
+			crossFade(&controls[2]);
+			crossFade(&controls[3]);
+		}
 	}
-	else {
-		crossFade(&controls[0]);
-		crossFade(&controls[1]);
-	}
-	if (params[PARAM_LINK_2].getValue() > 0.5f) {
-		crossFade(&controls[5]);
-	}
-	else {
-		crossFade(&controls[2]);
-		crossFade(&controls[3]);
-	}
-}
+};
 
 struct XF104 : SchemeModuleWidget {
 	XF104(XF_104 *module) {

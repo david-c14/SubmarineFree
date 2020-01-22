@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.2
+- 21-Jan-2020 Issue #50 - Protect internal classes with anonymous namespaces
 
 ## v1.1.1
 - 02-Jan-2020 Secret Santa 2019 is now obsolete
