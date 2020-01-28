@@ -200,6 +200,12 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"LT-116",
+			"name":"LT-116",
+			"description": "LT-116 Linear Transformations",
+			"tags": ["UTILITY"]
+		},
+		{
 			"slug":"NG-106",
 			"name":"NG-106",
 			"description": "NG-106 NOT Gates",
