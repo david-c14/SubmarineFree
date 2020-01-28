@@ -461,7 +461,7 @@ struct EO102 : SchemeModuleWidget {
 
 
 		for (int i = 0; i < 2; i++) {
-			PortWidget *port = createInputCentered<BluePort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i);
+			PortWidget *port = createInputCentered<SilverPort>(Vec(16.5 + 75 * i, 326.5), module, EO_102::INPUT_1 + i);
 			addInput(port);
 			display->ports[i] = port;
 			addParam(createParamCentered<SubSwitch2>(Vec(16.5 + 75 * i, 280), module, EO_102::PARAM_MODE_1 + i));
@@ -471,7 +471,7 @@ struct EO102 : SchemeModuleWidget {
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(172.5, 320), module, EO_102::PARAM_TIME));
 		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(172.5, 270), module, EO_102::PARAM_PRE));
 
-		addInput(createInputCentered<BluePort>(Vec(211.5, 326.5), module, EO_102::INPUT_EXT));
+		addInput(createInputCentered<SilverPort>(Vec(211.5, 326.5), module, EO_102::INPUT_EXT));
 		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(245, 320), module, EO_102::PARAM_TRIGGER));
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(226, 333), module, EO_102::LIGHT_TRIGGER));
 		addParam(createParamCentered<SubSwitch2>(Vec(211.5, 280), module, EO_102::PARAM_RUNMODE));
