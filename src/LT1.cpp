@@ -3,6 +3,43 @@
 #include <string.h>
 #include "SubmarineFree.hpp"
 
+namespace {
+	struct RotaryKnob : TinyKnob<LightKnob> {
+		std::function<void(RotaryKnob *)> rightClickHandler;
+		void onButton(const event::Button &e) override {
+			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+				e.consume(this);
+				if (rightClickHandler) {
+					rightClickHandler(this);
+				}
+				return;
+			}
+			LightKnob::onButton(e);
+		}
+		void onDoubleClick(const event::DoubleClick &e) override {
+			resetActionOverride();
+		}
+		void resetActionOverride() {
+			if (paramQuantity) {
+				float oldValue = paramQuantity->getValue();
+				paramQuantity->reset();
+				float newValue = paramQuantity->getValue();
+		
+				if (oldValue != newValue) {
+					// Push ParamChange history action
+					history::ParamChange* h = new history::ParamChange;
+					h->name = "reset parameter";
+					h->moduleId = paramQuantity->module->id;
+					h->paramId = paramQuantity->paramId;
+					h->oldValue = oldValue;
+					h->newValue = newValue;
+					APP->history->push(h);
+				}
+			}
+		}
+	};
+}
+
 struct LT_116 : Module {
 	enum ParamIds {
 		PARAM_COEFF_1,
@@ -28,10 +65,35 @@ struct LT_116 : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
-				configParam(PARAM_COEFF_1 + i * 16 + j, -INFINITY, INFINITY, 0.0f, string::f("Coefficient [%d,%d]", i, j));
+				configParam(PARAM_COEFF_1 + i * 16 + j, -INFINITY, INFINITY, 0.0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
 			}
 		}
 		configParam(PARAM_OUTPUT_CHANNELS, 1.0f, 16.0f, 16.0f, "Number of channels in output");
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_t *arr = json_array();
+		for (unsigned int i = 0; i < 256; i++) {
+			json_array_append_new(arr, json_real(params[PARAM_COEFF_1 + i].getValue()));
+		}
+		json_object_set_new(rootJ, "coefficients", arr);
+		return rootJ;
+	}
+
+	void dataFromJson(json_t *rootJ) override {
+		json_t *arr = json_object_get(rootJ, "coefficients");
+		if (arr) {
+			int size = json_array_size(arr);
+			if (size > 256)
+				size = 256;
+			for (int i = 0; i < size; i++) {
+				json_t *j1 = json_array_get(arr, i);
+				if (j1) {
+					APP->engine->setParam(this, PARAM_COEFF_1 + i, json_real_value(j1));
+				}
+			}
+		}
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -41,7 +103,7 @@ struct LT_116 : Module {
 };
 	
 struct LT116 : SchemeModuleWidget {
-	LightKnob *knobs[256];
+	RotaryKnob *knobs[256];
 	LT116(LT_116 *module) {
 		setModule(module);
 		this->box.size = Vec(300, 380);
@@ -49,7 +111,10 @@ struct LT116 : SchemeModuleWidget {
 
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
-				knobs[i * 16 + j] = createParamCentered<TinyKnob<LightKnob>>(Vec(15 + i * 18, 30 + j * 18), module, LT_116::PARAM_COEFF_1 + i * 16 + j);
+				knobs[i * 16 + j] = createParamCentered<RotaryKnob>(Vec(15 + i * 18, 30 + j * 18), module, LT_116::PARAM_COEFF_1 + i * 16 + j);
+				knobs[i * 16 + j]->rightClickHandler = [=](RotaryKnob *knob) {
+					addKnobMenu(knob);
+				};
 				addParam(knobs[i * 16 + j]);
 			}
 		}
@@ -79,7 +144,7 @@ struct LT116 : SchemeModuleWidget {
 		LT_116 *ltModule = dynamic_cast<LT_116 *>(module);
 		for (int i = 0; i < 16; i++) {
 			for (int j = 0; j < 16; j++) {
-				knobs[i * 16 + j]->setEnabled((i < ltModule->numberOfInputs) && (j < ltModule->numberOfOutputs));
+				knobs[i * 16 + j]->setEnabled((j < ltModule->numberOfInputs) && (i < ltModule->numberOfOutputs));
 			}
 		}
 		SchemeModuleWidget::step();
@@ -91,6 +156,34 @@ struct LT116 : SchemeModuleWidget {
 		drawText(vg, 35, 352, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
 		drawText(vg, 265, 352, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUTPUT");
 		drawText(vg, 200, 352, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CHANNELS");
+		drawText(vg, 50, 330, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x93"); 
+		drawText(vg, 240, 330, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x92"); 
+	}
+	void addKnobMenu(RotaryKnob *knob) {
+		if (!knob->paramQuantity)
+			return;
+		Menu *menu = createMenu();
+
+		MenuLabel *label = new MenuLabel();
+		label->text = knob->paramQuantity->getString();
+		menu->addChild(label);	
+
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		paramField->setText(knob->paramQuantity->getDisplayValueString());
+		paramField->changeHandler = [=](std::string text) {
+			knob->paramQuantity->setDisplayValueString(text);
+		};
+		menu->addChild(paramField);
+
+		EventWidgetMenuItem *entry = new EventWidgetMenuItem();
+		entry->text = "Initialize";
+		entry->rightText = "Double Click";
+		entry->clickHandler = [=]() {
+			knob->resetActionOverride();
+		};
+		menu->addChild(entry);
+
 	}
 };
 
