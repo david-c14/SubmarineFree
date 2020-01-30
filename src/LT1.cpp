@@ -17,6 +17,7 @@ namespace {
 			LightKnob::onButton(e);
 		}
 		void onDoubleClick(const event::DoubleClick &e) override {
+			e.consume(this);
 			resetActionOverride();
 		}
 		void resetActionOverride() {
@@ -35,6 +36,7 @@ namespace {
 					h->newValue = newValue;
 					APP->history->push(h);
 				}
+				this->oldValue = this->snapValue = paramQuantity->getValue();
 			}
 		}
 	};
@@ -99,6 +101,19 @@ struct LT_116 : Module {
 	void process(const ProcessArgs &args) override {
 		numberOfInputs = inputs[INPUT_1].getChannels();
 		numberOfOutputs = params[PARAM_OUTPUT_CHANNELS].getValue();
+		for (unsigned int i = 0; i < numberOfOutputs; i += 4) {
+			float working[4] = {0};
+			for (unsigned int j = 0; j < numberOfInputs; j++) {
+				float input = inputs[INPUT_1].getVoltage(j);
+				for (unsigned int n = 0; n < 4; n++) {
+					working[n] += input * params[(i + n) * 16 + j].getValue();
+				}
+			}
+			for (unsigned int n = 0; n < 4; n++) {
+				outputs[OUTPUT_1].setVoltage(working[n], i + n);
+			}
+		}
+		outputs[OUTPUT_1].setChannels(numberOfOutputs);
 	}
 };
 	

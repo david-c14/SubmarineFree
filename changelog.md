@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.2
+- 28-Jan-2020 Replace Digital Ports (Blue) with Analog (Silver) on EO-102
 - 21-Jan-2020 Issue #50 - Protect internal classes with anonymous namespaces
 
 ## v1.1.1
