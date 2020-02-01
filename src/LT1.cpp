@@ -40,6 +40,9 @@ namespace {
 			}
 		}
 	};
+
+	float clipboard[256];
+	bool clipboardUsed = false;
 }
 
 struct LT_116 : Module {
@@ -101,11 +104,11 @@ struct LT_116 : Module {
 	void process(const ProcessArgs &args) override {
 		numberOfInputs = inputs[INPUT_1].getChannels();
 		numberOfOutputs = params[PARAM_OUTPUT_CHANNELS].getValue();
-		for (unsigned int i = 0; i < numberOfOutputs; i += 4) {
+		for (int i = 0; i < numberOfOutputs; i += 4) {
 			float working[4] = {0};
-			for (unsigned int j = 0; j < numberOfInputs; j++) {
+			for (int j = 0; j < numberOfInputs; j++) {
 				float input = inputs[INPUT_1].getVoltage(j);
-				for (unsigned int n = 0; n < 4; n++) {
+				for (int n = 0; n < 4; n++) {
 					working[n] += input * params[(i + n) * 16 + j].getValue();
 				}
 			}
@@ -141,17 +144,20 @@ struct LT116 : SchemeModuleWidget {
 		if (!module)
 			return;
 		menu->addChild(new MenuSeparator);
-	/*
-		EventWidgetMenuItem *vmi = createMenuItem<EventWidgetMenuItem>("Match Cable Colors");
-		vmi->stepHandler = [=]() {
-			vmi->rightText = CHECKMARK(module->params[EO_102::PARAM_COLORS].getValue());
+
+		EventWidgetMenuItem *cmi = createMenuItem<EventWidgetMenuItem>("Copy");
+		cmi->clickHandler = [=]() {
+			copy();
 		};
-		vmi->clickHandler = [=]() {
-			bool val = module->params[EO_102::PARAM_COLORS].getValue();
-			module->params[EO_102::PARAM_COLORS].setValue(!val);
-		};
-		menu->addChild(vmi);
-*/
+		menu->addChild(cmi);
+		
+		if (clipboardUsed) {
+			EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Paste");
+			pmi->clickHandler = [=]() {
+				paste();
+			};
+			menu->addChild(pmi);
+		}
 	}
 	void step() override {
 		if (!module)
@@ -199,6 +205,12 @@ struct LT116 : SchemeModuleWidget {
 		};
 		menu->addChild(entry);
 
+		appendContextMenu(menu);
+	}
+	void copy() {
+		clipboardUsed = true;
+	}
+	void paste() {
 	}
 };
 
