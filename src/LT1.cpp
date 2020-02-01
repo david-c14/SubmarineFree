@@ -209,8 +209,14 @@ struct LT116 : SchemeModuleWidget {
 	}
 	void copy() {
 		clipboardUsed = true;
+		for (int i = 0; i < 256; i++) {
+			clipboard[i] = APP->engine->getParam(module, LT_116::INPUT_1 + i);
+		}
 	}
 	void paste() {
+		for (int i = 0; i < 256; i++) {
+			APP->engine->setParam(module, LT_116::INPUT_1 + i, clipboard[i]);
+		}
 	}
 };
 
