@@ -4,7 +4,33 @@
 #include "SubmarineFree.hpp"
 
 namespace {
-	struct RotaryKnob : TinyKnob<LightKnob> {
+
+	struct BulkParamKnob : BaseLightKnob {// was descended from ParamWidget
+		float &value;
+		float getBLKValue() override {
+			return *value;
+		}
+		
+		/** Multiplier for mouse movement to adjust knob value */
+		float speed = 1.0;
+		float oldValue = 0.f;
+		bool smooth = true;
+		/** Enable snapping at integer values */
+		bool snap = false;
+		float snapValue = NAN;
+		/** Drag horizontally instead of vertically */
+		bool horizontal = false;
+	
+		void onHover(const event::Hover& e) override;
+		void onButton(const event::Button& e) override;
+		void onDragStart(const event::DragStart& e) override;
+		void onDragEnd(const event::DragEnd& e) override;
+		void onDragMove(const event::DragMove& e) override;
+		void reset() override;
+		void randomize() override;
+	};
+
+	struct RotaryKnob : TinyKnob<BaseParamKnob> {
 		std::function<void(RotaryKnob *)> rightClickHandler;
 		void onButton(const event::Button &e) override {
 			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
@@ -70,7 +96,7 @@ struct LT_116 : Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
-				configParam(PARAM_COEFF_1 + i * 16 + j, -INFINITY, INFINITY, 0.0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
+				configParam<BulkQuantity>(PARAM_COEFF_1 + i * 16 + j, -INFINITY, INFINITY, 0.0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
 			}
 		}
 		configParam(PARAM_OUTPUT_CHANNELS, 1.0f, 16.0f, 16.0f, "Number of channels in output");

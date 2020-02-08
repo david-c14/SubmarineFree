@@ -98,7 +98,8 @@ struct LightButton : app::Switch {
 // Knobs
 //////////////////
 
-struct LightKnob : Knob {
+struct BaseLightKnob
+{
 	/** Angles in radians */
 	float minAngle = -0.83*M_PI;
 	float maxAngle = 0.83*M_PI;
@@ -106,10 +107,34 @@ struct LightKnob : Knob {
 	float radius = 19.0;
 	int enabled = 1;
 	NVGcolor color = SUBLIGHTBLUE;
-	LightKnob() {smooth = false;}
-	void draw(const DrawArgs &args) override;
+	virtual void doDraw(const rack::widget::Widget::DrawArgs &args);
 	void setEnabled(int val);
 	void setRadius(int r);
+	virtual float getBLKValue() { return 0.0f; } 
+	virtual float getBLKMinValue() { return -1.0f; }
+	virtual float getBLKMaxValue() { return 1.0f; }
+};
+
+struct LightKnob : BaseLightKnob, Knob {
+	LightKnob() {smooth = false;}
+	float getBLKValue() override {
+		if (paramQuantity)
+			return paramQuantity->getValue();
+		return BaseLightKnob::getBLKValue();
+	}
+	float getBLKMinValue() override {
+		if (paramQuantity)
+			return paramQuantity->getMinValue();
+		return BaseLightKnob::getBLKMinValue();
+	}
+	float getBLKMaxValue() override {
+		if (paramQuantity)
+			return paramQuantity->getMaxValue();
+		return BaseLightKnob::getBLKMaxValue();
+	}
+	void draw(const DrawArgs &args) override {
+		doDraw(args);
+	}
 };
 
 template <class K>
