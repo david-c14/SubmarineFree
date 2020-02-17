@@ -2,13 +2,14 @@
 
 #include <string.h>
 #include "SubmarineFree.hpp"
+#include "settings.hpp"
 
 struct BulkParamWidget : widget::OpaqueWidget {
 	float *value = NULL;
+	float minValue = .0f;
+	float maxValue = 1.0f;
 	ui::Tooltip* tooltip = NULL;
 	std::string description;
-
-	void step() override;
 
 	void onButton(const event::Button& e) override;
 	void onDoubleClick(const event::DoubleClick& e) override;
@@ -22,7 +23,7 @@ struct BulkParamWidget : widget::OpaqueWidget {
 	virtual void reset() {}
 	virtual void randomize() {}
 
-	void std::string getString();
+	std::string getString();
 };
 /*	
 struct ParamField : ui::TextField {
@@ -100,18 +101,6 @@ struct ParamResetItem : ui::MenuItem {
 
 */
 
-void BulkParamWidget::step() {
-	if (value) {
-		// Trigger change event when value changes
-		if (*value != dirtyValue) {
-			dirtyValue = *value;
-			event::Change eChange;
-			onChange(eChange);
-		}
-	}
-	Widget::step();
-}
-
 void BulkParamWidget::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 
@@ -163,15 +152,15 @@ void BulkParamWidget::createContextMenu() {
 	menuLabel->text = getString();
 	menu->addChild(menuLabel);
 
-	EventTextField *paramField = new EventTextField;
+	EventParamField *paramField = new EventParamField;
 	paramField->box.size.x = 100;
 	menu->addChild(paramField);
 
 
-	EventMenuItem *resetItem = new EventMenuItem;
+	EventWidgetMenuItem *resetItem = new EventWidgetMenuItem;
 	resetItem->text = "Initialize";
 	resetItem->rightText = "Double-click";
-	resetItem->onClick = [=]() {
+	resetItem->clickHandler = [=]() {
 		this->resetAction();
 	};
 	menu->addChild(resetItem);
@@ -185,11 +174,11 @@ void BulkParamWidget::resetAction() {
 		if (oldValue != newValue) {
 			APP->history->push(new EventWidgetAction(
 				"reset parameter",
-				[oldValue]() {
-					if (this.value) *value = oldValue;
+				[this,oldValue]() {
+					if (this->value) *value = oldValue;
 				},
-				[newValue]() {
-					if (this.value) *value = newValue;
+				[this,newValue]() {
+					if (this->value) *value = newValue;
 				}
 			));
 		}
@@ -200,7 +189,7 @@ void BulkParamWidget::resetAction() {
 struct BulkKnob : BulkParamWidget {
 	/** Multiplier for mouse movement to adjust knob value */
 	float speed = 1.0;
-	float oldValue = 0.f;
+	float oldValue = .0f;
 	bool smooth = true;
 	/** Enable snapping at integer values */
 	bool snap = false;
@@ -258,11 +247,11 @@ void BulkKnob::onDragEnd(const event::DragEnd& e) {
 		if (oldValue != newValue) {
 			APP->history->push(new EventWidgetAction(
 				"move knob",
-				[oldValue]() {
-					if (this.value) *value = oldValue;
+				[this]() {
+					if (this->value) *value = this->oldValue;
 				},
-				[newValue]() {
-					if (this.value) *value = newValue;
+				[this,newValue]() {
+					if (this->value) *value = newValue;
 				}
 			));
 		}
@@ -274,16 +263,12 @@ void BulkKnob::onDragMove(const event::DragMove& e) {
 		return;
 
 	if (value) {
-		float range;
-		if (paramQuantity->isBounded()) {
-			range = paramQuantity->getRange();
-		}
-		else {
-			// Continuous encoders scale as if their limits are +/-1
-			range = 2.f;
+		float range = 2.0f;
+		if (std::isfinite(minValue) && std::isfinite(maxValue)) {
+			range = maxValue - minValue;
 		}
 		float delta = (horizontal ? e.mouseDelta.x : -e.mouseDelta.y);
-		delta *= KNOB_SENSITIVITY;
+		delta *= 0.0015f;
 		delta *= speed;
 		delta *= range;
 
@@ -299,43 +284,30 @@ void BulkKnob::onDragMove(const event::DragMove& e) {
 
 		if (snap) {
 			snapValue += delta;
-			snapValue = math::clamp(snapValue, paramQuantity->getMinValue(), paramQuantity->getMaxValue());
-			paramQuantity->setValue(std::round(snapValue));
-		}
-		else if (smooth) {
-			paramQuantity->setSmoothValue(paramQuantity->getSmoothValue() + delta);
+			snapValue = math::clamp(snapValue, minValue, maxValue);
+			*value = std::round(snapValue);
 		}
 		else {
-			paramQuantity->setValue(paramQuantity->getValue() + delta);
+			*value += delta;
 		}
 	}
 
-	ParamWidget::onDragMove(e);
+	BulkParamWidget::onDragMove(e);
 }
 
-void Knob::reset() {
-	if (paramQuantity && paramQuantity->isBounded()) {
-		paramQuantity->reset();
-		oldValue = snapValue = paramQuantity->getValue();
-	}
+void BulkKnob::reset() {
+	if (value)
+		oldValue = snapValue = *value = .0f;
 }
 
-void Knob::randomize() {
-	if (paramQuantity && paramQuantity->isBounded()) {
-		float value = math::rescale(random::uniform(), 0.f, 1.f, paramQuantity->getMinValue(), paramQuantity->getMaxValue());
+void BulkKnob::randomize() {
+	if (value && std::isfinite(minValue) && std::isfinite(maxValue)) {
+		*value = math::rescale(random::uniform(), 0.f, 1.f, minValue, maxValue);
 		if (snap)
-			value = std::round(value);
-		paramQuantity->setValue(value);
-		oldValue = snapValue = paramQuantity->getValue();
+			*value = std::round(*value);
+		oldValue = snapValue = *value;
 	}
 }
-
-
-} // namespace app
-} // namespace rack
-
-
-
 
 
 
@@ -386,97 +358,7 @@ void Knob::randomize() {
 
 
 namespace {
-
-	struct BulkParamKnob : BaseLightKnob;
-
-	struct ParamResetItem : ui::MenuItem {
-		ParamWidget* paramWidget;
-		void onAction(const event::Action& e) override {
-			paramWidget->resetAction();
-		}
-	};
-
-	struct BulkParamKnob : BaseLightKnob {// was descended from ParamWidget
-		float &value;
-		float getBLKValue() override {
-			return value?*value:.0f;
-		}
-		
-		/** Multiplier for mouse movement to adjust knob value */
-		float speed = 1.0;
-		float oldValue = 0.f;
-		bool smooth = true;
-		/** Enable snapping at integer values */
-		bool snap = false;
-		float snapValue = NAN;
-		/** Drag horizontally instead of vertically */
-		bool horizontal = false;
-	
-		void createContextMenu() {
-			ui::Menu* menu = createMenu();
-		
-			MenuLabel* label = new MenuLabel;
-			label->text = "hello";
-			menu->addChild(menuLabel);
-		
-			ParamField* paramField = new ParamField;
-			paramField->box.size.x = 100;
-			paramField->setParamWidget(this);
-			menu->addChild(paramField);
-		
-			EventMenuItem* resetItem = new EventMenuItem;
-			resetItem->text = "Initialize";
-			resetItem->rightText = "Double-click";
-			resetItem->click = [=]() {
-				
-				*value
-			};
-				
-			
-			ParamResetItem* resetItem = new ParamResetItem;
-			resetItem->text = "Initialize";
-			resetItem->rightText = "Double-click";
-			resetItem->paramWidget = this;
-			menu->addChild(resetItem);
-		
-			// ParamFineItem *fineItem = new ParamFineItem;
-			// fineItem->text = "Fine adjust";
-			// fineItem->rightText = RACK_MOD_CTRL_NAME "+drag";
-			// fineItem->disabled = true;
-			// menu->addChild(fineItem);
-		
-			engine::ParamHandle* paramHandle = paramQuantity ? APP->engine->getParamHandle(paramQuantity->module->id, paramQuantity->paramId) : NULL;
-			if (paramHandle) {
-				ParamUnmapItem* unmapItem = new ParamUnmapItem;
-				unmapItem->text = "Unmap";
-				unmapItem->rightText = paramHandle->text;
-				unmapItem->paramWidget = this;
-				menu->addChild(unmapItem);
-			}
-		}
-
-		void onHover(const event::Hover& e) override;
-		void onButton(const event::Button& e) override;
-			OpaqueWidget::onButton(e);
-		
-			// Touch parameter
-			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-				e.consume(this);
-			}
-		
-			// Right click to open context menu
-			if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-				createContextMenu();
-				e.consume(this);
-			}
-		}
-		void onDragStart(const event::DragStart& e) override;
-		void onDragEnd(const event::DragEnd& e) override;
-		void onDragMove(const event::DragMove& e) override;
-		void reset() override;
-		void randomize() override;
-	};
-
+/*
 	struct RotaryKnob : TinyKnob<BaseParamKnob> {
 		std::function<void(RotaryKnob *)> rightClickHandler;
 		void onButton(const event::Button &e) override {
@@ -513,7 +395,7 @@ namespace {
 			}
 		}
 	};
-
+*/
 	float clipboard[256];
 	bool clipboardUsed = false;
 }
