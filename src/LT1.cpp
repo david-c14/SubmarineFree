@@ -23,7 +23,7 @@ struct BulkParamWidget : widget::OpaqueWidget {
 	virtual void reset() {}
 	virtual void randomize() {}
 
-	std::string getString();
+	std::string getString() { return std::string("hello"); }
 };
 /*	
 struct ParamField : ui::TextField {
@@ -309,101 +309,30 @@ void BulkKnob::randomize() {
 	}
 }
 
+struct BulkLightKnob : BaseLightKnob, BulkKnob {
+	BulkLightKnob() {smooth = false;}
+	float getBLKValue() override {
+		if (value)
+			return *value;
+		return BaseLightKnob::getBLKValue();
+	}
+	float getBLKMinValue() override {
+		return minValue;
+	}
+	float getBLKMaxValue() override {
+		return maxValue;
+	}
+	void draw(const DrawArgs &args) override {
+		doDraw(args);
+	}
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-namespace {
-/*
-	struct RotaryKnob : TinyKnob<BaseParamKnob> {
-		std::function<void(RotaryKnob *)> rightClickHandler;
-		void onButton(const event::Button &e) override {
-			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-				e.consume(this);
-				if (rightClickHandler) {
-					rightClickHandler(this);
-				}
-				return;
-			}
-			LightKnob::onButton(e);
-		}
-		void onDoubleClick(const event::DoubleClick &e) override {
-			e.consume(this);
-			resetActionOverride();
-		}
-		void resetActionOverride() {
-			if (paramQuantity) {
-				float oldValue = paramQuantity->getValue();
-				paramQuantity->reset();
-				float newValue = paramQuantity->getValue();
-		
-				if (oldValue != newValue) {
-					// Push ParamChange history action
-					history::ParamChange* h = new history::ParamChange;
-					h->name = "reset parameter";
-					h->moduleId = paramQuantity->module->id;
-					h->paramId = paramQuantity->paramId;
-					h->oldValue = oldValue;
-					h->newValue = newValue;
-					APP->history->push(h);
-				}
-				this->oldValue = this->snapValue = paramQuantity->getValue();
-			}
-		}
-	};
-*/
 	float clipboard[256];
 	bool clipboardUsed = false;
-}
 
 struct LT_116 : Module {
 	enum ParamIds {
-		PARAM_COEFF_1,
-		PARAM_OUTPUT_CHANNELS = PARAM_COEFF_1 + 256,
+		PARAM_OUTPUT_CHANNELS,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -418,16 +347,14 @@ struct LT_116 : Module {
 		NUM_LIGHTS
 	};
 
+	float bulkParams[256];
+
 	int numberOfInputs = 1;
 	int numberOfOutputs = 16;
 	
 	LT_116() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		for (unsigned int i = 0; i < 16; i++) {
-			for (unsigned int j = 0; j < 16; j++) {
-				configParam<BulkQuantity>(PARAM_COEFF_1 + i * 16 + j, -INFINITY, INFINITY, 0.0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
-			}
-		}
+		//		configParam<BulkQuantity>(PARAM_COEFF_1 + i * 16 + j, -INFINITY, INFINITY, 0.0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
 		configParam(PARAM_OUTPUT_CHANNELS, 1.0f, 16.0f, 16.0f, "Number of channels in output");
 	}
 
@@ -435,7 +362,7 @@ struct LT_116 : Module {
 		json_t *rootJ = json_object();
 		json_t *arr = json_array();
 		for (unsigned int i = 0; i < 256; i++) {
-			json_array_append_new(arr, json_real(params[PARAM_COEFF_1 + i].getValue()));
+			json_array_append_new(arr, json_real(bulkParams[i]));
 		}
 		json_object_set_new(rootJ, "coefficients", arr);
 		return rootJ;
@@ -450,7 +377,7 @@ struct LT_116 : Module {
 			for (int i = 0; i < size; i++) {
 				json_t *j1 = json_array_get(arr, i);
 				if (j1) {
-					APP->engine->setParam(this, PARAM_COEFF_1 + i, json_real_value(j1));
+					bulkParams[i] = json_real_value(j1);
 				}
 			}
 		}
@@ -464,7 +391,7 @@ struct LT_116 : Module {
 			for (int j = 0; j < numberOfInputs; j++) {
 				float input = inputs[INPUT_1].getVoltage(j);
 				for (int n = 0; n < 4; n++) {
-					working[n] += input * params[(i + n) * 16 + j].getValue();
+					working[n] += input * bulkParams[(i + n) * 16 + j];
 				}
 			}
 			for (unsigned int n = 0; n < 4; n++) {
@@ -474,21 +401,35 @@ struct LT_116 : Module {
 		outputs[OUTPUT_1].setChannels(numberOfOutputs);
 	}
 };
+
+template <class K>
+K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue) {
+	K* widget = new K();
+	widget->box.pos = pos.minus(widget->box.size.div(2));
+	widget->minValue = minValue;
+	widget->maxValue = maxValue;
+	return widget;
+}
 	
 struct LT116 : SchemeModuleWidget {
-	RotaryKnob *knobs[256];
+	BulkLightKnob *knobs[256];
+	float *bulkParams;
 	LT116(LT_116 *module) {
 		setModule(module);
+		if (module)
+			bulkParams = module->bulkParams;
 		this->box.size = Vec(300, 380);
 		addChild(new SchemePanel(this->box.size));
 
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
-				knobs[i * 16 + j] = createParamCentered<RotaryKnob>(Vec(15 + i * 18, 30 + j * 18), module, LT_116::PARAM_COEFF_1 + i * 16 + j);
-				knobs[i * 16 + j]->rightClickHandler = [=](RotaryKnob *knob) {
+				knobs[i * 16 + j] = createBulkParamCentered<TinyKnob<BulkLightKnob>>(Vec(15 + i * 18, 30 + j * 18), -INFINITY, +INFINITY);
+				if (module)
+					knobs[i * 16 + j]->value = &(bulkParams[i * 16 + j]);
+				/*knobs[i * 16 + j]->rightClickHandler = [=](RotaryKnob *knob) {
 					addKnobMenu(knob);
-				};
-				addParam(knobs[i * 16 + j]);
+				};*/
+				addChild(knobs[i * 16 + j]);
 			}
 		}
 		addInput(createInputCentered<SilverPort>(Vec(35, 330), module, LT_116::INPUT_1));
@@ -535,42 +476,18 @@ struct LT116 : SchemeModuleWidget {
 		drawText(vg, 50, 330, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x93"); 
 		drawText(vg, 240, 330, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x92"); 
 	}
-	void addKnobMenu(RotaryKnob *knob) {
-		if (!knob->paramQuantity)
-			return;
-		Menu *menu = createMenu();
-
-		MenuLabel *label = new MenuLabel();
-		label->text = knob->paramQuantity->getString();
-		menu->addChild(label);	
-
-		EventParamField *paramField = new EventParamField();
-		paramField->box.size.x = 100;
-		paramField->setText(knob->paramQuantity->getDisplayValueString());
-		paramField->changeHandler = [=](std::string text) {
-			knob->paramQuantity->setDisplayValueString(text);
-		};
-		menu->addChild(paramField);
-
-		EventWidgetMenuItem *entry = new EventWidgetMenuItem();
-		entry->text = "Initialize";
-		entry->rightText = "Double Click";
-		entry->clickHandler = [=]() {
-			knob->resetActionOverride();
-		};
-		menu->addChild(entry);
-
-		appendContextMenu(menu);
+	void addKnobMenu() {
+	//	appendContextMenu(menu);
 	}
 	void copy() {
 		clipboardUsed = true;
 		for (int i = 0; i < 256; i++) {
-			clipboard[i] = APP->engine->getParam(module, LT_116::INPUT_1 + i);
+			clipboard[i] = bulkParams[i];
 		}
 	}
 	void paste() {
 		for (int i = 0; i < 256; i++) {
-			APP->engine->setParam(module, LT_116::INPUT_1 + i, clipboard[i]);
+			bulkParams[i] = clipboard[i];
 		}
 	}
 };

@@ -13,12 +13,13 @@ void BaseLightKnob::setEnabled(int val) {
 }
 
 void BaseLightKnob::setRadius(int r) {
+	Widget *w = dynamic_cast<Widget *>(this);
 	radius = r;
-	box.size.x = r * 2;
-	box.size.y = r * 2;
+	w->box.size.x = r * 2;
+	w->box.size.y = r * 2;
 }
 
-void BaseLightKnob::doDraw(const DrawArgs &args) {
+void BaseLightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 	nvgSave(args.vg);
 	NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
 	float value = getBLKValue();
