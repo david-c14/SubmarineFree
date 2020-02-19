@@ -8,8 +8,15 @@ struct BulkParamWidget : widget::OpaqueWidget {
 	float *value = NULL;
 	float minValue = .0f;
 	float maxValue = 1.0f;
+	float defaultValue = .0f;
 	ui::Tooltip* tooltip = NULL;
 	std::string description;
+	std::string label;
+	std::string unit;
+	/** Set to 0 for linear, positive for exponential, negative for logarithmic. */
+	float displayBase = 0.f;
+	float displayMultiplier = 1.f;
+	float displayOffset = 0.f;
 
 	void onButton(const event::Button& e) override;
 	void onDoubleClick(const event::DoubleClick& e) override;
@@ -23,52 +30,76 @@ struct BulkParamWidget : widget::OpaqueWidget {
 	virtual void reset() {}
 	virtual void randomize() {}
 
-	std::string getString() { return std::string("hello"); }
-};
-/*	
-struct ParamField : ui::TextField {
-	ParamWidget* paramWidget;
-
-	void step() override {
-		// Keep selected
-		APP->event->setSelected(this);
-		TextField::step();
+	std::string getString() {
+		std::string s;
+		if (!label.empty())
+			s += label + ": ";
+		s += getDisplayValueString() + unit;
+		return s;
 	}
-
-	void setParamWidget(ParamWidget* paramWidget) {
-		this->paramWidget = paramWidget;
-		if (paramWidget->paramQuantity)
-			text = paramWidget->paramQuantity->getDisplayValueString();
-		selectAll();
-	}
-
-	void onSelectKey(const event::SelectKey& e) override {
-		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
-			float oldValue = paramWidget->paramQuantity->getValue();
-			if (paramWidget->paramQuantity)
-				paramWidget->paramQuantity->setDisplayValueString(text);
-			float newValue = paramWidget->paramQuantity->getValue();
-
-			if (oldValue != newValue) {
-				// Push ParamChange history action
-				history::ParamChange* h = new history::ParamChange;
-				h->moduleId = paramWidget->paramQuantity->module->id;
-				h->paramId = paramWidget->paramQuantity->paramId;
-				h->oldValue = oldValue;
-				h->newValue = newValue;
-				APP->history->push(h);
-			}
-
-			ui::MenuOverlay* overlay = getAncestorOfType<ui::MenuOverlay>();
-			overlay->requestDelete();
-			e.consume(this);
+	float getDisplayValue() {
+		if (!value)
+			return .0f;
+		float v = *value;
+		if (displayBase == 0.f) {
+			// Linear
+			// v is unchanged
 		}
-
-		if (!e.getTarget())
-			TextField::onSelectKey(e);
+		else if (displayBase < 0.f) {
+			// Logarithmic
+			v = std::log(v) / std::log(-displayBase);
+		}
+		else {
+			// Exponential
+			v = std::pow(displayBase, v);
+		}
+		return v * displayMultiplier + displayOffset;
 	}
-};*/
-
+	void setDisplayValue(float displayValue) {
+		if (!value)
+			return;
+		float v = displayValue - displayOffset;
+		if (displayMultiplier == 0.f)
+			v = 0.f;
+		else
+			v /= displayMultiplier;
+		if (displayBase == 0.f) {
+			// Linear
+			// v is unchanged
+		}
+		else if (displayBase < 0.f) {
+			// Logarithmic
+			v = std::pow(-displayBase, v);
+		}
+		else {
+			// Exponential
+			v = std::log(v) / std::log(displayBase);
+		}
+		*value = v;
+	}
+	std::string getDisplayValueString() {
+		return string::f("%.*g", 5, math::normalizeZero(getDisplayValue()));
+	}
+	void setDisplayValueString(std::string s) {
+		float v = 0.f;
+		char suffix[2];
+		int n = std::sscanf(s.c_str(), "%f%1s", &v, suffix);
+		if (n >= 2) {
+			// Parse SI prefixes
+			switch (suffix[0]) {
+				case 'n': v *= 1e-9f; break;
+				case 'u': v *= 1e-6f; break;
+				case 'm': v *= 1e-3f; break;
+				case 'k': v *= 1e3f; break;
+				case 'M': v *= 1e6f; break;
+				case 'G': v *= 1e9f; break;
+				default: break;
+			}
+		}
+		if (n >= 1)
+			setDisplayValue(v);
+	}
+};
 
 struct BulkParamTooltip : ui::Tooltip {
 	BulkParamWidget* bulkParamWidget;
@@ -90,16 +121,6 @@ struct BulkParamTooltip : ui::Tooltip {
 		box = box.nudge(parent->box.zeroPos());
 	}
 };
-
-/*
-struct ParamResetItem : ui::MenuItem {
-	ParamWidget* paramWidget;
-	void onAction(const event::Action& e) override {
-		paramWidget->resetAction();
-	}
-};
-
-*/
 
 void BulkParamWidget::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
@@ -154,6 +175,25 @@ void BulkParamWidget::createContextMenu() {
 
 	EventParamField *paramField = new EventParamField;
 	paramField->box.size.x = 100;
+	paramField->text = getDisplayValueString();
+	paramField->selectAll();
+	paramField->changeHandler = [=](std::string text) {
+		float oldValue = *value;
+		setDisplayValueString(text);
+		float newValue = *value;
+
+		if (oldValue != newValue) {
+			APP->history->push(new EventWidgetAction(
+				"change parameter",
+				[this,oldValue]() {
+					if (this->value) *value = oldValue;
+				},
+				[this,newValue]() {
+					if (this->value) *value = newValue;
+				}
+			));	
+		}
+	};
 	menu->addChild(paramField);
 
 
@@ -297,7 +337,7 @@ void BulkKnob::onDragMove(const event::DragMove& e) {
 
 void BulkKnob::reset() {
 	if (value)
-		oldValue = snapValue = *value = .0f;
+		oldValue = snapValue = *value = defaultValue;
 }
 
 void BulkKnob::randomize() {
@@ -347,14 +387,13 @@ struct LT_116 : Module {
 		NUM_LIGHTS
 	};
 
-	float bulkParams[256];
+	float bulkParams[256] = {.0f};
 
 	int numberOfInputs = 1;
 	int numberOfOutputs = 16;
 	
 	LT_116() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		//		configParam<BulkQuantity>(PARAM_COEFF_1 + i * 16 + j, -INFINITY, INFINITY, 0.0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
 		configParam(PARAM_OUTPUT_CHANNELS, 1.0f, 16.0f, 16.0f, "Number of channels in output");
 	}
 
@@ -403,11 +442,17 @@ struct LT_116 : Module {
 };
 
 template <class K>
-K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue) {
+K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
 	K* widget = new K();
 	widget->box.pos = pos.minus(widget->box.size.div(2));
 	widget->minValue = minValue;
 	widget->maxValue = maxValue;
+	widget->defaultValue = defaultValue;
+	widget->label = label;
+	widget->unit = unit;
+	widget->displayBase = displayBase;
+	widget->displayMultiplier = displayMultiplier;
+	widget->displayOffset = displayOffset;
 	return widget;
 }
 	
@@ -423,7 +468,7 @@ struct LT116 : SchemeModuleWidget {
 
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
-				knobs[i * 16 + j] = createBulkParamCentered<TinyKnob<BulkLightKnob>>(Vec(15 + i * 18, 30 + j * 18), -INFINITY, +INFINITY);
+				knobs[i * 16 + j] = createBulkParamCentered<TinyKnob<BulkLightKnob>>(Vec(15 + i * 18, 30 + j * 18), -INFINITY, +INFINITY, .0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
 				if (module)
 					knobs[i * 16 + j]->value = &(bulkParams[i * 16 + j]);
 				/*knobs[i * 16 + j]->rightClickHandler = [=](RotaryKnob *knob) {
