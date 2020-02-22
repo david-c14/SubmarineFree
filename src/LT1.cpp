@@ -30,6 +30,8 @@ struct BulkParamWidget : widget::OpaqueWidget {
 	virtual void reset() {}
 	virtual void randomize() {}
 
+	std::function<void(ui::Menu *)> contextMenuCallback;
+
 	std::string getString() {
 		std::string s;
 		if (!label.empty())
@@ -204,6 +206,9 @@ void BulkParamWidget::createContextMenu() {
 		this->resetAction();
 	};
 	menu->addChild(resetItem);
+	if (contextMenuCallback) {
+		contextMenuCallback(menu);
+	}
 }
 
 void BulkParamWidget::resetAction() {
@@ -367,8 +372,26 @@ struct BulkLightKnob : BaseLightKnob, BulkKnob {
 	}
 };
 
+namespace {
 	float clipboard[256];
 	bool clipboardUsed = false;
+
+	template <class K>
+	K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
+		K* widget = new K();
+		widget->box.pos = pos.minus(widget->box.size.div(2));
+		widget->minValue = minValue;
+		widget->maxValue = maxValue;
+		widget->defaultValue = defaultValue;
+		widget->label = label;
+		widget->unit = unit;
+		widget->displayBase = displayBase;
+		widget->displayMultiplier = displayMultiplier;
+		widget->displayOffset = displayOffset;
+		return widget;
+	}
+	
+}
 
 struct LT_116 : Module {
 	enum ParamIds {
@@ -387,7 +410,7 @@ struct LT_116 : Module {
 		NUM_LIGHTS
 	};
 
-	float bulkParams[256] = {.0f};
+	alignas(16) float bulkParams[256] = {.0f};
 
 	int numberOfInputs = 1;
 	int numberOfOutputs = 16;
@@ -425,37 +448,38 @@ struct LT_116 : Module {
 	void process(const ProcessArgs &args) override {
 		numberOfInputs = inputs[INPUT_1].getChannels();
 		numberOfOutputs = params[PARAM_OUTPUT_CHANNELS].getValue();
-		for (int i = 0; i < numberOfOutputs; i += 4) {
-			float working[4] = {0};
-			for (int j = 0; j < numberOfInputs; j++) {
-				float input = inputs[INPUT_1].getVoltage(j);
-				for (int n = 0; n < 4; n++) {
-					working[n] += input * bulkParams[(i + n) * 16 + j];
-				}
-			}
-			for (unsigned int n = 0; n < 4; n++) {
-				outputs[OUTPUT_1].setVoltage(working[n], i + n);
-			}
+
+		alignas(16) float portValues[16];
+		inputs[INPUT_1].readVoltages(portValues);
+		
+		__m128 a,b,c,d;
+		a = b = c = d = _mm_setzero_ps();
+		float *index = bulkParams;
+		for (int j = 0; j < numberOfInputs; j++) {
+			__m128 i = _mm_set_ps1(portValues[j]);
+			__m128 x = _mm_load_ps(index);
+			a = _mm_add_ps(a, _mm_mul_ps(i,x));
+			index += 4;
+			x = _mm_load_ps(index);
+			b = _mm_add_ps(b, _mm_mul_ps(i,x));
+			index += 4;
+			x = _mm_load_ps(index);
+			c = _mm_add_ps(c, _mm_mul_ps(i,x));
+			index += 4;
+			x = _mm_load_ps(index);
+			d = _mm_add_ps(d, _mm_mul_ps(i,x));
+			index += 4; 
 		}
+		_mm_store_ps(portValues, a);
+		_mm_store_ps(portValues + 4, b);
+		_mm_store_ps(portValues + 8, c);
+		_mm_store_ps(portValues + 12, d);
+
 		outputs[OUTPUT_1].setChannels(numberOfOutputs);
+		outputs[OUTPUT_1].writeVoltages(portValues);
 	}
 };
 
-template <class K>
-K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
-	K* widget = new K();
-	widget->box.pos = pos.minus(widget->box.size.div(2));
-	widget->minValue = minValue;
-	widget->maxValue = maxValue;
-	widget->defaultValue = defaultValue;
-	widget->label = label;
-	widget->unit = unit;
-	widget->displayBase = displayBase;
-	widget->displayMultiplier = displayMultiplier;
-	widget->displayOffset = displayOffset;
-	return widget;
-}
-	
 struct LT116 : SchemeModuleWidget {
 	BulkLightKnob *knobs[256];
 	float *bulkParams;
@@ -468,20 +492,23 @@ struct LT116 : SchemeModuleWidget {
 
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
-				knobs[i * 16 + j] = createBulkParamCentered<TinyKnob<BulkLightKnob>>(Vec(15 + i * 18, 30 + j * 18), -INFINITY, +INFINITY, .0f, string::f("Coefficient [%d,%d]", i + 1, j + 1));
-				if (module)
-					knobs[i * 16 + j]->value = &(bulkParams[i * 16 + j]);
-				/*knobs[i * 16 + j]->rightClickHandler = [=](RotaryKnob *knob) {
-					addKnobMenu(knob);
-				};*/
-				addChild(knobs[i * 16 + j]);
+				int index = i * 16 + j;
+				knobs[index] = createBulkParamCentered<TinyKnob<BulkLightKnob>>(Vec(15 + j * 18, 30 + i * 18), -INFINITY, +INFINITY, .0f, string::f("Coefficient [%d,%d]", j + 1, i + 1));
+				if (module) {
+					knobs[index]->value = &(bulkParams[index]);
+					knobs[index]->contextMenuCallback = [=](Menu *menu) {
+						this->appendCopyPasteMenu(menu);
+					};
+				}
+				
+				addChild(knobs[index]);
 			}
 		}
 		addInput(createInputCentered<SilverPort>(Vec(35, 330), module, LT_116::INPUT_1));
 		addOutput(createOutputCentered<SilverPort>(Vec(265, 330), module, LT_116::OUTPUT_1));
 		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(200, 330), module, LT_116::PARAM_OUTPUT_CHANNELS));
 	}
-	void appendContextMenu(Menu *menu) override {
+	void appendCopyPasteMenu(Menu *menu) {
 		if (!module)
 			return;
 		menu->addChild(new MenuSeparator);
@@ -500,13 +527,17 @@ struct LT116 : SchemeModuleWidget {
 			menu->addChild(pmi);
 		}
 	}
+	void appendContextMenu(Menu *menu) override {
+		appendCopyPasteMenu(menu);
+		SchemeModuleWidget::appendContextMenu(menu);
+	}
 	void step() override {
 		if (!module)
 			return;
 		LT_116 *ltModule = dynamic_cast<LT_116 *>(module);
 		for (int i = 0; i < 16; i++) {
 			for (int j = 0; j < 16; j++) {
-				knobs[i * 16 + j]->setEnabled((j < ltModule->numberOfInputs) && (i < ltModule->numberOfOutputs));
+				knobs[i * 16 + j]->setEnabled((j < ltModule->numberOfOutputs) && (i < ltModule->numberOfInputs));
 			}
 		}
 		SchemeModuleWidget::step();
@@ -520,9 +551,6 @@ struct LT116 : SchemeModuleWidget {
 		drawText(vg, 200, 352, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "CHANNELS");
 		drawText(vg, 50, 330, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x93"); 
 		drawText(vg, 240, 330, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x92"); 
-	}
-	void addKnobMenu() {
-	//	appendContextMenu(menu);
 	}
 	void copy() {
 		clipboardUsed = true;
