@@ -483,6 +483,7 @@ struct LT_116 : Module {
 struct LT116 : SchemeModuleWidget {
 	BulkLightKnob *knobs[256];
 	float *bulkParams;
+	const int bulkParamSize = sizeof(float) * 256;
 	LT116(LT_116 *module) {
 		setModule(module);
 		if (module)
@@ -552,16 +553,28 @@ struct LT116 : SchemeModuleWidget {
 		drawText(vg, 50, 330, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x93"); 
 		drawText(vg, 240, 330, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x92"); 
 	}
+	void bulkChangeWithHistory(std::string label, float *values) {
+		std::array<float, 256> oldValues;
+		std::array<float, 256> newValues;
+		memcpy(oldValues.data(), bulkParams, bulkParamSize);
+		memcpy(bulkParams, values, bulkParamSize);
+		memcpy(newValues.data(), bulkParams, bulkParamSize);
+		APP->history->push(new EventWidgetAction(
+			label,
+			[this,oldValues]() {
+				memcpy(this->bulkParams, oldValues.data(), bulkParamSize);
+			},
+			[this,newValues]() {
+				memcpy(this->bulkParams, newValues.data(), bulkParamSize);
+			}
+		));	
+	}
 	void copy() {
 		clipboardUsed = true;
-		for (int i = 0; i < 256; i++) {
-			clipboard[i] = bulkParams[i];
-		}
+		memcpy(clipboard, bulkParams, bulkParamSize);
 	}
 	void paste() {
-		for (int i = 0; i < 256; i++) {
-			bulkParams[i] = clipboard[i];
-		}
+		bulkChangeWithHistory("paste values", clipboard);
 	}
 };
 
