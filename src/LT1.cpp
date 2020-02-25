@@ -5,6 +5,8 @@
 #include "settings.hpp"
 
 struct BulkParamWidget : widget::OpaqueWidget {
+	Module *module;
+	int paramId;
 	float *value = NULL;
 	float minValue = .0f;
 	float maxValue = 1.0f;
@@ -103,6 +105,16 @@ struct BulkParamWidget : widget::OpaqueWidget {
 	}
 };
 
+namespace {
+	void setBulkParamValue(int thisModuleId, int thisParamId, float thisValue) {
+		SchemeModuleWidget *smw = dynamic_cast<SchemeModuleWidget *>(APP->scene->rack->getModule(thisModuleId));
+		if (smw) {
+			float *value = smw->getBulkParam(thisParamId);
+			if (value) *value = thisValue;
+		}
+	}
+}
+
 struct BulkParamTooltip : ui::Tooltip {
 	BulkParamWidget* bulkParamWidget;
 
@@ -185,13 +197,15 @@ void BulkParamWidget::createContextMenu() {
 		float newValue = *value;
 
 		if (oldValue != newValue) {
+			int thisModuleId = module->id;
+			int thisParamId = paramId;
 			APP->history->push(new EventWidgetAction(
 				"change parameter",
-				[this,oldValue]() {
-					if (this->value) *value = oldValue;
+				[=]() {
+					setBulkParamValue(thisModuleId, thisParamId, oldValue);
 				},
-				[this,newValue]() {
-					if (this->value) *value = newValue;
+				[=]() {
+					setBulkParamValue(thisModuleId, thisParamId, newValue);
 				}
 			));	
 		}
@@ -217,13 +231,15 @@ void BulkParamWidget::resetAction() {
 		reset();
 		float newValue = *value;
 		if (oldValue != newValue) {
+			int thisModuleId = module->id;
+			int thisParamId = paramId;
 			APP->history->push(new EventWidgetAction(
 				"reset parameter",
-				[this,oldValue]() {
-					if (this->value) *value = oldValue;
+				[=]() {
+					setBulkParamValue(thisModuleId, thisParamId, oldValue);
 				},
-				[this,newValue]() {
-					if (this->value) *value = newValue;
+				[=]() {
+					setBulkParamValue(thisModuleId, thisParamId, newValue);
 				}
 			));
 		}
@@ -290,13 +306,16 @@ void BulkKnob::onDragEnd(const event::DragEnd& e) {
 	if (value) {
 		float newValue = *value;
 		if (oldValue != newValue) {
+			int thisModuleId = module->id;
+			int thisParamId = paramId;
+			int thisOldValue = oldValue;
 			APP->history->push(new EventWidgetAction(
 				"move knob",
-				[this]() {
-					if (this->value) *value = this->oldValue;
+				[=]() {
+					setBulkParamValue(thisModuleId, thisParamId, thisOldValue);
 				},
-				[this,newValue]() {
-					if (this->value) *value = newValue;
+				[=]() {
+					setBulkParamValue(thisModuleId, thisParamId, newValue);
 				}
 			));
 		}
@@ -375,6 +394,7 @@ struct BulkLightKnob : BaseLightKnob, BulkKnob {
 namespace {
 	float clipboard[256];
 	bool clipboardUsed = false;
+	const int bulkParamSize = sizeof(float) * 256;
 
 	template <class K>
 	K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
@@ -483,7 +503,6 @@ struct LT_116 : Module {
 struct LT116 : SchemeModuleWidget {
 	BulkLightKnob *knobs[256];
 	float *bulkParams;
-	const int bulkParamSize = sizeof(float) * 256;
 	LT116(LT_116 *module) {
 		setModule(module);
 		if (module)
@@ -500,6 +519,8 @@ struct LT116 : SchemeModuleWidget {
 					knobs[index]->contextMenuCallback = [=](Menu *menu) {
 						this->appendCopyPasteMenu(menu);
 					};
+					knobs[index]->module = module;
+					knobs[index]->paramId = index;
 				}
 				
 				addChild(knobs[index]);
@@ -508,6 +529,15 @@ struct LT116 : SchemeModuleWidget {
 		addInput(createInputCentered<SilverPort>(Vec(35, 330), module, LT_116::INPUT_1));
 		addOutput(createOutputCentered<SilverPort>(Vec(265, 330), module, LT_116::OUTPUT_1));
 		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(200, 330), module, LT_116::PARAM_OUTPUT_CHANNELS));
+	}
+	float *getBulkParam(int id) override {
+		if (id < 0)
+			return NULL;
+		if (id > 255)
+			return NULL;
+		if (module)
+			return bulkParams + id;	
+		return NULL;
 	}
 	void appendCopyPasteMenu(Menu *menu) {
 		if (!module)
@@ -554,18 +584,25 @@ struct LT116 : SchemeModuleWidget {
 		drawText(vg, 240, 330, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x92"); 
 	}
 	void bulkChangeWithHistory(std::string label, float *values) {
-		std::array<float, 256> oldValues;
-		std::array<float, 256> newValues;
-		memcpy(oldValues.data(), bulkParams, bulkParamSize);
+		float oldValues[256];
+		float newValues[256];
+		memcpy(oldValues, bulkParams, bulkParamSize);
 		memcpy(bulkParams, values, bulkParamSize);
-		memcpy(newValues.data(), bulkParams, bulkParamSize);
+		memcpy(newValues, bulkParams, bulkParamSize);
+		int moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			label,
-			[this,oldValues]() {
-				memcpy(this->bulkParams, oldValues.data(), bulkParamSize);
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					memcpy(mw->bulkParams, oldValues, bulkParamSize);
+				}
 			},
-			[this,newValues]() {
-				memcpy(this->bulkParams, newValues.data(), bulkParamSize);
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					memcpy(mw->bulkParams, newValues, bulkParamSize);
+				}
 			}
 		));	
 	}
