@@ -392,26 +392,9 @@ struct BulkLightKnob : BaseLightKnob, BulkKnob {
 };
 
 namespace {
-	float clipboard[256];
+	alignas(16) float clipboard[256];
 	bool clipboardUsed = false;
 	const int bulkParamSize = sizeof(float) * 256;
-
-	float preset_identity[256] = {	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-					0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-					0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
-					0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
-					0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
-					0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,
-					0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,
-					0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,
-					0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,
-					0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
-					0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,
-					0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
-					0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
-					0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,
-					0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,
-					0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
 
 	template <class K>
 	K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
@@ -547,16 +530,6 @@ struct LT116 : SchemeModuleWidget {
 		addOutput(createOutputCentered<SilverPort>(Vec(265, 330), module, LT_116::OUTPUT_1));
 		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(200, 330), module, LT_116::PARAM_OUTPUT_CHANNELS));
 	}
-	static void createPresetMenuItem(Menu *menu, std::string label, float *values, int moduleId) {
-		EventWidgetMenuItem *cmi = createMenuItem<EventWidgetMenuItem>(label);
-		cmi->clickHandler = [=]() {
-			LT116* mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));
-			if (mw) {
-				mw->bulkChangeWithHistory("set preset " + label, values);
-			}
-		};
-		menu->addChild(cmi);
-	}
 	float *getBulkParam(int id) override {
 		if (id < 0)
 			return NULL;
@@ -585,22 +558,55 @@ struct LT116 : SchemeModuleWidget {
 			menu->addChild(pmi);
 		}
 	}
-	void appendPresetMenu(Menu *menu) {
+	void appendOpMenu(Menu *menu) {
 		if (!module)
 			return;
 		int moduleId = module->id;
-		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Presets");
+		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Operations");
 		pmi->rightText = SUBMENU;
 		pmi->childMenuHandler = [=]() {
 			Menu *thisMenu = new Menu();
-			createPresetMenuItem(thisMenu, "Identity", preset_identity, moduleId);
+			EventWidgetMenuItem *cmi = createMenuItem<EventWidgetMenuItem>("Identity");
+			cmi->clickHandler = [=]() {
+				LT116* mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));
+				if (mw) {
+					mw->opIdentity();
+				}
+			};
+			thisMenu->addChild(cmi);
+			cmi = createMenuItem<EventWidgetMenuItem>("Upper");
+			cmi->clickHandler = [=]() {
+				LT116* mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));
+				if (mw) {
+					mw->opUpper();
+				}
+			};
+			thisMenu->addChild(cmi);
+			cmi = createMenuItem<EventWidgetMenuItem>("Lower");
+			cmi->clickHandler = [=]() {
+				LT116* mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));
+				if (mw) {
+					mw->opLower();
+				}
+			};
+			thisMenu->addChild(cmi);
+			if (clipboardUsed) {
+				cmi = createMenuItem<EventWidgetMenuItem>("Paste Multiply");
+				cmi->clickHandler = [=]() {
+					LT116* mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));
+					if (mw) {
+						mw->opMultiply();
+					}
+				};
+				thisMenu->addChild(cmi);
+			}
 			return thisMenu;
 		};
 		menu->addChild(pmi);
 	}
 	void appendContextMenu(Menu *menu) override {
 		appendCopyPasteMenu(menu);
-		appendPresetMenu(menu);	
+		appendOpMenu(menu);	
 		SchemeModuleWidget::appendContextMenu(menu);
 	}
 	void step() override {
@@ -624,11 +630,11 @@ struct LT116 : SchemeModuleWidget {
 		drawText(vg, 50, 330, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x93"); 
 		drawText(vg, 240, 330, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x92"); 
 	}
-	void bulkChangeWithHistory(std::string label, float *values) {
+	void bulkChangeWithHistory(std::string label, std::function<void (float *params)> func) {
 		float oldValues[256];
 		float newValues[256];
 		memcpy(oldValues, bulkParams, bulkParamSize);
-		memcpy(bulkParams, values, bulkParamSize);
+		func(bulkParams);
 		memcpy(newValues, bulkParams, bulkParamSize);
 		int moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
@@ -647,12 +653,53 @@ struct LT116 : SchemeModuleWidget {
 			}
 		));	
 	}
+	void bulkChangeWithHistory(std::string label, float *values) {
+		bulkChangeWithHistory(label, [=](float *params) {
+			memcpy(params, values, bulkParamSize);	
+		});
+		
+	}
+	void opIdentity() {
+		bulkChangeWithHistory("set LT116 identity", [=](float *params) {
+			for (int i = 0; i < 256; i++) {
+				params[i] = ((i % 17) == 0)?1:0;
+			}
+		});
+	}
+	void opUpper() {
+		bulkChangeWithHistory("set LT116 upper", [=](float *params) {
+			for (int i = 0; i < 16; i++) {
+				for (int j = 0; j < 16; j++) {
+					params[i * 16 + j] = (i <=j )?1:0;
+				}
+			}
+		});
+	}
+	void opLower() {
+		bulkChangeWithHistory("set LT116 lower", [=](float *params) {
+			for (int i = 0; i < 16; i++) {
+				for (int j = 0; j < 16; j++) {
+					params[i * 16 + j] = (i >=j )?1:0;
+				}
+			}
+		});
+	}
+	void opMultiply() {
+		bulkChangeWithHistory("LT116 paste multiply", [=](float *params) {
+			for (int i = 0; i < 256; i += 4) {
+				__m128 d = _mm_load_ps(params + i);
+				__m128 s = _mm_load_ps(clipboard + i);
+				d = _mm_mul_ps(d, s);
+				_mm_store_ps(params + i, d);
+			}
+		});
+	}
 	void copy() {
 		clipboardUsed = true;
 		memcpy(clipboard, bulkParams, bulkParamSize);
 	}
 	void paste() {
-		bulkChangeWithHistory("paste values", clipboard);
+		bulkChangeWithHistory("LT116 paste", clipboard);
 	}
 };
 
