@@ -396,6 +396,23 @@ namespace {
 	bool clipboardUsed = false;
 	const int bulkParamSize = sizeof(float) * 256;
 
+	float preset_identity[256] = {	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
+					0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
+					0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,
+					0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,
+					0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,
+					0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,
+					0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
+					0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,
+					0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
+					0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,
+					0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,
+					0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,
+					0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1};
+
 	template <class K>
 	K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
 		K* widget = new K();
@@ -530,6 +547,16 @@ struct LT116 : SchemeModuleWidget {
 		addOutput(createOutputCentered<SilverPort>(Vec(265, 330), module, LT_116::OUTPUT_1));
 		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(200, 330), module, LT_116::PARAM_OUTPUT_CHANNELS));
 	}
+	static void createPresetMenuItem(Menu *menu, std::string label, float *values, int moduleId) {
+		EventWidgetMenuItem *cmi = createMenuItem<EventWidgetMenuItem>(label);
+		cmi->clickHandler = [=]() {
+			LT116* mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));
+			if (mw) {
+				mw->bulkChangeWithHistory("set preset " + label, values);
+			}
+		};
+		menu->addChild(cmi);
+	}
 	float *getBulkParam(int id) override {
 		if (id < 0)
 			return NULL;
@@ -558,8 +585,22 @@ struct LT116 : SchemeModuleWidget {
 			menu->addChild(pmi);
 		}
 	}
+	void appendPresetMenu(Menu *menu) {
+		if (!module)
+			return;
+		int moduleId = module->id;
+		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Presets");
+		pmi->rightText = SUBMENU;
+		pmi->childMenuHandler = [=]() {
+			Menu *thisMenu = new Menu();
+			createPresetMenuItem(thisMenu, "Identity", preset_identity, moduleId);
+			return thisMenu;
+		};
+		menu->addChild(pmi);
+	}
 	void appendContextMenu(Menu *menu) override {
 		appendCopyPasteMenu(menu);
+		appendPresetMenu(menu);	
 		SchemeModuleWidget::appendContextMenu(menu);
 	}
 	void step() override {
