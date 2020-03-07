@@ -157,7 +157,6 @@ struct LT116 : SchemeModuleWidget {
 		if (!module) {
 			return;
 		}
-		DEBUG("MENU APPEND");
 		menu->addChild(new MenuSeparator);
 		appendCopyMenu(menu, row, column);
 		appendPasteMenu(menu, row, column);
@@ -193,45 +192,52 @@ struct LT116 : SchemeModuleWidget {
 			copyColumn(column);
 		};
 		menu->addChild(cmi);
+		cmi = createMenuItem<EventWidgetMenuItem>("Copy Cell");
+		cmi->clickHandler = [=]() {
+			copyCell(row, column);
+		};
+		menu->addChild(cmi);
 		return menu;
 	}
 	void appendPasteMenu(Menu *menu, int row, int column) {
 		if (!clipboardUsed) {
 			return;
 		}
-		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Paste");
-		pmi->clickHandler = [=]() {
-			paste();
-		};
-		menu->addChild(pmi);
-		if (clipboardUsed && row > -1) {
-			pmi->rightText = SUBMENU;
-			pmi->childMenuHandler = [=]() {
-				return appendPasteSubMenu(row, column);
-			};
-		}
-	}
-	Menu *appendPasteSubMenu(int row, int column) {
-		Menu *menu = new Menu();
-		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Paste");
-		pmi->clickHandler = [=]() {
-			paste();
-		};
-		menu->addChild(pmi);
+		EventWidgetMenuItem *pmi;
+		std::string menuLabel;
 		if (clipboardRow > -1) {
-			EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Paste Row");
-			pmi->clickHandler = [=]() {
-				pasteRow(row);
-			};
-			menu->addChild(pmi);
+			if (clipboardColumn > -1) {
+				menuLabel = "Paste Cell";
+			}
+			else {
+				menuLabel = "Paste Row";
+			}
 		}
-		if (clipboardColumn > -1) {
-			EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Paste Column");
-			pmi->clickHandler = [=]() {
-				pasteColumn(column);
-			};
-			menu->addChild(pmi);
+		else {
+			if (clipboardColumn > -1) {
+				menuLabel = "Paste Column";
+			}
+			else {
+				menuLabel = "Paste";
+			}
 		}
+		pmi = createMenuItem<EventWidgetMenuItem>(menuLabel);
+		pmi->clickHandler = [=]() {
+			paste(row, column);
+		};
+		menu->addChild(pmi);
+		pmi->rightText = SUBMENU;
+		pmi->childMenuHandler = [=]() {
+			return appendPasteSubMenu(menuLabel, row, column);
+		};
+	}
+	Menu *appendPasteSubMenu(std::string menuLabel, int row, int column) {
+		Menu *menu = new Menu();
+		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>(menuLabel);
+		pmi->clickHandler = [=]() {
+			paste(row, column);
+		};
+		menu->addChild(pmi);
 		return menu;
 	}
 	void appendOpMenu(Menu *menu) {
@@ -373,31 +379,42 @@ struct LT116 : SchemeModuleWidget {
 		clipboardRow = -1;
 		clipboardColumn = column;
 	}
-	void paste() {
-		bulkChangeWithHistory("LT116 paste", clipboard);
+	void copyCell(int row, int column) {
+		clipboardUsed = true;
+		memcpy(clipboard, bulkParams, bulkParamSize);
+		clipboardRow = row;
+		clipboardColumn = column;
 	}
-	void pasteRow(int row) {
-		if (clipboardRow > -1) {
-			bulkChangeWithHistory("LT116 paste row", [=](float *params) {
-				int sIndex = clipboardRow * 16;
-				int dIndex = row * 16;
-				for (int i = 0; i < 16; i++) {
-					params[dIndex++] = clipboard[sIndex++];
-				}
-			});
+	void paste(int row, int column) {
+		if (row > -1 && clipboardRow > -1) {
+			if (column > -1 && clipboardColumn > -1) {
+				bulkChangeWithHistory("LT116 paste cell", [=](float *params) {
+					params[column + 16 * row] = clipboard[clipboardColumn + 16 * clipboardRow];
+				});
+			}
+			else {
+				bulkChangeWithHistory("LT116 paste row", [=](float *params) {
+					int sIndex = clipboardRow * 16;
+					int dIndex = row * 16;
+					memcpy(params + dIndex, clipboard + sIndex, sizeof(float) * 16);
+				});
+			} 
 		}
-	}
-	void pasteColumn(int column) {
-		if (clipboardColumn > -1) {
-			bulkChangeWithHistory("LT116 paste column", [=](float *params) {
-				int sIndex = clipboardColumn;
-				int dIndex = column;
-				for (int i = 0; i < 16; i++) {
-					params[dIndex] = clipboard[sIndex];
-					sIndex += 16;
-					dIndex += 16;
-				}
-			});
+		else {
+			if (column > -1 && clipboardColumn > -1) {
+				bulkChangeWithHistory("LT116 paste column", [=](float *params) {
+					int sIndex = clipboardColumn;
+					int dIndex = column;
+					for (int i = 0; i < 16; i++) {
+						params[dIndex] = clipboard[sIndex];
+						sIndex += 16;
+						dIndex += 16;
+					}
+				});
+			}
+			else {
+				bulkChangeWithHistory("LT116 paste", clipboard);
+			}
 		}
 	}
 };
