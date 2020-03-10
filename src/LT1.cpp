@@ -160,7 +160,8 @@ struct LT116 : SchemeModuleWidget {
 		menu->addChild(new MenuSeparator);
 		appendCopyMenu(menu, row, column);
 		appendPasteMenu(menu, row, column);
-		appendOpMenu(menu);
+		appendPresetMenu(menu);
+		appendNormaliseMenu(menu, column);
 	}
 	void appendCopyMenu(Menu *menu, int row, int column) {
 		EventWidgetMenuItem *cmi = createMenuItem<EventWidgetMenuItem>("Copy");
@@ -238,12 +239,30 @@ struct LT116 : SchemeModuleWidget {
 			paste(row, column);
 		};
 		menu->addChild(pmi);
+
+		pmi = createMenuItem<EventWidgetMenuItem>("Paste Multiply");
+		pmi->clickHandler = [=]() {
+			this->pasteMultiply(row, column);
+		};
+		menu->addChild(pmi);
+
+		pmi = createMenuItem<EventWidgetMenuItem>("Paste Add");
+		pmi->clickHandler = [=]() {
+			this->pasteAdd(row, column);
+		};
+		menu->addChild(pmi);
+
+		pmi = createMenuItem<EventWidgetMenuItem>("Paste Subtract");
+		pmi->clickHandler = [=]() {
+			this->pasteSubtract(row, column);
+		};
+		menu->addChild(pmi);
 		return menu;
 	}
-	void appendOpMenu(Menu *menu) {
+	void appendPresetMenu(Menu *menu) {
 		if (!module)
 			return;
-		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Operations");
+		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Presets");
 		pmi->rightText = SUBMENU;
 		pmi->childMenuHandler = [=]() {
 			Menu *thisMenu = new Menu();
@@ -262,13 +281,34 @@ struct LT116 : SchemeModuleWidget {
 				this->opLower();
 			};
 			thisMenu->addChild(cmi);
-			if (clipboardUsed) {
-				cmi = createMenuItem<EventWidgetMenuItem>("Paste Multiply");
+			return thisMenu;
+		};
+		menu->addChild(pmi);
+	}
+	void appendNormaliseMenu(Menu *menu, int column) {
+		if (!module)
+			return;
+		EventWidgetMenuItem *pmi = createMenuItem<EventWidgetMenuItem>("Normalise");
+		pmi->rightText = SUBMENU;
+		pmi->childMenuHandler = [=]() {
+			Menu *thisMenu = new Menu();
+			EventWidgetMenuItem *cmi = createMenuItem<EventWidgetMenuItem>("Normalise");
+			cmi->clickHandler = [=]() {
+				this->normalise();
+			};
+			thisMenu->addChild(cmi);
+			if (column > -1) {
+				cmi = createMenuItem<EventWidgetMenuItem>("Normalize Column");
 				cmi->clickHandler = [=]() {
-					this->opMultiply();
+					this->normalise(column);
 				};
 				thisMenu->addChild(cmi);
 			}
+			cmi = createMenuItem<EventWidgetMenuItem>("Normalise All Columns");
+			cmi->clickHandler = [=]() {
+				this->normaliseAll();
+			};
+			thisMenu->addChild(cmi);
 			return thisMenu;
 		};
 		menu->addChild(pmi);
@@ -352,16 +392,6 @@ struct LT116 : SchemeModuleWidget {
 			}
 		});
 	}
-	void opMultiply() {
-		bulkChangeWithHistory("LT116 paste multiply", [=](float *params) {
-			for (int i = 0; i < 256; i += 4) {
-				__m128 d = _mm_load_ps(params + i);
-				__m128 s = _mm_load_ps(clipboard + i);
-				d = _mm_mul_ps(d, s);
-				_mm_store_ps(params + i, d);
-			}
-		});
-	}
 	void copy() {
 		clipboardUsed = true;
 		memcpy(clipboard, bulkParams, bulkParamSize);
@@ -385,37 +415,309 @@ struct LT116 : SchemeModuleWidget {
 		clipboardRow = row;
 		clipboardColumn = column;
 	}
+	void pasteCell(int row, int column) {
+		float oldValue = bulkParams[column + 16 * row];
+		bulkParams[column + 16 * row] = clipboard[clipboardColumn + 16 * clipboardRow];
+		float newValue = bulkParams[column + 16 * row];
+		int moduleId = module->id;
+		APP->history->push(new EventWidgetAction(
+			"LT116 paste cell",
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = oldValue;
+				}
+			},
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = newValue;
+				}
+			}
+		));	
+	}
+	void pasteRow(int row) {
+		bulkChangeWithHistory("LT116 paste row", [=](float *params) {
+			int sIndex = clipboardRow * 16;
+			int dIndex = row * 16;
+			memcpy(params + dIndex, clipboard + sIndex, sizeof(float) * 16);
+		});
+	}
+	void pasteColumn(int column) {
+		bulkChangeWithHistory("LT116 paste column", [=](float *params) {
+			int sIndex = clipboardColumn;
+			int dIndex = column;
+			for (int i = 0; i < 16; i++) {
+				params[dIndex] = clipboard[sIndex];
+				sIndex += 16;
+				dIndex += 16;
+			}
+		});
+	}
+	void pasteAll() {
+		bulkChangeWithHistory("LT116 paste", clipboard);
+	}
 	void paste(int row, int column) {
 		if (row > -1 && clipboardRow > -1) {
 			if (column > -1 && clipboardColumn > -1) {
-				bulkChangeWithHistory("LT116 paste cell", [=](float *params) {
-					params[column + 16 * row] = clipboard[clipboardColumn + 16 * clipboardRow];
-				});
+				pasteCell(row, column);
 			}
 			else {
-				bulkChangeWithHistory("LT116 paste row", [=](float *params) {
-					int sIndex = clipboardRow * 16;
-					int dIndex = row * 16;
-					memcpy(params + dIndex, clipboard + sIndex, sizeof(float) * 16);
-				});
+				pasteRow(row);
 			} 
 		}
 		else {
 			if (column > -1 && clipboardColumn > -1) {
-				bulkChangeWithHistory("LT116 paste column", [=](float *params) {
-					int sIndex = clipboardColumn;
-					int dIndex = column;
-					for (int i = 0; i < 16; i++) {
-						params[dIndex] = clipboard[sIndex];
-						sIndex += 16;
-						dIndex += 16;
-					}
-				});
+				pasteColumn(column);
 			}
 			else {
-				bulkChangeWithHistory("LT116 paste", clipboard);
+				pasteAll();
 			}
 		}
+	}
+	void pasteMultiplyCell(int row, int column) {
+		float oldValue = bulkParams[column + 16 * row];
+		bulkParams[column + 16 * row] *= clipboard[clipboardColumn + 16 * clipboardRow];
+		float newValue = bulkParams[column + 16 * row];
+		int moduleId = module->id;
+		APP->history->push(new EventWidgetAction(
+			"LT116 paste multiply cell",
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = oldValue;
+				}
+			},
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = newValue;
+				}
+			}
+		));	
+	}
+	void pasteMultiplyRow(int row) {
+		bulkChangeWithHistory("LT116 paste multiply row", [=](float *params) {
+			int sIndex = clipboardRow * 16;
+			int dIndex = row * 16;
+			for (int i = 0; i < 16; i++) {
+				params[dIndex++] *= clipboard[sIndex++];
+			}
+		});
+	}
+	void pasteMultiplyColumn(int column) {
+		bulkChangeWithHistory("LT116 paste multiply column", [=](float *params) {
+			int sIndex = clipboardColumn;
+			int dIndex = column;
+			for (int i = 0; i < 16; i++) {
+				params[dIndex] *= clipboard[sIndex];
+				sIndex += 16;
+				dIndex += 16;
+			}
+		});
+	}
+	void pasteMultiplyAll() {
+		bulkChangeWithHistory("LT116 paste multiply", [=](float *params) {
+			for (int i = 0; i < 256; i += 4) {
+				__m128 d = _mm_load_ps(params + i);
+				__m128 s = _mm_load_ps(clipboard + i);
+				d = _mm_mul_ps(d, s);
+				_mm_store_ps(params + i, d);
+			}
+		});
+	}
+	void pasteMultiply(int row, int column) {
+		if (row > -1 && clipboardRow > -1) {
+			if (column > -1 && clipboardColumn > -1) {
+				pasteMultiplyCell(row, column);
+			}
+			else {
+				pasteMultiplyRow(row);
+			} 
+		}
+		else {
+			if (column > -1 && clipboardColumn > -1) {
+				pasteMultiplyColumn(column);
+			}
+			else {
+				pasteMultiplyAll();
+			}
+		}
+	}
+	void pasteAddCell(int row, int column) {
+		float oldValue = bulkParams[column + 16 * row];
+		bulkParams[column + 16 * row] += clipboard[clipboardColumn + 16 * clipboardRow];
+		float newValue = bulkParams[column + 16 * row];
+		int moduleId = module->id;
+		APP->history->push(new EventWidgetAction(
+			"LT116 paste add cell",
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = oldValue;
+				}
+			},
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = newValue;
+				}
+			}
+		));	
+	}
+	void pasteAddRow(int row) {
+		bulkChangeWithHistory("LT116 paste add row", [=](float *params) {
+			int sIndex = clipboardRow * 16;
+			int dIndex = row * 16;
+			for (int i = 0; i < 16; i++) {
+				params[dIndex++] += clipboard[sIndex++];
+			}
+		});
+	}
+	void pasteAddColumn(int column) {
+		bulkChangeWithHistory("LT116 paste add column", [=](float *params) {
+			int sIndex = clipboardColumn;
+			int dIndex = column;
+			for (int i = 0; i < 16; i++) {
+				params[dIndex] += clipboard[sIndex];
+				sIndex += 16;
+				dIndex += 16;
+			}
+		});
+	}
+	void pasteAddAll() {
+		bulkChangeWithHistory("LT116 paste add", [=](float *params) {
+			for (int i = 0; i < 256; i += 4) {
+				__m128 d = _mm_load_ps(params + i);
+				__m128 s = _mm_load_ps(clipboard + i);
+				d = _mm_add_ps(d, s);
+				_mm_store_ps(params + i, d);
+			}
+		});
+	}
+	void pasteAdd(int row, int column) {
+		if (row > -1 && clipboardRow > -1) {
+			if (column > -1 && clipboardColumn > -1) {
+				pasteAddCell(row, column);
+			}
+			else {
+				pasteAddRow(row);
+			} 
+		}
+		else {
+			if (column > -1 && clipboardColumn > -1) {
+				pasteAddColumn(column);
+			}
+			else {
+				pasteAddAll();
+			}
+		}
+	}
+	void pasteSubtractCell(int row, int column) {
+		float oldValue = bulkParams[column + 16 * row];
+		bulkParams[column + 16 * row] -= clipboard[clipboardColumn + 16 * clipboardRow];
+		float newValue = bulkParams[column + 16 * row];
+		int moduleId = module->id;
+		APP->history->push(new EventWidgetAction(
+			"LT116 paste subtract cell",
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = oldValue;
+				}
+			},
+			[=]() {
+				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
+				if (mw) {
+					mw->bulkParams[column + 16 * row] = newValue;
+				}
+			}
+		));	
+	}
+	void pasteSubtractRow(int row) {
+		bulkChangeWithHistory("LT116 paste subtract row", [=](float *params) {
+			int sIndex = clipboardRow * 16;
+			int dIndex = row * 16;
+			for (int i = 0; i < 16; i++) {
+				params[dIndex++] -= clipboard[sIndex++];
+			}
+		});
+	}
+	void pasteSubtractColumn(int column) {
+		bulkChangeWithHistory("LT116 paste subtract column", [=](float *params) {
+			int sIndex = clipboardColumn;
+			int dIndex = column;
+			for (int i = 0; i < 16; i++) {
+				params[dIndex] -= clipboard[sIndex];
+				sIndex += 16;
+				dIndex += 16;
+			}
+		});
+	}
+	void pasteSubtractAll() {
+		bulkChangeWithHistory("LT116 paste subtract", [=](float *params) {
+			for (int i = 0; i < 256; i += 4) {
+				__m128 d = _mm_load_ps(params + i);
+				__m128 s = _mm_load_ps(clipboard + i);
+				d = _mm_sub_ps(d, s);
+				_mm_store_ps(params + i, d);
+			}
+		});
+	}
+	void pasteSubtract(int row, int column) {
+		if (row > -1 && clipboardRow > -1) {
+			if (column > -1 && clipboardColumn > -1) {
+				pasteSubtractCell(row, column);
+			}
+			else {
+				pasteSubtractRow(row);
+			} 
+		}
+		else {
+			if (column > -1 && clipboardColumn > -1) {
+				pasteSubtractColumn(column);
+			}
+			else {
+				pasteSubtractAll();
+			}
+		}
+	}
+	void normalise() {
+	}
+	void normalise(int column) {
+	}
+	void normaliseAll() {
+		bulkChangeWithHistory("LT116 normalise all columns", [=](float *params) {
+			__m128 a1, a2, a3, a4 = _mm_set_ps1(0.0f);
+			for (int i = 0; i < 256; i += 16) {
+				__m128 s = _mm_load_ps(params + i);
+				a1 = _mm_add_ps(a1, s);
+				s = _mm_load_ps(params + i + 4);
+				a2 = _mm_add_ps(a2, s);
+				s = _mm_load_ps(params + i + 8);
+				a3 = _mm_add_ps(a3, s);
+				s = _mm_load_ps(params + i + 12);
+				a4 = _mm_add_ps(a4, s);	
+			}
+			a1 = _mm_rcp_ps(a1);
+			a2 = _mm_rcp_ps(a2);
+			a3 = _mm_rcp_ps(a3);
+			a4 = _mm_rcp_ps(a4);
+			for (int i = 0; i < 256; i += 16) {
+				__m128 s = _mm_load_ps(params + i);
+				__m128 d = _mm_mul_ps(s, a1);
+				_mm_store_ps(params + i, d);
+				s = _mm_load_ps(params + i + 4);
+				d = _mm_mul_ps(s, a2);
+				_mm_store_ps(params + i + 4, d);
+				s = _mm_load_ps(params + i + 8);
+				d = _mm_mul_ps(s, a3);
+				_mm_store_ps(params + i + 8, d);
+				s = _mm_load_ps(params + i + 12);
+				d = _mm_mul_ps(s, a4);
+				_mm_store_ps(params + i + 12, d);
+			}
+		});
 	}
 };
 
