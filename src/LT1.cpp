@@ -683,12 +683,42 @@ struct LT116 : SchemeModuleWidget {
 		}
 	}
 	void normalise() {
+		bulkChangeWithHistory("LT116 normalise", [=](float *params) {
+			alignas(16) float res[4];
+			__m128 a = _mm_setzero_ps();
+			for (int i = 0; i < 256; i += 4) {
+				__m128 s = _mm_load_ps(params + i);
+				a = _mm_add_ps(a, s);
+			}
+			_mm_store_ps(res, a);
+			res[0] += (res[1] + res[2] + res[3]);
+			a = _mm_set_ps1(res[0]);
+			a = _mm_rcp_ps(a);
+			for (int i = 0; i < 256; i += 4) {
+				__m128 s = _mm_load_ps(params + i);
+				s = _mm_mul_ps(s, a);
+				_mm_store_ps(params + i, s);
+			}
+		});
 	}
 	void normalise(int column) {
+		bulkChangeWithHistory("LT116 normalise column", [=](float *params) {
+			float a = 0.0f;
+			int index = column;
+			for(int i = 0; i < 16; i++) {
+				a += params[index];
+				index += 16;
+			}
+			a = _mm_cvtss_f32(_mm_rcp_ps(_mm_set_ps1(a)));
+			for(int i = 0; i < 16; i++) {
+				index -= 16;
+				params[index] *= a;
+			}
+		});
 	}
 	void normaliseAll() {
 		bulkChangeWithHistory("LT116 normalise all columns", [=](float *params) {
-			__m128 a1, a2, a3, a4 = _mm_set_ps1(0.0f);
+			__m128 a1, a2, a3, a4 = _mm_setzero_ps();
 			for (int i = 0; i < 256; i += 16) {
 				__m128 s = _mm_load_ps(params + i);
 				a1 = _mm_add_ps(a1, s);
