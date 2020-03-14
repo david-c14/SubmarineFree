@@ -58,7 +58,11 @@ struct LT_116 : Module {
 		json_t *rootJ = json_object();
 		json_t *arr = json_array();
 		for (unsigned int i = 0; i < 256; i++) {
-			json_array_append_new(arr, json_real(bulkParams[i]));
+			if (std::isnan(bulkParams[i])) {
+				json_array_append_new(arr, json_real(0.0f));
+			} else {
+				json_array_append_new(arr, json_real(bulkParams[i]));
+			}
 		}
 		json_object_set_new(rootJ, "coefficients", arr);
 		return rootJ;
@@ -694,6 +698,9 @@ struct LT116 : SchemeModuleWidget {
 			res[0] += (res[1] + res[2] + res[3]);
 			a = _mm_set_ps1(res[0]);
 			a = _mm_rcp_ps(a);
+			_mm_store_ps(res, a);
+			DEBUG("%f %f %f %f", res[0], res[1], res[2], res[3]);
+			a = _mm_and_ps(a, _mm_cmpord_ps(a, _mm_setzero_ps()));
 			for (int i = 0; i < 256; i += 4) {
 				__m128 s = _mm_load_ps(params + i);
 				s = _mm_mul_ps(s, a);
@@ -709,7 +716,8 @@ struct LT116 : SchemeModuleWidget {
 				a += params[index];
 				index += 16;
 			}
-			a = _mm_cvtss_f32(_mm_rcp_ps(_mm_set_ps1(a)));
+			if (a)
+				a = 1.0f/a;
 			for(int i = 0; i < 16; i++) {
 				index -= 16;
 				params[index] *= a;
@@ -733,6 +741,10 @@ struct LT116 : SchemeModuleWidget {
 			a2 = _mm_rcp_ps(a2);
 			a3 = _mm_rcp_ps(a3);
 			a4 = _mm_rcp_ps(a4);
+			a1 = _mm_and_ps(a1, _mm_cmpord_ps(a1, _mm_setzero_ps()));
+			a2 = _mm_and_ps(a2, _mm_cmpord_ps(a2, _mm_setzero_ps()));
+			a3 = _mm_and_ps(a3, _mm_cmpord_ps(a3, _mm_setzero_ps()));
+			a4 = _mm_and_ps(a4, _mm_cmpord_ps(a4, _mm_setzero_ps()));
 			for (int i = 0; i < 256; i += 16) {
 				__m128 s = _mm_load_ps(params + i);
 				__m128 d = _mm_mul_ps(s, a1);
