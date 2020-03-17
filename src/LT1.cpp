@@ -697,10 +697,11 @@ struct LT116 : SchemeModuleWidget {
 			_mm_store_ps(res, a);
 			res[0] += (res[1] + res[2] + res[3]);
 			a = _mm_set_ps1(res[0]);
+			__m128 mask = _mm_cmpneq_ps(a, _mm_setzero_ps());
 			a = _mm_rcp_ps(a);
+			a = _mm_and_ps(a, mask);
 			_mm_store_ps(res, a);
 			DEBUG("%f %f %f %f", res[0], res[1], res[2], res[3]);
-			a = _mm_and_ps(a, _mm_cmpord_ps(a, _mm_setzero_ps()));
 			for (int i = 0; i < 256; i += 4) {
 				__m128 s = _mm_load_ps(params + i);
 				s = _mm_mul_ps(s, a);
@@ -737,14 +738,18 @@ struct LT116 : SchemeModuleWidget {
 				s = _mm_load_ps(params + i + 12);
 				a4 = _mm_add_ps(a4, s);	
 			}
+			__m128 mask = _mm_cmpneq_ps(a1, _mm_setzero_ps());
 			a1 = _mm_rcp_ps(a1);
+			a1 = _mm_and_ps(a1, mask);
+			mask = _mm_cmpneq_ps(a2, _mm_setzero_ps());
 			a2 = _mm_rcp_ps(a2);
+			a2 = _mm_and_ps(a2, mask);
+			mask = _mm_cmpneq_ps(a3, _mm_setzero_ps());
 			a3 = _mm_rcp_ps(a3);
+			a3 = _mm_and_ps(a3, mask);
+			mask = _mm_cmpneq_ps(a4, _mm_setzero_ps());
 			a4 = _mm_rcp_ps(a4);
-			a1 = _mm_and_ps(a1, _mm_cmpord_ps(a1, _mm_setzero_ps()));
-			a2 = _mm_and_ps(a2, _mm_cmpord_ps(a2, _mm_setzero_ps()));
-			a3 = _mm_and_ps(a3, _mm_cmpord_ps(a3, _mm_setzero_ps()));
-			a4 = _mm_and_ps(a4, _mm_cmpord_ps(a4, _mm_setzero_ps()));
+			a4 = _mm_and_ps(a4, mask);
 			for (int i = 0; i < 256; i += 16) {
 				__m128 s = _mm_load_ps(params + i);
 				__m128 d = _mm_mul_ps(s, a1);
