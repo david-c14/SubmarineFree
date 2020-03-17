@@ -1010,7 +1010,7 @@ struct WM101 : SizeableModuleWidget {
 			this->addWireMenu(wb);
 		};
 		wb->doubleClickHandler = [=]() {
-			this->selectWirePanel(color);
+			this->selectWirePanel(wb->color);
 		};
 		scrollWidget->container->addChild(wb);
 		return wb;
