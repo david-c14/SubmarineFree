@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.2
+- 18-Mar-2020 Issue #80 - Save and load collections in WM-101
 - 21-Jan-2020 Issue #50 - Protect internal classes with anonymous namespaces
 - 17-Mar-2020 Issue #78 - Color one wire uses stale color
 
