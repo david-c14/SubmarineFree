@@ -1,8 +1,10 @@
 # Changelog
 
 ## v1.1.2
-- 21-Jan-2020 Issue #50 - Protect internal classes with anonymous namespaces
+- 17-Mar-2020 Add LT-116 Linear Transformations
 - 17-Mar-2020 Issue #78 - Color one wire uses stale color
+- 28-Jan-2020 Replace Digital Ports (Blue) with Analog (Silver) on EO-102
+- 21-Jan-2020 Issue #50 - Protect internal classes with anonymous namespaces
 
 ## v1.1.1
 - 02-Jan-2020 Secret Santa 2019 is now obsolete
