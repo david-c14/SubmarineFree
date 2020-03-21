@@ -1,5 +1,7 @@
 //SubTag W10
 #include <settings.hpp>
+#include <system.hpp>
+#include <osdialog.h>
 #include "SubmarineFree.hpp"
 
 struct BackPanel : Widget {
@@ -1101,6 +1103,21 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0x80, 0x36, 0x10), false);
 		addCollection(std::string("Default"), currentCollection());
 	}
+	void loadCollectionFromJson(json_t *json) {
+		json_t *n1 = json_object_get(json, "name");	
+		json_t *a1 = json_object_get(json, "colors");
+		if (a1) {
+			std::vector<NVGcolor> colors;
+			int asize = json_array_size(a1);
+			for (int j = 0; j < asize; j++) {
+				json_t *c1 = json_array_get(a1, j);
+				if (c1) {
+					colors.push_back(color::fromHexString(json_string_value(c1)));
+				}
+			}
+			addCollection(n1?json_string_value(n1):"[Unnamed]", colors);
+		}	
+	}
 	void loadSettings() {
 		json_error_t error;
 		FILE *file = fopen(asset::user("SubmarineFree/WM-101.json").c_str(), "r");
@@ -1171,19 +1188,7 @@ struct WM101 : SizeableModuleWidget {
 			for (int i = 0; i < size; i++) {
 				json_t *j1 = json_array_get(arr, i);
 				if (j1) {
-					json_t *n1 = json_object_get(j1, "name");	
-					json_t *a1 = json_object_get(j1, "colors");
-					if (a1) {
-						std::vector<NVGcolor> colors;
-						int asize = json_array_size(a1);
-						for (int j = 0; j < asize; j++) {
-							json_t *c1 = json_array_get(a1, j);
-							if (c1) {
-								colors.push_back(color::fromHexString(json_string_value(c1)));
-							}
-						}
-						addCollection(n1?json_string_value(n1):"[Unnamed]", colors);
-					}	
+					loadCollectionFromJson(j1);
 				}
 			}
 			reflowCollections();
@@ -1213,13 +1218,7 @@ struct WM101 : SizeableModuleWidget {
 		for (Widget *w : collectionScrollWidget->container->children) {
 			ColorCollectionButton *cb = dynamic_cast<ColorCollectionButton *>(w);
 			json_t *c1 = json_object();
-			json_object_set_new(c1, "name", json_string(cb->name.c_str()));
-			json_t *a1 = json_array();
-			for (NVGcolor col: cb->colors) {
-				std::string s = color::toHexString(col);
-				json_array_append_new(a1, json_string(s.c_str()));
-			}
-			json_object_set_new(c1, "colors", a1);
+			saveCollectionToJson(cb, c1);
 			json_array_append_new(arr, c1);
 		} 
 		json_object_set_new(settings, "collections", arr);
@@ -1327,9 +1326,16 @@ struct WM101 : SizeableModuleWidget {
 		EventWidgetMenuItem *addColl = new EventWidgetMenuItem();
 		addColl->text = "Save as Collection";
 		addColl->clickHandler = [=]() {
-			this->saveCollection();
+			this->saveAsCollection();
 		};
 		menu->addChild(addColl);
+
+		EventWidgetMenuItem *loadColl = new EventWidgetMenuItem();
+		loadColl->text = "Load collection...";
+		loadColl->clickHandler = [=]() {
+			this->loadCollectionDialog();
+		};
+		menu->addChild(loadColl);
 
 		menu->addChild(new MenuSeparator);
 	
@@ -1436,6 +1442,13 @@ struct WM101 : SizeableModuleWidget {
 			this->deleteCollectionDialog(cb);
 		};
 		menu->addChild(dm);
+
+		EventWidgetMenuItem *sm = new EventWidgetMenuItem();
+		sm->text = "Save collection...";
+		sm->clickHandler = [=]() {
+			this->saveCollectionDialog(cb);
+		};
+		menu->addChild(sm);
 	}
 	unsigned int swapCollectionCore(ColorCollectionButton *cb, bool up) {
 		unsigned int index = cb->index();
@@ -1472,6 +1485,90 @@ struct WM101 : SizeableModuleWidget {
 				}
 			}
 		));
+	}
+	void loadCollectionDialog() {
+		std::string dir = asset::user("SubmarineFree");
+		system::createDirectory(dir);
+		std::string filename = "";
+		
+		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
+		DEFER({
+			osdialog_filters_free(filters);
+		});
+
+		char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
+		if (!pathC) {
+			// Fail silently
+			return;
+		}
+		DEFER({
+			std::free(pathC);
+		});
+
+		loadCollectionFromDisk(pathC);
+	}
+	void loadCollectionFromDisk(std::string pathC) {
+		json_error_t error;
+		FILE *file = fopen(pathC.c_str(), "r");
+		if (!file) {
+			return;
+		}
+		json_t *rootJ = json_loadf(file, 0, &error);
+		fclose(file);
+		if (!rootJ) {
+			WARN("Submarine Free WM-101: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+			return;
+		}
+		loadCollectionFromJson(rootJ);
+		reflowCollections();
+		saveSettings();
+		json_decref(rootJ);
+	}
+	void saveCollectionDialog(ColorCollectionButton *cb) {
+		std::string dir = asset::user("SubmarineFree");
+		system::createDirectory(dir);
+		std::string filename = cb->name;
+
+		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
+		DEFER({
+			osdialog_filters_free(filters);
+		});
+
+		char* pathC = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
+		if (!pathC) {
+			// Fail silently
+			return;
+		}
+		DEFER({
+			std::free(pathC);
+		});
+
+		// Append .vcv extension if no extension was given.
+		std::string pathStr = pathC;
+		if (string::filenameExtension(string::filename(pathStr)) == "") {
+			pathStr += ".wmCollection";
+		}
+
+		saveCollectionToDisk(cb, pathStr);
+	}
+	void saveCollectionToDisk(ColorCollectionButton *cb, std::string pathStr) {
+		json_t *settings = json_object();
+		saveCollectionToJson(cb, settings);
+		FILE *file = fopen(pathStr.c_str(), "w");
+		if (file) {
+			json_dumpf(settings, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+			fclose(file);
+		}
+		json_decref(settings);
+	}
+	void saveCollectionToJson(ColorCollectionButton *cb, json_t *node) {
+		json_object_set_new(node, "name", json_string(cb->name.c_str()));
+		json_t *a1 = json_array();
+		for (NVGcolor col: cb->colors) {
+			std::string s = color::toHexString(col);
+			json_array_append_new(a1, json_string(s.c_str()));
+		}
+		json_object_set_new(node, "colors", a1);
 	}
 	void changeCollectionName(ColorCollectionButton *cb, std::string text) {
 		if (cb->name == text)
@@ -1551,12 +1648,12 @@ struct WM101 : SizeableModuleWidget {
 		};
 		menu->addChild(dm);
 	}
-	void saveCollection() {
+	void saveAsCollection() {
 		std::vector<NVGcolor> colors = currentCollection();
 		unsigned int index = addCollection(std::string("[Unnamed]"), colors)->index();
 		saveSettings();
 		APP->history->push(new EventWidgetAction(
-			"Save Collection",
+			"Save as Collection",
 			[index]() {
 				if (masterWireManager) {
 					ColorCollectionButton *cb = masterWireManager->findCollectionButton(index);

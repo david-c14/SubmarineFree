@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.2
+- 18-Mar-2020 Issue #80 - Save and load collections in WM-101
 - 17-Mar-2020 Add LT-116 Linear Transformations
 - 17-Mar-2020 Issue #78 - Color one wire uses stale color
 - 28-Jan-2020 Replace Digital Ports (Blue) with Analog (Silver) on EO-102
