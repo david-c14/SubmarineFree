@@ -287,6 +287,9 @@ struct WireButton : EventWidgetButtonBase {
 struct ColorCollectionButton : EventWidgetButtonBase {
 	std::string name;
 	std::vector<NVGcolor> colors;
+	// add a dedicated tooltip to show color descriptions on rollover
+	ui::Tooltip* tooltip;
+	unsigned int counter = 0;  // just for testing
 	
 	void draw(const DrawArgs &args) override {
 		if (!name.empty()) {
@@ -303,7 +306,7 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 			NVGcolor col = color;
 			col.a = 1.0f;
 			nvgBeginPath(args.vg);
-			nvgRect(args.vg, left, 15, width, 5);
+			nvgRect(args.vg, left, 15, width, 8);
 			nvgFillColor(args.vg, col);
 			nvgFill(args.vg);
 			left += width;
@@ -318,6 +321,50 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 			i++;
 		}
 		return 0;
+	}
+
+	void onEnter(const event::Enter &e) override {
+		OpaqueWidget::onEnter(e);
+		//e.consume(this);
+	}
+	void onHover(const event::Hover &e) override {
+		if (!tooltip) {
+			counter++;
+			SubTooltip *stt = new SubTooltip();
+			tooltip = stt;
+			APP->scene->addChild(tooltip);
+			stt->stepLambda = [=]() {
+				tooltip->text = "FOO-" + std::to_string(counter);
+				stt->Tooltip::step();
+				// place the tooltip just below the collection's color strip
+				tooltip->box.pos = this->getAbsoluteOffset(this->box.size).minus(Vec(110, 1)).round();
+			};
+		}
+		/* TODO: adapt logic above to show the description for the current target color chip
+		float width = box.size.x - 25.0f;
+		width = width / colors.size();
+		float left = 0.0f;
+		for (NVGcolor color : colors) {
+			NVGcolor col = color;
+			col.a = 1.0f;
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, left, 15, width, 8);
+			nvgFillColor(args.vg, col);
+			nvgFill(args.vg);
+			left += width;
+		}
+		*/
+		OpaqueWidget::onHover(e);
+		//e.consume(this);
+	}
+	void onLeave(const event::Leave &e) override {
+		if (tooltip) {
+			APP->scene->removeChild(tooltip);
+			delete tooltip;
+			tooltip = NULL;
+		}
+		OpaqueWidget::onLeave(e);
+		//e.consume(this);
 	}
 };
 
@@ -1016,10 +1063,10 @@ struct WM101 : SizeableModuleWidget {
 		return wb;
 	}
 	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors) {
-		float y = collectionScrollWidget->container->children.size() * 21;
+		float y = collectionScrollWidget->container->children.size() * 24;
 		ColorCollectionButton *btn = new ColorCollectionButton();
 		btn->box.pos = Vec(0, y);
-		btn->box.size = Vec(collectionScrollWidget->box.size.x, 21);
+		btn->box.size = Vec(collectionScrollWidget->box.size.x, 24);
 		btn->name = name;
 		btn->colors = colors;
 		btn->rightClickHandler = [=]() {
@@ -1571,7 +1618,7 @@ struct WM101 : SizeableModuleWidget {
 			EventWidgetMenuItem *mu = new EventWidgetMenuItem();
 			mu->text = "Move Up";
 			mu->clickHandler = [=]() {
-				this->swap(wb->box.pos.y / 21 - 1);
+				this->swap(wb->box.pos.y / 24 - 1);
 			};
 			menu->addChild(mu);
 		}
@@ -1579,7 +1626,7 @@ struct WM101 : SizeableModuleWidget {
 			EventWidgetMenuItem *md = new EventWidgetMenuItem();
 			md->text = "Move Down";
 			md->clickHandler = [=]() {
-				this->swap(wb->box.pos.y / 21);
+				this->swap(wb->box.pos.y / 24);
 			};
 			menu->addChild(md);
 		}
@@ -1696,7 +1743,7 @@ struct WM101 : SizeableModuleWidget {
 		unsigned int y = 0;
 		for (Widget *widget : collectionScrollWidget->container->children) {
 			widget->box.pos.y = y;
-			y += 21;
+			y += 24;
 		}
 	}
 	void swap(int i) {
