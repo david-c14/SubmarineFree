@@ -8,27 +8,23 @@
 #include "../SubmarineFree.hpp"
 #include "color.hpp"
 
-void LightKnob::setEnabled(int val) {
+void BaseLightKnob::setEnabled(int val) {
 	enabled = val;
 }
 
-void LightKnob::setRadius(int r) {
+void BaseLightKnob::setRadius(int r) {
+	Widget *w = dynamic_cast<Widget *>(this);
 	radius = r;
-	box.size.x = r * 2;
-	box.size.y = r * 2;
+	w->box.size.x = r * 2;
+	w->box.size.y = r * 2;
 }
 
-void LightKnob::draw(const DrawArgs &args) {
+void BaseLightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 	nvgSave(args.vg);
 	NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
-	float value = 0.0f;
-	float minValue = -1.0f;
-	float maxValue = 1.0f;
-	if (paramQuantity) {
-		value = paramQuantity->getValue();
-		minValue = paramQuantity->getMinValue();
-		maxValue = paramQuantity->getMaxValue();
-	}
+	float value = getBLKValue();
+	float minValue = getBLKMinValue();
+	float maxValue = getBLKMaxValue();
 
 	// Shadow
 	if (!gScheme.isFlat) {
