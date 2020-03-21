@@ -1103,9 +1103,10 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0x80, 0x36, 0x10), false);
 		addCollection(std::string("Default"), currentCollection());
 	}
-	void loadCollectionFromJson(json_t *json) {
+	ColorCollectionButton *loadCollectionFromJson(json_t *json) {
 		json_t *n1 = json_object_get(json, "name");	
 		json_t *a1 = json_object_get(json, "colors");
+		ColorCollectionButton *cb = NULL;
 		if (a1) {
 			std::vector<NVGcolor> colors;
 			int asize = json_array_size(a1);
@@ -1115,8 +1116,9 @@ struct WM101 : SizeableModuleWidget {
 					colors.push_back(color::fromHexString(json_string_value(c1)));
 				}
 			}
-			addCollection(n1?json_string_value(n1):"[Unnamed]", colors);
+			cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors);
 		}	
+		return cb;
 	}
 	void loadSettings() {
 		json_error_t error;
@@ -1470,7 +1472,7 @@ struct WM101 : SizeableModuleWidget {
 			up?"Move Collection Up":"Move Collection Down",
 			[index, up]() {
 				if (masterWireManager) {
-					ColorCollectionButton *btn = masterWireManager->findCollectionButton(index - 1);
+					ColorCollectionButton *btn = masterWireManager->findCollectionButton(index + (up?-1:+1));
 					if (btn) {
 						masterWireManager->swapCollectionCore(btn, !up);
 					}
@@ -1519,10 +1521,36 @@ struct WM101 : SizeableModuleWidget {
 			WARN("Submarine Free WM-101: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 			return;
 		}
-		loadCollectionFromJson(rootJ);
+		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
+		json_decref(rootJ);
+		if (!cb)
+			return;
+		
 		reflowCollections();
 		saveSettings();
-		json_decref(rootJ);
+		std::vector<NVGcolor> colors = cb->colors; 
+		std::string name = cb->name;
+		unsigned int index = cb->index();
+		APP->history->push(new EventWidgetAction(
+			"Load Collection",
+			[index]() {
+				if (masterWireManager) {
+					ColorCollectionButton *cb = masterWireManager->findCollectionButton(index);
+					if (cb) {
+						masterWireManager->collectionScrollWidget->container->removeChild(cb);
+						delete cb;
+						masterWireManager->reflowCollections();
+						masterWireManager->saveSettings();
+					}
+				}
+			},
+			[name, colors]() {
+				if (masterWireManager) {
+					masterWireManager->addCollection(name, colors);
+					masterWireManager->saveSettings();
+				}
+			}
+		));
 	}
 	void saveCollectionDialog(ColorCollectionButton *cb) {
 		std::string dir = asset::user("SubmarineFree");
