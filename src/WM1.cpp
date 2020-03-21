@@ -1421,7 +1421,15 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(redo);
 	}
 	void addCollectionMenu(ColorCollectionButton *cb) {
+		// by convention, place at the current mouse location
+		addCollectionMenu(cb, false);
+	}
+	void addCollectionMenu(ColorCollectionButton *cb, bool forcePosition) {
 		Menu *menu = createMenu();
+		if (forcePosition) {
+			// put the name field under the mouse
+			menu->box.pos = APP->window->mousePos.minus(Vec(100, 12));
+		}
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
 		paramField->setText(cb->name);
@@ -1606,6 +1614,17 @@ struct WM101 : SizeableModuleWidget {
 				}
 			}
 		));
+		promptForCollectionName(index);
+	}
+	void promptForCollectionName(unsigned int index) {
+		// jump to collections list (if not already visible)
+		collectionsDialog();
+		ColorCollectionButton *cb = findCollectionButton(index);
+		// TODO: scroll to show the n-th collection (vs. jump to end of list)
+		math::Rect box = math::Rect(math::Vec(INFINITY, INFINITY), math::Vec(INFINITY, INFINITY));
+		collectionScrollWidget->scrollTo(box);
+		// prompt for this collection's name/position/etc.
+		addCollectionMenu(cb, true);  // use sensible menu position
 	}
 	void deleteCollection(ColorCollectionButton *cb) {
 		unsigned int index = cb->index();
