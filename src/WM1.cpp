@@ -126,11 +126,13 @@ struct WirePanel : BackPanel {
 };
 
 struct EditPanel : BackPanel {
-	std::function<void(NVGcolor)> completeHandler;
+	std::function<void(NVGcolor, std::string)> completeHandler;
 	std::function<void()> cancelHandler;
 	EventWidgetSlider *r;
 	EventWidgetSlider *g;
 	EventWidgetSlider *b;
+	Label *labelLabel;
+	EventParamField *labelField;
 	EditPanel() {
 		r = new EventWidgetSlider();
 		r->box.pos = Vec(10, 105);
@@ -150,19 +152,28 @@ struct EditPanel : BackPanel {
 		b->textHandler = percentageTextHandler;
 		b->label = "Blue";
 		addChild(b);
+		labelLabel = new Label();
+		labelLabel->box.pos = Vec(0, 223);
+		labelLabel->text = "Color label";
+		addChild(labelLabel);
+		labelField = new EventParamField();
+		labelField->box.pos = Vec(7, 243);
+		labelField->box.size.x = 116;
+		addChild(labelField);
+
 		EventWidgetButton *saveButton = new EventWidgetButton();
-		saveButton->box.pos = Vec(5, 250);
+		saveButton->box.pos = Vec(5, 275);
 		saveButton->box.size = Vec(55, 19);
 		saveButton->label = "Save";
 		saveButton->clickHandler = [=](){
 			if (this->completeHandler) {
-				this->completeHandler(nvgRGBf(r->value, g->value, b->value));
+				this->completeHandler(nvgRGBf(r->value, g->value, b->value), labelField->text);
 			}
 		};
 		addChild(saveButton);
 		
 		EventWidgetButton *cancelButton = new EventWidgetButton();
-		cancelButton->box.pos = Vec(70, 250);
+		cancelButton->box.pos = Vec(70, 275);
 		cancelButton->box.size = Vec(55, 19);
 		cancelButton->label = "Cancel";
 		cancelButton->clickHandler = [=](){
@@ -1946,7 +1957,7 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->visible = false;
 		collectionPanel->visible = true;
 	}
-	void editAdd(NVGcolor col) {
+	void editAdd(NVGcolor col, std::string label) {
 		std::string defaultLabel = "";
 		addColor(col, defaultLabel, false);
 		unsigned int index = scrollWidget->container->children.size() - 1;
@@ -1970,26 +1981,30 @@ struct WM101 : SizeableModuleWidget {
 			}
 		));
 	}
-	void editEdit(WireButton *wb, NVGcolor col) {
+	void editEdit(WireButton *wb, NVGcolor col, std::string label) {
 		NVGcolor oldCol = wb->color;
+		std::string oldLabel = wb->label;
 		unsigned int index = wb->index();
 		wb->color = col;
+		wb->label = label;
 		APP->history->push(new EventWidgetAction(
 			"Edit Color",
-			[index, oldCol]() {
+			[index, oldCol, oldLabel]() {
 				if (masterWireManager) {
 					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
 						wb->color = oldCol;
+						wb->label = oldLabel;
 						masterWireManager->saveSettings();
 					}
 				}
 			},
-			[index, col]() {
+			[index, col, label]() {
 				if (masterWireManager) {
 					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
 						wb->color = col;
+						wb->label = label;
 						masterWireManager->saveSettings();
 					}
 				}
@@ -1998,12 +2013,12 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void editDialog(WireButton *wb) {
 		backPanel->visible = false;
-		editPanel->completeHandler = [=](NVGcolor col) {
+		editPanel->completeHandler = [=](NVGcolor col, std::string label) {
 			if (wb) {
-				editEdit(wb, col);
+				editEdit(wb, col, label);
 			}
 			else {
-				editAdd(col);
+				editAdd(col, label);
 			}
 			saveSettings();
 			cancel();
@@ -2012,11 +2027,13 @@ struct WM101 : SizeableModuleWidget {
 			editPanel->r->value = wb->color.r;
 			editPanel->g->value = wb->color.g;
 			editPanel->b->value = wb->color.b;
+			editPanel->labelField->setText(wb->label);
 		}
 		else {
 			editPanel->r->value = 0.5f;
 			editPanel->g->value = 0.5f;
 			editPanel->b->value = 0.5f;
+			editPanel->labelField->setText("");
 		}
 		editPanel->visible = true;
 	}
