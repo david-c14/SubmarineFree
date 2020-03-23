@@ -1589,6 +1589,9 @@ struct WM101 : SizeableModuleWidget {
 			std::vector<NVGcolor> colors = cb->colors;
 			cb->colors = cb2->colors;
 			cb2->colors = colors;	
+			std::vector<std::string> labels = cb->labels;
+			cb->labels = cb2->labels;
+			cb2->labels = labels;
 		}
 		saveSettings();
 		return index;
