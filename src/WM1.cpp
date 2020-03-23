@@ -1302,6 +1302,7 @@ struct WM101 : SizeableModuleWidget {
 			json_t *color = json_object();
 			std::string s = color::toHexString(wb->color);
 			json_object_set_new(color, "color", json_string(s.c_str()));
+			json_object_set_new(color, "label", json_string(wb->label.c_str()));
 			json_object_set_new(color,"selected", json_real(wb->checkBox->selected));
 			json_array_append_new(arr, color);
 		}
