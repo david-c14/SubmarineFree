@@ -1795,7 +1795,7 @@ struct WM101 : SizeableModuleWidget {
 			EventWidgetMenuItem *mu = new EventWidgetMenuItem();
 			mu->text = "Move Up";
 			mu->clickHandler = [=]() {
-				this->swap(wb->box.pos.y / 24 - 1);
+				this->swap(wb->box.pos.y / 21 - 1);
 			};
 			menu->addChild(mu);
 		}
@@ -1803,7 +1803,7 @@ struct WM101 : SizeableModuleWidget {
 			EventWidgetMenuItem *md = new EventWidgetMenuItem();
 			md->text = "Move Down";
 			md->clickHandler = [=]() {
-				this->swap(wb->box.pos.y / 24);
+				this->swap(wb->box.pos.y / 21);
 			};
 			menu->addChild(md);
 		}
