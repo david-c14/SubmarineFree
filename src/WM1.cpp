@@ -231,6 +231,9 @@ struct WireButton : EventWidgetButtonBase {
 	NVGcolor color;
 	std::string label;
 	EventWidgetCheckBox *checkBox;
+	// add a dedicated tooltip to show color descriptions on rollover
+	ui::Tooltip* tooltip = NULL;
+
 	WireButton() {
 		checkBox = new EventWidgetCheckBox();
 		checkBox->box.pos = Vec(1,1);
@@ -299,6 +302,32 @@ struct WireButton : EventWidgetButtonBase {
 			i++;
 		}
 		return 0;
+	}
+    // TODO: Custom behavior for tooltip? or use built-in stuff?
+	void onEnter(const event::Enter &e) override {
+		if (!tooltip && (this->label != "")) {
+			SubTooltip *stt = new SubTooltip();
+			tooltip = stt;
+			APP->scene->addChild(tooltip);
+			stt->stepLambda = [=]() {
+				tooltip->text = std::string(this->label);
+				stt->Tooltip::step();
+				tooltip->box.pos = this->getAbsoluteOffset(this->box.size).minus(this->box.size).plus(Vec(100, 0)).round();
+			};
+		}
+        EventWidgetButtonBase::onEnter(e);
+		//e.consume(this);
+	}
+	void onLeave(const event::Leave &e) override {
+		if (tooltip) {
+            if (tooltip->parent == APP->scene) {
+                APP->scene->removeChild(tooltip);
+            }
+			delete tooltip;
+			tooltip = NULL;
+		}
+		EventWidgetButtonBase::onLeave(e);
+		//e.consume(this);
 	}
 };
 
