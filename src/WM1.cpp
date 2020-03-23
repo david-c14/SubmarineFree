@@ -73,13 +73,6 @@ struct CollectionButton : EventWidgetButtonBase {
 	}
 };
 
-/* TODO: Consider this struct? simple bundle of colors and labels
-struct ColorCollection {
-	std::vector<NVGcolor> colors;
-	std::vector<std::string> labels;
-}
-*/
-
 struct WirePanel : BackPanel {
 	NVGcolor color;
 	std::function<void()> cancelHandler;
@@ -304,7 +297,8 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 	std::vector<std::string> labels;
 	// add a dedicated tooltip to show color descriptions on rollover
 	ui::Tooltip* tooltip;
-	unsigned int counter = 0;  // just for testing
+	float tooltipX = 0;
+	std::string foundLabel = "";
 	
 	void draw(const DrawArgs &args) override {
 		if (!name.empty()) {
@@ -343,32 +337,29 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 		//e.consume(this);
 	}
 	void onHover(const event::Hover &e) override {
+		float mouseX = e.pos.x;  // relative to this collection button
 		if (!tooltip) {
-			counter++;
 			SubTooltip *stt = new SubTooltip();
 			tooltip = stt;
 			APP->scene->addChild(tooltip);
 			stt->stepLambda = [=]() {
-				tooltip->text = "FOO-" + std::to_string(counter);
+				tooltip->text = foundLabel;
 				stt->Tooltip::step();
-				// place the tooltip just below the collection's color strip
-				tooltip->box.pos = this->getAbsoluteOffset(this->box.size).minus(Vec(110, 1)).round();
+				// place the tooltip just above the target color's block
+				tooltip->box.pos = this->getAbsoluteOffset(this->box.size).minus(this->box.size).plus(Vec(tooltipX, -6)).round();
 			};
 		}
-		/* TODO: adapt logic above to show the description for the current target color chip
+		// adapt logic above to show the description for the current target color chip
 		float width = box.size.x - 25.0f;
 		width = width / colors.size();
-		float left = 0.0f;
-		for (NVGcolor color : colors) {
-			NVGcolor col = color;
-			col.a = 1.0f;
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, left, 15, width, 8);
-			nvgFillColor(args.vg, col);
-			nvgFill(args.vg);
-			left += width;
+		int colorIndex = floor(mouseX / width);
+		if (colorIndex < int(labels.size())) {
+			foundLabel = std::string(labels[colorIndex]);
+			tooltipX = (width * colorIndex);
+		} else {
+			foundLabel = "";
 		}
-		*/
+		tooltip->visible = !(foundLabel == "");
 		OpaqueWidget::onHover(e);
 		//e.consume(this);
 	}
@@ -1118,10 +1109,10 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->container->clearChildren();
 		for(unsigned int i = 0; i < colors.size(); i++) {
 			NVGcolor color = colors[i];
-            std::string label = "";
-            if (i < labels.size()) {
-                 label = labels[i];
-            }
+			std::string label = "";
+			if (i < labels.size()) {
+				 label = labels[i];
+			}
 			bool selected = (color.a > 0.5f);
 			color.a = 1.0f;
 			addColor(color, label, selected);
@@ -1169,7 +1160,7 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void setDefaults() {
 		for (NVGcolor color : settings::cableColors) {
-			addColor(color, "TODO", true);
+			addColor(color, "", true);	// assume no labels for these colors
 		}
 		
 		addColor(nvgRGB(0xff, 0xae, 0xc9), "", false);
@@ -1206,7 +1197,7 @@ struct WM101 : SizeableModuleWidget {
 					labels.push_back(json_string_value(l1));
 				} else {
 					labels.push_back("");
-                }
+				}
 			}
 		}
 		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
@@ -1242,8 +1233,8 @@ struct WM101 : SizeableModuleWidget {
 						if (s1) {
 							selected = clamp((int)json_number_value(s1), 0, 1);
 						}
-                        std::string label;
-                        label = (l1) ? json_string_value(l1) : "";
+						std::string label;
+						label = (l1) ? json_string_value(l1) : "";
 						addColor(color::fromHexString(json_string_value(c1)), label, selected);
 					}
 				}
@@ -1888,7 +1879,7 @@ struct WM101 : SizeableModuleWidget {
 		WireButton *wb1 = dynamic_cast<WireButton *>(* vi++);
 		WireButton *wb2 = dynamic_cast<WireButton *>(* vi);
 		NVGcolor col = wb1->color;
-        std::string lab = wb1->label;
+		std::string lab = wb1->label;
 		wb1->color = wb2->color;
 		wb1->label = wb2->label;
 		wb2->color = col;
