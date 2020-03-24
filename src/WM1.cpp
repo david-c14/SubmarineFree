@@ -159,7 +159,7 @@ struct EditPanel : BackPanel {
 		labelField = new EventParamField();
 		labelField->box.pos = Vec(7, 243);
 		labelField->box.size.x = 116;
-		addChild(labelField);
+		// postpone call to addChild, or this will capture all keystrokes!
 
 		EventWidgetButton *saveButton = new EventWidgetButton();
 		saveButton->box.pos = Vec(5, 275);
@@ -2194,6 +2194,7 @@ struct WM101 : SizeableModuleWidget {
 			editPanel->b->value = 0.5f;
 			editPanel->labelField->setText("");
 		}
+		editPanel->addChild(editPanel->labelField);
 		editPanel->visible = true;
 	}
 	void highlightChangedCore(int value) {
@@ -2250,6 +2251,9 @@ struct WM101 : SizeableModuleWidget {
 	void hidePanels() {
 		blockingPanel->visible = false;
 		backPanel->visible = false;	
+		if (editPanel->visible) {
+			editPanel->removeChild(editPanel->labelField);
+		}
 		editPanel->visible = false;
 		wirePanel->visible = false;
 		settingsPanel->visible = false;
