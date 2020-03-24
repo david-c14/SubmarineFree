@@ -228,90 +228,84 @@ struct EditPanel : BackPanel {
 };
 
 struct BillboardPanel : BackPanel {
+	//SizeableModuleWidget *mw;
 	std::function<void()> cancelHandler;
+	std::vector<NVGcolor> currentColors;
+	std::vector<std::string> currentLabels;
+
 	BillboardPanel() {
+		// warning if there are no current colors
 		EventWidgetLabel *label = new EventWidgetLabel();
-		label->label = "I'm a billboard!";
-		label->box.pos = Vec(15, 200);
+		label->label = "No Wire Colors Defined";
+		label->box.pos = Vec(25, 175);
 		label->box.size = Vec(100, 19);
 		addChild(label);
-        /*
-		EventWidgetButton *cancelButton = new EventWidgetButton();
-		cancelButton->box.pos = Vec(35, 250);
-		cancelButton->box.size = Vec(60, 19);
-		cancelButton->label = "Cancel";
-		cancelButton->clickHandler = [=](){
-			if (this->cancelHandler) {
-				this->cancelHandler();
-			}
-		};
-		addChild(cancelButton);
-        */
 	}
 	void draw(const DrawArgs &args) override {
 		BackPanel::draw(args);
-        /*
-		NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
-		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, 12, 12);
-		nvgQuadTo(args.vg, box.size.x / 2, 150, box.size.x - 12, 12);
-		nvgStrokeColor(args.vg, colorOutline);
-		nvgStrokeWidth(args.vg, 5);
-		nvgStroke(args.vg);
-
-		nvgStrokeColor(args.vg, color);
-		nvgStrokeWidth(args.vg, 3);
-		nvgStroke(args.vg);
-
-		nvgBeginPath(args.vg);
-		nvgCircle(args.vg, 12, 12, 9);
-		nvgCircle(args.vg, box.size.x - 12, 12, 9);
-		nvgFillColor(args.vg, color);
-		nvgFill(args.vg);
-
-		nvgStrokeWidth(args.vg, 1.0);
-		nvgStrokeColor(args.vg, colorOutline);
-		nvgStroke(args.vg);
-	
-		nvgBeginPath(args.vg);
-		nvgCircle(args.vg, 12, 12, 5);
-		nvgCircle(args.vg, box.size.x - 12, 12, 5);
-		nvgFillColor(args.vg, nvgRGB(0, 0, 0));
-		nvgFill(args.vg);
-        */
+		float totalHeight = box.size.y;
+		float blockHeight = box.size.y / currentColors.size();
+		float currentBlockTop = 0.0f;
+		float shadowGray = 0.0f;
+		float shadowOpacity = 0.8f;
+		float shadowOffset = 0.85f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// draw a block of the n-th wire color
+			NVGcolor col = currentColors[i];
+			col.a = 1.0f;  // make sure it's opaque here!
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, 0.0f, currentBlockTop, box.size.x, blockHeight);
+			nvgFillColor(args.vg, col);
+			nvgFill(args.vg);
+			// add a big high-contrast label for this block (if labeled)
+			std::string label = "";
+			if (i < currentLabels.size()) {
+				 label = currentLabels[i];
+			}
+			if (!label.empty()) {
+				float labelY = currentBlockTop + (blockHeight/2.0f);
+				nvgFontFaceId(args.vg, APP->window->uiFont->handle);
+				nvgFontSize(args.vg, 24);
+				nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
+				// add a drop shadow to work on all backgrounds
+				nvgFillColor(args.vg, nvgRGBAf(shadowGray, shadowGray, shadowGray, shadowOpacity));
+				nvgText(args.vg, 5 - shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
+				nvgText(args.vg, 5 + shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
+				nvgText(args.vg, 5 - shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
+				nvgText(args.vg, 5 + shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
+				// add white text over this
+				nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
+			}
+			currentBlockTop += blockHeight;
+		}
 	}
 };
 
 
 struct ViewToggleButton : EventWidgetButtonBase {
-    // special click behavior, drawing options mimic MinButton
+	// special click behavior, drawing options mimic MinButton
 	SizeableModuleWidget *mw;
-    BillboardPanel *billboard = NULL;
+	BillboardPanel *billboard = NULL;
 	ViewToggleButton();
-    bool billboardIsVisible = false;
+	bool billboardIsVisible = false;
 	void draw (const DrawArgs &args) override {
-        nvgBeginPath(args.vg);
-        if (billboardIsVisible) {
-            nvgMoveTo(args.vg, 8, 0);
-            nvgLineTo(args.vg, 0, 7);
-            nvgLineTo(args.vg, 8, 14);
-            nvgClosePath(args.vg);
-        } else {
-            nvgMoveTo(args.vg, 0, 0);
-            nvgLineTo(args.vg, 10, 10);
-            nvgLineTo(args.vg, 0, 20);
-            nvgClosePath(args.vg);
-        }
-        nvgFillColor(args.vg, gScheme.getAlternative(mw->module));
-        nvgFill(args.vg);
-        /*
-        if (billboard->visible) {
-        }
-        else {
-        }
-        */
+		nvgBeginPath(args.vg);
+		if (billboardIsVisible) {
+			nvgMoveTo(args.vg, 8, 0);
+			nvgLineTo(args.vg, 0, 7);
+			nvgLineTo(args.vg, 8, 14);
+			nvgClosePath(args.vg);
+		} else {
+			nvgMoveTo(args.vg, 0, 0);
+			nvgLineTo(args.vg, 10, 10);
+			nvgLineTo(args.vg, 0, 20);
+			nvgClosePath(args.vg);
+		}
+		nvgFillColor(args.vg, gScheme.getAlternative(mw->module));
+		nvgFill(args.vg);
 		EventWidgetButtonBase::draw(args);
-    };
+	};
 };
 ViewToggleButton::ViewToggleButton() {
 	this->box.size = Vec(10, 20);
@@ -393,7 +387,6 @@ struct WireButton : EventWidgetButtonBase {
 		}
 		return 0;
 	}
-    // TODO: Custom behavior for tooltip? or use built-in stuff?
 	void onEnter(const event::Enter &e) override {
 		if (!tooltip && (this->label != "")) {
 			SubTooltip *stt = new SubTooltip();
@@ -405,14 +398,14 @@ struct WireButton : EventWidgetButtonBase {
 				tooltip->box.pos = this->getAbsoluteOffset(this->box.size).minus(this->box.size).plus(Vec(100, 0)).round();
 			};
 		}
-        EventWidgetButtonBase::onEnter(e);
+		EventWidgetButtonBase::onEnter(e);
 		//e.consume(this);
 	}
 	void onLeave(const event::Leave &e) override {
 		if (tooltip) {
-            if (tooltip->parent == APP->scene) {
-                APP->scene->removeChild(tooltip);
-            }
+			if (tooltip->parent == APP->scene) {
+				APP->scene->removeChild(tooltip);
+			}
 			delete tooltip;
 			tooltip = NULL;
 		}
@@ -525,7 +518,7 @@ struct WM101 : SizeableModuleWidget {
 	unsigned int newColorIndex = 0;
 
 	MinButton *minButton;
-    ViewToggleButton *viewToggle;
+	ViewToggleButton *viewToggle;
 	BackPanel *backPanel;
 	EventWidgetCheckBox *checkBoxAll;
 	BackPanel *deleteConfirmPanel;
@@ -556,15 +549,12 @@ struct WM101 : SizeableModuleWidget {
 		minButton->box.pos = Vec(140,160);
 		minButton->mw = this;
 		addChild(minButton); 
-        viewToggle = new ViewToggleButton();
+		viewToggle = new ViewToggleButton();
 		viewToggle->mw = this;
-        DEBUG("BILLBOARD ATTACHED");
-        viewToggle->clickHandler = [=]() {
-            DEBUG("Let's toggle this view!");
-            //mw->Minimize(mw->box.size.x > 16.0f);
-            toggleBillboard();
-            viewToggle->billboardIsVisible = !(viewToggle->billboardIsVisible);
-        };
+		viewToggle->clickHandler = [=]() {
+			toggleBillboard();
+			//viewToggle->billboardIsVisible = !(viewToggle->billboardIsVisible);
+		};
 		viewToggle->box.pos = Vec(140,200);
 		addChild(viewToggle); 
 		backPanel = new BackPanel();
@@ -993,6 +983,10 @@ struct WM101 : SizeableModuleWidget {
 		if (masterWireManager != this) {
 			if (masterWireManager) {
 				hidePanels();
+				if (billboardPanel->visible) {
+					toggleBillboard();
+					//viewToggle->billboardIsVisible = !(viewToggle->billboardIsVisible);
+				}
 				blockingPanel->visible = (box.size.x > 16.0f);
 				SizeableModuleWidget::step();
 				return;
@@ -1169,23 +1163,26 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->visible = !small;
 		SizeableModuleWidget::onResize();	
 	}
-    void toggleBillboard() {
-        // assumes we're not already minimized (toggle not available)
-        bool alreadyShowingBillboard = billboardPanel->visible;
-        if (alreadyShowingBillboard) {
-            billboardPanel->visible = false;
-            backPanel->visible = true;
-            //viewToggle->box.pos.y = 200;
-            viewToggle->box.pos = Vec(140,200);
-            minButton->visible = true;
-        } else {
-            hidePanels();
-            billboardPanel->visible = true;
-            //viewToggle->box.pos.y = 180;
-            viewToggle->box.pos = Vec(1,1);
-            minButton->visible = false;
-        }
-    }
+	void toggleBillboard() {
+		// assumes we're not already minimized (toggle not available)
+		bool alreadyShowingBillboard = billboardPanel->visible;
+		if (alreadyShowingBillboard) {
+			billboardPanel->visible = false;
+			backPanel->visible = true;
+			//viewToggle->box.pos.y = 200;
+			viewToggle->box.pos = Vec(140,200);
+			minButton->visible = true;
+		} else {
+			hidePanels();
+			billboardPanel->currentColors = currentCollectionColors();
+			billboardPanel->currentLabels = currentCollectionLabels();
+			billboardPanel->visible = true;
+			//viewToggle->box.pos.y = 180;
+			viewToggle->box.pos = Vec(1,1);
+			minButton->visible = false;
+		}
+		viewToggle->billboardIsVisible = !(viewToggle->billboardIsVisible);
+	}
 	EventWidgetAction *checkBoxAction(unsigned int index, bool selected) {
 		return new EventWidgetAction(
 				selected?"Select Color":"Deselect Color",	
