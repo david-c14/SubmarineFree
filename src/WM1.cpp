@@ -399,7 +399,7 @@ struct WireButton : EventWidgetButtonBase {
 			};
 		}
 		EventWidgetButtonBase::onEnter(e);
-		//e.consume(this);
+		e.consume(this);
 	}
 	void onLeave(const event::Leave &e) override {
 		if (tooltip) {
@@ -410,7 +410,7 @@ struct WireButton : EventWidgetButtonBase {
 			tooltip = NULL;
 		}
 		EventWidgetButtonBase::onLeave(e);
-		//e.consume(this);
+		e.consume(this);
 	}
 };
 
@@ -457,7 +457,7 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 
 	void onEnter(const event::Enter &e) override {
 		OpaqueWidget::onEnter(e);
-		//e.consume(this);
+		e.consume(this);
 	}
 	void onHover(const event::Hover &e) override {
 		float mouseX = e.pos.x;  // relative to this collection button
@@ -484,7 +484,7 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 		}
 		tooltip->visible = !(foundLabel == "");
 		OpaqueWidget::onHover(e);
-		//e.consume(this);
+		e.consume(this);
 	}
 	void onLeave(const event::Leave &e) override {
 		if (tooltip) {
@@ -493,7 +493,7 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 			tooltip = NULL;
 		}
 		OpaqueWidget::onLeave(e);
-		//e.consume(this);
+		e.consume(this);
 	}
 };
 
@@ -909,6 +909,7 @@ struct WM101 : SizeableModuleWidget {
 				}
 			}
 		}
+		e.consume(this);
 	}
 	void varyCheckChanged() {
 		bool selected = varyCheck->selected;
