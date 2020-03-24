@@ -553,7 +553,6 @@ struct WM101 : SizeableModuleWidget {
 		viewToggle->mw = this;
 		viewToggle->clickHandler = [=]() {
 			toggleBillboard();
-			//viewToggle->billboardIsVisible = !(viewToggle->billboardIsVisible);
 		};
 		viewToggle->box.pos = Vec(140,200);
 		addChild(viewToggle); 
@@ -985,7 +984,6 @@ struct WM101 : SizeableModuleWidget {
 				hidePanels();
 				if (billboardPanel->visible) {
 					toggleBillboard();
-					//viewToggle->billboardIsVisible = !(viewToggle->billboardIsVisible);
 				}
 				blockingPanel->visible = (box.size.x > 16.0f);
 				SizeableModuleWidget::step();
