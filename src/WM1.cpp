@@ -232,6 +232,7 @@ struct BillboardPanel : BackPanel {
 	std::function<void()> cancelHandler;
 	std::vector<NVGcolor> currentColors;
 	std::vector<std::string> currentLabels;
+    std::shared_ptr<Image> cableImg;
 
 	BillboardPanel() {
 		// warning if there are no current colors
@@ -240,6 +241,7 @@ struct BillboardPanel : BackPanel {
 		label->box.pos = Vec(25, 175);
 		label->box.size = Vec(100, 19);
 		addChild(label);
+        cableImg = APP->window->loadImage(asset::plugin(pluginInstance, "res/cable-contours.png"));
 	}
 	void draw(const DrawArgs &args) override {
 		BackPanel::draw(args);
@@ -257,6 +259,16 @@ struct BillboardPanel : BackPanel {
 			nvgRect(args.vg, 0.0f, currentBlockTop, box.size.x, blockHeight);
 			nvgFillColor(args.vg, col);
 			nvgFill(args.vg);
+			currentBlockTop += blockHeight;
+        }
+        // add a tiled image to mimic a stack of cables
+        nvgBeginPath(args.vg);
+        nvgRect(args.vg, 0.0f, 0.0f, box.size.x, box.size.y);
+        NVGpaint cableTile = nvgImagePattern(args.vg, 0.0, 0.0, box.size.x, blockHeight, 0.0, cableImg->handle, 1.0);
+		nvgFillPaint(args.vg, cableTile);
+		nvgFill(args.vg);
+		currentBlockTop = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
 			// add a big high-contrast label for this block (if labeled)
 			std::string label = "";
 			if (i < currentLabels.size()) {
