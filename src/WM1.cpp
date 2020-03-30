@@ -1384,6 +1384,38 @@ struct WM101 : SizeableModuleWidget {
 		this->reflow();
 	}
 	void setDefaults() {
+		// add some useful color conventions
+
+		// Omri Cohen's colors as shown here  <https://github.com/david-c14/ModularFungi/blob/master/res/Colors.png>
+		scrollWidget->container->clearChildren();
+		addColor(color::fromHexString("#c91847"), false);  // audio
+		addColor(color::fromHexString("#0986ad"), false);  // clock/trigger/gate
+		addColor(color::fromHexString("#c9b70e"), false);  // volt/octave
+		addColor(color::fromHexString("#0c8e15"), false);  // modulation
+		addCollection(std::string("Modular Fungi"), currentCollection());
+
+		// jack color conventions used in NYSTHI modules  <https://github.com/patman023/nysthimanual/blob/master/pages/basics/basics.md>
+		scrollWidget->container->clearChildren();
+		addColor(color::fromHexString("#dddddd"), false);  // audio
+		addColor(color::fromHexString("#3c82dc"), false);  // control voltage
+		addColor(color::fromHexString("#fad12d"), false);  // gate
+		addColor(color::fromHexString("#dc7814"), false);  // pulse/trigger
+		addColor(color::fromHexString("#800080"), false);  // sync
+		addCollection(std::string("NYSTHI"), currentCollection());
+
+		// jack color conventions used in TheXOR modules  <https://github.com/The-XOR/RackPlugins>
+		scrollWidget->container->clearChildren();
+		addColor(color::fromHexString("#ff0000"), false);  // clock
+		addColor(color::fromHexString("#fffc0d"), false);  // reset
+		addColor(color::fromHexString("#008000"), false);  // control voltage
+		addColor(color::fromHexString("#f1f1f1"), false);  // gate
+		addColor(color::fromHexString("#000000"), false);  // modulation
+		addColor(color::fromHexString("#0000ff"), false);  // trigger
+		addColor(color::fromHexString("#ff5555"), false);  // expansion
+		addCollection(std::string("TheXOR"), currentCollection());
+
+		// add default colors (will remain active)
+		scrollWidget->container->clearChildren();
 		for (NVGcolor color : settings::cableColors) {
 			addColor(color, "", true);	// assume no labels for these colors
 		}
@@ -1724,7 +1756,15 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(billboard);
 	}
 	void addCollectionMenu(ColorCollectionButton *cb) {
+		// by convention, place at the current mouse location
+		addCollectionMenu(cb, false);
+	}
+	void addCollectionMenu(ColorCollectionButton *cb, bool forcePosition) {
 		Menu *menu = createMenu();
+		if (forcePosition) {
+			// put the name field under the mouse
+			menu->box.pos = APP->window->mousePos.minus(Vec(100, 12));
+		}
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
 		paramField->setText(cb->name);
@@ -2038,6 +2078,17 @@ struct WM101 : SizeableModuleWidget {
 				}
 			}
 		));
+		promptForCollectionName(index);
+	}
+	void promptForCollectionName(unsigned int index) {
+		// jump to collections list (if not already visible)
+		collectionsDialog();
+		ColorCollectionButton *cb = findCollectionButton(index);
+		// TODO: scroll to show the n-th collection (vs. jump to end of list)
+		math::Rect box = math::Rect(math::Vec(INFINITY, INFINITY), math::Vec(INFINITY, INFINITY));
+		collectionScrollWidget->scrollTo(box);
+		// prompt for this collection's name/position/etc.
+		addCollectionMenu(cb, true);  // use sensible menu position
 	}
 	void deleteCollection(ColorCollectionButton *cb) {
 		unsigned int index = cb->index();
