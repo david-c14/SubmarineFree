@@ -183,6 +183,15 @@ struct EditPanel : BackPanel {
 		};
 		addChild(cancelButton);
 	}
+	~EditPanel() {
+		if (labelField) {
+			if (!visible) {
+				labelField->clearChildren();
+				labelField->parent = NULL;
+				delete labelField;
+			}
+		}
+	}
 	void drawBackground(NVGcontext *vg, float r1, float r2, float g1, float g2, float b1, float b2, float y) {
 		NVGpaint grad = nvgLinearGradient(vg, r->box.pos.x + 5, 100, r->box.size.x - 10, 100, nvgRGBf(r1, g1, b1), nvgRGBf(r2, g2, b2));
 		nvgBeginPath(vg);
