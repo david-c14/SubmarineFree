@@ -42,7 +42,7 @@ parts of the color. Each slider has a gradient background accurately showing the
 
 ## Settings.
 
-The settings page currently has two functions.
+The settings page currently has the following functions.
 
 ### Variation
 
@@ -68,6 +68,14 @@ There are two highlighting options, they differ in what happens when you are not
 rack. *Always On* will still fade all the wires when you are not hovering over any module; *When Hovering* will only fade wires away when you 
 are pointing at something.
 
+### Redo colors
+
+When this option is selected, the wire manager will not apply new colors to deleted wires when the deletion is undone. By default the wire manager will continue to color all new wires, including those which are undone deletions.
+
+### 3D billboard
+
+When this option is selected (default), the billboard will be displayed with a rounded effect on the wires.
+
 ## Sizing
 
 ### Minimize
@@ -77,6 +85,15 @@ The Minimize control at the center right hand side of the module will shrink the
 When the module is minimized, a Restore button is visible in the centre of the module. Selecting this will restore the module to its previous size. All modules to the right of the module browser will be moved to the right to make space.
 
 In this way you can keep the WM-101 Wire Manager in your patch for ready access, without taking up more space than is necessary.
+
+## Billboard
+
+![View of the Wire Manager Billboard](WM-Billboard.png "Billboard View")
+
+The billboard control at the top right of the module will switch to a billboard display, suitable for use as a key when recording videos. By default the billboard displays wires with a rounded effect but you can have flat colors by adjusting the "3D billboard?" setting.
+
+You can switch back to the standard view by clicking on the arrow at the top left of the module.
+
 
 ## Saving.
 

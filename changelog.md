@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1.2
+- 25-Mar-2020 Jim Allman added names to colors - and billboard view
+- 21-Mar-2020 Jim Allman added some popular color conventions as collections
+- 21-Mar-2020 Add undo to load collections
+- 21-Mar-2020 Bug fix - Undo on move collection down was not working
+- 18-Mar-2020 Issue #80 - Save and load collections in WM-101
+- 17-Mar-2020 Add LT-116 Linear Transformations
+- 17-Mar-2020 Bug fix #78 - Color one wire uses stale color
+- 28-Jan-2020 Replace Digital Ports (Blue) with Analog (Silver) on EO-102
+- 21-Jan-2020 Issue #50 - Protect internal classes with anonymous namespaces
+
 ## v1.1.1
 - 02-Jan-2020 Secret Santa 2019 is now obsolete
 - 02-Jan-2020 Make WK-XXX case insensitive when searching for Scala files

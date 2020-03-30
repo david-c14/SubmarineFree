@@ -6,12 +6,14 @@
 
 struct TD_116;
 
-struct TDInput : Torpedo::PatchInputPort {
-	TD_116 *tdModule;
-	TDInput(TD_116 *module, unsigned int portNum) : Torpedo::PatchInputPort((Module *)module, portNum) { tdModule = module; }
-	void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
-	NVGcolor decodeColor(std::string colorStr);
-};
+namespace {
+	struct TDInput : Torpedo::PatchInputPort {
+		TD_116 *tdModule;
+		TDInput(TD_116 *module, unsigned int portNum) : Torpedo::PatchInputPort((Module *)module, portNum) { tdModule = module; }
+		void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
+		NVGcolor decodeColor(std::string colorStr);
+	};
+} // end namespace
 
 struct TD_116 : Module {
 	TDInput inPort = TDInput(this, 0);
@@ -75,68 +77,71 @@ struct TD_116 : Module {
 	int isDirtyC = false;
 };
 
-struct TD1Text : SubText {
-	TD_116 *tdModule;
-	TD1Text() {
-		color = SUBLIGHTBLUE;
-	}
-	void onChange(const event::Change &e) override {
-		LedDisplayTextField::onChange(e);
-		if (tdModule) {
-			tdModule->sendText(text);
-		}
-	}
-	void foregroundMenu(Menu *menu) override {
-		SubText::foregroundMenu(menu);
-		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
-	}
-	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-			e.consume(this);
-			Menu *menu = createMenu();
-			appendContextMenu(menu);
-		}
-		else {
-			SubText::onButton(e);
-		}
-	}
-};
+namespace {
 
-NVGcolor TDInput::decodeColor(std::string colorStr) {
-	int r = (colorStr[0] - 'A') * 16 + (colorStr[1] - 'A');
-	int g = (colorStr[2] - 'A') * 16 + (colorStr[3] - 'A');
-	int b = (colorStr[4] - 'A') * 16 + (colorStr[5] - 'A');
-	return nvgRGB(r, g, b);
-}
-
-void TDInput::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
-	if (pluginName.compare("SubmarineFree")) return;
-	if (!moduleName.compare("TDNotesText")) { 
-		json_t *text = json_object_get(rootJ, "text");
-		if (text) {
-			tdModule->text.assign(json_string_value(text));
-			tdModule->isDirty = true;
+	struct TD1Text : SubText {
+		TD_116 *tdModule;
+		TD1Text() {
+			color = SUBLIGHTBLUE;
 		}
+		void onChange(const event::Change &e) override {
+			LedDisplayTextField::onChange(e);
+			if (tdModule) {
+				tdModule->sendText(text);
+			}
+		}
+		void foregroundMenu(Menu *menu) override {
+			SubText::foregroundMenu(menu);
+			menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
+		}
+		void onButton(const event::Button &e) override {
+			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+				e.consume(this);
+				Menu *menu = createMenu();
+				appendContextMenu(menu);
+			}
+			else {
+				SubText::onButton(e);
+			}
+		}
+	};
+
+	NVGcolor TDInput::decodeColor(std::string colorStr) {
+		int r = (colorStr[0] - 'A') * 16 + (colorStr[1] - 'A');
+		int g = (colorStr[2] - 'A') * 16 + (colorStr[3] - 'A');
+		int b = (colorStr[4] - 'A') * 16 + (colorStr[5] - 'A');
+		return nvgRGB(r, g, b);
 	}
-	else if (!moduleName.compare("TDNotesColor")) {
-		json_t *size = json_object_get(rootJ, "size");
-		if (size) {
-			tdModule->fontSize = json_number_value(size);
-			tdModule->isDirtyC = true;
+	
+	void TDInput::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
+		if (pluginName.compare("SubmarineFree")) return;
+		if (!moduleName.compare("TDNotesText")) { 
+			json_t *text = json_object_get(rootJ, "text");
+			if (text) {
+				tdModule->text.assign(json_string_value(text));
+				tdModule->isDirty = true;
+			}
+		}
+		else if (!moduleName.compare("TDNotesColor")) {
+			json_t *size = json_object_get(rootJ, "size");
+			if (size) {
+				tdModule->fontSize = json_number_value(size);
+				tdModule->isDirtyC = true;
+			}	
+			json_t *fg = json_object_get(rootJ, "fg");
+			if (fg) {
+				tdModule->fg = decodeColor(std::string(json_string_value(fg)));
+				tdModule->isDirtyC = true;
+			}
+			json_t *bg = json_object_get(rootJ, "bg");
+			if (bg) {
+				tdModule->bg = decodeColor(std::string(json_string_value(bg)));
+				tdModule->isDirtyC = true;
+			}
 		}	
-		json_t *fg = json_object_get(rootJ, "fg");
-		if (fg) {
-			tdModule->fg = decodeColor(std::string(json_string_value(fg)));
-			tdModule->isDirtyC = true;
-		}
-		json_t *bg = json_object_get(rootJ, "bg");
-		if (bg) {
-			tdModule->bg = decodeColor(std::string(json_string_value(bg)));
-			tdModule->isDirtyC = true;
-		}
-	}	
-}
-
+	}
+} // end namespace
+	
 struct TD116 : SchemeModuleWidget {
 	TD1Text *textField;
 

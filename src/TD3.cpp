@@ -46,25 +46,28 @@ struct TD_316 : Module {
 	bool fontSizeDirty = false;
 };
 
-struct TD3Text : SubText {
-	TD3Text() {
-		color = SUBLIGHTBLUE;
-	}
-	void foregroundMenu(Menu *menu) override {
-		SubText::foregroundMenu(menu);
-		menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
-	}
-	void onButton(const event::Button &e) override {
-		if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-			e.consume(this);
-			Menu *menu = createMenu();
-			appendContextMenu(menu);
+namespace {
+
+	struct TD3Text : SubText {
+		TD3Text() {
+			color = SUBLIGHTBLUE;
 		}
-		else {
-			SubText::onButton(e);
+		void foregroundMenu(Menu *menu) override {
+			SubText::foregroundMenu(menu);
+			menu->addChild(createForegroundMenuItem("Black", nvgRGB(0, 0, 0)));
 		}
-	}
-};
+		void onButton(const event::Button &e) override {
+			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+				e.consume(this);
+				Menu *menu = createMenu();
+				appendContextMenu(menu);
+			}
+			else {
+				SubText::onButton(e);
+			}
+		}
+	};
+} // end namespace
 
 struct TD316 : SchemeModuleWidget {
 	TD3Text *textField;

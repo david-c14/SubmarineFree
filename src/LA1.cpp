@@ -70,268 +70,268 @@ struct LA_108 : DS_Module {
 		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f, "Pre-trigger buffer size");
 		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
 	}
-	void process(const ProcessArgs &args) override;
-	void startFrame(void);
-};
 
-void LA_108::startFrame() {
-	frameIndex = 0;
-	preCount = (int)(params[PARAM_PRE].getValue() + 0.5f);
-	if (preCount) {
-		for (int i = 0; i < 8; i++) {
-			for (int s = 0; s < preCount; s++) {
-				buffer[i][s] = preBuffer[i][(preBufferIndex + 64 - preCount + s) % 32];
+	void startFrame() {
+		frameIndex = 0;
+		preCount = (int)(params[PARAM_PRE].getValue() + 0.5f);
+		if (preCount) {
+			for (int i = 0; i < 8; i++) {
+				for (int s = 0; s < preCount; s++) {
+					buffer[i][s] = preBuffer[i][(preBufferIndex + 64 - preCount + s) % 32];
+				}
 			}
-		}
-		bufferIndex = preCount;
-		return;
-	}
-	bufferIndex = 0;
-}
-
-void LA_108::process(const ProcessArgs &args) {
-	// Set trigger lights
-	for (int i = 0; i < 9; i++)
-		lights[LIGHT_1 + i].setBrightness(params[PARAM_TRIGGER].getValue() == i);
-	// Compute time
-	float deltaTime = powf(2.0f, params[PARAM_TIME].getValue());
-	int frameCount = (int)ceilf(deltaTime * args.sampleRate);
-	
-	// Add frame to preBuffer
-	if (++preFrameIndex >= frameCount) {
-		preFrameIndex = 0;
-		for (int i = 0; i < 8; i++)
-			preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].getVoltage();
-		preBufferIndex++;
-		if (preBufferIndex >= 32)
-			preBufferIndex = 0;
-	}
-
-	// Add frame to buffer
-	if (bufferIndex < BUFFER_SIZE) {
-		if (++frameIndex >= frameCount) {
-			frameIndex = 0;
-			for (int i = 0; i < 8; i++)
-				buffer[i][bufferIndex] = inputs[INPUT_1 + i].getVoltage();
-			bufferIndex++;
-		}
-	}
-
-	int triggerInput = LA_108::INPUT_1 + (int)(clamp(params[PARAM_TRIGGER].getValue(), 0.0f, 8.0f));
-	int edge = (params[PARAM_EDGE].getValue() > 0.5f);
-	
-	// Are we waiting on the next trigger?
-	if (bufferIndex >= BUFFER_SIZE) {
-		// Trigger immediately if nothing connected to trigger input
-		if (!inputs[triggerInput].isConnected()) {
-			startFrame();
+			bufferIndex = preCount;
 			return;
 		}
+		bufferIndex = 0;
+	}
 
-		// Reset the Schmitt trigger so we don't trigger immediately if the input is high
-		if (frameIndex == 0) {
-			//trigger.set(edge);
+	void process(const ProcessArgs &args) override {
+		// Set trigger lights
+		for (int i = 0; i < 9; i++)
+			lights[LIGHT_1 + i].setBrightness(params[PARAM_TRIGGER].getValue() == i);
+		// Compute time
+		float deltaTime = powf(2.0f, params[PARAM_TIME].getValue());
+		int frameCount = (int)ceilf(deltaTime * args.sampleRate);
+		
+		// Add frame to preBuffer
+		if (++preFrameIndex >= frameCount) {
+			preFrameIndex = 0;
+			for (int i = 0; i < 8; i++)
+				preBuffer[i][preBufferIndex] = inputs[INPUT_1 + i].getVoltage();
+			preBufferIndex++;
+			if (preBufferIndex >= 32)
+				preBufferIndex = 0;
 		}
-		frameIndex++;
-
-		float gate = inputs[triggerInput].getVoltage();
-		int triggered = trigger.edge(this, gate, edge);
-
-		if (params[PARAM_RUN].getValue() < 0.5f) { // Continuous run mode
-			params[PARAM_RESET].setValue(0.0f);
-			// Reset if triggered
-			float holdTime = 0.1f;
-			if (triggered) {
+	
+		// Add frame to buffer
+		if (bufferIndex < BUFFER_SIZE) {
+			if (++frameIndex >= frameCount) {
+				frameIndex = 0;
+				for (int i = 0; i < 8; i++)
+					buffer[i][bufferIndex] = inputs[INPUT_1 + i].getVoltage();
+				bufferIndex++;
+			}
+		}
+	
+		int triggerInput = LA_108::INPUT_1 + (int)(clamp(params[PARAM_TRIGGER].getValue(), 0.0f, 8.0f));
+		int edge = (params[PARAM_EDGE].getValue() > 0.5f);
+		
+		// Are we waiting on the next trigger?
+		if (bufferIndex >= BUFFER_SIZE) {
+			// Trigger immediately if nothing connected to trigger input
+			if (!inputs[triggerInput].isConnected()) {
 				startFrame();
 				return;
 			}
-
-			// Reset if we've waited too long
-			if (frameIndex >= args.sampleRate * holdTime) {
-				startFrame();
-				return;
+	
+			// Reset the Schmitt trigger so we don't trigger immediately if the input is high
+			if (frameIndex == 0) {
+				//trigger.set(edge);
 			}
-		}
-		else {
-			if (params[PARAM_RESET].getValue() > 0.5f) {
+			frameIndex++;
+	
+			float gate = inputs[triggerInput].getVoltage();
+			int triggered = trigger.edge(this, gate, edge);
+	
+			if (params[PARAM_RUN].getValue() < 0.5f) { // Continuous run mode
+				params[PARAM_RESET].setValue(0.0f);
+				// Reset if triggered
+				float holdTime = 0.1f;
 				if (triggered) {
 					startFrame();
-					params[PARAM_RESET].setValue(0.0f);
 					return;
+				}
+	
+				// Reset if we've waited too long
+				if (frameIndex >= args.sampleRate * holdTime) {
+					startFrame();
+					return;
+				}
+			}
+			else {
+				if (params[PARAM_RESET].getValue() > 0.5f) {
+					if (triggered) {
+						startFrame();
+						params[PARAM_RESET].setValue(0.0f);
+						return;
+					}
 				}
 			}
 		}
 	}
-}
+};
 
-struct LA_Display : TransparentWidget {
-	LA_108 *module;
-	PortWidget *ports[8];
-
-	void drawTrace(NVGcontext *vg, float *values, float offset, NVGcolor col) {
-		if (!values)
-			return;
-		nvgSave(vg);
-		Rect b = Rect(Vec(0, 0), box.size);
-		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-		nvgBeginPath(vg);
-		for (int i = 0; i < BUFFER_SIZE; i++) {
-			float x, y;
-			x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-			y = module->voltage0 -clamp(values[i], module->voltage0, module->voltage1);
-			y *= 29.0f / (module->voltage1 - module->voltage0);
-			y += offset;
-			if (i == 0)
-				nvgMoveTo(vg, x, y);
-			else
-				nvgLineTo(vg, x, y);
-		} 
-		nvgStrokeColor(vg, col);
-		nvgLineCap(vg, NVG_ROUND);
-		nvgMiterLimit(vg, 2.0f);
-		nvgStrokeWidth(vg, 1.5f);
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-		nvgStroke(vg);
-		nvgResetScissor(vg);
-		nvgRestore(vg);	
-	}
-
-	void drawIndex(NVGcontext *vg, float value) {
-		Rect b = Rect(Vec(0, 0), box.size);
-		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-		value = value * b.size.x;
-
-		nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
-		{
-			nvgBeginPath(vg);
-			nvgMoveTo(vg, value, 0);
-			nvgLineTo(vg, value, b.size.y);
-			nvgClosePath(vg);
-		}
-		nvgStroke(vg);
-		nvgResetScissor(vg);
-	}
-
-	void drawPre(NVGcontext *vg, float value) {
-		if (value == 0.0f)
-			return;
-		Rect b = Rect(Vec(0, 0), box.size);
-		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-		value = value * b.size.x;
-
-		nvgStrokeColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x80));
-		{
-			nvgBeginPath(vg);
-			nvgMoveTo(vg, value, 0);
-			nvgLineTo(vg, value, b.size.y);
-			nvgClosePath(vg);
-		}
-		nvgStroke(vg);
-		nvgResetScissor(vg);
-	}
-
-	void drawMask(NVGcontext *vg, float value) {
-		if (value == 0.0f)
-			return;
-		Rect b = Rect(Vec(0, 0), box.size);
-		nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-		value = value * b.size.x;
-
-		nvgFillColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x40));
-		{
-			nvgBeginPath(vg);
-			nvgRect(vg, 0, 0, value, b.size.y);
-			nvgClosePath(vg);
-		}
-		nvgFill(vg);
-		nvgResetScissor(vg);
-	}
-
-	void drawEasterEgg(NVGcontext *vg) {
-		nvgFillColor(vg, SUBLIGHTBLUE);
-		scheme::drawLogoPath(vg, 100, 2.5f, 2.0f, 0);
-		nvgFill(vg);
-		scheme::drawLogoPath(vg, 20, 37.5f, 2.0f, 0);
-		nvgFill(vg);
-		scheme::drawLogoPath(vg, 160, 72.5f, 2.0f, 0);
-		nvgFill(vg);
-		scheme::drawLogoPath(vg, 145, 107.5f, 2.0f, 0);
-		nvgFill(vg);
-		scheme::drawLogoPath(vg, 75, 142.5f, 2.0f, 0);
-		nvgFill(vg);
-		scheme::drawLogoPath(vg, 120, 177.5f, 2.0f, 0);
-		nvgFill(vg);
-		scheme::drawLogoPath(vg, 40, 212.5f, 2.0f, 0);
-		nvgFill(vg);
-		scheme::drawLogoPath(vg, 60, 247.5f, 2.0f, 0);
-		nvgFill(vg);
-	}
-
-	void draw(const DrawArgs &args) override {
-		if (!module) {
-			drawEasterEgg(args.vg);
-			return;
-		}
-		for (int i = 0; i < 8; i++) {
-			if (module->inputs[LA_108::INPUT_1 + i].isConnected()) {
-				NVGcolor col = getColor(i);
-				drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i, col); 
-			}
-		}
-		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
-		drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
-		drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].getValue(), 0.0f, 32.0f) / BUFFER_SIZE);
-		drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
-	}
+namespace {	
+	struct LA_Display : TransparentWidget {
+		LA_108 *module;
+		PortWidget *ports[8];
 	
-	NVGcolor getColor(int i) {
-		if (!module->params[LA_108::PARAM_COLORS].getValue())
-			return SUBLIGHTBLUETRANS;
-		NVGcolor col = APP->scene->rack->getTopCable(ports[i])->color;
-		col.a = 1.0f;
-		return col;
-	}
-};
-
-struct LA_Measure : TransparentWidget {
-	LA_108 *module;
-	char measureText[41];
-
-	void draw(const DrawArgs &args) override {
-		if (!module) {
-			return;
+		void drawTrace(NVGcontext *vg, float *values, float offset, NVGcolor col) {
+			if (!values)
+				return;
+			nvgSave(vg);
+			Rect b = Rect(Vec(0, 0), box.size);
+			nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+			nvgBeginPath(vg);
+			for (int i = 0; i < BUFFER_SIZE; i++) {
+				float x, y;
+				x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
+				y = module->voltage0 -clamp(values[i], module->voltage0, module->voltage1);
+				y *= 29.0f / (module->voltage1 - module->voltage0);
+				y += offset;
+				if (i == 0)
+					nvgMoveTo(vg, x, y);
+				else
+					nvgLineTo(vg, x, y);
+			} 
+			nvgStrokeColor(vg, col);
+			nvgLineCap(vg, NVG_ROUND);
+			nvgMiterLimit(vg, 2.0f);
+			nvgStrokeWidth(vg, 1.5f);
+			nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+			nvgStroke(vg);
+			nvgResetScissor(vg);
+			nvgRestore(vg);	
 		}
-		float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].getValue());
-		int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
-		frameCount *= BUFFER_SIZE;
-		float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].getValue() - module->params[LA_108::PARAM_INDEX_2].getValue()) / APP->engine->getSampleRate(); 
+	
+		void drawIndex(NVGcontext *vg, float value) {
+			Rect b = Rect(Vec(0, 0), box.size);
+			nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+			value = value * b.size.x;
+	
+			nvgStrokeColor(vg, nvgRGBA(0xff, 0xff, 0xff, 0x40));
+			{
+				nvgBeginPath(vg);
+				nvgMoveTo(vg, value, 0);
+				nvgLineTo(vg, value, b.size.y);
+				nvgClosePath(vg);
+			}
+			nvgStroke(vg);
+			nvgResetScissor(vg);
+		}
+	
+		void drawPre(NVGcontext *vg, float value) {
+			if (value == 0.0f)
+				return;
+			Rect b = Rect(Vec(0, 0), box.size);
+			nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+			value = value * b.size.x;
+	
+			nvgStrokeColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x80));
+			{
+				nvgBeginPath(vg);
+				nvgMoveTo(vg, value, 0);
+				nvgLineTo(vg, value, b.size.y);
+				nvgClosePath(vg);
+			}
+			nvgStroke(vg);
+			nvgResetScissor(vg);
+		}
+	
+		void drawMask(NVGcontext *vg, float value) {
+			if (value == 0.0f)
+				return;
+			Rect b = Rect(Vec(0, 0), box.size);
+			nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+			value = value * b.size.x;
+	
+			nvgFillColor(vg, nvgRGBA(0xff, 0x40, 0x40, 0x40));
+			{
+				nvgBeginPath(vg);
+				nvgRect(vg, 0, 0, value, b.size.y);
+				nvgClosePath(vg);
+			}
+			nvgFill(vg);
+			nvgResetScissor(vg);
+		}
+	
+		void drawEasterEgg(NVGcontext *vg) {
+			nvgFillColor(vg, SUBLIGHTBLUE);
+			scheme::drawLogoPath(vg, 100, 2.5f, 2.0f, 0);
+			nvgFill(vg);
+			scheme::drawLogoPath(vg, 20, 37.5f, 2.0f, 0);
+			nvgFill(vg);
+			scheme::drawLogoPath(vg, 160, 72.5f, 2.0f, 0);
+			nvgFill(vg);
+			scheme::drawLogoPath(vg, 145, 107.5f, 2.0f, 0);
+			nvgFill(vg);
+			scheme::drawLogoPath(vg, 75, 142.5f, 2.0f, 0);
+			nvgFill(vg);
+			scheme::drawLogoPath(vg, 120, 177.5f, 2.0f, 0);
+			nvgFill(vg);
+			scheme::drawLogoPath(vg, 40, 212.5f, 2.0f, 0);
+			nvgFill(vg);
+			scheme::drawLogoPath(vg, 60, 247.5f, 2.0f, 0);
+			nvgFill(vg);
+		}
+	
+		void draw(const DrawArgs &args) override {
+			if (!module) {
+				drawEasterEgg(args.vg);
+				return;
+			}
+			for (int i = 0; i < 8; i++) {
+				if (module->inputs[LA_108::INPUT_1 + i].isConnected()) {
+					NVGcolor col = getColor(i);
+					drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i, col); 
+				}
+			}
+			drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
+			drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
+			drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].getValue(), 0.0f, 32.0f) / BUFFER_SIZE);
+			drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
+		}
 		
-		if (width < 0.00000995f)
-			sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
-		else if (width < 0.0000995f)
-			sprintf(measureText, "%4.2f\xc2\xb5s", width * 1000000.0f);
-		else if (width < 0.000995f)
-			sprintf(measureText, "%4.1f\xc2\xb5s", width * 1000000.0f);
-		else if (width < 0.00995f)
-			sprintf(measureText, "%4.3fms", width * 1000.0f);
-		else if (width < 0.0995f)
-			sprintf(measureText, "%4.2fms", width * 1000.0f);
-		else if (width < 0.995f)
-			sprintf(measureText, "%4.1fms", width * 1000.0f);
-		else if (width < 9.95f)
-			sprintf(measureText, "%4.3fs", width);
-		else if (width < 99.5f)
-			sprintf(measureText, "%4.2fs", width);
-		else
-			sprintf(measureText, "%4.1fs", width);
-		nvgFontSize(args.vg, 14);
-		nvgFontFaceId(args.vg, gScheme.font()->handle);
-		nvgFillColor(args.vg, SUBLIGHTBLUE);
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-		nvgText(args.vg, 27, 12, measureText, NULL);
-	}
-};
+		NVGcolor getColor(int i) {
+			if (!module->params[LA_108::PARAM_COLORS].getValue())
+				return SUBLIGHTBLUETRANS;
+			NVGcolor col = APP->scene->rack->getTopCable(ports[i])->color;
+			col.a = 1.0f;
+			return col;
+		}
+	};
 
+	struct LA_Measure : TransparentWidget {
+		LA_108 *module;
+		char measureText[41];
+	
+		void draw(const DrawArgs &args) override {
+			if (!module) {
+				return;
+			}
+			float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].getValue());
+			int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
+			frameCount *= BUFFER_SIZE;
+			float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].getValue() - module->params[LA_108::PARAM_INDEX_2].getValue()) / APP->engine->getSampleRate(); 
+			
+			if (width < 0.00000995f)
+				sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
+			else if (width < 0.0000995f)
+				sprintf(measureText, "%4.2f\xc2\xb5s", width * 1000000.0f);
+			else if (width < 0.000995f)
+				sprintf(measureText, "%4.1f\xc2\xb5s", width * 1000000.0f);
+			else if (width < 0.00995f)
+				sprintf(measureText, "%4.3fms", width * 1000.0f);
+			else if (width < 0.0995f)
+				sprintf(measureText, "%4.2fms", width * 1000.0f);
+			else if (width < 0.995f)
+				sprintf(measureText, "%4.1fms", width * 1000.0f);
+			else if (width < 9.95f)
+				sprintf(measureText, "%4.3fs", width);
+			else if (width < 99.5f)
+				sprintf(measureText, "%4.2fs", width);
+			else
+				sprintf(measureText, "%4.1fs", width);
+			nvgFontSize(args.vg, 14);
+			nvgFontFaceId(args.vg, gScheme.font()->handle);
+			nvgFillColor(args.vg, SUBLIGHTBLUE);
+			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+			nvgText(args.vg, 27, 12, measureText, NULL);
+		}
+	};
+
+} // end namespace
 
 struct LA108 : SchemeModuleWidget {
 	LightButton *resetButton;

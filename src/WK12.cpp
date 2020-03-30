@@ -5,151 +5,130 @@
 #include <fstream>
 #include <cctype>
 
-struct WK_Tuning {
-	std::string name;
-	float offsets[12];
-};
+struct WK_101;
 
-std::vector<WK_Tuning> tunings;
+namespace {
 
-int tuningsLoaded = false;
+	struct WK_Tuning {
+		std::string name;
+		float offsets[12];
+	};
 
-struct WK_Tunings {
-	static void loadTuningsFromWK(const char *path);
-	static void loadTuningsFromScala(Plugin *pluginInstance);
-	static void loadScalaFile(std::string path);
-	static void loadTunings(Plugin *pluginInstance) {
-		if (tuningsLoaded)
+	std::vector<WK_Tuning> tunings;
+
+	int tuningsLoaded = false;
+
+	struct WK_Tunings {
+		static void loadTuningsFromWK(const char *path);
+		static void loadTuningsFromScala(Plugin *pluginInstance);
+		static void loadScalaFile(std::string path);
+		static void loadTunings(Plugin *pluginInstance) {
+			if (tuningsLoaded)
+				return;
+			tuningsLoaded = true;
+			loadTuningsFromWK(asset::plugin(pluginInstance, "WK_Custom.tunings").c_str());
+			loadTuningsFromScala(pluginInstance);
+		}
+	};
+
+	void WK_Tunings::loadTuningsFromWK(const char *path) {
+		FILE *file = fopen(path, "r");
+		if (!file) {
 			return;
-		tuningsLoaded = true;
-		loadTuningsFromWK(asset::plugin(pluginInstance, "WK_Custom.tunings").c_str());
-		loadTuningsFromScala(pluginInstance);
-	}
-};
-
-void WK_Tunings::loadTuningsFromWK(const char *path) {
-	FILE *file = fopen(path, "r");
-	if (!file) {
-		return;
-	}
-	int defaultSize = tunings.size();
-	
-	json_error_t error;
-	json_t *rootJ = json_loadf(file, 0, &error);
-	if (rootJ) {
-		int size = json_array_size(rootJ);
-		for (int i = 0; i < size; i++) {
-			json_t *j0 = json_array_get(rootJ, i);
-			if (j0) {
-				json_t *jname = json_object_get(j0, "name");
-				if (jname) {
-					json_t *joffsets = json_object_get(j0, "tunings");
-					if (joffsets) {
-						tunings.push_back(WK_Tuning());
-						tunings[i + defaultSize].name.assign(json_string_value(jname));
-						int tsize = json_array_size(joffsets);
-						for (int j = 0; j < 12; j++) {
-							if (j < tsize) {
-								json_t *joffset = json_array_get(joffsets, j);
-								if (joffset) {
-									tunings[i + defaultSize].offsets[j] = json_number_value(joffset);
+		}
+		int defaultSize = tunings.size();
+		
+		json_error_t error;
+		json_t *rootJ = json_loadf(file, 0, &error);
+		if (rootJ) {
+			int size = json_array_size(rootJ);
+			for (int i = 0; i < size; i++) {
+				json_t *j0 = json_array_get(rootJ, i);
+				if (j0) {
+					json_t *jname = json_object_get(j0, "name");
+					if (jname) {
+						json_t *joffsets = json_object_get(j0, "tunings");
+						if (joffsets) {
+							tunings.push_back(WK_Tuning());
+							tunings[i + defaultSize].name.assign(json_string_value(jname));
+							int tsize = json_array_size(joffsets);
+							for (int j = 0; j < 12; j++) {
+								if (j < tsize) {
+									json_t *joffset = json_array_get(joffsets, j);
+									if (joffset) {
+										tunings[i + defaultSize].offsets[j] = json_number_value(joffset);
+									}
+								}
+								else {
+									tunings[i + defaultSize].offsets[j] = 0.0f;
 								}
 							}
-							else {
-								tunings[i + defaultSize].offsets[j] = 0.0f;
-							}
-						}
-					}	
+						}	
+					}
 				}
 			}
+			json_decref(rootJ);
 		}
-		json_decref(rootJ);
+		else {
+			std::string message = string::f("SubmarineFree WK: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+			WARN(message.c_str());
+		}
+		fclose(file);
 	}
-	else {
-		std::string message = string::f("SubmarineFree WK: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		WARN(message.c_str());
-	}
-	fclose(file);
-}
 
-void WK_Tunings::loadScalaFile(std::string path) {
-	std::ifstream fs{path, std::ios_base::in};
-	if (fs) {
-		std::vector<std::string> strings;
-		while (!fs.eof()) {
-			std::string line;
-			getline(fs, line);
-			int iscomment = false;
-			for (unsigned int i = 0; i < line.size(); i++) {
-				if (std::isspace(line[i]))
+	void WK_Tunings::loadScalaFile(std::string path) {
+		std::ifstream fs{path, std::ios_base::in};
+		if (fs) {
+			std::vector<std::string> strings;
+			while (!fs.eof()) {
+				std::string line;
+				getline(fs, line);
+				int iscomment = false;
+				for (unsigned int i = 0; i < line.size(); i++) {
+					if (std::isspace(line[i]))
+						continue;
+					if (line[i] == '!') {
+						iscomment = true;
+						break;
+					}
+				}
+				if (iscomment)
 					continue;
-				if (line[i] == '!') {
-					iscomment = true;
+				strings.push_back(std::string(line));
+				if (strings.size() >= 14)
 					break;
-				}
 			}
-			if (iscomment)
-				continue;
-			strings.push_back(std::string(line));
-			if (strings.size() >= 14)
-				break;
-		}
-		fs.close();
-		if (strings.size() < 2) return;
-		WK_Tuning tuning = { "", { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
-		tuning.name.assign(strings[0]);
-		for (unsigned int i = 2; i < strings.size(); i++) {
-			// remove leading whitespace
-			while (strings[i].size() && std::isspace(strings[i][0]))
-				strings[i].erase(0,1);
-			std::string line;
-			int decimal = false;
-			int ratio = false;
-			while (strings[i].size() && !std::isspace(strings[i][0])) {
-				char c = strings[i][0];
-				line.append(1,c);
-				strings[i].erase(0,1);
-				if (!std::isdigit(c) && (c != '/') && (c != '.')) {
-					WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
-					return;
-				}
-				if (c == '.')
-					decimal = true;
-				if (c == '/' && !ratio)
-					ratio = line.size();
-				if (decimal && ratio) {
-					WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
-					return;
-				}
-			}
-			if (decimal) {
-				try {
-					float d = std::stof(line, nullptr);
-					d -= (i-1) * 100.0;
-					if ((d < -50.0) || (d > 50.0)) {
+			fs.close();
+			if (strings.size() < 2) return;
+			WK_Tuning tuning = { "", { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+			tuning.name.assign(strings[0]);
+			for (unsigned int i = 2; i < strings.size(); i++) {
+				// remove leading whitespace
+				while (strings[i].size() && std::isspace(strings[i][0]))
+					strings[i].erase(0,1);
+				std::string line;
+				int decimal = false;
+				int ratio = false;
+				while (strings[i].size() && !std::isspace(strings[i][0])) {
+					char c = strings[i][0];
+					line.append(1,c);
+					strings[i].erase(0,1);
+					if (!std::isdigit(c) && (c != '/') && (c != '.')) {
 						WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 						return;
 					}
-					tuning.offsets[(i-1)%12] = d;
+					if (c == '.')
+						decimal = true;
+					if (c == '/' && !ratio)
+						ratio = line.size();
+					if (decimal && ratio) {
+						WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+						return;
+					}
 				}
-				catch (std::exception &err) {
-					WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
-					return;
-				}
-			}
-			else {
-				if (ratio) {
-					std::string num = line.substr(0,ratio);
-					std::string denom = line.substr(ratio);
+				if (decimal) {
 					try {
-						int inum = std::stoi(num,nullptr);
-						int idenom = std::stoi(denom, nullptr);
-						if (!idenom) {
-							WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
-							return;
-						}
-						float r = (1.0f * inum / idenom);  
-						float d = 1200.0 * log2(r);
+						float d = std::stof(line, nullptr);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
 							WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
@@ -163,48 +142,73 @@ void WK_Tunings::loadScalaFile(std::string path) {
 					}
 				}
 				else {
-					try {
-						int inum = std::stoi(line, nullptr);
-						float d = 1200.0 * log2(inum);
-						d -= (i-1) * 100.0;
-						if ((d < -50.0) || (d > 50.0)) {
+					if (ratio) {
+						std::string num = line.substr(0,ratio);
+						std::string denom = line.substr(ratio);
+						try {
+							int inum = std::stoi(num,nullptr);
+							int idenom = std::stoi(denom, nullptr);
+							if (!idenom) {
+								WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+								return;
+							}
+							float r = (1.0f * inum / idenom);  
+							float d = 1200.0 * log2(r);
+							d -= (i-1) * 100.0;
+							if ((d < -50.0) || (d > 50.0)) {
+								WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+								return;
+							}
+							tuning.offsets[(i-1)%12] = d;
+						}
+						catch (std::exception &err) {
 							WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
 							return;
 						}
-						tuning.offsets[(i-1)%12] = d;
 					}
-					catch (std::exception &err) {
-						WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
-						return;
+					else {
+						try {
+							int inum = std::stoi(line, nullptr);
+							float d = 1200.0 * log2(inum);
+							d -= (i-1) * 100.0;
+							if ((d < -50.0) || (d > 50.0)) {
+								WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+								return;
+							}
+							tuning.offsets[(i-1)%12] = d;
+						}
+						catch (std::exception &err) {
+							WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+							return;
+						}
 					}
 				}
 			}
+			int index = tunings.size();
+			tunings.push_back(WK_Tuning());
+			tunings[index].name = tuning.name;
+			for (int i = 0; i < 12; i++)
+				tunings[index].offsets[i] = tuning.offsets[i];
 		}
-		int index = tunings.size();
-		tunings.push_back(WK_Tuning());
-		tunings[index].name = tuning.name;
-		for (int i = 0; i < 12; i++)
-			tunings[index].offsets[i] = tuning.offsets[i];
+	
 	}
 
-}
-
-void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
-	std::list<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
-	for (auto entry : dirList) {
-		if (system::isDirectory(entry)) continue;
-		if (string::lowercase(string::filenameExtension(entry)).compare("scl")) continue;
-		loadScalaFile(entry);
+	void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
+		std::list<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
+		for (auto entry : dirList) {
+			if (system::isDirectory(entry)) continue;
+			if (string::lowercase(string::filenameExtension(entry)).compare("scl")) continue;
+			loadScalaFile(entry);
+		}
 	}
-}
 
-struct WK_101;
+	struct WK101_InputPort : Torpedo::PatchInputPort {
+		WK_101 *wkModule;
+		WK101_InputPort(WK_101 *module, unsigned int portNum):PatchInputPort((Module *)module, portNum) { wkModule = module;};
+		void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
+	};
 
-struct WK101_InputPort : Torpedo::PatchInputPort {
-	WK_101 *wkModule;
-	WK101_InputPort(WK_101 *module, unsigned int portNum):PatchInputPort((Module *)module, portNum) { wkModule = module;};
-	void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
-};
+} // end namespace
 
 struct WK_101 : Module {
 	enum ParamIds {
@@ -247,78 +251,81 @@ struct WK_101 : Module {
 		}
 		outPort.size(5);
 	}
-	void process(const ProcessArgs &args) override;
+
+	void process(const ProcessArgs &args) override {
+		int quantized = floor((12.0f * inputs[INPUT_CV].getVoltage()) + 0.5f);
+		int note = (120 + quantized) % 12;
+		outputs[OUTPUT_CV].setVoltage((params[PARAM_1 + note].getValue() / 1200.0f) + (quantized / 12.0f));	
+		light = note;
+		if (toSend && !outPort.isBusy()) {
+			toSend = 0;
+			json_t *rootJ = json_array();
+			for (int i = 0; i < 12; i++)
+				json_array_append_new(rootJ, json_real(params[PARAM_1 + i].getValue()));
+			outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
+		}
+		outPort.process();
+		inPort.process();
+	}
 };
 
-void WK_101::process(const ProcessArgs &args) {
-	int quantized = floor((12.0f * inputs[INPUT_CV].getVoltage()) + 0.5f);
-	int note = (120 + quantized) % 12;
-	outputs[OUTPUT_CV].setVoltage((params[PARAM_1 + note].getValue() / 1200.0f) + (quantized / 12.0f));	
-	light = note;
-	if (toSend && !outPort.isBusy()) {
-		toSend = 0;
-		json_t *rootJ = json_array();
+namespace {
+
+	void WK101_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
+		if (pluginName.compare(TOSTRING(SLUG))) return;
+		if (moduleName.compare("WK")) return;
+		float tunings[12];
+		int size = json_array_size(rootJ);
+		if (!size) return;
+		if (size > 12)
+			size = 12;
+		for (int i = 0; i < size; i++) {
+			json_t *j1 = json_array_get(rootJ, i);
+			if (j1)
+				tunings[i] = json_number_value(j1);
+		}
 		for (int i = 0; i < 12; i++)
-			json_array_append_new(rootJ, json_real(params[PARAM_1 + i].getValue()));
-		outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
+			wkModule->params[WK_101::PARAM_1 + i].setValue(tunings[i]);
 	}
-	outPort.process();
-	inPort.process();
-}
-
-void WK101_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
-	if (pluginName.compare(TOSTRING(SLUG))) return;
-	if (moduleName.compare("WK")) return;
-	float tunings[12];
-	int size = json_array_size(rootJ);
-	if (!size) return;
-	if (size > 12)
-		size = 12;
-	for (int i = 0; i < size; i++) {
-		json_t *j1 = json_array_get(rootJ, i);
-		if (j1)
-			tunings[i] = json_number_value(j1);
-	}
-	for (int i = 0; i < 12; i++)
-		wkModule->params[WK_101::PARAM_1 + i].setValue(tunings[i]);
-}
-
-struct WK_Display : TransparentWidget {
-	WK_101 *module;
-	int index;
-	char dspText[20];
 	
-	void draw(const DrawArgs &args) override {
-		if (!module) {
-			return;
-		}
-		float val = APP->engine->getParam(module, WK_101::PARAM_1 + index);
-		sprintf(dspText, "%+05.2f", val);
-		nvgFontSize(args.vg, 14);
-		nvgFontFaceId(args.vg, gScheme.font()->handle);
-		nvgFillColor(args.vg, SUBLIGHTBLUE);
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-		nvgText(args.vg, 30, 13, dspText, NULL);
-	}
-};
-
-struct WK_Param : MedKnob<LightKnob> {
-	WK_101 *module;
-	unsigned int index;
-	void step() override {
-		if (module) {
-			color = (index == module->light)?SUBLIGHTRED:SUBLIGHTBLUE;
-		}
-		MedKnob::step();
-	}
-	void onChange(const event::Change &e) override {
-		MedKnob<LightKnob>::onChange(e);
+	struct WK_Display : TransparentWidget {
+		WK_101 *module;
+		int index;
+		char dspText[20];
 		
-		if (module) {
-			module->toSend = true;
+		void draw(const DrawArgs &args) override {
+			if (!module) {
+				return;
+			}
+			float val = APP->engine->getParam(module, WK_101::PARAM_1 + index);
+			sprintf(dspText, "%+05.2f", val);
+			nvgFontSize(args.vg, 14);
+			nvgFontFaceId(args.vg, gScheme.font()->handle);
+			nvgFillColor(args.vg, SUBLIGHTBLUE);
+			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+			nvgText(args.vg, 30, 13, dspText, NULL);
 		}
-	}
-};
+	};
+	
+	struct WK_Param : MedKnob<LightKnob> {
+		WK_101 *module;
+		unsigned int index;
+		void step() override {
+			if (module) {
+				color = (index == module->light)?SUBLIGHTRED:SUBLIGHTBLUE;
+			}
+			MedKnob::step();
+		}
+		void onChange(const event::Change &e) override {
+			MedKnob<LightKnob>::onChange(e);
+			
+			if (module) {
+				module->toSend = true;
+			}
+		}
+	};
+
+} // end namespace
 
 struct WK101 : SchemeModuleWidget {
 	WK101(WK_101 *module) {
@@ -544,11 +551,15 @@ void WK101::appendContextMenu(Menu *menu) {
 
 struct WK_205;
 
-struct WK205_InputPort : Torpedo::PatchInputPort {
-	WK_205 *wkModule;
-	WK205_InputPort(WK_205 *module, unsigned int portNum):PatchInputPort((Module *)module, portNum) { wkModule = module;};
-	void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
-};
+namespace {
+
+	struct WK205_InputPort : Torpedo::PatchInputPort {
+		WK_205 *wkModule;
+		WK205_InputPort(WK_205 *module, unsigned int portNum):PatchInputPort((Module *)module, portNum) { wkModule = module;};
+		void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
+	};
+
+} // end namespace
 
 struct WK_205 : Module {
 	static const int deviceCount = 5;
@@ -610,19 +621,21 @@ void WK_205::process(const ProcessArgs &args) {
 	inPort.process();
 }
 
-void WK205_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
-	if (pluginName.compare(TOSTRING(SLUG))) return;
-	if (moduleName.compare("WK")) return;
-	int size = json_array_size(rootJ);
-	if (!size) return;
-	if (size > 12)
-		size = 12;
-	for (int i = 0; i < size; i++) {
-		json_t *j1 = json_array_get(rootJ, i);
-		if (j1)
-			wkModule->tunings[i] = json_number_value(j1);
+namespace {
+	void WK205_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
+		if (pluginName.compare(TOSTRING(SLUG))) return;
+		if (moduleName.compare("WK")) return;
+		int size = json_array_size(rootJ);
+		if (!size) return;
+		if (size > 12)
+			size = 12;
+		for (int i = 0; i < size; i++) {
+			json_t *j1 = json_array_get(rootJ, i);
+			if (j1)
+				wkModule->tunings[i] = json_number_value(j1);
+		}
 	}
-}
+} // end namespace
 
 struct WK205 : SchemeModuleWidget {
 	WK205(WK_205 *module) {
