@@ -228,10 +228,8 @@ struct EditPanel : BackPanel {
 };
 
 struct BillboardPanel : BackPanel {
-	//SizeableModuleWidget *mw;
 	std::function<void()> cancelHandler;
-	std::vector<NVGcolor> currentColors;
-	std::vector<std::string> currentLabels;
+	std::function<void(const DrawArgs)> drawHandler;
 	std::shared_ptr<Image> cableImg;
 
 	BillboardPanel() {
@@ -245,50 +243,8 @@ struct BillboardPanel : BackPanel {
 	}
 	void draw(const DrawArgs &args) override {
 		BackPanel::draw(args);
-		float blockHeight = box.size.y / currentColors.size();
-		float currentBlockTop = 0.0f;
-		float shadowGray = 0.0f;
-		float shadowOpacity = 0.8f;
-		float shadowOffset = 0.85f;
-		for(unsigned int i = 0; i < currentColors.size(); i++) {
-			// draw a block of the n-th wire color
-			NVGcolor col = currentColors[i];
-			col.a = 1.0f;  // make sure it's opaque here!
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, 0.0f, currentBlockTop, box.size.x, blockHeight);
-			nvgFillColor(args.vg, col);
-			nvgFill(args.vg);
-			currentBlockTop += blockHeight;
-		}
-		// add a tiled image to mimic a stack of cables
-		nvgBeginPath(args.vg);
-		nvgRect(args.vg, 0.0f, 0.0f, box.size.x, box.size.y);
-		NVGpaint cableTile = nvgImagePattern(args.vg, 0.0, 0.0, box.size.x, blockHeight, 0.0, cableImg->handle, 1.0);
-		nvgFillPaint(args.vg, cableTile);
-		nvgFill(args.vg);
-		currentBlockTop = 0.0f;
-		for(unsigned int i = 0; i < currentColors.size(); i++) {
-			// add a big high-contrast label for this block (if labeled)
-			std::string label = "";
-			if (i < currentLabels.size()) {
-				 label = currentLabels[i];
-			}
-			if (!label.empty()) {
-				float labelY = currentBlockTop + (blockHeight/2.0f);
-				nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-				nvgFontSize(args.vg, 24);
-				nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
-				// add a drop shadow to work on all backgrounds
-				nvgFillColor(args.vg, nvgRGBAf(shadowGray, shadowGray, shadowGray, shadowOpacity));
-				nvgText(args.vg, 5 - shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
-				nvgText(args.vg, 5 + shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
-				nvgText(args.vg, 5 - shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
-				nvgText(args.vg, 5 + shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
-				// add white text over this
-				nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
-				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
-			}
-			currentBlockTop += blockHeight;
+		if (drawHandler) {
+			drawHandler(args);
 		}
 	}
 };
@@ -547,6 +503,7 @@ struct WM101 : SizeableModuleWidget {
 	EventWidgetSlider *varyS;
 	EventWidgetSlider *varyL;
 	EventWidgetCheckBox *redoCheck;
+	EventWidgetCheckBox *billboard3d;
 	BackPanel *blockingPanel;
 	BackPanel *collectionPanel;
 	ScrollWidget *collectionScrollWidget;
@@ -651,6 +608,9 @@ struct WM101 : SizeableModuleWidget {
 		billboardPanel->visible = false;
 		billboardPanel->cancelHandler = [=]() {
 			this->cancel();
+		};
+		billboardPanel->drawHandler = [=](const DrawArgs &args) { 
+			this->drawBillboard(args);
 		};
 		addChild(billboardPanel);
 
@@ -855,6 +815,14 @@ struct WM101 : SizeableModuleWidget {
 		redoCheck->changeHandler = [=]() { this->redoCheckChanged(); };
 		settingsPanel->addChild(redoCheck);
 
+		billboard3d = new EventWidgetCheckBox();
+		billboard3d->label = "3D billboard?";
+		billboard3d->box.pos = Vec(10, 255);
+		billboard3d->box.size = Vec(box.size.x - 40, 19);
+		billboard3d->selected = 1;
+		billboard3d->changeHandler = [=]() { this->billboard3dChanged(); };
+		settingsPanel->addChild(billboard3d);
+
 		EventWidgetButton *settingsButton = new EventWidgetButton();
 		settingsButton->box.pos = Vec(35, 290);
 		settingsButton->box.size = Vec(60, 19);
@@ -958,6 +926,78 @@ struct WM101 : SizeableModuleWidget {
 			}
 		));
 	}
+	void billboard3dChanged() {
+		bool selected = billboard3d->selected;
+		saveSettings();
+		APP->history->push(new EventWidgetAction(
+			selected?"Turn on 3D billboard":"Turn off 3D billboard",
+			[selected]() {
+				if (masterWireManager) {
+					masterWireManager->billboard3d->selected = !selected;
+					masterWireManager->saveSettings();
+				}
+			},
+			[selected]() {
+				if (masterWireManager) {
+					masterWireManager->billboard3d->selected = selected;
+					masterWireManager->saveSettings();
+				}
+			}
+		));
+	}
+
+	void drawBillboard(const DrawArgs &args) {
+		std::vector<NVGcolor> currentColors = currentCollectionColors();
+		std::vector<std::string> currentLabels = currentCollectionLabels();
+		float blockHeight = billboardPanel->box.size.y / currentColors.size();
+		float currentBlockTop = 0.0f;
+		float shadowGray = 0.0f;
+		float shadowOpacity = 0.8f;
+		float shadowOffset = 0.85f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// draw a block of the n-th wire color
+			NVGcolor col = currentColors[i];
+			col.a = 1.0f;  // make sure it's opaque here!
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
+			nvgFillColor(args.vg, col);
+			nvgFill(args.vg);
+			currentBlockTop += blockHeight;
+		}
+		// add a tiled image to mimic a stack of cables
+		if (billboard3d->selected) {
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, 0.0f, 0.0f, billboardPanel->box.size.x, billboardPanel->box.size.y);
+			NVGpaint cableTile = nvgImagePattern(args.vg, 0.0, 0.0, box.size.x, blockHeight, 0.0, billboardPanel->cableImg->handle, 1.0);
+			nvgFillPaint(args.vg, cableTile);
+			nvgFill(args.vg);
+		}
+		currentBlockTop = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// add a big high-contrast label for this block (if labeled)
+			std::string label = "";
+			if (i < currentLabels.size()) {
+				 label = currentLabels[i];
+			}
+			if (!label.empty()) {
+				float labelY = currentBlockTop + (blockHeight/2.0f);
+				nvgFontFaceId(args.vg, APP->window->uiFont->handle);
+				nvgFontSize(args.vg, 24);
+				nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
+				// add a drop shadow to work on all backgrounds
+				nvgFillColor(args.vg, nvgRGBAf(shadowGray, shadowGray, shadowGray, shadowOpacity));
+				nvgText(args.vg, 5 - shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
+				nvgText(args.vg, 5 + shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
+				nvgText(args.vg, 5 - shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
+				nvgText(args.vg, 5 + shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
+				// add white text over this
+				nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
+			}
+			currentBlockTop += blockHeight;
+		}
+	}
+
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (this->box.size.x > 16.0f) {
 			drawBase(vg, "WM-101");
@@ -1181,8 +1221,6 @@ struct WM101 : SizeableModuleWidget {
 			minButton->visible = true;
 		} else {
 			hidePanels();
-			billboardPanel->currentColors = currentCollectionColors();
-			billboardPanel->currentLabels = currentCollectionLabels();
 			billboardPanel->visible = true;
 			viewToggle->box.pos = Vec(1,1);
 			minButton->visible = false;
@@ -1442,6 +1480,10 @@ struct WM101 : SizeableModuleWidget {
 		if (v1) {
 			redoCheck->selected = clamp((int)json_number_value(v1), 0, 1);
 		}
+		v1 = json_object_get(rootJ, "billboard");
+		if (v1) {
+			billboard3d->selected = clamp((int)json_number_value(v1), 0, 1);
+		}
 		arr = json_object_get(rootJ, "collections");
 		if (arr) {
 			collectionScrollWidget->container->clearChildren();
@@ -1476,6 +1518,7 @@ struct WM101 : SizeableModuleWidget {
 		json_object_set_new(settings, "variationS", json_real(varyS->value));
 		json_object_set_new(settings, "variationL", json_real(varyL->value));
 		json_object_set_new(settings, "redo", json_real(redoCheck->selected));
+		json_object_set_new(settings, "billboard", json_real(billboard3d->selected));
 		arr = json_array();
 		for (Widget *w : collectionScrollWidget->container->children) {
 			ColorCollectionButton *cb = dynamic_cast<ColorCollectionButton *>(w);
@@ -1656,6 +1699,15 @@ struct WM101 : SizeableModuleWidget {
 			this->redoCheckChanged();
 		};
 		menu->addChild(redo);
+
+		EventWidgetMenuItem *billboard = new EventWidgetMenuItem();
+		billboard->text = "3D billboard";
+		billboard->rightText = CHECKMARK(billboard3d->selected);
+		billboard->clickHandler = [=]() {
+			this->billboard3d->selected = !(this->billboard3d->selected);
+			this->billboard3dChanged();
+		};
+		menu->addChild(billboard);
 	}
 	void addCollectionMenu(ColorCollectionButton *cb) {
 		Menu *menu = createMenu();
