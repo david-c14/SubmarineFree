@@ -524,6 +524,81 @@ struct WM_Base {
 		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
 		return cb;
 	}
+	void drawBillboardBase(NVGcontext *vg, rack::math::Rect box, std::vector<NVGcolor> currentColors, std::vector<std::string> currentLabels, bool draw3d) {
+		float blockHeight = box.size.y / currentColors.size();
+		float stop1 = blockHeight * 0.10f;
+		float stop2 = blockHeight * 0.28f;
+		float stop3 = blockHeight * 0.46f;
+		float currentBlockTop = 0.0f;
+		float shadowGray = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// draw a block of the n-th wire color
+			NVGcolor col = currentColors[i];
+			col.a = 1.0f;  // make sure it's opaque here!
+			NVGcolor shadowCol = nvgLerpRGBA(col, nvgRGBf(0.0f, 0.0f, 0.0f), 0.9f);
+			NVGcolor highlightCol = nvgLerpRGBA(col, nvgRGBf(1.0f, 1.0f, 1.0f), 0.55f);
+			if (draw3d) {
+				float stopPos1 = currentBlockTop + stop1;
+				float stopPos2 = currentBlockTop + stop2;
+				float stopPos3 = currentBlockTop + stop3;
+				float end = currentBlockTop + blockHeight;
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, currentBlockTop, box.size.x, blockHeight);
+				NVGpaint grad = nvgLinearGradient(vg, 0, currentBlockTop, 0, stopPos1, shadowCol, col);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, stopPos1, box.size.x, blockHeight - stop1);
+				grad = nvgLinearGradient(vg, 0, stopPos1, 0, stopPos2, col, highlightCol);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, stopPos2, box.size.x, blockHeight - stop2);
+				grad = nvgLinearGradient(vg, 0, stopPos2, 0, stopPos3, highlightCol, col);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, stopPos3, box.size.x, blockHeight - stop3);
+				grad = nvgLinearGradient(vg, 0, stopPos3, 0, end, col, shadowCol);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+			}
+			else {
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, currentBlockTop, box.size.x, blockHeight);
+				nvgFillColor(vg, col);
+				nvgFill(vg);
+			}
+			currentBlockTop += blockHeight;
+		}
+		currentBlockTop = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// add a big high-contrast label for this block (if labeled)
+			std::string label = "";
+			if (i < currentLabels.size()) {
+				 label = currentLabels[i];
+			}
+			if (!label.empty()) {
+				float labelY = currentBlockTop + (blockHeight/2.0f);
+				nvgFontFaceId(vg, APP->window->uiFont->handle);
+				nvgFontSize(vg, 24);
+				nvgTextAlign(vg, NVG_ALIGN_MIDDLE);
+				// add a drop shadow to work on all backgrounds
+				nvgFillColor(vg, nvgRGBf(shadowGray, shadowGray, shadowGray));
+				nvgFontBlur(vg, 1.15f);
+				nvgText(vg, 5, labelY, label.c_str(), NULL);
+				// add white text over this
+				nvgFontBlur(vg, 0.0f);
+				nvgFillColor(vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+				nvgText(vg, 5, labelY, label.c_str(), NULL);
+			}
+			currentBlockTop += blockHeight;
+		}
+	}
 };
 
 struct WM101;
@@ -1011,79 +1086,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	void drawBillboard(const DrawArgs &args) {
 		std::vector<NVGcolor> currentColors = currentCollectionColors();
 		std::vector<std::string> currentLabels = currentCollectionLabels();
-		float blockHeight = billboardPanel->box.size.y / currentColors.size();
-		float stop1 = blockHeight * 0.10f;
-		float stop2 = blockHeight * 0.28f;
-		float stop3 = blockHeight * 0.46f;
-		float currentBlockTop = 0.0f;
-		float shadowGray = 0.0f;
-		for(unsigned int i = 0; i < currentColors.size(); i++) {
-			// draw a block of the n-th wire color
-			NVGcolor col = currentColors[i];
-			col.a = 1.0f;  // make sure it's opaque here!
-			NVGcolor shadowCol = nvgLerpRGBA(col, nvgRGBf(0.0f, 0.0f, 0.0f), 0.9f);
-			NVGcolor highlightCol = nvgLerpRGBA(col, nvgRGBf(1.0f, 1.0f, 1.0f), 0.55f);
-			if (billboard3d->selected) {
-				float stopPos1 = currentBlockTop + stop1;
-				float stopPos2 = currentBlockTop + stop2;
-				float stopPos3 = currentBlockTop + stop3;
-				float end = currentBlockTop + blockHeight;
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
-				NVGpaint grad = nvgLinearGradient(args.vg, 0, currentBlockTop, 0, stopPos1, shadowCol, col);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, stopPos1, billboardPanel->box.size.x, blockHeight - stop1);
-				grad = nvgLinearGradient(args.vg, 0, stopPos1, 0, stopPos2, col, highlightCol);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, stopPos2, billboardPanel->box.size.x, blockHeight - stop2);
-				grad = nvgLinearGradient(args.vg, 0, stopPos2, 0, stopPos3, highlightCol, col);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, stopPos3, billboardPanel->box.size.x, blockHeight - stop3);
-				grad = nvgLinearGradient(args.vg, 0, stopPos3, 0, end, col, shadowCol);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-			}
-			else {
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
-				nvgFillColor(args.vg, col);
-				nvgFill(args.vg);
-			}
-			currentBlockTop += blockHeight;
-		}
-		currentBlockTop = 0.0f;
-		for(unsigned int i = 0; i < currentColors.size(); i++) {
-			// add a big high-contrast label for this block (if labeled)
-			std::string label = "";
-			if (i < currentLabels.size()) {
-				 label = currentLabels[i];
-			}
-			if (!label.empty()) {
-				float labelY = currentBlockTop + (blockHeight/2.0f);
-				nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-				nvgFontSize(args.vg, 24);
-				nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
-				// add a drop shadow to work on all backgrounds
-				nvgFillColor(args.vg, nvgRGBf(shadowGray, shadowGray, shadowGray));
-				nvgFontBlur(args.vg, 1.15f);
-				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
-				// add white text over this
-				nvgFontBlur(args.vg, 0.0f);
-				nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
-				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
-			}
-			currentBlockTop += blockHeight;
-		}
+		drawBillboardBase(args.vg, billboardPanel->box, currentCollectionColors(), currentCollectionLabels(), billboard3d->selected);
 	}
 
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
@@ -2415,13 +2418,22 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 struct WM102 : SchemeModuleWidget, WM_Base {
 	std::vector<NVGcolor> colors;
 	std::vector<std::string> labels;
+	SchemePanel *schemePanel;
 	WM102(Module *module) {
 		setModule(module);
 		this->box.size = Vec(150, 380);
-		addChild(new SchemePanel(this->box.size));
+		schemePanel = new SchemePanel(this->box.size);
+		addChild(schemePanel);
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WM-102");
+		Rect renderBox;
+		renderBox.pos = Vec(0, 15);
+		renderBox.size = Vec(box.size.x, box.size.y - 30);
+		nvgSave(vg);
+		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
+		drawBillboardBase(vg, renderBox, colors, labels, true);
+		nvgRestore(vg);
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
@@ -2449,6 +2461,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		labels = cb->labels;
 		delete cb;
 		json_decref(rootJ);
+		schemePanel->dirty = true;
 	}
 	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
 		ColorCollectionButton *btn = new ColorCollectionButton();
