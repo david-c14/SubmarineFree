@@ -1388,31 +1388,31 @@ struct WM101 : SizeableModuleWidget {
 
 		// Omri Cohen's colors as shown here  <https://github.com/david-c14/ModularFungi/blob/master/res/Colors.png>
 		scrollWidget->container->clearChildren();
-		addColor(color::fromHexString("#c91847"), false);  // audio
-		addColor(color::fromHexString("#0986ad"), false);  // clock/trigger/gate
-		addColor(color::fromHexString("#c9b70e"), false);  // volt/octave
-		addColor(color::fromHexString("#0c8e15"), false);  // modulation
-		addCollection(std::string("Modular Fungi"), currentCollection());
+		addColor(color::fromHexString("#c91847"), "Audio", 		true);  // audio
+		addColor(color::fromHexString("#0986ad"), "Clk/Trig/Gate", 	false);  // clock/trigger/gate
+		addColor(color::fromHexString("#c9b70e"), "Volt/Oct", 		false);  // volt/octave
+		addColor(color::fromHexString("#0c8e15"), "Modulation", 	false);  // modulation
+		addCollection(std::string("Modular Fungi"), currentCollectionColors(), currentCollectionLabels());
 
 		// jack color conventions used in NYSTHI modules  <https://github.com/patman023/nysthimanual/blob/master/pages/basics/basics.md>
 		scrollWidget->container->clearChildren();
-		addColor(color::fromHexString("#dddddd"), false);  // audio
-		addColor(color::fromHexString("#3c82dc"), false);  // control voltage
-		addColor(color::fromHexString("#fad12d"), false);  // gate
-		addColor(color::fromHexString("#dc7814"), false);  // pulse/trigger
-		addColor(color::fromHexString("#800080"), false);  // sync
-		addCollection(std::string("NYSTHI"), currentCollection());
+		addColor(color::fromHexString("#dddddd"), "Audio",		true);  // audio
+		addColor(color::fromHexString("#3c82dc"), "CV",			false);  // control voltage
+		addColor(color::fromHexString("#fad12d"), "Gate",		false);  // gate
+		addColor(color::fromHexString("#dc7814"), "Pulse/Trigger",	false);  // pulse/trigger
+		addColor(color::fromHexString("#800080"), "Sync",		false);  // sync
+		addCollection(std::string("NYSTHI"), currentCollectionColors(), currentCollectionLabels());
 
 		// jack color conventions used in TheXOR modules  <https://github.com/The-XOR/RackPlugins>
 		scrollWidget->container->clearChildren();
-		addColor(color::fromHexString("#ff0000"), false);  // clock
-		addColor(color::fromHexString("#fffc0d"), false);  // reset
-		addColor(color::fromHexString("#008000"), false);  // control voltage
-		addColor(color::fromHexString("#f1f1f1"), false);  // gate
-		addColor(color::fromHexString("#000000"), false);  // modulation
-		addColor(color::fromHexString("#0000ff"), false);  // trigger
-		addColor(color::fromHexString("#ff5555"), false);  // expansion
-		addCollection(std::string("TheXOR"), currentCollection());
+		addColor(color::fromHexString("#ff0000"), "Clock",		true);  // clock
+		addColor(color::fromHexString("#fffc0d"), "Reset",		false);  // reset
+		addColor(color::fromHexString("#008000"), "CV",			false);  // control voltage
+		addColor(color::fromHexString("#f1f1f1"), "Gate",		false);  // gate
+		addColor(color::fromHexString("#000000"), "Modulation",		false);  // modulation
+		addColor(color::fromHexString("#0000ff"), "Trigger",		false);  // trigger
+		addColor(color::fromHexString("#ff5555"), "Expansion",		false);  // expansion
+		addCollection(std::string("TheXOR"), currentCollectionColors(), currentCollectionLabels());
 
 		// add default colors (will remain active)
 		scrollWidget->container->clearChildren();
