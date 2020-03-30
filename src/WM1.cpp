@@ -249,14 +249,12 @@ struct BillboardPanel : BackPanel {
 struct ViewToggleButton : EventWidgetButtonBase {
 	// special click behavior, drawing options mimic MinButton
 	SizeableModuleWidget *mw;
-	BillboardPanel *billboard = NULL;
 	ViewToggleButton() {
-		this->box.size = Vec(10, 20);
+		this->box.size = Vec(8, 14);
 	}
-	bool billboardIsVisible = false;
 	void draw (const DrawArgs &args) override {
 		nvgBeginPath(args.vg);
-		if (billboardIsVisible) {
+		if (this->box.pos.x == 1) {
 			nvgMoveTo(args.vg, 8, 0);
 			nvgLineTo(args.vg, 0, 7);
 			nvgLineTo(args.vg, 8, 14);
@@ -512,13 +510,15 @@ struct WM101 : SizeableModuleWidget {
 		minButton->box.pos = Vec(140,160);
 		minButton->mw = this;
 		addChild(minButton); 
+
 		viewToggle = new ViewToggleButton();
+		viewToggle->box.pos = Vec(141, 1);
 		viewToggle->mw = this;
 		viewToggle->clickHandler = [=]() {
 			toggleBillboard();
 		};
-		viewToggle->box.pos = Vec(141,1);
 		addChild(viewToggle); 
+
 		backPanel = new BackPanel();
 		backPanel->box.pos = Vec(10, 15);
 		backPanel->box.size = Vec(box.size.x - 20, box.size.y - 30);
@@ -1036,6 +1036,7 @@ struct WM101 : SizeableModuleWidget {
 	void takeMasterSlot() {
 		blockingPanel->visible = false;
 		backPanel->visible = (box.size.x > 16.0f);
+		viewToggle->visible = true;
 		masterWireManager = this;
 		scrollWidget->container->clearChildren();
 		collectionScrollWidget->container->clearChildren();
@@ -1052,10 +1053,8 @@ struct WM101 : SizeableModuleWidget {
 		if (masterWireManager != this) {
 			if (masterWireManager) {
 				hidePanels();
-				if (billboardPanel->visible) {
-					toggleBillboard();
-				}
 				blockingPanel->visible = (box.size.x > 16.0f);
+				viewToggle->visible = false;
 				SizeableModuleWidget::step();
 				return;
 			}
@@ -1229,23 +1228,18 @@ struct WM101 : SizeableModuleWidget {
 		minButton->box.pos.y = small?180:160;
 		hidePanels();
 		backPanel->visible = !small;
+		viewToggle->visible = !small;
 		SizeableModuleWidget::onResize();	
 	}
 	void toggleBillboard() {
 		// assumes we're not already minimized (toggle not available)
 		bool alreadyShowingBillboard = billboardPanel->visible;
 		if (alreadyShowingBillboard) {
-			billboardPanel->visible = false;
-			backPanel->visible = true;
-			viewToggle->box.pos = Vec(141,1);
-			minButton->visible = true;
-		} else {
 			hidePanels();
-			billboardPanel->visible = true;
-			viewToggle->box.pos = Vec(1,1);
-			minButton->visible = false;
+			backPanel->visible = true;
+		} else {
+			showBillboard();
 		}
-		viewToggle->billboardIsVisible = !(viewToggle->billboardIsVisible);
 	}
 	EventWidgetAction *checkBoxAction(unsigned int index, bool selected) {
 		return new EventWidgetAction(
@@ -2338,6 +2332,15 @@ struct WM101 : SizeableModuleWidget {
 		settingsPanel->visible = false;
 		collectionPanel->visible = false;
 		deleteConfirmPanel->visible = false;	
+		billboardPanel->visible = false;
+		viewToggle->box.pos = Vec(141, 1);
+		minButton->visible = true;
+	}
+	void showBillboard() {
+		hidePanels();
+		billboardPanel->visible = true;
+		viewToggle->box.pos = Vec(1,1);
+		minButton->visible = false;
 	}
 };
 
