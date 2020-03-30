@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.2
+- 25-Mar-2020 Jim Allman added names to colors - and billboard view
 - 21-Mar-2020 Jim Allman added some popular color conventions as collections
 - 21-Mar-2020 Add undo to load collections
 - 21-Mar-2020 Bug fix - Undo on move collection down was not working

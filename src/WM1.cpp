@@ -126,11 +126,13 @@ struct WirePanel : BackPanel {
 };
 
 struct EditPanel : BackPanel {
-	std::function<void(NVGcolor)> completeHandler;
+	std::function<void(NVGcolor, std::string)> completeHandler;
 	std::function<void()> cancelHandler;
 	EventWidgetSlider *r;
 	EventWidgetSlider *g;
 	EventWidgetSlider *b;
+	Label *labelLabel;
+	EventParamField *labelField;
 	EditPanel() {
 		r = new EventWidgetSlider();
 		r->box.pos = Vec(10, 105);
@@ -150,19 +152,28 @@ struct EditPanel : BackPanel {
 		b->textHandler = percentageTextHandler;
 		b->label = "Blue";
 		addChild(b);
+		labelLabel = new Label();
+		labelLabel->box.pos = Vec(0, 223);
+		labelLabel->text = "Color label";
+		addChild(labelLabel);
+		labelField = new EventParamField();
+		labelField->box.pos = Vec(7, 243);
+		labelField->box.size.x = 116;
+		// postpone call to addChild, or this will capture all keystrokes!
+
 		EventWidgetButton *saveButton = new EventWidgetButton();
-		saveButton->box.pos = Vec(5, 250);
+		saveButton->box.pos = Vec(5, 275);
 		saveButton->box.size = Vec(55, 19);
 		saveButton->label = "Save";
 		saveButton->clickHandler = [=](){
 			if (this->completeHandler) {
-				this->completeHandler(nvgRGBf(r->value, g->value, b->value));
+				this->completeHandler(nvgRGBf(r->value, g->value, b->value), labelField->text);
 			}
 		};
 		addChild(saveButton);
 		
 		EventWidgetButton *cancelButton = new EventWidgetButton();
-		cancelButton->box.pos = Vec(70, 250);
+		cancelButton->box.pos = Vec(70, 275);
 		cancelButton->box.size = Vec(55, 19);
 		cancelButton->label = "Cancel";
 		cancelButton->clickHandler = [=](){
@@ -216,9 +227,57 @@ struct EditPanel : BackPanel {
 	}
 };
 
+struct BillboardPanel : BackPanel {
+	std::function<void(const DrawArgs)> drawHandler;
+
+	BillboardPanel() {
+		// warning if there are no current colors
+		EventWidgetLabel *label = new EventWidgetLabel();
+		label->label = "No Wire Colors Defined";
+		label->box.pos = Vec(25, 175);
+		label->box.size = Vec(100, 19);
+		addChild(label);
+	}
+	void draw(const DrawArgs &args) override {
+		BackPanel::draw(args);
+		if (drawHandler) {
+			drawHandler(args);
+		}
+	}
+};
+
+struct ViewToggleButton : EventWidgetButtonBase {
+	// special click behavior, drawing options mimic MinButton
+	SizeableModuleWidget *mw;
+	ViewToggleButton() {
+		this->box.size = Vec(8, 14);
+	}
+	void draw (const DrawArgs &args) override {
+		nvgBeginPath(args.vg);
+		if (this->box.pos.x == 1) {
+			nvgMoveTo(args.vg, 8, 0);
+			nvgLineTo(args.vg, 0, 7);
+			nvgLineTo(args.vg, 8, 14);
+			nvgClosePath(args.vg);
+		} else {
+			nvgMoveTo(args.vg, 0, 0);
+			nvgLineTo(args.vg, 8, 7);
+			nvgLineTo(args.vg, 0, 14);
+			nvgClosePath(args.vg);
+		}
+		nvgFillColor(args.vg, gScheme.getAlternative(mw->module));
+		nvgFill(args.vg);
+		EventWidgetButtonBase::draw(args);
+	};
+};
+
 struct WireButton : EventWidgetButtonBase {
 	NVGcolor color;
+	std::string label;
 	EventWidgetCheckBox *checkBox;
+	// add a dedicated tooltip to show color descriptions on rollover
+	ui::Tooltip* tooltip = NULL;
+
 	WireButton() {
 		checkBox = new EventWidgetCheckBox();
 		checkBox->box.pos = Vec(1,1);
@@ -244,6 +303,10 @@ struct WireButton : EventWidgetButtonBase {
 				return false;
 		}
 		color = color::fromHexString(text);
+		return true;
+	}
+	bool setLabel(std::string text) {
+		label = text;
 		return true;
 	}
 	void draw(const DrawArgs &args) override {
@@ -284,11 +347,41 @@ struct WireButton : EventWidgetButtonBase {
 		}
 		return 0;
 	}
+	void onEnter(const event::Enter &e) override {
+		if (!tooltip && (this->label != "")) {
+			SubTooltip *stt = new SubTooltip();
+			tooltip = stt;
+			APP->scene->addChild(tooltip);
+			stt->stepLambda = [=]() {
+				tooltip->text = std::string(this->label);
+				stt->Tooltip::step();
+				tooltip->box.pos = this->getAbsoluteOffset(this->box.size).minus(this->box.size).plus(Vec(100, 0)).round();
+			};
+		}
+		EventWidgetButtonBase::onEnter(e);
+		e.consume(this);
+	}
+	void onLeave(const event::Leave &e) override {
+		if (tooltip) {
+			if (tooltip->parent == APP->scene) {
+				APP->scene->removeChild(tooltip);
+			}
+			delete tooltip;
+			tooltip = NULL;
+		}
+		EventWidgetButtonBase::onLeave(e);
+		e.consume(this);
+	}
 };
 
 struct ColorCollectionButton : EventWidgetButtonBase {
 	std::string name;
 	std::vector<NVGcolor> colors;
+	std::vector<std::string> labels;
+	// add a dedicated tooltip to show color descriptions on rollover
+	ui::Tooltip* tooltip;
+	float tooltipX = 0;
+	std::string foundLabel = "";
 	
 	void draw(const DrawArgs &args) override {
 		if (!name.empty()) {
@@ -305,7 +398,7 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 			NVGcolor col = color;
 			col.a = 1.0f;
 			nvgBeginPath(args.vg);
-			nvgRect(args.vg, left, 15, width, 5);
+			nvgRect(args.vg, left, 15, width, 8);
 			nvgFillColor(args.vg, col);
 			nvgFill(args.vg);
 			left += width;
@@ -320,6 +413,47 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 			i++;
 		}
 		return 0;
+	}
+
+	void onEnter(const event::Enter &e) override {
+		OpaqueWidget::onEnter(e);
+		e.consume(this);
+	}
+	void onHover(const event::Hover &e) override {
+		float mouseX = e.pos.x;  // relative to this collection button
+		if (!tooltip) {
+			SubTooltip *stt = new SubTooltip();
+			tooltip = stt;
+			APP->scene->addChild(tooltip);
+			stt->stepLambda = [=]() {
+				tooltip->text = foundLabel;
+				stt->Tooltip::step();
+				// place the tooltip just above the target color's block
+				tooltip->box.pos = this->getAbsoluteOffset(this->box.size).minus(this->box.size).plus(Vec(tooltipX, -6)).round();
+			};
+		}
+		// adapt logic above to show the description for the current target color chip
+		float width = box.size.x - 25.0f;
+		width = width / colors.size();
+		int colorIndex = floor(mouseX / width);
+		if (colorIndex < int(labels.size())) {
+			foundLabel = std::string(labels[colorIndex]);
+			tooltipX = (width * colorIndex);
+		} else {
+			foundLabel = "";
+		}
+		tooltip->visible = !(foundLabel == "");
+		OpaqueWidget::onHover(e);
+		e.consume(this);
+	}
+	void onLeave(const event::Leave &e) override {
+		if (tooltip) {
+			APP->scene->removeChild(tooltip);
+			delete tooltip;
+			tooltip = NULL;
+		}
+		OpaqueWidget::onLeave(e);
+		e.consume(this);
 	}
 };
 
@@ -344,6 +478,7 @@ struct WM101 : SizeableModuleWidget {
 	unsigned int newColorIndex = 0;
 
 	MinButton *minButton;
+	ViewToggleButton *viewToggle;
 	BackPanel *backPanel;
 	EventWidgetCheckBox *checkBoxAll;
 	BackPanel *deleteConfirmPanel;
@@ -352,6 +487,7 @@ struct WM101 : SizeableModuleWidget {
 	EventWidgetButton *deleteOkButton;
 	EditPanel *editPanel;
 	WirePanel *wirePanel;
+	BillboardPanel *billboardPanel;
 	BackPanel *settingsPanel;
 	EventWidgetRadioButton *highlightOff;
 	EventWidgetRadioButton *highlightLow;
@@ -362,6 +498,7 @@ struct WM101 : SizeableModuleWidget {
 	EventWidgetSlider *varyS;
 	EventWidgetSlider *varyL;
 	EventWidgetCheckBox *redoCheck;
+	EventWidgetCheckBox *billboard3d;
 	BackPanel *blockingPanel;
 	BackPanel *collectionPanel;
 	ScrollWidget *collectionScrollWidget;
@@ -370,9 +507,18 @@ struct WM101 : SizeableModuleWidget {
 	WM101(Module *module) : SizeableModuleWidget(150) {
 		setModule(module);
 		minButton = new MinButton();
-		minButton->box.pos = Vec(140,180);
+		minButton->box.pos = Vec(140,160);
 		minButton->mw = this;
 		addChild(minButton); 
+
+		viewToggle = new ViewToggleButton();
+		viewToggle->box.pos = Vec(141, 1);
+		viewToggle->mw = this;
+		viewToggle->clickHandler = [=]() {
+			toggleBillboard();
+		};
+		addChild(viewToggle); 
+
 		backPanel = new BackPanel();
 		backPanel->box.pos = Vec(10, 15);
 		backPanel->box.size = Vec(box.size.x - 20, box.size.y - 30);
@@ -452,6 +598,15 @@ struct WM101 : SizeableModuleWidget {
 			this->cancel();
 		};
 		addChild(wirePanel);
+
+		billboardPanel = new BillboardPanel();
+		billboardPanel->box.pos = Vec(0, 15);
+		billboardPanel->box.size = Vec(box.size.x, box.size.y - 30);
+		billboardPanel->visible = false;
+		billboardPanel->drawHandler = [=](const DrawArgs &args) { 
+			this->drawBillboard(args);
+		};
+		addChild(billboardPanel);
 
 		collectionPanel = new BackPanel();
 		collectionPanel->box.pos = backPanel->box.pos;
@@ -654,6 +809,14 @@ struct WM101 : SizeableModuleWidget {
 		redoCheck->changeHandler = [=]() { this->redoCheckChanged(); };
 		settingsPanel->addChild(redoCheck);
 
+		billboard3d = new EventWidgetCheckBox();
+		billboard3d->label = "3D billboard?";
+		billboard3d->box.pos = Vec(10, 255);
+		billboard3d->box.size = Vec(box.size.x - 40, 19);
+		billboard3d->selected = 1;
+		billboard3d->changeHandler = [=]() { this->billboard3dChanged(); };
+		settingsPanel->addChild(billboard3d);
+
 		EventWidgetButton *settingsButton = new EventWidgetButton();
 		settingsButton->box.pos = Vec(35, 290);
 		settingsButton->box.size = Vec(60, 19);
@@ -717,6 +880,7 @@ struct WM101 : SizeableModuleWidget {
 				}
 			}
 		}
+		e.consume(this);
 	}
 	void varyCheckChanged() {
 		bool selected = varyCheck->selected;
@@ -756,6 +920,104 @@ struct WM101 : SizeableModuleWidget {
 			}
 		));
 	}
+	void billboard3dChanged() {
+		bool selected = billboard3d->selected;
+		saveSettings();
+		APP->history->push(new EventWidgetAction(
+			selected?"Turn on 3D billboard":"Turn off 3D billboard",
+			[selected]() {
+				if (masterWireManager) {
+					masterWireManager->billboard3d->selected = !selected;
+					masterWireManager->saveSettings();
+				}
+			},
+			[selected]() {
+				if (masterWireManager) {
+					masterWireManager->billboard3d->selected = selected;
+					masterWireManager->saveSettings();
+				}
+			}
+		));
+	}
+
+	void drawBillboard(const DrawArgs &args) {
+		std::vector<NVGcolor> currentColors = currentCollectionColors();
+		std::vector<std::string> currentLabels = currentCollectionLabels();
+		float blockHeight = billboardPanel->box.size.y / currentColors.size();
+		float stop1 = blockHeight * 0.10f;
+		float stop2 = blockHeight * 0.28f;
+		float stop3 = blockHeight * 0.46f;
+		float currentBlockTop = 0.0f;
+		float shadowGray = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// draw a block of the n-th wire color
+			NVGcolor col = currentColors[i];
+			col.a = 1.0f;  // make sure it's opaque here!
+			NVGcolor shadowCol = nvgLerpRGBA(col, nvgRGBf(0.0f, 0.0f, 0.0f), 0.9f);
+			NVGcolor highlightCol = nvgLerpRGBA(col, nvgRGBf(1.0f, 1.0f, 1.0f), 0.55f);
+			if (billboard3d->selected) {
+				float stopPos1 = currentBlockTop + stop1;
+				float stopPos2 = currentBlockTop + stop2;
+				float stopPos3 = currentBlockTop + stop3;
+				float end = currentBlockTop + blockHeight;
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
+				NVGpaint grad = nvgLinearGradient(args.vg, 0, currentBlockTop, 0, stopPos1, shadowCol, col);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, stopPos1, billboardPanel->box.size.x, blockHeight - stop1);
+				grad = nvgLinearGradient(args.vg, 0, stopPos1, 0, stopPos2, col, highlightCol);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, stopPos2, billboardPanel->box.size.x, blockHeight - stop2);
+				grad = nvgLinearGradient(args.vg, 0, stopPos2, 0, stopPos3, highlightCol, col);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, stopPos3, billboardPanel->box.size.x, blockHeight - stop3);
+				grad = nvgLinearGradient(args.vg, 0, stopPos3, 0, end, col, shadowCol);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+			}
+			else {
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
+				nvgFillColor(args.vg, col);
+				nvgFill(args.vg);
+			}
+			currentBlockTop += blockHeight;
+		}
+		currentBlockTop = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// add a big high-contrast label for this block (if labeled)
+			std::string label = "";
+			if (i < currentLabels.size()) {
+				 label = currentLabels[i];
+			}
+			if (!label.empty()) {
+				float labelY = currentBlockTop + (blockHeight/2.0f);
+				nvgFontFaceId(args.vg, APP->window->uiFont->handle);
+				nvgFontSize(args.vg, 24);
+				nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
+				// add a drop shadow to work on all backgrounds
+				nvgFillColor(args.vg, nvgRGBf(shadowGray, shadowGray, shadowGray));
+				nvgFontBlur(args.vg, 1.15f);
+				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
+				// add white text over this
+				nvgFontBlur(args.vg, 0.0f);
+				nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
+			}
+			currentBlockTop += blockHeight;
+		}
+	}
+
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (this->box.size.x > 16.0f) {
 			drawBase(vg, "WM-101");
@@ -774,6 +1036,7 @@ struct WM101 : SizeableModuleWidget {
 	void takeMasterSlot() {
 		blockingPanel->visible = false;
 		backPanel->visible = (box.size.x > 16.0f);
+		viewToggle->visible = true;
 		masterWireManager = this;
 		scrollWidget->container->clearChildren();
 		collectionScrollWidget->container->clearChildren();
@@ -791,6 +1054,7 @@ struct WM101 : SizeableModuleWidget {
 			if (masterWireManager) {
 				hidePanels();
 				blockingPanel->visible = (box.size.x > 16.0f);
+				viewToggle->visible = false;
 				SizeableModuleWidget::step();
 				return;
 			}
@@ -961,9 +1225,21 @@ struct WM101 : SizeableModuleWidget {
 	void onResize() override {
 		bool small = this->box.size.x < 16.0f;
 		minButton->box.pos.x = small?2.5f:(this->box.size.x - 10.0f);
+		minButton->box.pos.y = small?180:160;
 		hidePanels();
 		backPanel->visible = !small;
+		viewToggle->visible = !small;
 		SizeableModuleWidget::onResize();	
+	}
+	void toggleBillboard() {
+		// assumes we're not already minimized (toggle not available)
+		bool alreadyShowingBillboard = billboardPanel->visible;
+		if (alreadyShowingBillboard) {
+			hidePanels();
+			backPanel->visible = true;
+		} else {
+			showBillboard();
+		}
 	}
 	EventWidgetAction *checkBoxAction(unsigned int index, bool selected) {
 		return new EventWidgetAction(
@@ -998,12 +1274,13 @@ struct WM101 : SizeableModuleWidget {
 		wirePanel->visible = true;
 		wirePanel->color = color;
 	}
-	WireButton *addColor(NVGcolor color, bool selected) {
+	WireButton *addColor(NVGcolor color, std::string label, bool selected) {
 		float y = scrollWidget->container->children.size() * 21;
 		WireButton *wb = new WireButton();
 		wb->box.pos = Vec(0, y);
 		wb->box.size = Vec(scrollWidget->box.size.x, 21);
 		wb->color = color;
+		wb->label = label;
 		wb->checkBox->selected = selected;
 		wb->checkBox->changeHandler = [=]() {
 			this->updateWireButtonCheckBox(wb);
@@ -1017,13 +1294,14 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->container->addChild(wb);
 		return wb;
 	}
-	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors) {
-		float y = collectionScrollWidget->container->children.size() * 21;
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) {
+		float y = collectionScrollWidget->container->children.size() * 24;
 		ColorCollectionButton *btn = new ColorCollectionButton();
 		btn->box.pos = Vec(0, y);
-		btn->box.size = Vec(collectionScrollWidget->box.size.x, 21);
+		btn->box.size = Vec(collectionScrollWidget->box.size.x, 24);
 		btn->name = name;
 		btn->colors = colors;
+		btn->labels = labels;
 		btn->rightClickHandler = [=]() {
 			this->addCollectionMenu(btn);
 		};
@@ -1033,7 +1311,7 @@ struct WM101 : SizeableModuleWidget {
 		collectionScrollWidget->container->addChild(btn);
 		return btn;
 	}
-	std::vector<NVGcolor> currentCollection() {
+	std::vector<NVGcolor> currentCollectionColors() {
 		std::vector<NVGcolor> colors;
 		for (Widget *w : scrollWidget->container->children) {
 			WireButton *wb = dynamic_cast<WireButton *>(w);
@@ -1043,46 +1321,62 @@ struct WM101 : SizeableModuleWidget {
 		}
 		return colors;
 	}
-	void applyCollection(std::vector<NVGcolor> colors) {
+	std::vector<std::string> currentCollectionLabels() {
+		std::vector<std::string> labels;
+		for (Widget *w : scrollWidget->container->children) {
+			WireButton *wb = dynamic_cast<WireButton *>(w);
+			std::string lab = wb->label;
+			labels.push_back(lab);
+		}
+		return labels;
+	}
+	void applyCollection(std::vector<NVGcolor> colors, std::vector<std::string> labels) {
 		scrollWidget->container->clearChildren();
-		for (NVGcolor color : colors) {
+		for(unsigned int i = 0; i < colors.size(); i++) {
+			NVGcolor color = colors[i];
+			std::string label = "";
+			if (i < labels.size()) {
+				 label = labels[i];
+			}
 			bool selected = (color.a > 0.5f);
 			color.a = 1.0f;
-			addColor(color, selected);
+			addColor(color, label, selected);
 		}
 	}
 	void applyCollection(ColorCollectionButton *btn) {
-		std::vector<NVGcolor> oldColors = currentCollection();
+		std::vector<NVGcolor> oldColors = currentCollectionColors();
+		std::vector<std::string> oldLabels = currentCollectionLabels();
 		std::vector<NVGcolor> newColors = btn->colors;
-		applyCollection(newColors);
+		std::vector<std::string> newLabels = btn->labels;
+		applyCollection(newColors, newLabels);
 		saveSettings();
 		this->cancel();
 		APP->history->push(new EventWidgetAction(
 			"Use Collection",
-			[oldColors]() {
+			[oldColors, oldLabels]() {
 				if (masterWireManager) {
-					masterWireManager->applyCollection(oldColors);
+					masterWireManager->applyCollection(oldColors, oldLabels);
 					masterWireManager->saveSettings();
 				}
 			},
-			[newColors]() {
+			[newColors, newLabels]() {
 				if (masterWireManager) {
-					masterWireManager->applyCollection(newColors);
+					masterWireManager->applyCollection(newColors, newLabels);
 					masterWireManager->saveSettings();
 				}
 			}
 		));
 	}
-	void insertCollection(std::string name, std::vector<NVGcolor> colors, unsigned int index) {
-		ColorCollectionButton *w = addCollection(name, colors);
+	void insertCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels, unsigned int index) {
+		ColorCollectionButton *w = addCollection(name, colors, labels);
 		collectionScrollWidget->container->children.pop_back();
 		auto v = collectionScrollWidget->container->children.begin();
 		std::advance(v, index);
 		collectionScrollWidget->container->children.insert(v, w);
 		this->reflowCollections();
 	}
-	void insertColor(NVGcolor color, bool selected, unsigned int index) {
-		WireButton *w = addColor(color, selected);
+	void insertColor(NVGcolor color, std::string label, bool selected, unsigned int index) {
+		WireButton *w = addColor(color, label, selected);
 		scrollWidget->container->children.pop_back();
 		auto v = scrollWidget->container->children.begin();
 		std::advance(v, index);
@@ -1094,62 +1388,76 @@ struct WM101 : SizeableModuleWidget {
 
 		// Omri Cohen's colors as shown here  <https://github.com/david-c14/ModularFungi/blob/master/res/Colors.png>
 		scrollWidget->container->clearChildren();
-		addColor(color::fromHexString("#c91847"), false);  // audio
-		addColor(color::fromHexString("#0986ad"), false);  // clock/trigger/gate
-		addColor(color::fromHexString("#c9b70e"), false);  // volt/octave
-		addColor(color::fromHexString("#0c8e15"), false);  // modulation
-		addCollection(std::string("Modular Fungi"), currentCollection());
+		addColor(color::fromHexString("#c91847"), "Audio", 		true);  // audio
+		addColor(color::fromHexString("#0986ad"), "Clk/Trig/Gate", 	false);  // clock/trigger/gate
+		addColor(color::fromHexString("#c9b70e"), "Volt/Oct", 		false);  // volt/octave
+		addColor(color::fromHexString("#0c8e15"), "Modulation", 	false);  // modulation
+		addCollection(std::string("Modular Fungi"), currentCollectionColors(), currentCollectionLabels());
 
 		// jack color conventions used in NYSTHI modules  <https://github.com/patman023/nysthimanual/blob/master/pages/basics/basics.md>
 		scrollWidget->container->clearChildren();
-		addColor(color::fromHexString("#dddddd"), false);  // audio
-		addColor(color::fromHexString("#3c82dc"), false);  // control voltage
-		addColor(color::fromHexString("#fad12d"), false);  // gate
-		addColor(color::fromHexString("#dc7814"), false);  // pulse/trigger
-		addColor(color::fromHexString("#800080"), false);  // sync
-		addCollection(std::string("NYSTHI"), currentCollection());
+		addColor(color::fromHexString("#dddddd"), "Audio",		true);  // audio
+		addColor(color::fromHexString("#3c82dc"), "CV",			false);  // control voltage
+		addColor(color::fromHexString("#fad12d"), "Gate",		false);  // gate
+		addColor(color::fromHexString("#dc7814"), "Pulse/Trigger",	false);  // pulse/trigger
+		addColor(color::fromHexString("#800080"), "Sync",		false);  // sync
+		addCollection(std::string("NYSTHI"), currentCollectionColors(), currentCollectionLabels());
 
 		// jack color conventions used in TheXOR modules  <https://github.com/The-XOR/RackPlugins>
 		scrollWidget->container->clearChildren();
-		addColor(color::fromHexString("#ff0000"), false);  // clock
-		addColor(color::fromHexString("#fffc0d"), false);  // reset
-		addColor(color::fromHexString("#008000"), false);  // control voltage
-		addColor(color::fromHexString("#f1f1f1"), false);  // gate
-		addColor(color::fromHexString("#000000"), false);  // modulation
-		addColor(color::fromHexString("#0000ff"), false);  // trigger
-		addColor(color::fromHexString("#ff5555"), false);  // expansion
-		addCollection(std::string("TheXOR"), currentCollection());
+		addColor(color::fromHexString("#ff0000"), "Clock",		true);  // clock
+		addColor(color::fromHexString("#fffc0d"), "Reset",		false);  // reset
+		addColor(color::fromHexString("#008000"), "CV",			false);  // control voltage
+		addColor(color::fromHexString("#f1f1f1"), "Gate",		false);  // gate
+		addColor(color::fromHexString("#000000"), "Modulation",		false);  // modulation
+		addColor(color::fromHexString("#0000ff"), "Trigger",		false);  // trigger
+		addColor(color::fromHexString("#ff5555"), "Expansion",		false);  // expansion
+		addCollection(std::string("TheXOR"), currentCollectionColors(), currentCollectionLabels());
 
 		// add default colors (will remain active)
 		scrollWidget->container->clearChildren();
 		for (NVGcolor color : settings::cableColors) {
-			addColor(color, true);
+			addColor(color, "", true);	// assume no labels for these colors
 		}
 		
-		addColor(nvgRGB(0xff, 0xae, 0xc9), false);
-		addColor(nvgRGB(0xb7, 0x00, 0xb5), false);
-		addColor(nvgRGB(0x80, 0x80, 0x80), false);
-		addColor(nvgRGB(0xff, 0xff, 0xff), false);
-		addColor(nvgRGB(0x10, 0x0f, 0x12), false);
-		addColor(nvgRGB(0xff, 0x99, 0x41), false);
-		addColor(nvgRGB(0x80, 0x36, 0x10), false);
-		addCollection(std::string("Default"), currentCollection());
+		addColor(nvgRGB(0xff, 0xae, 0xc9), "", false);
+		addColor(nvgRGB(0xb7, 0x00, 0xb5), "", false);
+		addColor(nvgRGB(0x80, 0x80, 0x80), "", false);
+		addColor(nvgRGB(0xff, 0xff, 0xff), "", false);
+		addColor(nvgRGB(0x10, 0x0f, 0x12), "", false);
+		addColor(nvgRGB(0xff, 0x99, 0x41), "", false);
+		addColor(nvgRGB(0x80, 0x36, 0x10), "", false);
+		addCollection(std::string("Default"), currentCollectionColors(), currentCollectionLabels());
 	}
 	ColorCollectionButton *loadCollectionFromJson(json_t *json) {
 		json_t *n1 = json_object_get(json, "name");	
 		json_t *a1 = json_object_get(json, "colors");
+		json_t *a2 = json_object_get(json, "labels");
 		ColorCollectionButton *cb = NULL;
+		int asize, j;
+		std::vector<NVGcolor> colors;
+		std::vector<std::string> labels;
 		if (a1) {
-			std::vector<NVGcolor> colors;
-			int asize = json_array_size(a1);
-			for (int j = 0; j < asize; j++) {
+			asize = json_array_size(a1);
+			for (j = 0; j < asize; j++) {
 				json_t *c1 = json_array_get(a1, j);
 				if (c1) {
 					colors.push_back(color::fromHexString(json_string_value(c1)));
 				}
 			}
-			cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors);
 		}	
+		if (a2) {
+			asize = json_array_size(a2);
+			for (j = 0; j < asize; j++) {
+				json_t *l1 = json_array_get(a2, j);
+				if (l1) {
+					labels.push_back(json_string_value(l1));
+				} else {
+					labels.push_back("");
+				}
+			}
+		}
+		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
 		return cb;
 	}
 	void loadSettings() {
@@ -1175,13 +1483,16 @@ struct WM101 : SizeableModuleWidget {
 				json_t *j1 = json_array_get(arr, i);
 				if (j1) {
 					json_t *c1 = json_object_get(j1, "color");
+					json_t *l1 = json_object_get(j1, "label");
 					if (c1) {
 						int selected = false;
 						json_t *s1 = json_object_get(j1, "selected");
 						if (s1) {
 							selected = clamp((int)json_number_value(s1), 0, 1);
 						}
-						addColor(color::fromHexString(json_string_value(c1)), selected);
+						std::string label;
+						label = (l1) ? json_string_value(l1) : "";
+						addColor(color::fromHexString(json_string_value(c1)), label, selected);
 					}
 				}
 			}
@@ -1215,6 +1526,10 @@ struct WM101 : SizeableModuleWidget {
 		if (v1) {
 			redoCheck->selected = clamp((int)json_number_value(v1), 0, 1);
 		}
+		v1 = json_object_get(rootJ, "billboard");
+		if (v1) {
+			billboard3d->selected = clamp((int)json_number_value(v1), 0, 1);
+		}
 		arr = json_object_get(rootJ, "collections");
 		if (arr) {
 			collectionScrollWidget->container->clearChildren();
@@ -1237,6 +1552,7 @@ struct WM101 : SizeableModuleWidget {
 			json_t *color = json_object();
 			std::string s = color::toHexString(wb->color);
 			json_object_set_new(color, "color", json_string(s.c_str()));
+			json_object_set_new(color, "label", json_string(wb->label.c_str()));
 			json_object_set_new(color,"selected", json_real(wb->checkBox->selected));
 			json_array_append_new(arr, color);
 		}
@@ -1248,6 +1564,7 @@ struct WM101 : SizeableModuleWidget {
 		json_object_set_new(settings, "variationS", json_real(varyS->value));
 		json_object_set_new(settings, "variationL", json_real(varyL->value));
 		json_object_set_new(settings, "redo", json_real(redoCheck->selected));
+		json_object_set_new(settings, "billboard", json_real(billboard3d->selected));
 		arr = json_array();
 		for (Widget *w : collectionScrollWidget->container->children) {
 			ColorCollectionButton *cb = dynamic_cast<ColorCollectionButton *>(w);
@@ -1428,6 +1745,15 @@ struct WM101 : SizeableModuleWidget {
 			this->redoCheckChanged();
 		};
 		menu->addChild(redo);
+
+		EventWidgetMenuItem *billboard = new EventWidgetMenuItem();
+		billboard->text = "3D billboard";
+		billboard->rightText = CHECKMARK(billboard3d->selected);
+		billboard->clickHandler = [=]() {
+			this->billboard3d->selected = !(this->billboard3d->selected);
+			this->billboard3dChanged();
+		};
+		menu->addChild(billboard);
 	}
 	void addCollectionMenu(ColorCollectionButton *cb) {
 		// by convention, place at the current mouse location
@@ -1502,6 +1828,9 @@ struct WM101 : SizeableModuleWidget {
 			std::vector<NVGcolor> colors = cb->colors;
 			cb->colors = cb2->colors;
 			cb2->colors = colors;	
+			std::vector<std::string> labels = cb->labels;
+			cb->labels = cb2->labels;
+			cb2->labels = labels;
 		}
 		saveSettings();
 		return index;
@@ -1569,6 +1898,7 @@ struct WM101 : SizeableModuleWidget {
 		reflowCollections();
 		saveSettings();
 		std::vector<NVGcolor> colors = cb->colors; 
+		std::vector<std::string> labels = cb->labels;
 		std::string name = cb->name;
 		unsigned int index = cb->index();
 		APP->history->push(new EventWidgetAction(
@@ -1584,9 +1914,9 @@ struct WM101 : SizeableModuleWidget {
 					}
 				}
 			},
-			[name, colors]() {
+			[name, colors, labels]() {
 				if (masterWireManager) {
-					masterWireManager->addCollection(name, colors);
+					masterWireManager->addCollection(name, colors, labels);
 					masterWireManager->saveSettings();
 				}
 			}
@@ -1637,6 +1967,13 @@ struct WM101 : SizeableModuleWidget {
 			json_array_append_new(a1, json_string(s.c_str()));
 		}
 		json_object_set_new(node, "colors", a1);
+		json_t *a2 = json_array();
+		if (cb->labels.size() > 0) {  // check for labels first
+			for (std::string label: cb->labels) {
+				json_array_append_new(a2, json_string(label.c_str()));
+			}
+			json_object_set_new(node, "labels", a2);
+		}
 	}
 	void changeCollectionName(ColorCollectionButton *cb, std::string text) {
 		if (cb->name == text)
@@ -1717,8 +2054,9 @@ struct WM101 : SizeableModuleWidget {
 		menu->addChild(dm);
 	}
 	void saveAsCollection() {
-		std::vector<NVGcolor> colors = currentCollection();
-		unsigned int index = addCollection(std::string("[Unnamed]"), colors)->index();
+		std::vector<NVGcolor> colors = currentCollectionColors();
+		std::vector<std::string> labels = currentCollectionLabels();
+		unsigned int index = addCollection(std::string("[Unnamed]"), colors, labels)->index();
 		saveSettings();
 		APP->history->push(new EventWidgetAction(
 			"Save as Collection",
@@ -1733,9 +2071,9 @@ struct WM101 : SizeableModuleWidget {
 					}
 				}
 			},
-			[colors]() {
+			[colors, labels]() {
 				if (masterWireManager) {
-					masterWireManager->addCollection(std::string("Unnamed"), colors);
+					masterWireManager->addCollection(std::string("Unnamed"), colors, labels);
 					masterWireManager->saveSettings();
 				}
 			}
@@ -1756,15 +2094,16 @@ struct WM101 : SizeableModuleWidget {
 		unsigned int index = cb->index();
 		std::string name = cb->name;
 		std::vector<NVGcolor> colors = cb->colors;
+		std::vector<std::string> labels = cb->labels;
 		collectionScrollWidget->container->removeChild(cb);
 		delete cb;
 		reflowCollections();
 		saveSettings();
 		APP->history->push(new EventWidgetAction(
 			"Delete Collection",
-			[name, colors, index]() {
+			[name, colors, labels, index]() {
 				if (masterWireManager) {
-					masterWireManager->insertCollection(name, colors, index);
+					masterWireManager->insertCollection(name, colors, labels, index);
 					masterWireManager->saveSettings();
 				}
 			},
@@ -1783,6 +2122,7 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void deleteWire(WireButton *wb) {
 		NVGcolor color = wb->color;
+		std::string label = wb->label;
 		bool selected = wb->checkBox->selected;
 		unsigned int index = wb->index();
 		scrollWidget->container->removeChild(wb);
@@ -1791,9 +2131,9 @@ struct WM101 : SizeableModuleWidget {
 		saveSettings();
 		APP->history->push(new EventWidgetAction(
 			"Delete Color",
-			[color, selected, index]() {
+			[color, label, selected, index]() {
 				if (masterWireManager) {
-					masterWireManager->insertColor(color, selected, index);
+					masterWireManager->insertColor(color, label, selected, index);
 					masterWireManager->saveSettings();
 				}
 			},
@@ -1822,7 +2162,7 @@ struct WM101 : SizeableModuleWidget {
 		unsigned int y = 0;
 		for (Widget *widget : collectionScrollWidget->container->children) {
 			widget->box.pos.y = y;
-			y += 21;
+			y += 24;
 		}
 	}
 	void swap(int i) {
@@ -1833,8 +2173,11 @@ struct WM101 : SizeableModuleWidget {
 		WireButton *wb1 = dynamic_cast<WireButton *>(* vi++);
 		WireButton *wb2 = dynamic_cast<WireButton *>(* vi);
 		NVGcolor col = wb1->color;
+		std::string lab = wb1->label;
 		wb1->color = wb2->color;
+		wb1->label = wb2->label;
 		wb2->color = col;
+		wb2->label = lab;
 		bool sel = wb1->checkBox->selected;
 		wb1->checkBox->selected = wb2->checkBox->selected;
 		wb2->checkBox->selected = sel;
@@ -1897,8 +2240,9 @@ struct WM101 : SizeableModuleWidget {
 		backPanel->visible = false;
 		collectionPanel->visible = true;
 	}
-	void editAdd(NVGcolor col) {
-		addColor(col, false);
+	void editAdd(NVGcolor col, std::string label) {
+		std::string defaultLabel = "";
+		addColor(col, defaultLabel, false);
 		unsigned int index = scrollWidget->container->children.size() - 1;
 		APP->history->push(new EventWidgetAction(
 			"Add Color",
@@ -1912,34 +2256,38 @@ struct WM101 : SizeableModuleWidget {
 					}
 				}
 			},
-			[index, col]() {
+			[index, col, defaultLabel]() {
 				if (masterWireManager) {
-					masterWireManager->insertColor(col, false, index);
+					masterWireManager->insertColor(col, defaultLabel, false, index);
 					masterWireManager->saveSettings();
 				}
 			}
 		));
 	}
-	void editEdit(WireButton *wb, NVGcolor col) {
+	void editEdit(WireButton *wb, NVGcolor col, std::string label) {
 		NVGcolor oldCol = wb->color;
+		std::string oldLabel = wb->label;
 		unsigned int index = wb->index();
 		wb->color = col;
+		wb->label = label;
 		APP->history->push(new EventWidgetAction(
 			"Edit Color",
-			[index, oldCol]() {
+			[index, oldCol, oldLabel]() {
 				if (masterWireManager) {
 					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
 						wb->color = oldCol;
+						wb->label = oldLabel;
 						masterWireManager->saveSettings();
 					}
 				}
 			},
-			[index, col]() {
+			[index, col, label]() {
 				if (masterWireManager) {
 					WireButton *wb = masterWireManager->findWireButton(index);
 					if (wb) {
 						wb->color = col;
+						wb->label = label;
 						masterWireManager->saveSettings();
 					}
 				}
@@ -1948,12 +2296,12 @@ struct WM101 : SizeableModuleWidget {
 	}
 	void editDialog(WireButton *wb) {
 		backPanel->visible = false;
-		editPanel->completeHandler = [=](NVGcolor col) {
+		editPanel->completeHandler = [=](NVGcolor col, std::string label) {
 			if (wb) {
-				editEdit(wb, col);
+				editEdit(wb, col, label);
 			}
 			else {
-				editAdd(col);
+				editAdd(col, label);
 			}
 			saveSettings();
 			cancel();
@@ -1962,12 +2310,15 @@ struct WM101 : SizeableModuleWidget {
 			editPanel->r->value = wb->color.r;
 			editPanel->g->value = wb->color.g;
 			editPanel->b->value = wb->color.b;
+			editPanel->labelField->setText(wb->label);
 		}
 		else {
 			editPanel->r->value = 0.5f;
 			editPanel->g->value = 0.5f;
 			editPanel->b->value = 0.5f;
+			editPanel->labelField->setText("");
 		}
+		editPanel->addChild(editPanel->labelField);
 		editPanel->visible = true;
 	}
 	void highlightChangedCore(int value) {
@@ -2024,11 +2375,23 @@ struct WM101 : SizeableModuleWidget {
 	void hidePanels() {
 		blockingPanel->visible = false;
 		backPanel->visible = false;	
+		if (editPanel->visible) {
+			editPanel->removeChild(editPanel->labelField);
+		}
 		editPanel->visible = false;
 		wirePanel->visible = false;
 		settingsPanel->visible = false;
 		collectionPanel->visible = false;
 		deleteConfirmPanel->visible = false;	
+		billboardPanel->visible = false;
+		viewToggle->box.pos = Vec(141, 1);
+		minButton->visible = true;
+	}
+	void showBillboard() {
+		hidePanels();
+		billboardPanel->visible = true;
+		viewToggle->box.pos = Vec(1,1);
+		minButton->visible = false;
 	}
 };
 
