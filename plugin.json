@@ -406,6 +406,13 @@
 			"tags": ["UTILITY"]
 		},
 		{
+			"slug":"WM-102",
+			"name":"WM-102",
+			"description":"WM-102 Wire Manager Billboard",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/WM.md",
+			"tags": ["BLANK", "UTILITY"]
+		},
+		{
 			"slug":"XF-101",
 			"name":"XF-101",
 			"description": "XF-101 Single Mono Cross Fader",

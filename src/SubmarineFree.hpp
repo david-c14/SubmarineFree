@@ -82,6 +82,7 @@ extern Model *modelWK101;
 extern Model *modelWK205;
 
 extern Model *modelWM101;
+extern Model *modelWM102;
 
 extern Model *modelXF101;
 extern Model *modelXF102;

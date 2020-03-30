@@ -2395,4 +2395,16 @@ struct WM101 : SizeableModuleWidget {
 	}
 };
 
+struct WM102 : SchemeModuleWidget {
+	WM102(Module *module) {
+		setModule(module);
+		this->box.size = Vec(150, 380);
+		addChild(new SchemePanel(this->box.size));
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "WM-102");
+	}
+};
+
 Model *modelWM101 = createModel<Module, WM101>("WM-101");
+Model *modelWM102 = createModel<Module, WM102>("WM-102");
