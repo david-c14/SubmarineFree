@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.2
+- 21-Mar-2020 Jim Allman added some popular color conventions as collections
 - 21-Mar-2020 Add undo to load collections
 - 21-Mar-2020 Bug fix - Undo on move collection down was not working
 - 18-Mar-2020 Issue #80 - Save and load collections in WM-101

@@ -1090,10 +1090,6 @@ struct WM101 : SizeableModuleWidget {
 		this->reflow();
 	}
 	void setDefaults() {
-		for (NVGcolor color : settings::cableColors) {
-			addColor(color, true);
-		}
-		
 		// add some useful color conventions
 
 		// Omri Cohen's colors as shown here  <https://github.com/david-c14/ModularFungi/blob/master/res/Colors.png>
@@ -1125,6 +1121,11 @@ struct WM101 : SizeableModuleWidget {
 		addCollection(std::string("TheXOR"), currentCollection());
 
 		// add default colors (will remain active)
+		scrollWidget->container->clearChildren();
+		for (NVGcolor color : settings::cableColors) {
+			addColor(color, true);
+		}
+		
 		addColor(nvgRGB(0xff, 0xae, 0xc9), false);
 		addColor(nvgRGB(0xb7, 0x00, 0xb5), false);
 		addColor(nvgRGB(0x80, 0x80, 0x80), false);
