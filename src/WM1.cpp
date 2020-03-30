@@ -2472,6 +2472,33 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		btn->labels = labels;
 		return btn;
 	}
+	json_t *toJson() override {
+		json_t *rootJ = ModuleWidget::toJson();
+
+		json_t *a1 = json_array();
+		for (NVGcolor col: colors) {
+			std::string s = color::toHexString(col);
+			json_array_append_new(a1, json_string(s.c_str()));
+		}
+		json_object_set_new(rootJ, "colors", a1);
+		json_t *a2 = json_array();
+		if (labels.size() > 0) {  // check for labels first
+			for (std::string label: labels) {
+				json_array_append_new(a2, json_string(label.c_str()));
+			}
+			json_object_set_new(rootJ, "labels", a2);
+		}
+
+		return rootJ;
+	}
+	void fromJson(json_t *rootJ) override {
+		ModuleWidget::fromJson(rootJ);
+		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
+		colors = cb->colors;
+		labels = cb->labels;
+		delete cb;
+		schemePanel->dirty = true;
+	}
 };
 
 Model *modelWM101 = createModel<Module, WM101>("WM-101");
