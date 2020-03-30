@@ -310,8 +310,8 @@ struct ViewToggleButton : EventWidgetButtonBase {
 			nvgClosePath(args.vg);
 		} else {
 			nvgMoveTo(args.vg, 0, 0);
-			nvgLineTo(args.vg, 10, 10);
-			nvgLineTo(args.vg, 0, 20);
+			nvgLineTo(args.vg, 8, 7);
+			nvgLineTo(args.vg, 0, 14);
 			nvgClosePath(args.vg);
 		}
 		nvgFillColor(args.vg, gScheme.getAlternative(mw->module));
@@ -563,7 +563,7 @@ struct WM101 : SizeableModuleWidget {
 		viewToggle->clickHandler = [=]() {
 			toggleBillboard();
 		};
-		viewToggle->box.pos = Vec(140,200);
+		viewToggle->box.pos = Vec(141,1);
 		addChild(viewToggle); 
 		backPanel = new BackPanel();
 		backPanel->box.pos = Vec(10, 15);
@@ -1177,15 +1177,13 @@ struct WM101 : SizeableModuleWidget {
 		if (alreadyShowingBillboard) {
 			billboardPanel->visible = false;
 			backPanel->visible = true;
-			//viewToggle->box.pos.y = 200;
-			viewToggle->box.pos = Vec(140,200);
+			viewToggle->box.pos = Vec(141,1);
 			minButton->visible = true;
 		} else {
 			hidePanels();
 			billboardPanel->currentColors = currentCollectionColors();
 			billboardPanel->currentLabels = currentCollectionLabels();
 			billboardPanel->visible = true;
-			//viewToggle->box.pos.y = 180;
 			viewToggle->box.pos = Vec(1,1);
 			minButton->visible = false;
 		}
