@@ -275,7 +275,9 @@ void EventParamField::onSelectKey(const event::SelectKey &e) {
 			changeHandler(text);
 		}
 		ui::MenuOverlay *overlay = getAncestorOfType<ui::MenuOverlay>();
-		overlay->requestDelete();
+		if (overlay) {
+			overlay->requestDelete();
+		}
 		e.consume(this);
 	}
 	if (!e.getTarget())
