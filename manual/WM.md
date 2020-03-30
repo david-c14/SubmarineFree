@@ -74,8 +74,6 @@ When this option is selected, the wire manager will not apply new colors to dele
 
 ### 3D billboard
 
-![View of the Wire Manager Billboard](WM-Billboard.png "Billboard View")
-
 When this option is selected (default), the billboard will be displayed with a rounded effect on the wires.
 
 ## Sizing
@@ -89,6 +87,8 @@ When the module is minimized, a Restore button is visible in the centre of the m
 In this way you can keep the WM-101 Wire Manager in your patch for ready access, without taking up more space than is necessary.
 
 ## Billboard
+
+![View of the Wire Manager Billboard](WM-Billboard.png "Billboard View")
 
 The billboard control at the top right of the module will switch to a billboard display, suitable for use as a key when recording videos. By default the billboard displays wires with a rounded effect but you can have flat colors by adjusting the "3D billboard?" setting.
 
