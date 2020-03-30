@@ -232,7 +232,7 @@ struct BillboardPanel : BackPanel {
 	std::function<void()> cancelHandler;
 	std::vector<NVGcolor> currentColors;
 	std::vector<std::string> currentLabels;
-    std::shared_ptr<Image> cableImg;
+	std::shared_ptr<Image> cableImg;
 
 	BillboardPanel() {
 		// warning if there are no current colors
@@ -241,11 +241,10 @@ struct BillboardPanel : BackPanel {
 		label->box.pos = Vec(25, 175);
 		label->box.size = Vec(100, 19);
 		addChild(label);
-        cableImg = APP->window->loadImage(asset::plugin(pluginInstance, "res/cable-contours.png"));
+		cableImg = APP->window->loadImage(asset::plugin(pluginInstance, "res/cable-contours.png"));
 	}
 	void draw(const DrawArgs &args) override {
 		BackPanel::draw(args);
-		float totalHeight = box.size.y;
 		float blockHeight = box.size.y / currentColors.size();
 		float currentBlockTop = 0.0f;
 		float shadowGray = 0.0f;
@@ -260,11 +259,11 @@ struct BillboardPanel : BackPanel {
 			nvgFillColor(args.vg, col);
 			nvgFill(args.vg);
 			currentBlockTop += blockHeight;
-        }
-        // add a tiled image to mimic a stack of cables
-        nvgBeginPath(args.vg);
-        nvgRect(args.vg, 0.0f, 0.0f, box.size.x, box.size.y);
-        NVGpaint cableTile = nvgImagePattern(args.vg, 0.0, 0.0, box.size.x, blockHeight, 0.0, cableImg->handle, 1.0);
+		}
+		// add a tiled image to mimic a stack of cables
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0.0f, 0.0f, box.size.x, box.size.y);
+		NVGpaint cableTile = nvgImagePattern(args.vg, 0.0, 0.0, box.size.x, blockHeight, 0.0, cableImg->handle, 1.0);
 		nvgFillPaint(args.vg, cableTile);
 		nvgFill(args.vg);
 		currentBlockTop = 0.0f;
@@ -294,12 +293,13 @@ struct BillboardPanel : BackPanel {
 	}
 };
 
-
 struct ViewToggleButton : EventWidgetButtonBase {
 	// special click behavior, drawing options mimic MinButton
 	SizeableModuleWidget *mw;
 	BillboardPanel *billboard = NULL;
-	ViewToggleButton();
+	ViewToggleButton() {
+		this->box.size = Vec(10, 20);
+	}
 	bool billboardIsVisible = false;
 	void draw (const DrawArgs &args) override {
 		nvgBeginPath(args.vg);
@@ -319,9 +319,6 @@ struct ViewToggleButton : EventWidgetButtonBase {
 		EventWidgetButtonBase::draw(args);
 	};
 };
-ViewToggleButton::ViewToggleButton() {
-	this->box.size = Vec(10, 20);
-}
 
 struct WireButton : EventWidgetButtonBase {
 	NVGcolor color;
