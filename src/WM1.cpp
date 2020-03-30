@@ -160,12 +160,19 @@ struct EditPanel : BackPanel {
 		labelField->box.pos = Vec(7, 243);
 		labelField->box.size.x = 116;
 		// postpone call to addChild, or this will capture all keystrokes!
+		labelField->changeHandler = [=](std::string text) {
+			DEBUG("Label completion");
+			if (this->completeHandler) {
+				this->completeHandler(nvgRGBf(r->value, g->value, b->value), text);
+			}
+		};
 
 		EventWidgetButton *saveButton = new EventWidgetButton();
 		saveButton->box.pos = Vec(5, 275);
 		saveButton->box.size = Vec(55, 19);
 		saveButton->label = "Save";
 		saveButton->clickHandler = [=](){
+			DEBUG("Button completion");
 			if (this->completeHandler) {
 				this->completeHandler(nvgRGBf(r->value, g->value, b->value), labelField->text);
 			}
@@ -2419,6 +2426,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 	std::vector<NVGcolor> colors;
 	std::vector<std::string> labels;
 	SchemePanel *schemePanel;
+	bool draw3d = true;
 	WM102(Module *module) {
 		setModule(module);
 		this->box.size = Vec(150, 380);
@@ -2432,7 +2440,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		renderBox.size = Vec(box.size.x, box.size.y - 30);
 		nvgSave(vg);
 		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
-		drawBillboardBase(vg, renderBox, colors, labels, true);
+		drawBillboardBase(vg, renderBox, colors, labels, draw3d);
 		nvgRestore(vg);
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -2443,6 +2451,15 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			this->loadCollectionDialog();
 		};
 		menu->addChild(mi);
+		EventWidgetMenuItem *opt3d = createMenuItem<EventWidgetMenuItem>("3D billboard");
+		opt3d->stepHandler = [=]() {
+			opt3d->rightText = CHECKMARK(draw3d);
+		};
+		opt3d->clickHandler = [=]() {
+			draw3d = !draw3d;
+			this->schemePanel->dirty = true;
+		};
+		menu->addChild(opt3d);
 	}
 	void loadCollectionFromDisk(std::string pathC) override {
 		json_error_t error;
@@ -2488,11 +2505,15 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			}
 			json_object_set_new(rootJ, "labels", a2);
 		}
-
+		json_object_set_new(rootJ, "billboard", json_real(draw3d));
 		return rootJ;
 	}
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
+		json_t *v1 = json_object_get(rootJ, "billboard");
+		if (v1) {
+			draw3d = clamp((int)json_number_value(v1), 0, 1);
+		}
 		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
 		colors = cb->colors;
 		labels = cb->labels;

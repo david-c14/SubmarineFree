@@ -1,6 +1,6 @@
 # Wire Manager
 #### WM-101 Wire Manager
-
+#### WM-102 Wire Manager Billboard
 
 ![View of the Wire Manager](WM.png "Wire Manager")
 
@@ -106,3 +106,7 @@ every patch that you add wire manager to.
 
 Do not add more than one wire manager to your patch. It will do no harm, but only one of them will be actually selecting the colors and the 
 other will be wasting CPU.
+
+## WM-102 Wire Manager Billboard
+
+The WM-102 is a stand alone billboard. It can load wire manager collections and display them as a billboard. Suitable for incorporating into patches for sharing, or for use in videos
