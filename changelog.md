@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.3
+- 30-Mar-2020 Add WM-102 Wire Manager Billboard
+- 30-Mar-2020 Fix memory leak and crash in WM-101 color labels
+
 ## v1.1.2
 - 25-Mar-2020 Jim Allman added names to colors - and billboard view
 - 21-Mar-2020 Jim Allman added some popular color conventions as collections

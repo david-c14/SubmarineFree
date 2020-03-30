@@ -160,12 +160,19 @@ struct EditPanel : BackPanel {
 		labelField->box.pos = Vec(7, 243);
 		labelField->box.size.x = 116;
 		// postpone call to addChild, or this will capture all keystrokes!
+		labelField->changeHandler = [=](std::string text) {
+			DEBUG("Label completion");
+			if (this->completeHandler) {
+				this->completeHandler(nvgRGBf(r->value, g->value, b->value), text);
+			}
+		};
 
 		EventWidgetButton *saveButton = new EventWidgetButton();
 		saveButton->box.pos = Vec(5, 275);
 		saveButton->box.size = Vec(55, 19);
 		saveButton->label = "Save";
 		saveButton->clickHandler = [=](){
+			DEBUG("Button completion");
 			if (this->completeHandler) {
 				this->completeHandler(nvgRGBf(r->value, g->value, b->value), labelField->text);
 			}
@@ -182,6 +189,15 @@ struct EditPanel : BackPanel {
 			}
 		};
 		addChild(cancelButton);
+	}
+	~EditPanel() {
+		if (labelField) {
+			if (!visible) {
+				labelField->clearChildren();
+				labelField->parent = NULL;
+				delete labelField;
+			}
+		}
 	}
 	void drawBackground(NVGcontext *vg, float r1, float r2, float g1, float g2, float b1, float b2, float y) {
 		NVGpaint grad = nvgLinearGradient(vg, r->box.pos.x + 5, 100, r->box.size.x - 10, 100, nvgRGBf(r1, g1, b1), nvgRGBf(r2, g2, b2));
@@ -457,12 +473,146 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 	}
 };
 
+struct WM_Base {
+	virtual void loadCollectionFromDisk(std::string path) {
+	}
+	virtual ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) {
+		return NULL;
+	}
+	void loadCollectionDialog() {
+		std::string dir = asset::user("SubmarineFree");
+		system::createDirectory(dir);
+		std::string filename = "";
+		
+		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
+		DEFER({
+			osdialog_filters_free(filters);
+		});
+
+		char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
+		if (!pathC) {
+			// Fail silently
+			return;
+		}
+		DEFER({
+			std::free(pathC);
+		});
+
+		loadCollectionFromDisk(pathC);
+	}
+	ColorCollectionButton *loadCollectionFromJson(json_t *json) {
+		json_t *n1 = json_object_get(json, "name");	
+		json_t *a1 = json_object_get(json, "colors");
+		json_t *a2 = json_object_get(json, "labels");
+		ColorCollectionButton *cb = NULL;
+		int asize, j;
+		std::vector<NVGcolor> colors;
+		std::vector<std::string> labels;
+		if (a1) {
+			asize = json_array_size(a1);
+			for (j = 0; j < asize; j++) {
+				json_t *c1 = json_array_get(a1, j);
+				if (c1) {
+					colors.push_back(color::fromHexString(json_string_value(c1)));
+				}
+			}
+		}	
+		if (a2) {
+			asize = json_array_size(a2);
+			for (j = 0; j < asize; j++) {
+				json_t *l1 = json_array_get(a2, j);
+				if (l1) {
+					labels.push_back(json_string_value(l1));
+				} else {
+					labels.push_back("");
+				}
+			}
+		}
+		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
+		return cb;
+	}
+	void drawBillboardBase(NVGcontext *vg, rack::math::Rect box, std::vector<NVGcolor> currentColors, std::vector<std::string> currentLabels, bool draw3d) {
+		float blockHeight = box.size.y / currentColors.size();
+		float stop1 = blockHeight * 0.10f;
+		float stop2 = blockHeight * 0.28f;
+		float stop3 = blockHeight * 0.46f;
+		float currentBlockTop = 0.0f;
+		float shadowGray = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// draw a block of the n-th wire color
+			NVGcolor col = currentColors[i];
+			col.a = 1.0f;  // make sure it's opaque here!
+			NVGcolor shadowCol = nvgLerpRGBA(col, nvgRGBf(0.0f, 0.0f, 0.0f), 0.9f);
+			NVGcolor highlightCol = nvgLerpRGBA(col, nvgRGBf(1.0f, 1.0f, 1.0f), 0.55f);
+			if (draw3d) {
+				float stopPos1 = currentBlockTop + stop1;
+				float stopPos2 = currentBlockTop + stop2;
+				float stopPos3 = currentBlockTop + stop3;
+				float end = currentBlockTop + blockHeight;
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, currentBlockTop, box.size.x, blockHeight);
+				NVGpaint grad = nvgLinearGradient(vg, 0, currentBlockTop, 0, stopPos1, shadowCol, col);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, stopPos1, box.size.x, blockHeight - stop1);
+				grad = nvgLinearGradient(vg, 0, stopPos1, 0, stopPos2, col, highlightCol);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, stopPos2, box.size.x, blockHeight - stop2);
+				grad = nvgLinearGradient(vg, 0, stopPos2, 0, stopPos3, highlightCol, col);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, stopPos3, box.size.x, blockHeight - stop3);
+				grad = nvgLinearGradient(vg, 0, stopPos3, 0, end, col, shadowCol);
+				nvgFillPaint(vg, grad);
+				nvgFill(vg);
+			}
+			else {
+				nvgBeginPath(vg);
+				nvgRect(vg, 0.0f, currentBlockTop, box.size.x, blockHeight);
+				nvgFillColor(vg, col);
+				nvgFill(vg);
+			}
+			currentBlockTop += blockHeight;
+		}
+		currentBlockTop = 0.0f;
+		for(unsigned int i = 0; i < currentColors.size(); i++) {
+			// add a big high-contrast label for this block (if labeled)
+			std::string label = "";
+			if (i < currentLabels.size()) {
+				 label = currentLabels[i];
+			}
+			if (!label.empty()) {
+				float labelY = currentBlockTop + (blockHeight/2.0f);
+				nvgFontFaceId(vg, APP->window->uiFont->handle);
+				nvgFontSize(vg, 24);
+				nvgTextAlign(vg, NVG_ALIGN_MIDDLE);
+				// add a drop shadow to work on all backgrounds
+				nvgFillColor(vg, nvgRGBf(shadowGray, shadowGray, shadowGray));
+				nvgFontBlur(vg, 1.15f);
+				nvgText(vg, 5, labelY, label.c_str(), NULL);
+				// add white text over this
+				nvgFontBlur(vg, 0.0f);
+				nvgFillColor(vg, nvgRGBf(1.0f, 1.0f, 1.0f));
+				nvgText(vg, 5, labelY, label.c_str(), NULL);
+			}
+			currentBlockTop += blockHeight;
+		}
+	}
+};
+
 struct WM101;
 
 WM101 *masterWireManager = NULL;
 
-
-struct WM101 : SizeableModuleWidget {
+struct WM101 : SizeableModuleWidget, WM_Base {
 
 	enum {
 		HIGHLIGHT_OFF,
@@ -943,79 +1093,7 @@ struct WM101 : SizeableModuleWidget {
 	void drawBillboard(const DrawArgs &args) {
 		std::vector<NVGcolor> currentColors = currentCollectionColors();
 		std::vector<std::string> currentLabels = currentCollectionLabels();
-		float blockHeight = billboardPanel->box.size.y / currentColors.size();
-		float stop1 = blockHeight * 0.10f;
-		float stop2 = blockHeight * 0.28f;
-		float stop3 = blockHeight * 0.46f;
-		float currentBlockTop = 0.0f;
-		float shadowGray = 0.0f;
-		for(unsigned int i = 0; i < currentColors.size(); i++) {
-			// draw a block of the n-th wire color
-			NVGcolor col = currentColors[i];
-			col.a = 1.0f;  // make sure it's opaque here!
-			NVGcolor shadowCol = nvgLerpRGBA(col, nvgRGBf(0.0f, 0.0f, 0.0f), 0.9f);
-			NVGcolor highlightCol = nvgLerpRGBA(col, nvgRGBf(1.0f, 1.0f, 1.0f), 0.55f);
-			if (billboard3d->selected) {
-				float stopPos1 = currentBlockTop + stop1;
-				float stopPos2 = currentBlockTop + stop2;
-				float stopPos3 = currentBlockTop + stop3;
-				float end = currentBlockTop + blockHeight;
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
-				NVGpaint grad = nvgLinearGradient(args.vg, 0, currentBlockTop, 0, stopPos1, shadowCol, col);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, stopPos1, billboardPanel->box.size.x, blockHeight - stop1);
-				grad = nvgLinearGradient(args.vg, 0, stopPos1, 0, stopPos2, col, highlightCol);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, stopPos2, billboardPanel->box.size.x, blockHeight - stop2);
-				grad = nvgLinearGradient(args.vg, 0, stopPos2, 0, stopPos3, highlightCol, col);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, stopPos3, billboardPanel->box.size.x, blockHeight - stop3);
-				grad = nvgLinearGradient(args.vg, 0, stopPos3, 0, end, col, shadowCol);
-				nvgFillPaint(args.vg, grad);
-				nvgFill(args.vg);
-			}
-			else {
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
-				nvgFillColor(args.vg, col);
-				nvgFill(args.vg);
-			}
-			currentBlockTop += blockHeight;
-		}
-		currentBlockTop = 0.0f;
-		for(unsigned int i = 0; i < currentColors.size(); i++) {
-			// add a big high-contrast label for this block (if labeled)
-			std::string label = "";
-			if (i < currentLabels.size()) {
-				 label = currentLabels[i];
-			}
-			if (!label.empty()) {
-				float labelY = currentBlockTop + (blockHeight/2.0f);
-				nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-				nvgFontSize(args.vg, 24);
-				nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
-				// add a drop shadow to work on all backgrounds
-				nvgFillColor(args.vg, nvgRGBf(shadowGray, shadowGray, shadowGray));
-				nvgFontBlur(args.vg, 1.15f);
-				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
-				// add white text over this
-				nvgFontBlur(args.vg, 0.0f);
-				nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
-				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
-			}
-			currentBlockTop += blockHeight;
-		}
+		drawBillboardBase(args.vg, billboardPanel->box, currentCollectionColors(), currentCollectionLabels(), billboard3d->selected);
 	}
 
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
@@ -1294,7 +1372,7 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->container->addChild(wb);
 		return wb;
 	}
-	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) {
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
 		float y = collectionScrollWidget->container->children.size() * 24;
 		ColorCollectionButton *btn = new ColorCollectionButton();
 		btn->box.pos = Vec(0, y);
@@ -1428,37 +1506,6 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0xff, 0x99, 0x41), "", false);
 		addColor(nvgRGB(0x80, 0x36, 0x10), "", false);
 		addCollection(std::string("Default"), currentCollectionColors(), currentCollectionLabels());
-	}
-	ColorCollectionButton *loadCollectionFromJson(json_t *json) {
-		json_t *n1 = json_object_get(json, "name");	
-		json_t *a1 = json_object_get(json, "colors");
-		json_t *a2 = json_object_get(json, "labels");
-		ColorCollectionButton *cb = NULL;
-		int asize, j;
-		std::vector<NVGcolor> colors;
-		std::vector<std::string> labels;
-		if (a1) {
-			asize = json_array_size(a1);
-			for (j = 0; j < asize; j++) {
-				json_t *c1 = json_array_get(a1, j);
-				if (c1) {
-					colors.push_back(color::fromHexString(json_string_value(c1)));
-				}
-			}
-		}	
-		if (a2) {
-			asize = json_array_size(a2);
-			for (j = 0; j < asize; j++) {
-				json_t *l1 = json_array_get(a2, j);
-				if (l1) {
-					labels.push_back(json_string_value(l1));
-				} else {
-					labels.push_back("");
-				}
-			}
-		}
-		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
-		return cb;
 	}
 	void loadSettings() {
 		json_error_t error;
@@ -1857,28 +1904,8 @@ struct WM101 : SizeableModuleWidget {
 			}
 		));
 	}
-	void loadCollectionDialog() {
-		std::string dir = asset::user("SubmarineFree");
-		system::createDirectory(dir);
-		std::string filename = "";
-		
-		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
-		DEFER({
-			osdialog_filters_free(filters);
-		});
 
-		char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
-		if (!pathC) {
-			// Fail silently
-			return;
-		}
-		DEFER({
-			std::free(pathC);
-		});
-
-		loadCollectionFromDisk(pathC);
-	}
-	void loadCollectionFromDisk(std::string pathC) {
+	void loadCollectionFromDisk(std::string pathC) override {
 		json_error_t error;
 		FILE *file = fopen(pathC.c_str(), "r");
 		if (!file) {
@@ -2395,4 +2422,105 @@ struct WM101 : SizeableModuleWidget {
 	}
 };
 
+struct WM102 : SchemeModuleWidget, WM_Base {
+	std::vector<NVGcolor> colors;
+	std::vector<std::string> labels;
+	SchemePanel *schemePanel;
+	bool draw3d = true;
+	WM102(Module *module) {
+		setModule(module);
+		this->box.size = Vec(150, 380);
+		schemePanel = new SchemePanel(this->box.size);
+		addChild(schemePanel);
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "WM-102");
+		Rect renderBox;
+		renderBox.pos = Vec(0, 15);
+		renderBox.size = Vec(box.size.x, box.size.y - 30);
+		nvgSave(vg);
+		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
+		drawBillboardBase(vg, renderBox, colors, labels, draw3d);
+		nvgRestore(vg);
+	}
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		menu->addChild(new MenuEntry);
+		EventWidgetMenuItem *mi = createMenuItem<EventWidgetMenuItem>("Load collection");
+		mi->clickHandler = [=]() {
+			this->loadCollectionDialog();
+		};
+		menu->addChild(mi);
+		EventWidgetMenuItem *opt3d = createMenuItem<EventWidgetMenuItem>("3D billboard");
+		opt3d->stepHandler = [=]() {
+			opt3d->rightText = CHECKMARK(draw3d);
+		};
+		opt3d->clickHandler = [=]() {
+			draw3d = !draw3d;
+			this->schemePanel->dirty = true;
+		};
+		menu->addChild(opt3d);
+	}
+	void loadCollectionFromDisk(std::string pathC) override {
+		json_error_t error;
+		FILE *file = fopen(pathC.c_str(), "r");
+		if (!file) {
+			return;
+		}
+		json_t *rootJ = json_loadf(file, 0, &error);
+		fclose(file);
+		if (!rootJ) {
+			WARN("Submarine Free WM-102: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+			return;
+		}
+		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
+		colors = cb->colors;
+		labels = cb->labels;
+		delete cb;
+		json_decref(rootJ);
+		schemePanel->dirty = true;
+	}
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
+		ColorCollectionButton *btn = new ColorCollectionButton();
+		btn->box.pos = Vec(0, 0);
+		btn->box.size = Vec(140, 24);
+		btn->name = name;
+		btn->colors = colors;
+		btn->labels = labels;
+		return btn;
+	}
+	json_t *toJson() override {
+		json_t *rootJ = ModuleWidget::toJson();
+
+		json_t *a1 = json_array();
+		for (NVGcolor col: colors) {
+			std::string s = color::toHexString(col);
+			json_array_append_new(a1, json_string(s.c_str()));
+		}
+		json_object_set_new(rootJ, "colors", a1);
+		json_t *a2 = json_array();
+		if (labels.size() > 0) {  // check for labels first
+			for (std::string label: labels) {
+				json_array_append_new(a2, json_string(label.c_str()));
+			}
+			json_object_set_new(rootJ, "labels", a2);
+		}
+		json_object_set_new(rootJ, "billboard", json_real(draw3d));
+		return rootJ;
+	}
+	void fromJson(json_t *rootJ) override {
+		ModuleWidget::fromJson(rootJ);
+		json_t *v1 = json_object_get(rootJ, "billboard");
+		if (v1) {
+			draw3d = clamp((int)json_number_value(v1), 0, 1);
+		}
+		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
+		colors = cb->colors;
+		labels = cb->labels;
+		delete cb;
+		schemePanel->dirty = true;
+	}
+};
+
 Model *modelWM101 = createModel<Module, WM101>("WM-101");
+Model *modelWM102 = createModel<Module, WM102>("WM-102");
