@@ -228,9 +228,7 @@ struct EditPanel : BackPanel {
 };
 
 struct BillboardPanel : BackPanel {
-	std::function<void()> cancelHandler;
 	std::function<void(const DrawArgs)> drawHandler;
-	std::shared_ptr<Image> cableImg;
 
 	BillboardPanel() {
 		// warning if there are no current colors
@@ -239,7 +237,6 @@ struct BillboardPanel : BackPanel {
 		label->box.pos = Vec(25, 175);
 		label->box.size = Vec(100, 19);
 		addChild(label);
-		cableImg = APP->window->loadImage(asset::plugin(pluginInstance, "res/cable-contours.png"));
 	}
 	void draw(const DrawArgs &args) override {
 		BackPanel::draw(args);
@@ -606,9 +603,6 @@ struct WM101 : SizeableModuleWidget {
 		billboardPanel->box.pos = Vec(0, 15);
 		billboardPanel->box.size = Vec(box.size.x, box.size.y - 30);
 		billboardPanel->visible = false;
-		billboardPanel->cancelHandler = [=]() {
-			this->cancel();
-		};
 		billboardPanel->drawHandler = [=](const DrawArgs &args) { 
 			this->drawBillboard(args);
 		};
@@ -950,27 +944,54 @@ struct WM101 : SizeableModuleWidget {
 		std::vector<NVGcolor> currentColors = currentCollectionColors();
 		std::vector<std::string> currentLabels = currentCollectionLabels();
 		float blockHeight = billboardPanel->box.size.y / currentColors.size();
+		float stop1 = blockHeight * 0.10f;
+		float stop2 = blockHeight * 0.28f;
+		float stop3 = blockHeight * 0.46f;
 		float currentBlockTop = 0.0f;
 		float shadowGray = 0.0f;
-		float shadowOpacity = 0.8f;
-		float shadowOffset = 0.85f;
 		for(unsigned int i = 0; i < currentColors.size(); i++) {
 			// draw a block of the n-th wire color
 			NVGcolor col = currentColors[i];
 			col.a = 1.0f;  // make sure it's opaque here!
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
-			nvgFillColor(args.vg, col);
-			nvgFill(args.vg);
+			NVGcolor shadowCol = nvgLerpRGBA(col, nvgRGBf(0.0f, 0.0f, 0.0f), 0.9f);
+			NVGcolor highlightCol = nvgLerpRGBA(col, nvgRGBf(1.0f, 1.0f, 1.0f), 0.55f);
+			if (billboard3d->selected) {
+				float stopPos1 = currentBlockTop + stop1;
+				float stopPos2 = currentBlockTop + stop2;
+				float stopPos3 = currentBlockTop + stop3;
+				float end = currentBlockTop + blockHeight;
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
+				NVGpaint grad = nvgLinearGradient(args.vg, 0, currentBlockTop, 0, stopPos1, shadowCol, col);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, stopPos1, billboardPanel->box.size.x, blockHeight - stop1);
+				grad = nvgLinearGradient(args.vg, 0, stopPos1, 0, stopPos2, col, highlightCol);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, stopPos2, billboardPanel->box.size.x, blockHeight - stop2);
+				grad = nvgLinearGradient(args.vg, 0, stopPos2, 0, stopPos3, highlightCol, col);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, stopPos3, billboardPanel->box.size.x, blockHeight - stop3);
+				grad = nvgLinearGradient(args.vg, 0, stopPos3, 0, end, col, shadowCol);
+				nvgFillPaint(args.vg, grad);
+				nvgFill(args.vg);
+			}
+			else {
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0.0f, currentBlockTop, billboardPanel->box.size.x, blockHeight);
+				nvgFillColor(args.vg, col);
+				nvgFill(args.vg);
+			}
 			currentBlockTop += blockHeight;
-		}
-		// add a tiled image to mimic a stack of cables
-		if (billboard3d->selected) {
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, 0.0f, 0.0f, billboardPanel->box.size.x, billboardPanel->box.size.y);
-			NVGpaint cableTile = nvgImagePattern(args.vg, 0.0, 0.0, box.size.x, blockHeight, 0.0, billboardPanel->cableImg->handle, 1.0);
-			nvgFillPaint(args.vg, cableTile);
-			nvgFill(args.vg);
 		}
 		currentBlockTop = 0.0f;
 		for(unsigned int i = 0; i < currentColors.size(); i++) {
@@ -985,12 +1006,11 @@ struct WM101 : SizeableModuleWidget {
 				nvgFontSize(args.vg, 24);
 				nvgTextAlign(args.vg, NVG_ALIGN_MIDDLE);
 				// add a drop shadow to work on all backgrounds
-				nvgFillColor(args.vg, nvgRGBAf(shadowGray, shadowGray, shadowGray, shadowOpacity));
-				nvgText(args.vg, 5 - shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
-				nvgText(args.vg, 5 + shadowOffset, labelY - shadowOffset, label.c_str(), NULL);
-				nvgText(args.vg, 5 - shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
-				nvgText(args.vg, 5 + shadowOffset, labelY + shadowOffset, label.c_str(), NULL);
+				nvgFillColor(args.vg, nvgRGBf(shadowGray, shadowGray, shadowGray));
+				nvgFontBlur(args.vg, 1.15f);
+				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
 				// add white text over this
+				nvgFontBlur(args.vg, 0.0f);
 				nvgFillColor(args.vg, nvgRGBf(1.0f, 1.0f, 1.0f));
 				nvgText(args.vg, 5, labelY, label.c_str(), NULL);
 			}
