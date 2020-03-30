@@ -457,12 +457,71 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 	}
 };
 
+struct WM_Base {
+	virtual void loadCollectionFromDisk(std::string path) {
+	}
+	virtual ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) {
+		return NULL;
+	}
+	void loadCollectionDialog() {
+		std::string dir = asset::user("SubmarineFree");
+		system::createDirectory(dir);
+		std::string filename = "";
+		
+		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
+		DEFER({
+			osdialog_filters_free(filters);
+		});
+
+		char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
+		if (!pathC) {
+			// Fail silently
+			return;
+		}
+		DEFER({
+			std::free(pathC);
+		});
+
+		loadCollectionFromDisk(pathC);
+	}
+	ColorCollectionButton *loadCollectionFromJson(json_t *json) {
+		json_t *n1 = json_object_get(json, "name");	
+		json_t *a1 = json_object_get(json, "colors");
+		json_t *a2 = json_object_get(json, "labels");
+		ColorCollectionButton *cb = NULL;
+		int asize, j;
+		std::vector<NVGcolor> colors;
+		std::vector<std::string> labels;
+		if (a1) {
+			asize = json_array_size(a1);
+			for (j = 0; j < asize; j++) {
+				json_t *c1 = json_array_get(a1, j);
+				if (c1) {
+					colors.push_back(color::fromHexString(json_string_value(c1)));
+				}
+			}
+		}	
+		if (a2) {
+			asize = json_array_size(a2);
+			for (j = 0; j < asize; j++) {
+				json_t *l1 = json_array_get(a2, j);
+				if (l1) {
+					labels.push_back(json_string_value(l1));
+				} else {
+					labels.push_back("");
+				}
+			}
+		}
+		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
+		return cb;
+	}
+};
+
 struct WM101;
 
 WM101 *masterWireManager = NULL;
 
-
-struct WM101 : SizeableModuleWidget {
+struct WM101 : SizeableModuleWidget, WM_Base {
 
 	enum {
 		HIGHLIGHT_OFF,
@@ -1294,7 +1353,7 @@ struct WM101 : SizeableModuleWidget {
 		scrollWidget->container->addChild(wb);
 		return wb;
 	}
-	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) {
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
 		float y = collectionScrollWidget->container->children.size() * 24;
 		ColorCollectionButton *btn = new ColorCollectionButton();
 		btn->box.pos = Vec(0, y);
@@ -1428,37 +1487,6 @@ struct WM101 : SizeableModuleWidget {
 		addColor(nvgRGB(0xff, 0x99, 0x41), "", false);
 		addColor(nvgRGB(0x80, 0x36, 0x10), "", false);
 		addCollection(std::string("Default"), currentCollectionColors(), currentCollectionLabels());
-	}
-	ColorCollectionButton *loadCollectionFromJson(json_t *json) {
-		json_t *n1 = json_object_get(json, "name");	
-		json_t *a1 = json_object_get(json, "colors");
-		json_t *a2 = json_object_get(json, "labels");
-		ColorCollectionButton *cb = NULL;
-		int asize, j;
-		std::vector<NVGcolor> colors;
-		std::vector<std::string> labels;
-		if (a1) {
-			asize = json_array_size(a1);
-			for (j = 0; j < asize; j++) {
-				json_t *c1 = json_array_get(a1, j);
-				if (c1) {
-					colors.push_back(color::fromHexString(json_string_value(c1)));
-				}
-			}
-		}	
-		if (a2) {
-			asize = json_array_size(a2);
-			for (j = 0; j < asize; j++) {
-				json_t *l1 = json_array_get(a2, j);
-				if (l1) {
-					labels.push_back(json_string_value(l1));
-				} else {
-					labels.push_back("");
-				}
-			}
-		}
-		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
-		return cb;
 	}
 	void loadSettings() {
 		json_error_t error;
@@ -1857,28 +1885,8 @@ struct WM101 : SizeableModuleWidget {
 			}
 		));
 	}
-	void loadCollectionDialog() {
-		std::string dir = asset::user("SubmarineFree");
-		system::createDirectory(dir);
-		std::string filename = "";
-		
-		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
-		DEFER({
-			osdialog_filters_free(filters);
-		});
 
-		char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
-		if (!pathC) {
-			// Fail silently
-			return;
-		}
-		DEFER({
-			std::free(pathC);
-		});
-
-		loadCollectionFromDisk(pathC);
-	}
-	void loadCollectionFromDisk(std::string pathC) {
+	void loadCollectionFromDisk(std::string pathC) override {
 		json_error_t error;
 		FILE *file = fopen(pathC.c_str(), "r");
 		if (!file) {
@@ -2395,7 +2403,9 @@ struct WM101 : SizeableModuleWidget {
 	}
 };
 
-struct WM102 : SchemeModuleWidget {
+struct WM102 : SchemeModuleWidget, WM_Base {
+	std::vector<NVGcolor> colors;
+	std::vector<std::string> labels;
 	WM102(Module *module) {
 		setModule(module);
 		this->box.size = Vec(150, 380);
@@ -2403,6 +2413,42 @@ struct WM102 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WM-102");
+	}
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		menu->addChild(new MenuEntry);
+		EventWidgetMenuItem *mi = createMenuItem<EventWidgetMenuItem>("Load collection");
+		mi->clickHandler = [=]() {
+			this->loadCollectionDialog();
+		};
+		menu->addChild(mi);
+	}
+	void loadCollectionFromDisk(std::string pathC) override {
+		json_error_t error;
+		FILE *file = fopen(pathC.c_str(), "r");
+		if (!file) {
+			return;
+		}
+		json_t *rootJ = json_loadf(file, 0, &error);
+		fclose(file);
+		if (!rootJ) {
+			WARN("Submarine Free WM-102: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+			return;
+		}
+		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
+		colors = cb->colors;
+		labels = cb->labels;
+		delete cb;
+		json_decref(rootJ);
+	}
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
+		ColorCollectionButton *btn = new ColorCollectionButton();
+		btn->box.pos = Vec(0, 0);
+		btn->box.size = Vec(140, 24);
+		btn->name = name;
+		btn->colors = colors;
+		btn->labels = labels;
+		return btn;
 	}
 };
 
