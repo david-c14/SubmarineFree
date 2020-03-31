@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.4
+- 31-Mar-2020 Make WM-102 billboard automatically track WM-101
+
 ## v1.1.3
 - 30-Mar-2020 Add WM-102 Wire Manager Billboard
 - 30-Mar-2020 Fix memory leak and crash in WM-101 color labels
