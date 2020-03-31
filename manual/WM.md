@@ -110,3 +110,7 @@ other will be wasting CPU.
 ## WM-102 Wire Manager Billboard
 
 The WM-102 is a stand alone billboard. It can load wire manager collections and display them as a billboard. Suitable for incorporating into patches for sharing, or for use in videos
+
+If you do not load a collection into the billboard, it will automatically track the colors of any active WM-101 Wire Manager. You can use the "Lock Colors" option to stop tracking.
+
+If you intend to distribute a patch containing a WM-102, you should lock the colors before you distribute the patch. Otherwise, the patch will continue to track the colors in the WM-101 which will not be the same as your own color selections once the patch is loaded by another user.

@@ -610,7 +610,10 @@ struct WM_Base {
 
 struct WM101;
 
-WM101 *masterWireManager = NULL;
+namespace {
+	WM101 *masterWireManager = NULL;
+	int changeMarker = 1;
+}
 
 struct WM101 : SizeableModuleWidget, WM_Base {
 
@@ -1506,6 +1509,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		addColor(nvgRGB(0xff, 0x99, 0x41), "", false);
 		addColor(nvgRGB(0x80, 0x36, 0x10), "", false);
 		addCollection(std::string("Default"), currentCollectionColors(), currentCollectionLabels());
+		changeMarker++;
 	}
 	void loadSettings() {
 		json_error_t error;
@@ -1592,6 +1596,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		json_decref(rootJ);
 	}
 	void saveSettings() {
+		changeMarker++;
 		json_t *settings = json_object();
 		json_t *arr = json_array();
 		for (Widget *w : scrollWidget->container->children) {
@@ -2427,6 +2432,8 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 	std::vector<std::string> labels;
 	SchemePanel *schemePanel;
 	bool draw3d = true;
+	bool locked = false;
+	int changeTracker = 0;
 	WM102(Module *module) {
 		setModule(module);
 		this->box.size = Vec(150, 380);
@@ -2460,6 +2467,28 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			this->schemePanel->dirty = true;
 		};
 		menu->addChild(opt3d);
+		EventWidgetMenuItem *lockMi = createMenuItem<EventWidgetMenuItem>("Lock colors");
+		lockMi->stepHandler = [=]() {
+			lockMi->rightText = CHECKMARK(locked);
+		};
+		lockMi->clickHandler = [=]() {
+			locked = !locked;
+			changeTracker--;
+		};
+		menu->addChild(lockMi);
+	}
+	void step() override {
+		SchemeModuleWidget::step();
+		if (locked)
+			return;
+		if (changeTracker == changeMarker)
+			return;
+		changeTracker = changeMarker;
+		if (masterWireManager) {
+			colors = masterWireManager->currentCollectionColors();
+			labels = masterWireManager->currentCollectionLabels();
+			schemePanel->dirty = true;
+		}
 	}
 	void loadCollectionFromDisk(std::string pathC) override {
 		json_error_t error;
@@ -2479,6 +2508,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		delete cb;
 		json_decref(rootJ);
 		schemePanel->dirty = true;
+		locked = true;
 	}
 	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
 		ColorCollectionButton *btn = new ColorCollectionButton();
@@ -2506,6 +2536,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			json_object_set_new(rootJ, "labels", a2);
 		}
 		json_object_set_new(rootJ, "billboard", json_real(draw3d));
+		json_object_set_new(rootJ, "locked", json_real(locked));
 		return rootJ;
 	}
 	void fromJson(json_t *rootJ) override {
@@ -2514,11 +2545,18 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		if (v1) {
 			draw3d = clamp((int)json_number_value(v1), 0, 1);
 		}
+		locked = false;
 		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
 		colors = cb->colors;
 		labels = cb->labels;
 		delete cb;
 		schemePanel->dirty = true;
+		if (colors.size())
+			locked = true;
+		v1 = json_object_get(rootJ, "locked");
+		if (v1) {
+			locked = clamp((int)json_number_value(v1), 0, 1);
+		}
 	}
 };
 
