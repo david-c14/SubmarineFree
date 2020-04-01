@@ -1,7 +1,7 @@
 //SubTag W2 W6
 
 #include "SubmarineFree.hpp"
-#include "torpedo.hpp"
+#include "shared/torpedo.hpp"
 
 template<bool hasParams>
 struct TF : Module  {
