@@ -1,6 +1,6 @@
 //SubTag DS TM W2 W6
 
-#include "DS.hpp"
+#include "shared/DS.hpp"
 
 template <int x>
 struct AG_1 : DS_Module {

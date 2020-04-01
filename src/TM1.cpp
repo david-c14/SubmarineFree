@@ -1,7 +1,7 @@
 //SubTag W2
 
 #include "SubmarineFree.hpp"
-#include "torpedo.hpp"
+#include "shared/torpedo.hpp"
 
 struct TM_105;
 

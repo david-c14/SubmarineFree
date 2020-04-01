@@ -2,7 +2,7 @@
 
 /* Portions of this code derive from Fundamental/src/Scope.cpp - Copyright © 2016 by Andrew Belt */
 #include <string.h>
-#include "DS.hpp"
+#include "shared/DS.hpp"
 
 #define BUFFER_SIZE 512
 
