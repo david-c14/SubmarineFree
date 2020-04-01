@@ -14,6 +14,7 @@ namespace {
 		std::string text = "Sample";
 		int alignment = NVG_ALIGN_CENTER;
 		std::function<void ()> addMenuHandler;
+		std::function<void (int posChange)> posHandler;
 		TD4Text() {
 			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			this->box.size = Vec(142, 20);
@@ -44,6 +45,23 @@ namespace {
 			}
 			else {
 				OpaqueWidget::onButton(e);
+			}
+		}
+		void onHoverKey(const event::HoverKey &e) override {
+			OpaqueWidget::onHoverKey(e);
+			if (e.isConsumed())
+				return;
+			if (e.action == GLFW_PRESS) {
+				if (e.key == GLFW_KEY_PAGE_UP) {
+					if (posHandler) {
+						posHandler(box.pos.y - 1);
+					}	
+				}
+				else if (e.key == GLFW_KEY_PAGE_DOWN) {
+					if (posHandler) {
+						posHandler(box.pos.y + 1);
+					}
+				}
 			}
 		}
 	};
@@ -109,13 +127,13 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void textNameSubMenu(Menu *menu, TD4Text *textItem) {
-			EventParamField *paramField = new EventParamField();
-			paramField->box.size.x = 100;
-			paramField->setText(textItem->text);
-			paramField->changeHandler = [=](std::string text) {
-				setText(textItem, text);
-			};
-			menu->addChild(paramField);
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		paramField->setText(textItem->text);
+		paramField->changeHandler = [=](std::string text) {
+			setText(textItem, text);
+		};
+		menu->addChild(paramField);
 	}
 
 	EventWidgetMenuItem *colorMenuItem(TD4Text *textItem, std::string label, NVGcolor color) {
@@ -127,31 +145,50 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void colorSubMenu(Menu *menu, TD4Text *textItem) {
-			EventParamField *paramField = new EventParamField();
-			paramField->box.size.x = 100;
-			paramField->setText(color::toHexString(textItem->color));
-			paramField->changeHandler = [=](std::string text) {
-				if (text[0] != '#')
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		paramField->setText(color::toHexString(textItem->color));
+		paramField->changeHandler = [=](std::string text) {
+			if (text[0] != '#')
+				return;
+			for (unsigned int i = 1; i < 7; i++) {
+				if (!( (text[i] >= '0' && text[i] <= '9') ||
+					(text[i] >= 'A' && text[i] <= 'F') ||
+					(text[i] >= 'a' && text[i] <= 'f')))
 					return;
-				for (unsigned int i = 1; i < 7; i++) {
-					if (!( (text[i] >= '0' && text[i] <= '9') ||
-						(text[i] >= 'A' && text[i] <= 'F') ||
-						(text[i] >= 'a' && text[i] <= 'f')))
-						return;
-				}
-				setColor(textItem, color::fromHexString(text));
-			};
-			menu->addChild(paramField);
-			menu->addChild(colorMenuItem(textItem, "Blue", SUBLIGHTBLUE));
-			menu->addChild(colorMenuItem(textItem, "Yellow", nvgRGB(0xc9, 0xb7, 0x0e)));
-			menu->addChild(colorMenuItem(textItem, "Red", nvgRGB(0xff, 0x13, 0x13)));
-			menu->addChild(colorMenuItem(textItem, "Green", nvgRGB(0x0a, 0xff, 0x13)));
-			menu->addChild(colorMenuItem(textItem, "Orange", nvgRGB(0xff, 0xa5, 0x2d)));
-			menu->addChild(colorMenuItem(textItem, "Pink", nvgRGB(0xff, 0x7d, 0xec)));
-			menu->addChild(colorMenuItem(textItem, "White", nvgRGB(0xff, 0xff, 0xff)));
+			}
+			setColor(textItem, color::fromHexString(text));
+		};
+		menu->addChild(paramField);
+		menu->addChild(colorMenuItem(textItem, "Blue", SUBLIGHTBLUE));
+		menu->addChild(colorMenuItem(textItem, "Yellow", nvgRGB(0xc9, 0xb7, 0x0e)));
+		menu->addChild(colorMenuItem(textItem, "Red", nvgRGB(0xff, 0x13, 0x13)));
+		menu->addChild(colorMenuItem(textItem, "Green", nvgRGB(0x0a, 0xff, 0x13)));
+		menu->addChild(colorMenuItem(textItem, "Orange", nvgRGB(0xff, 0xa5, 0x2d)));
+		menu->addChild(colorMenuItem(textItem, "Pink", nvgRGB(0xff, 0x7d, 0xec)));
+		menu->addChild(colorMenuItem(textItem, "White", nvgRGB(0xff, 0xff, 0xff)));
+	}
+
+	void positionSubMenu(Menu *menu, TD4Text *textItem) {
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		char str[20];
+		snprintf(str, 20, "%d", (int)(textItem->box.pos.y));
+		paramField->setText(str);
+		paramField->changeHandler = [=](std::string text) {
+			try {
+				setPosition(textItem, clamp(stoi(text, NULL), 20, (int)(box.size.y - 30)));
+			}
+			catch (...) {
+			}
+		};
+		menu->addChild(paramField);
 	}
 
 	void addClickHandler(TD4Text *textItem) {
+		textItem->posHandler = [=](int newPosition) {
+			setPosition(textItem, newPosition);
+		};
 		textItem->addMenuHandler = [=]() {
 			Menu *menu = createMenu();
 			EventWidgetMenuItem *textMenu = createMenuItem<EventWidgetMenuItem>("Label: " + textItem->text);
@@ -171,6 +208,17 @@ struct TD410 : SchemeModuleWidget {
 				return subMenu;
 			};
 			menu->addChild(colorMenu);
+
+			char str[30];
+			snprintf(str, 20, "Position: %d", (int)(textItem->box.pos.y));
+			EventWidgetMenuItem *positionMenu = createMenuItem<EventWidgetMenuItem>(str);
+			positionMenu->rightText = SUBMENU;
+			positionMenu->childMenuHandler = [=]() {
+				Menu *subMenu = new Menu();
+				positionSubMenu(subMenu, textItem);
+				return subMenu;
+			};
+			menu->addChild(positionMenu);
 
 			EventWidgetMenuItem *leftAlign = createMenuItem<EventWidgetMenuItem>("Left Align");
 			leftAlign->stepHandler = [=]() {
@@ -303,6 +351,40 @@ struct TD410 : SchemeModuleWidget {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
 						foundItem->alignment = newAlignment;
+					}
+				}
+			}
+		));
+	}
+	
+	void setPosition(TD4Text *textItem, int newPosition) {
+		newPosition = clamp(newPosition, 20, (int)box.size.y - 30);
+		int oldPosition = textItem->box.pos.y;
+		if (newPosition == oldPosition)
+			return;
+		textItem->box.pos.y = newPosition;
+		if (!module)
+			return;
+		int moduleId = module->id;
+		unsigned int index = textItem->id;
+
+		APP->history->push(new EventWidgetAction(
+			"TD-410 Change Position",
+			[=]() {
+				TD410 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					TD4Text *foundItem = mw->getTextItem(index);
+					if (foundItem) {
+						foundItem->box.pos.y = oldPosition;
+					}
+				}
+			},
+			[=]() {
+				TD410 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					TD4Text *foundItem = mw->getTextItem(index);
+					if (foundItem) {
+						foundItem->box.pos.y = newPosition;
 					}
 				}
 			}
