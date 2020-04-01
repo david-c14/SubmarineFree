@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.4
+- 01-Apr-2020 Tidy up source code for XF modules
 - 01-Apr-2020 Add XF-302 Small Form Factor Stereo Cross Fader
 - 31-Mar-2020 Make WM-102 billboard automatically track WM-101
 
