@@ -26,3 +26,17 @@ The TD-202 is a small 2-HP text display which can show a single line of text run
 sections of a patch.
 
 The colors of the TD-202 can be adjusted using the context menu. Or by using an extension device such as the [TF-101](TF.md) or [TF-102](TF.md).
+
+#### TD-410 Multiple Label Display
+
+![View of the Multiple Label Display](TD-410.png "Multiple Label Display")
+
+## Basic Operation
+
+The TD-410 is a 10-HP text display which can show multiple labels. It can be used next to another device to label the inputs or signal channels that you are using on that device.
+
+Using the context menu, you can add labels to the device.
+
+Each label has a context menu through which you can change the text, color, alignment and position of the label.
+
+You can also make fine adjustments to the position of the label by hovering over it and using the Page-Up and Page-Down keys.
