@@ -1,4 +1,4 @@
-#include "SubmarineFree.hpp"
+#include "../SubmarineFree.hpp"
 
 struct DS_Module : Module {
 	float voltage0 = 0.0f;

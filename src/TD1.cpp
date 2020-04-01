@@ -2,7 +2,7 @@
 
 #include "SubmarineFree.hpp"
 #include "window.hpp"
-#include "torpedo.hpp"
+#include "shared/torpedo.hpp"
 
 struct TD_116;
 
