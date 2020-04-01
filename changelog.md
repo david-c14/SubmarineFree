@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.4
+- 01-Apr-2020 Add bias compensator to XF-XXX cross faders
 - 01-Apr-2020 Tidy up filenames
 - 01-Apr-2020 Tidy up source code for XF modules
 - 01-Apr-2020 Add XF-302 Small Form Factor Stereo Cross Fader

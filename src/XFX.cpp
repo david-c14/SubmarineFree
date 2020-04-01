@@ -14,8 +14,24 @@ namespace {
 		float sigma_b = 0;
 		float sigma_a2 = 0;
 		float sigma_b2 = 0;
+
+		float covarianceX = 0;
+		float sigma_aX = 0;
+		float sigma_bX = 0;
+		float sigma_a2X = 0;
+		float sigma_b2X = 0;
+
 		int schmitt = 0;
 		float correlation = 0;
+
+		void compensate() {
+			covariance = covarianceX;
+			sigma_a = sigma_aX;
+			sigma_b = sigma_bX;
+			sigma_a2 = sigma_a2X;
+			sigma_b2 = sigma_b2X;
+			covarianceX = sigma_aX = sigma_bX = sigma_a2X = sigma_b2X = 0;
+		}
 	
 		int correlate(float a, float b) {
 			//Remove old samples
@@ -36,9 +52,17 @@ namespace {
 			sigma_b += samples_b[sp] = b;
 			sigma_a2 += (a * a);
 			sigma_b2 += (b * b);
+
+			covarianceX += (a * b);
+			sigma_aX += a;
+			sigma_bX += b;
+			sigma_a2X += (a * a);
+			sigma_b2X += (b * b);
+			
 			sp++;
 			if (sp > frameSize - 1) {
 				sp -= frameSize;
+				compensate();
 			}
 			float stdev_a = powf(sigma_a2 - (sigma_a * sigma_a / n), 0.5f);
 			float stdev_b = powf(sigma_b2 - (sigma_b * sigma_b / n), 0.5f);
