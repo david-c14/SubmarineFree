@@ -448,6 +448,13 @@
 			"tags": ["MIXER", "DUAL"]
 		},
 		{
+			"slug":"XF-301",
+			"name":"XF-301",
+			"description": "XF-301 Small Form Factor Stereo Cross Fader",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/XF.md",
+			"tags": ["MIXER"]
+		},
+		{
 			"slug":"XG-104",
 			"name":"XG-104",
 			"description": "XG-104 XOR Gates",
