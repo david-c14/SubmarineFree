@@ -4,6 +4,7 @@
 #### XF-104 Quad Monophonic Cross-Fader with LINK option
 #### XF-201 Single Stereophonic Cross-Fader
 #### XF-202 Dual Stereophonic Cross-Fader
+#### XF-301 Small Form Factor Stereophonic Cross-Fader
 
 ![View of the Cross-Fader modules](XF.png "Cross-Fader Range")
 
@@ -21,4 +22,4 @@ The cross-fader also offers an automatic mode which makes use of an internal cor
 ## LINK option
 The XF-102 and XF-104 modules feature a LINK button. When LINK is enabled, a pair of monophonic cross-faders are linked to form a single stereo cross-fader. The A, B and OUTPUT connections of the first cross-fader form the left signal channel, while the A, B and OUTPUT connections of the second cross-fader form the right signal channel. All other controls on the second cross-fader are disabled when in link mode. Signal correlation for auto profile selection is only carried out on the left signal.
 
-The XF-201 and XF-202 modules are always stereo devices. The right signal connections are distinguished by red sockets. 
+The XF-201, XF-202 and XF-301 modules are always stereo devices. The right signal connections are distinguished by red sockets. 
