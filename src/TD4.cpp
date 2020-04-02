@@ -11,10 +11,11 @@ namespace {
 		unsigned int id = 0;
 		std::shared_ptr<Font> font;
 		NVGcolor color = SUBLIGHTBLUE;
-		std::string text = "Sample";
+		std::string text = "New Label";
 		int alignment = NVG_ALIGN_CENTER;
 		std::function<void ()> addMenuHandler;
 		std::function<void (int posChange)> posHandler;
+		int oldPosition = 0;
 		TD4Text() {
 			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			this->box.size = Vec(142, 20);
@@ -43,26 +44,34 @@ namespace {
 					addMenuHandler();
 				}
 			}
-			else {
-				OpaqueWidget::onButton(e);
-			}
+			OpaqueWidget::onButton(e);
 		}
-		void onHoverKey(const event::HoverKey &e) override {
-			OpaqueWidget::onHoverKey(e);
-			if (e.isConsumed())
-				return;
-			if (e.action == GLFW_PRESS) {
-				if (e.key == GLFW_KEY_PAGE_UP) {
+		void onDragStart(const event::DragStart &e) override {
+			if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+				APP->window->cursorLock();
+				e.consume(this);
+				oldPosition = box.pos.y;
+			}
+			OpaqueWidget::onDragStart(e);
+		}
+		void onDragEnd(const event::DragEnd &e) override {
+			if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+				APP->window->cursorUnlock();
+				e.consume(this);
+				if (box.pos.y != oldPosition) {
 					if (posHandler) {
-						posHandler(box.pos.y - 1);
-					}	
-				}
-				else if (e.key == GLFW_KEY_PAGE_DOWN) {
-					if (posHandler) {
-						posHandler(box.pos.y + 1);
+						posHandler(box.pos.y);
 					}
 				}
 			}
+			OpaqueWidget::onDragEnd(e);
+		}
+		void onDragMove(const event::DragMove &e) override {
+			if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+				e.consume(this);
+				box.pos.y += e.mouseDelta.y;
+			}
+			OpaqueWidget::onDragMove(e);
 		}
 	};
 
@@ -114,7 +123,7 @@ struct TD410 : SchemeModuleWidget {
 					}
 					json_t *pos = json_object_get(i, "position");
 					if (pos) {
-						item->box.pos.y = clamp(json_number_value(pos), 20.0f, box.size.y - 30);
+						item->box.pos.y = clampPosition(json_number_value(pos));
 					}
 					json_t *align = json_object_get(i, "alignment");
 					if (align) {
@@ -124,6 +133,10 @@ struct TD410 : SchemeModuleWidget {
 				}
 			}
 		}
+	}
+
+	int clampPosition(int input) {
+		return clamp(input, 13, (int)(box.size.y) - 33);
 	}
 
 	void textNameSubMenu(Menu *menu, TD4Text *textItem) {
@@ -177,7 +190,7 @@ struct TD410 : SchemeModuleWidget {
 		paramField->setText(str);
 		paramField->changeHandler = [=](std::string text) {
 			try {
-				setPosition(textItem, clamp(stoi(text, NULL), 20, (int)(box.size.y - 30)));
+				setPosition(textItem, clampPosition(stoi(text, NULL)));
 			}
 			catch (...) {
 			}
@@ -358,7 +371,7 @@ struct TD410 : SchemeModuleWidget {
 	}
 	
 	void setPosition(TD4Text *textItem, int newPosition) {
-		newPosition = clamp(newPosition, 20, (int)box.size.y - 30);
+		newPosition = clampPosition(newPosition);
 		int oldPosition = textItem->box.pos.y;
 		if (newPosition == oldPosition)
 			return;
@@ -435,21 +448,22 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void addNewText() {
-		int position = 20;
+		int position = clampPosition(0);
+		const int spacing = 20;
 		bool found = false;
 		while (!found) {
 			found = true;
 			for (TD4Text *text: textItems) {
-				if (abs(text->box.pos.y - position) < 20) {
+				if (abs(text->box.pos.y - position) < spacing) {
 					found = false;
-					if ((text->box.pos.y + 20) > position) {
-						position = text->box.pos.y + 20;
+					if ((text->box.pos.y + spacing) > position) {
+						position = text->box.pos.y + spacing;
 					}
 					break;
 				} 
 			}
-			if (position > (box.size.y - 30)) {
-				position = 0;
+			if (position > clampPosition(position)) {
+				position = clampPosition(0);
 				found = true;
 			}
 		}	

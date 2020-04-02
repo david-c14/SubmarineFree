@@ -39,4 +39,4 @@ Using the context menu, you can add labels to the device.
 
 Each label has a context menu through which you can change the text, color, alignment and position of the label.
 
-You can also make fine adjustments to the position of the label by hovering over it and using the Page-Up and Page-Down keys.
+The labels can be dragged up and down the device to the position that you need.
