@@ -38,8 +38,10 @@ struct HS_101 : Module {
 	int bufferIndex = 0;
 	bool running = false;
 	dsp::SchmittTrigger trigger;
+	dsp::PulseGenerator triggerOut;
 	float minValue = +INFINITY;
 	float maxValue = -INFINITY;
+	std::vector<float *>mipEntries;
 	
 	HS_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -78,20 +80,52 @@ struct HS_101 : Module {
 			if (running) {
 				minValue = +INFINITY;
 				maxValue = -INFINITY;
+				triggerOut.trigger(0.01f);
 			}
 		}
 		lights[LIGHT_STORING].setBrightness(running);
+		outputs[OUTPUT_TRIGGER].setVoltage(10.0f * triggerOut.process(args.sampleTime));
 		if (running) {
 			trigger.reset();
-			float value = inputs[INPUT_1].getVoltage();
-			buffer[bufferIndex++] = value;
-			minValue = std::min(minValue, value);
-			maxValue = std::max(maxValue, value);
+			storeData(inputs[INPUT_1].getVoltage());
 			if (bufferIndex >= bufferCount) {
 				dataCaptured = true;
 				running = false;
 				bufferIndex = 0;
 			}
+		}
+	}
+
+	void storeData(float value) {
+		buffer[bufferIndex] = value;
+		minValue = std::min(minValue, value);
+		maxValue = std::max(maxValue, value);
+		bool notFirst = (bufferIndex & 0x3);
+		int mipIndex = bufferIndex >> 2;
+		for(float *mipPointer : mipEntries) {
+			if (notFirst) {
+				mipPointer[mipIndex * 2] = std::min(mipPointer[mipIndex * 2], value);
+				mipPointer[mipIndex * 2 + 1] = std::max(mipPointer[mipIndex * 2 + 1], value);
+			}
+			else {
+				mipPointer[mipIndex * 2]  = mipPointer[mipIndex * 2 + 1] = value;
+			}
+			assert((mipPointer + mipIndex * 2) < (buffer + (int)(bufferCount * 1.785f)));
+			notFirst = (mipIndex & 0x3);
+			mipIndex >>= 2;
+		}
+		bufferIndex++;
+	}
+
+	void generateMips() {
+		mipEntries.clear();
+		int dataSize = bufferCount;
+		float * mipPointer = buffer + bufferCount; 
+		while (dataSize > 1000) {
+			mipEntries.push_back(mipPointer);
+			dataSize >>= 1;
+			mipPointer += dataSize;
+			dataSize >>= 1;
 		}
 	}
 
@@ -109,6 +143,7 @@ struct HS_101 : Module {
 		trigger.reset();
 		minValue = +INFINITY;
 		maxValue = -INFINITY;
+		generateMips();
 	}
 
 	void onSampleRateChange() override {
@@ -187,7 +222,22 @@ namespace {
 			minY = module->minValue + offset;
 			maxY = minY + (rangeY * multiplier);
 
-			drawFullScale(vg, col, values, bufferSize);
+			int entry = -1;
+			int range = (maxX - minX);
+			while (range > 1000) {
+				entry++;
+				if (entry == (signed int)module->mipEntries.size()) {
+					entry--;
+					break;
+				}
+				maxX >>= 2;
+				minX >>= 2;
+				range >>= 2;
+			}
+			if (entry == -1) 
+				drawFullScale(vg, col, values, bufferSize);
+			else 
+				drawMipped(vg, col, module->mipEntries[entry], bufferSize >> (2 * (entry + 1)));
 		}
 		void drawFullScale(NVGcontext *vg, NVGcolor col, float *values, int bufferSize) {
 			nvgSave(vg);
@@ -200,6 +250,30 @@ namespace {
 				
 				x = rescale(i, minX, maxX, 0, b.size.x);
 				y = rescale(values[i], minY, maxY, b.size.y - 2, 2);
+				if (i == minX)
+					nvgMoveTo(vg, x, y);
+				else
+					nvgLineTo(vg, x, y);
+			}
+			nvgStrokeColor(vg, col);
+			nvgLineCap(vg, NVG_ROUND);
+			nvgMiterLimit(vg, 2.0f);
+			nvgStrokeWidth(vg, 1.5f);
+			nvgStroke(vg);
+			nvgResetScissor(vg);
+			nvgRestore(vg);
+		}
+		void drawMipped(NVGcontext *vg, NVGcolor col, float *values, int bufferSize) {
+			nvgSave(vg);
+			Rect b = Rect(Vec(0,0), box.size);
+			nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
+			nvgBeginPath(vg);
+
+			for (int i = minX; i <= maxX; i++) {
+				float x, y;
+				
+				x = rescale(i, minX, maxX, 0, b.size.x);
+				y = rescale(values[i * 2 + 1], minY, maxY, b.size.y - 2, 2);
 				if (i == minX)
 					nvgMoveTo(vg, x, y);
 				else
