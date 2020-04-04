@@ -48,9 +48,9 @@ struct HS_101 : Module {
 		configParam(PARAM_TIME, -4.0f, 6.0f, -4.0f, "Time base");
 		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f, "Run");
 		configParam(PARAM_X_PAN, 0.0f, 1.0f, 0.5f, "X Pan");
-		configParam(PARAM_X_SCALE, 0.0f, +18.0f, 0.0f, "X Scale");
+		configParam(PARAM_X_SCALE, 0.0f, +18.0f, 0.0f, "X Zoom");
 		configParam(PARAM_Y_PAN, 0.0f, 1.0f, 0.5f, "Y Pan");
-		configParam(PARAM_Y_SCALE, 0.0f, +20.0f, 0.0f, "Y Scale");
+		configParam(PARAM_Y_SCALE, 0.0f, +20.0f, 0.0f, "Y Zoom");
 		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
 	}
 
@@ -152,47 +152,12 @@ struct HS_101 : Module {
 };
 	
 namespace {
-	struct HS_Info : TransparentWidget {
-		HS_101 *module;
-		void draw(const DrawArgs &args) override {
-			nvgFontSize(args.vg, 12);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
-			if (!module) {
-				nvgFontSize(args.vg, 18);
-				nvgText(args.vg, 2, 12, "Submarine", NULL);
-				nvgText(args.vg, 2, 24, "High Resolution", NULL);
-				nvgText(args.vg, 2, 36, "Storage Scope", NULL);
-				return;
-			}
-			
-			if (module->running) {
-				nvgText(args.vg, 2, 12, "Storing", NULL);
-			}
-			else {
-				if (module->dataCaptured) {
-					nvgText(args.vg, 2, 12, "Stored", NULL);
-				}
-				else {
-					nvgText(args.vg, 2, 12, "No Data", NULL);
-				}
-			}
-			nvgText(args.vg, 2, 24, string::f("%.3fs", module->time).c_str(), NULL);
-			if (std::isfinite(module->minValue)) 
-				nvgText(args.vg, 2, 36, string::f("min %.3fV", module->minValue).c_str(), NULL);
-			nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE);
-			nvgText(args.vg, box.size.x - 2, 24, string::f("%.3fMb", module->bufferSize / 1000000.0f).c_str(), NULL);
-			if (std::isfinite(module->maxValue))
-				nvgText(args.vg, box.size.x - 2, 36, string::f("max %.3fV", module->maxValue).c_str(), NULL);
-		}
-	};
-
 	struct HS_Display : OpaqueWidget {
 		HS_101 *module;
 		PortWidget *port;
 		int minX, maxX;
 		float minY, maxY;
+		int mipEntry = -1;
 
 		void draw(const DrawArgs &args) override {
 			if (!module) {
@@ -222,22 +187,22 @@ namespace {
 			minY = module->minValue + offset;
 			maxY = minY + (rangeY * multiplier);
 
-			int entry = -1;
+			mipEntry = -1;
 			int range = (maxX - minX);
 			while (range > 1000) {
-				entry++;
-				if (entry == (signed int)module->mipEntries.size()) {
-					entry--;
+				mipEntry++;
+				if (mipEntry == (signed int)module->mipEntries.size()) {
+					mipEntry--;
 					break;
 				}
 				maxX >>= 2;
 				minX >>= 2;
 				range >>= 2;
 			}
-			if (entry == -1) 
+			if (mipEntry == -1) 
 				drawFullScale(vg, col, values, bufferSize);
 			else 
-				drawMipped(vg, col, module->mipEntries[entry], bufferSize >> (2 * (entry + 1)));
+				drawMipped(vg, col, module->mipEntries[mipEntry], bufferSize >> (2 * (mipEntry + 1)));
 		}
 		void drawFullScale(NVGcontext *vg, NVGcolor col, float *values, int bufferSize) {
 			nvgSave(vg);
@@ -273,59 +238,25 @@ namespace {
 				float x, y;
 				
 				x = rescale(i, minX, maxX, 0, b.size.x);
-				y = rescale(values[i * 2 + 1], minY, maxY, b.size.y - 2, 2);
+				y = rescale(values[i * 2], minY, maxY, b.size.y - 2, 2);
 				if (i == minX)
 					nvgMoveTo(vg, x, y);
 				else
 					nvgLineTo(vg, x, y);
 			}
-			nvgStrokeColor(vg, col);
-			nvgLineCap(vg, NVG_ROUND);
-			nvgMiterLimit(vg, 2.0f);
-			nvgStrokeWidth(vg, 1.5f);
-			nvgStroke(vg);
+			for (int i = maxX; i >= minX; i--) {
+				float x, y;
+				
+				x = rescale(i, minX, maxX, 0, b.size.x);
+				y = rescale(values[i * 2 + 1], minY, maxY, b.size.y - 2, 2);
+				nvgLineTo(vg, x, y);
+			}
+			nvgFillColor(vg, col);
+			nvgClosePath(vg);
+			nvgFill(vg);
 			nvgResetScissor(vg);
 			nvgRestore(vg);
 		}
-/*
-			drawTrace(args.vg, module->buffer[i], module->params[HS_101::PARAM_OFFSET_1 + i].getValue(), module->params[HS_101::PARAM_SCALE_1 + i].getValue(), col, module->traceMode[i]); 
-		void drawTrace(NVGcontext *vg, float *values, float offset, float scale, NVGcolor col, int mode) {
-			if (!values)
-				return;
-			float scaling = powf(2.0, scale);
-			nvgSave(vg);
-			Rect b = Rect(Vec(0, 0), box.size);
-			nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-			nvgBeginPath(vg);
-			for (int i = 0; i < BUFFER_SIZE; i++) {
-				float x, y;
-				x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-				y = ((values[i] * scaling + offset ) / 20.0f - 0.8f) * -b.size.y;
-				if (i == 0)
-					nvgMoveTo(vg, x, y);
-				else
-					nvgLineTo(vg, x, y);
-			} 
-			if (mode) {
-				nvgLineTo(vg, b.size.x, (offset / 20.0f - 0.8f) * -b.size.y);
-				nvgLineTo(vg, 0, (offset / 20.0f - 0.8f) * -b.size.y);
-				nvgClosePath(vg);
-				nvgFillColor(vg, col);
-				nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-				nvgFill(vg);
-			}
-			else {
-				nvgStrokeColor(vg, col);
-				nvgLineCap(vg, NVG_ROUND);
-				nvgMiterLimit(vg, 2.0f);
-				nvgStrokeWidth(vg, 1.5f);
-				nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-				nvgStroke(vg);
-			}
-			nvgResetScissor(vg);
-			nvgRestore(vg);	
-		}*/
-	
 
 		void drawEasterEgg(NVGcontext *vg) {
 			scheme::drawLogoPath(vg, 0, 0, 15, 0);
@@ -337,50 +268,48 @@ namespace {
 		}
 	};
 
-/*
-	struct EO_Display : TransparentWidget {
+	struct HS_Info : TransparentWidget {
 		HS_101 *module;
-		PortWidget *ports[2];
-	
-		void drawTrace(NVGcontext *vg, float *values, float offset, float scale, NVGcolor col, int mode) {
-			if (!values)
+		HS_Display *display;
+		void draw(const DrawArgs &args) override {
+			nvgFontSize(args.vg, 12);
+			nvgFontFaceId(args.vg, gScheme.font()->handle);
+			nvgFillColor(args.vg, SUBLIGHTBLUE);
+			nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
+			if (!module) {
+				nvgFontSize(args.vg, 18);
+				nvgText(args.vg, 2, 12, "Submarine", NULL);
+				nvgText(args.vg, 2, 24, "High Resolution", NULL);
+				nvgText(args.vg, 2, 36, "Storage Scope", NULL);
 				return;
-			float scaling = powf(2.0, scale);
-			nvgSave(vg);
-			Rect b = Rect(Vec(0, 0), box.size);
-			nvgScissor(vg, b.pos.x, b.pos.y, b.size.x, b.size.y);
-			nvgBeginPath(vg);
-			for (int i = 0; i < BUFFER_SIZE; i++) {
-				float x, y;
-				x = (float)i / (BUFFER_SIZE - 1) * b.size.x;
-				y = ((values[i] * scaling + offset ) / 20.0f - 0.8f) * -b.size.y;
-				if (i == 0)
-					nvgMoveTo(vg, x, y);
-				else
-					nvgLineTo(vg, x, y);
-			} 
-			if (mode) {
-				nvgLineTo(vg, b.size.x, (offset / 20.0f - 0.8f) * -b.size.y);
-				nvgLineTo(vg, 0, (offset / 20.0f - 0.8f) * -b.size.y);
-				nvgClosePath(vg);
-				nvgFillColor(vg, col);
-				nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-				nvgFill(vg);
+			}
+			
+			if (module->running) {
+				int percentage = (100 * module->bufferIndex) / module->bufferCount;
+				nvgText(args.vg, 2, 12, string::f("Storing %d%%", percentage).c_str(), NULL);
 			}
 			else {
-				nvgStrokeColor(vg, col);
-				nvgLineCap(vg, NVG_ROUND);
-				nvgMiterLimit(vg, 2.0f);
-				nvgStrokeWidth(vg, 1.5f);
-				nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-				nvgStroke(vg);
+				if (module->dataCaptured) {
+					nvgText(args.vg, 2, 12, "Stored", NULL);
+				}
+				else {
+					nvgText(args.vg, 2, 12, "No Data", NULL);
+				}
 			}
-			nvgResetScissor(vg);
-			nvgRestore(vg);	
+			nvgText(args.vg, 2, 24, string::f("%.3fs", module->time).c_str(), NULL);
+			if (std::isfinite(module->minValue)) 
+				nvgText(args.vg, 2, 36, string::f("min %.3fV", module->minValue).c_str(), NULL);
+			nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE);
+			if (display->mipEntry > -1) {
+				nvgText(args.vg, box.size.x -2, 12, string::f("Mipped %dx", 4 << (2 * display->mipEntry)).c_str(), NULL);
+			}
+			nvgText(args.vg, box.size.x - 2, 24, string::f("%.3fMb", module->bufferSize / 1000000.0f).c_str(), NULL);
+			if (std::isfinite(module->maxValue))
+				nvgText(args.vg, box.size.x - 2, 36, string::f("max %.3fV", module->maxValue).c_str(), NULL);
 		}
-	
 	};
-	
+
+/*
 	struct EO_Measure_Horz : EO_Measure {
 		void updateText() override {
 			if (!module) {
@@ -422,17 +351,18 @@ struct HS101 : SchemeModuleWidget {
 		this->box.size = Vec(450, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		HS_Info *info = new HS_Info();
-		info->module = module;
-		info->box.pos = Vec(270, 325);
-		info->box.size = Vec(177.5, 40);
-		addChild(info);
-
-		HS_Display * display = new HS_Display();
+		HS_Display *display = new HS_Display();
 		display->module = module;
 		display->box.pos = Vec(2.5, 14);
 		display->box.size = Vec(445, 310);
 		addChild(display);
+
+		HS_Info *info = new HS_Info();
+		info->module = module;
+		info->display = display;
+		info->box.pos = Vec(270, 325);
+		info->box.size = Vec(177.5, 40);
+		addChild(info);
 
 		PortWidget *port = createInputCentered<SilverPort>(Vec(17, 341), module, HS_101::INPUT_1);
 		addInput(port);
@@ -490,11 +420,11 @@ struct HS101 : SchemeModuleWidget {
 
 		drawText(vg, 170, 365, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "PAN");
 		drawText(vg, 182.5, 357, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "X");
-		drawText(vg, 195, 365, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SCALE");
+		drawText(vg, 195, 365, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ZOOM");
 
 		drawText(vg, 225, 365, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "PAN");
 		drawText(vg, 237.5, 357, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "Y");
-		drawText(vg, 250, 365, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SCALE");
+		drawText(vg, 250, 365, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ZOOM");
 	}
 };
 
