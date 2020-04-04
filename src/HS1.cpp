@@ -158,6 +158,7 @@ namespace {
 		int minX, maxX;
 		float minY, maxY;
 		int mipEntry = -1;
+		ui::Tooltip *tooltip = NULL;
 
 		void draw(const DrawArgs &args) override {
 			if (!module) {
@@ -265,6 +266,66 @@ namespace {
 			scheme::drawLogoPath(vg, 100, 50, 12, 0);
 			nvgStrokeColor(vg, SUBLIGHTBLUETRANS);
 			nvgStroke(vg);
+		}
+
+		void setTooltip(ui::Tooltip *tooltip) {
+			if (this->tooltip) {
+				this->tooltip->requestDelete();
+				this->tooltip = NULL;
+			}
+			if (tooltip) {
+				APP->scene->addChild(tooltip);
+				this->tooltip = tooltip;
+			}
+		}
+		void onEnter(const event::Enter& e) override {
+			if (module) {
+				std::string text;
+				text = module->dataCaptured?"":"No Data";
+				ui::Tooltip *tooltip = new ui::Tooltip;
+				tooltip->text = text;
+				setTooltip(tooltip);
+			}
+		}
+		std::string scale(float input) {
+			float ainput = std::abs(input);
+			if (ainput < 0.00000995f)
+				return string::f("%6.5f\xc2\xb5", input * 1000000.0f);
+			if (ainput < 0.0000995f)
+				return string::f("%6.4f\xc2\xb5", input * 1000000.0f);
+			if (ainput < 0.000995f)
+				return string::f("%6.3f\xc2\xb5", input * 1000000.0f);
+			if (ainput < 0.00995f)
+				return string::f("%6.5fm", input * 1000.0f);
+			if (ainput < 0.0995f)
+				return string::f("%6.4fm", input * 1000.0f);
+			if (ainput < 0.995f)
+				return string::f("%6.3fm", input * 1000.0f);
+			if (ainput < 9.95f)
+				return string::f("%6.5f", input);
+			if (ainput < 99.5f)
+				return string::f("%6.4f", input);
+			return string::f("%6.3f", input);
+		}
+		void onHover(const event::Hover& e) override {
+			if (module) {
+				if (module->dataCaptured) {
+					if (tooltip) {
+						std::string text;
+						float voltage = rescale(e.pos.y, box.size.y - 2, 2, minY, maxY);
+						text = "Voltage: " + scale(voltage) + "V";
+						tooltip->text = text;
+					}
+				}
+			}
+			OpaqueWidget::onHover(e);
+		}
+		void onLeave(const event::Leave& e) override {
+			setTooltip(NULL);
+		}
+		void onHide(const event::Hide& e) override {
+			setTooltip(NULL);
+			OpaqueWidget::onHide(e);
 		}
 	};
 
