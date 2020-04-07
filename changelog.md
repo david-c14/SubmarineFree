@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.4
+- 06-Apr-2020 Tidy plugin manifest to suit library
 - 02-Apr-2020 Add HS-101 Hi-Res Storage Scope
 - 01-Apr-2020 Add TD-410 multiple label textbox
 - 01-Apr-2020 Add bias compensator to XF-XXX cross faders
