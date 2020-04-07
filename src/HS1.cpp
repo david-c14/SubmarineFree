@@ -261,10 +261,7 @@ namespace {
 		}
 
 		void drawEasterEgg(NVGcontext *vg) {
-			scheme::drawLogoPath(vg, 0, 0, 15, 0);
-			nvgFillColor(vg, SUBLIGHTREDTRANS);
-			nvgFill(vg);
-			scheme::drawLogoPath(vg, 100, 50, 12, 0);
+			scheme::drawLogoPath(vg, 75, 40, 15, 0);
 			nvgStrokeColor(vg, SUBLIGHTBLUETRANS);
 			nvgStroke(vg);
 		}
