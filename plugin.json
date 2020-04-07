@@ -1,6 +1,6 @@
 {
 	"slug": "SubmarineFree",
-	"name": "Submarine (Free)",
+	"name": "Submarine",
 	"author": "carbon14",
         "brand": "Submarine",
 	"license": "GPL-3.0-only",
@@ -208,6 +208,13 @@
 			"description": "FF-212 Edge Triggered Flip-Flops",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/FF.md",
 			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"HS-101",
+			"name":"HS-101",
+			"description": "HS-101 Hi-Res Storage Oscilloscope",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/HS.md",
+			"tags": ["VISUAL"]
 		},
 		{
 			"slug":"LA-108",
