@@ -156,6 +156,7 @@ namespace {
 		HS_101 *module;
 		PortWidget *port;
 		int minX, maxX;
+		int originalMinX, originalMaxX;
 		float minY, maxY;
 		int mipEntry = -1;
 		ui::Tooltip *tooltip = NULL;
@@ -179,8 +180,8 @@ namespace {
 			
 			float maxfX = bufferSize / powf(2.0f, module->params[HS_101::PARAM_X_SCALE].getValue());
 			float offset = (bufferSize - maxfX) * module->params[HS_101::PARAM_X_PAN].getValue();
-			minX = std::max(0, (int)offset);
-			maxX = std::min(bufferSize - 1, (int)(maxfX + offset));
+			originalMinX = minX = std::max(0, (int)offset);
+			originalMaxX = maxX = std::min(bufferSize - 1, (int)(maxfX + offset));
 
 			float rangeY = module->maxValue - module->minValue;
 			float multiplier = 1 / powf(2.0f, module->params[HS_101::PARAM_Y_SCALE].getValue());
@@ -311,9 +312,25 @@ namespace {
 			if (module) {
 				if (module->dataCaptured) {
 					if (tooltip) {
-						std::string text;
 						float voltage = rescale(e.pos.y, box.size.y - 2, 2, minY, maxY);
-						text = "Voltage: " + scale(voltage) + "V";
+						int sample = rescale(e.pos.x, 0, box.size.x, originalMinX, originalMaxX);
+						float time = rescale(sample, 0, module->bufferCount, 0, module->time); 
+						int mipSample = rescale(e.pos.x, 0, box.size.x, minX, maxX);
+						
+						std::string text;
+						if (mipEntry == -1) {
+							float voltageAtSample = module->buffer[sample];
+							text = "Signal Voltage: " + scale(voltageAtSample) + "V";
+						}
+						else {
+							float minVoltage = module->mipEntries[mipEntry][mipSample * 2];
+							float maxVoltage = module->mipEntries[mipEntry][mipSample * 2 + 1];
+							text = "Signal Voltage: " + scale(minVoltage) + "V - " + scale(maxVoltage) + "V";
+						}
+						text = "Voltage: " + scale(voltage) + "V\n" +
+							"Time: " + scale(time) + "s\n" +
+							"Sample: " + string::f("%d", sample) + "\n\n" + 
+							text;
 						tooltip->text = text;
 					}
 				}
