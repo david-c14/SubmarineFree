@@ -45,12 +45,12 @@ struct HS_101 : Module {
 	
 	HS_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_TIME, -4.0f, 6.0f, -4.0f, "Time base");
+		configParam(PARAM_TIME, -4.0f, 6.0f, -4.0f, "Time base", "s", 2.0f);
 		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f, "Run");
-		configParam(PARAM_X_PAN, 0.0f, 1.0f, 0.5f, "X Pan");
-		configParam(PARAM_X_SCALE, 0.0f, +18.0f, 0.0f, "X Zoom");
-		configParam(PARAM_Y_PAN, 0.0f, 1.0f, 0.5f, "Y Pan");
-		configParam(PARAM_Y_SCALE, 0.0f, +20.0f, 0.0f, "Y Zoom");
+		configParam(PARAM_X_PAN, 0.0f, 1.0f, 0.5f, "X Pan", "%", 0.0f, 100.0f);
+		configParam(PARAM_X_SCALE, 0.0f, +18.0f, 0.0f, "X Zoom", "x", 2.0f);
+		configParam(PARAM_Y_PAN, 0.0f, 1.0f, 0.5f, "Y Pan", "%", 0.0f, 100.0f);
+		configParam(PARAM_Y_SCALE, 0.0f, +20.0f, 0.0f, "Y Zoom", "x", 2.0f);
 		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
 	}
 
@@ -317,7 +317,7 @@ namespace {
 						std::string text;
 						if (mipEntry == -1) {
 							float voltageAtSample = module->buffer[sample];
-							text = "Signal Voltage: " + scale(voltageAtSample) + "V";
+							text = "Sampled Voltage: " + scale(voltageAtSample) + "V";
 						}
 						else {
 							float minVoltage = module->mipEntries[mipEntry][mipSample * 2];
