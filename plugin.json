@@ -210,6 +210,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"HS-101",
+			"name":"HS-101",
+			"description": "HS-101 Hi-Res Storage Oscilloscope",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/HS.md",
+			"tags": ["VISUAL"]
+		},
+		{
 			"slug":"LA-108",
 			"name":"LA-108",
 			"description": "LA-108 Logic Analyser",

@@ -43,6 +43,8 @@ extern Model *modelFF120;
 extern Model *modelFF206;
 extern Model *modelFF212;
 
+extern Model *modelHS101;
+
 extern Model *modelLA108;
 
 extern Model *modelLD103;

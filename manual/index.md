@@ -27,6 +27,9 @@ Envelope Oscilloscope
 # [FF](FF.md)
 Flip-Flops
 
+# [HS](HS.md)
+Hi-Resolution Storage Scope
+
 # [LA](LA.md)
 8-Channel Logic Analyser
 
