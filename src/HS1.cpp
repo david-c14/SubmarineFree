@@ -80,7 +80,7 @@ struct HS_101 : Module {
 			if (running) {
 				minValue = +INFINITY;
 				maxValue = -INFINITY;
-				triggerOut.trigger(0.01f);
+				triggerOut.trigger(0.001f);
 			}
 		}
 		lights[LIGHT_STORING].setBrightness(running);

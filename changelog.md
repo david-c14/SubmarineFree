@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.5
+- 14-Apr-2020 HS-101 Trigger output pulse width changed to 1ms
+
 ## v1.1.4
 - 06-Apr-2020 Tidy plugin manifest to suit library
 - 02-Apr-2020 Add HS-101 Hi-Res Storage Scope
