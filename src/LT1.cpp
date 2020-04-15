@@ -701,7 +701,6 @@ struct LT116 : SchemeModuleWidget {
 			a = _mm_rcp_ps(a);
 			a = _mm_and_ps(a, mask);
 			_mm_store_ps(res, a);
-			DEBUG("%f %f %f %f", res[0], res[1], res[2], res[3]);
 			for (int i = 0; i < 256; i += 4) {
 				__m128 s = _mm_load_ps(params + i);
 				s = _mm_mul_ps(s, a);
