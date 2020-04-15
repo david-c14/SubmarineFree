@@ -161,7 +161,6 @@ struct EditPanel : BackPanel {
 		labelField->box.size.x = 116;
 		// postpone call to addChild, or this will capture all keystrokes!
 		labelField->changeHandler = [=](std::string text) {
-			DEBUG("Label completion");
 			if (this->completeHandler) {
 				this->completeHandler(nvgRGBf(r->value, g->value, b->value), text);
 			}
@@ -172,7 +171,6 @@ struct EditPanel : BackPanel {
 		saveButton->box.size = Vec(55, 19);
 		saveButton->label = "Save";
 		saveButton->clickHandler = [=](){
-			DEBUG("Button completion");
 			if (this->completeHandler) {
 				this->completeHandler(nvgRGBf(r->value, g->value, b->value), labelField->text);
 			}
@@ -657,7 +655,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	ScrollWidget *collectionScrollWidget;
 	
 	ScrollWidget *scrollWidget;
-	WM101(Module *module) : SizeableModuleWidget(150) {
+	WM101(SizeableModule *module) : SizeableModuleWidget(module, 150) {
 		setModule(module);
 		minButton = new MinButton();
 		minButton->box.pos = Vec(140,160);
@@ -1303,14 +1301,14 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		l = rescale(random::uniform(), 0.0f, 1.0f, std::max(l - varyL->value, 0.0f), std::min(l + varyL->value, 1.0f));
 		return nvgHSLA(h, s, l, a * 255);
 	}
-	void onResize() override {
+	void onResized() override {
 		bool small = this->box.size.x < 16.0f;
 		minButton->box.pos.x = small?2.5f:(this->box.size.x - 10.0f);
 		minButton->box.pos.y = small?180:160;
 		hidePanels();
 		backPanel->visible = !small;
 		viewToggle->visible = !small;
-		SizeableModuleWidget::onResize();	
+		SizeableModuleWidget::onResized();	
 	}
 	void toggleBillboard() {
 		// assumes we're not already minimized (toggle not available)
@@ -2560,5 +2558,5 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 	}
 };
 
-Model *modelWM101 = createModel<Module, WM101>("WM-101");
+Model *modelWM101 = createModel<SizeableModule, WM101>("WM-101");
 Model *modelWM102 = createModel<Module, WM102>("WM-102");

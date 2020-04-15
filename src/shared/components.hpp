@@ -498,17 +498,23 @@ struct EventParamField : ui::TextField {
 // SizeableModuleWidget
 //////////////////
 
+struct SizeableModule : Module {
+	float size = 0;
+	json_t *dataToJson() override;
+	void dataFromJson(json_t *rootJ) override;
+};
+
 struct SizeableModuleWidget : SchemeModuleWidget {
-	bool stabilized = false;
+	SizeableModule *sizeableModule = NULL;
 	float fullSize = 0;
+	bool stabilized = false;
 	SchemePanel *panel;
-	SizeableModuleWidget(float size);
+	SizeableModuleWidget(SizeableModule *module, float size);
 	void Resize();
 	void Minimize(bool minimize);
 	void ShiftOthers(float delta);
-	json_t *toJson() override;
 	void fromJson(json_t *rootJ) override;
-	virtual void onResize();
+	virtual void onResized();
 };
 
 struct MinButton : EventWidgetButtonBase {
