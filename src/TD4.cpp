@@ -1,4 +1,4 @@
-//SubTag W10
+//SubTag W10 WP AM
 
 #include "SubmarineFree.hpp"
 #include "window.hpp"

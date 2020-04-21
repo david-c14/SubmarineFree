@@ -101,15 +101,11 @@ Scheme gScheme;
 SchemePanel::SchemePanel() {
 	isFlat = gScheme.isFlat;
 	scheme = gScheme.scheme;
-	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
+	canvas = new SchemeCanvasWidget();
 	addChild(canvas);
 }
 
-SchemePanel::SchemePanel(Vec size) {
-	isFlat = gScheme.isFlat;
-	scheme = gScheme.scheme;
-	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
-	addChild(canvas);
+SchemePanel::SchemePanel(Vec size) : SchemePanel() {
 	canvas->box.size = size;
 	box.size = size;
 }

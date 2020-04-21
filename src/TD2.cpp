@@ -1,4 +1,4 @@
-//SubTag W2
+//SubTag W2 WP AM
 
 #include "SubmarineFree.hpp"
 #include "window.hpp"

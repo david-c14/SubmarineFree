@@ -332,8 +332,31 @@ extern Scheme gScheme;
 
 struct SchemeCanvasWidget; 
 
+//////////////////
+// ResizeHandle
+//////////////////
+
+struct ResizeHandle : OpaqueWidget {
+	bool right = false;
+	Vec dragPos;
+	Rect originalBox;
+
+	ResizeHandle();
+
+	void onDragStart(const event::DragStart& e) override;
+
+	void onDragMove(const event::DragMove& e) override;
+
+	void draw(const DrawArgs& args) override;
+};
+
 struct SchemePanel : FramebufferWidget {
+	SchemeCanvasWidget *canvas;
 	bool isFlat;
+	ResizeHandle *leftHandle;
+	ResizeHandle *rightHandle;
+	float minWidth = 60.0f;
+	float maxWidth = 300.0f;
 	int scheme;
 	SchemePanel();
 	SchemePanel(Vec size);
@@ -506,7 +529,7 @@ struct SizeableModule : Module {
 
 struct SizeableModuleWidget : SchemeModuleWidget {
 	SizeableModule *sizeableModule = NULL;
-	float fullSize = 0;
+	float fullSize = 0.0f;
 	bool stabilized = false;
 	SchemePanel *panel;
 	SizeableModuleWidget(SizeableModule *module, float size);

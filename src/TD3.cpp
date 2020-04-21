@@ -1,4 +1,4 @@
-//SubTag W16
+//SubTag W16 WP AM
 
 #include "SubmarineFree.hpp"
 #include "window.hpp"
@@ -37,6 +37,16 @@ struct TD_316 : Module {
 		reset = 1;
 		Module::onReset();
 	}
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "width", json_real(moduleSize));
+		return rootJ;
+	}
+	void dataFromJson(json_t *rootJ) override {
+		json_t *sizeJ = json_object_get(rootJ, "width");
+		if (sizeJ)
+			moduleSize = json_number_value(sizeJ);
+	}
 	int reset = 0;
 	float fontSize = 12.0f;
 	NVGcolor fg = SUBLIGHTBLUE;
@@ -44,6 +54,7 @@ struct TD_316 : Module {
 	bool fgDirty = false;
 	bool bgDirty = false;
 	bool fontSizeDirty = false;
+	float moduleSize;
 };
 
 namespace {
@@ -148,6 +159,10 @@ struct TD316 : SchemeModuleWidget {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TD-316");
 	}
+
+	//void onResized() override {
+		//textField->box.size.x = box.size.x - 8;
+	//}
 };
 
 Model *modelTD316 = createModel<TD_316, TD316>("TD-316");
