@@ -125,7 +125,6 @@ struct TD316 : SchemeModuleWidget {
 			textField->bgColor = color::fromHexString(json_string_value(bgJ));
 		}
 		TD_316 *td = dynamic_cast<TD_316 *>(module);
-		DEBUG("%f", td->moduleSize);
 		box.size.x = td->moduleSize;
 		schemePanel->resize(this, box);
 		
