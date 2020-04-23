@@ -360,7 +360,10 @@ struct SchemePanel : FramebufferWidget {
 	int scheme;
 	SchemePanel();
 	SchemePanel(Vec size);
+	SchemePanel(Vec size, float minimum, float maximum);
 	void step() override;
+	void resize(Rect newBox, Rect oldBox);
+	void resize(ModuleWidget *mw, Rect newBox);
 };
 
 struct SchemeCanvasWidget : Widget {

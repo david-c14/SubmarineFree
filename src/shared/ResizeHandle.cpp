@@ -8,7 +8,7 @@
 #include "../SubmarineFree.hpp"
 
 ResizeHandle::ResizeHandle() {
-	box.size = Vec(4, 20);
+	box.size = Vec(8, 12);
 }
 
 void ResizeHandle::onDragStart(const event::DragStart& e) {
@@ -23,13 +23,14 @@ void ResizeHandle::onDragStart(const event::DragStart& e) {
 
 void ResizeHandle::onDragMove(const event::DragMove& e) {
 	SchemePanel* sp = getAncestorOfType<SchemePanel>();
+	ModuleWidget *mw = sp->getAncestorOfType<ModuleWidget>();
 	assert(sp);
 
 	Vec newDragPos = APP->scene->rack->mousePos;
 	float deltaX = newDragPos.x - dragPos.x;
 
 	Rect newBox = originalBox;
-	Rect oldBox = sp->box;
+	Rect oldBox = mw->box;
 	if (right) {
 		newBox.size.x += deltaX;
 		newBox.size.x = clamp(newBox.size.x, sp->minWidth, sp->maxWidth);
@@ -43,26 +44,22 @@ void ResizeHandle::onDragMove(const event::DragMove& e) {
 	}
 
 	// Set box and test whether it's valid
-	ModuleWidget *mw = sp->getAncestorOfType<ModuleWidget>();
-	mw->box = newBox;
-	if (!APP->scene->rack->requestModulePos(mw, newBox.pos)) {
-		mw->box = oldBox;
-	}
-	else {
-		sp->box = newBox;
-		mw->setSize(newBox.size);
-	}
-	
+	sp->resize(newBox, oldBox);
 }
 
 void ResizeHandle::draw(const DrawArgs& args) {
-	for (float x = 5.0; x <= 10.0; x += 5.0) {
+	ModuleWidget *mw = getAncestorOfType<ModuleWidget>();
+	nvgStrokeWidth(args.vg, 1.0);
+	for (float x = 1.0; x <= 8.0; x += 2.0) {
 		nvgBeginPath(args.vg);
-		const float margin = 5.0;
-		nvgMoveTo(args.vg, x + 0.5, margin + 0.5);
-		nvgLineTo(args.vg, x + 0.5, box.size.y - margin + 0.5);
-		nvgStrokeWidth(args.vg, 1.0);
-		nvgStrokeColor(args.vg, nvgRGBAf(0.5, 0.5, 0.5, 0.5));
+		nvgMoveTo(args.vg, x - 0.5, 0);
+		nvgLineTo(args.vg, x - 0.5, box.size.y);
+		nvgStrokeColor(args.vg, gScheme.getHighlight(mw->module));
+		nvgStroke(args.vg);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, x + 0.5, 0);
+		nvgLineTo(args.vg, x + 0.5, box.size.y);
+		nvgStrokeColor(args.vg, gScheme.getShadow(mw->module));
 		nvgStroke(args.vg);
 	}
 }

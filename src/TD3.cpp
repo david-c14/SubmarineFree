@@ -45,7 +45,7 @@ struct TD_316 : Module {
 	void dataFromJson(json_t *rootJ) override {
 		json_t *sizeJ = json_object_get(rootJ, "width");
 		if (sizeJ)
-			moduleSize = json_number_value(sizeJ);
+			moduleSize = clamp(json_number_value(sizeJ), 75.0f, 300.0f);
 	}
 	int reset = 0;
 	float fontSize = 12.0f;
@@ -54,7 +54,7 @@ struct TD_316 : Module {
 	bool fgDirty = false;
 	bool bgDirty = false;
 	bool fontSizeDirty = false;
-	float moduleSize;
+	float moduleSize = 240.0;
 };
 
 namespace {
@@ -82,11 +82,13 @@ namespace {
 
 struct TD316 : SchemeModuleWidget {
 	TD3Text *textField;
+	SchemePanel *schemePanel;
 
 	TD316(TD_316 *module) {
 		setModule(module);
 		this->box.size = Vec(240, 380);
-		addChild(new SchemePanel(this->box.size));
+		schemePanel = new SchemePanel(this->box.size, 75, 300);
+		addChild(schemePanel);
 
 		textField = createWidget<TD3Text>(Vec(4, 18));
 		textField->box.size = Vec(232, 344);
@@ -122,6 +124,11 @@ struct TD316 : SchemeModuleWidget {
 		if (bgJ) {
 			textField->bgColor = color::fromHexString(json_string_value(bgJ));
 		}
+		TD_316 *td = dynamic_cast<TD_316 *>(module);
+		DEBUG("%f", td->moduleSize);
+		box.size.x = td->moduleSize;
+		schemePanel->resize(this, box);
+		
 	}
 
 	void step() override {
@@ -160,9 +167,16 @@ struct TD316 : SchemeModuleWidget {
 		drawBase(vg, "TD-316");
 	}
 
-	//void onResized() override {
-		//textField->box.size.x = box.size.x - 8;
-	//}
+	void onResize(const event::Resize &e) override {
+		onResized();
+	}
+	void onResized() {
+		textField->box.size.x = box.size.x - 8;
+		if (module) {
+			TD_316 *td = dynamic_cast<TD_316 *>(module);
+			td->moduleSize = box.size.x;
+		}
+	}
 };
 
 Model *modelTD316 = createModel<TD_316, TD316>("TD-316");
