@@ -16,9 +16,9 @@ namespace {
 		std::function<void ()> addMenuHandler;
 		std::function<void (int posChange)> posHandler;
 		int oldPosition = 0;
-		TD4Text() {
+		TD4Text(float width) {
 			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
-			this->box.size = Vec(142, 20);
+			this->box.size = Vec(width - 8.0f, 20);
 		}
 		void draw(const DrawArgs &args) override {
 			nvgFontFaceId(args.vg, font->handle);
@@ -77,15 +77,33 @@ namespace {
 
 } // end namespace
 
+struct TD_410 : Module {
+	TD_410() : Module () {
+		config(0, 0, 0, 0);
+	}
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_object_set_new(rootJ, "width", json_real(moduleSize));
+		return rootJ;
+	}
+	void dataFromJson(json_t *rootJ) override {
+		json_t *sizeJ = json_object_get(rootJ, "width");
+		if (sizeJ)
+			moduleSize = clamp(json_number_value(sizeJ), 75.0f, 300.0f);
+	}
+	float moduleSize = 150.0f;
+};
+
 struct TD410 : SchemeModuleWidget {
 	std::vector<TD4Text *> textItems;  
+	SchemePanel *schemePanel;
 
-	TD410(Module *module) {
+	TD410(TD_410 *module) {
 		setModule(module);
 		this->box.size = Vec(150, 380);
-		addChild(new SchemePanel(this->box.size));
+		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
+		addChild(schemePanel);
 	}
-
 
 	json_t *toJson() override {
 		json_t *rootJ = ModuleWidget::toJson();
@@ -110,7 +128,8 @@ struct TD410 : SchemeModuleWidget {
 			for (int j = 0; j < asize; j++) {
 				json_t *i = json_array_get(a1, j);
 				if (i) {
-					TD4Text *item = createWidget<TD4Text>(Vec(4, 18));
+					TD4Text *item = new TD4Text(box.size.x);
+					item->box.pos = Vec(4, 18);
 					addClickHandler(item);
 					item->id = nextId++;
 					json_t *text = json_object_get(i, "text");
@@ -133,6 +152,9 @@ struct TD410 : SchemeModuleWidget {
 				}
 			}
 		}
+		TD_410 *td = dynamic_cast<TD_410 *>(module);
+		box.size.x = td->moduleSize;
+		schemePanel->resize(this, box);
 	}
 
 	int clampPosition(int input) {
@@ -438,7 +460,8 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment) {
-		TD4Text *newItem = createWidget<TD4Text>(Vec(4, position));
+		TD4Text *newItem = new TD4Text(box.size.x);
+		newItem->box.pos = Vec(4, position);
 		newItem->id = id;
 		addClickHandler(newItem);
 		newItem->color = color;
@@ -467,7 +490,8 @@ struct TD410 : SchemeModuleWidget {
 				found = true;
 			}
 		}	
-		TD4Text *newItem = createWidget<TD4Text>(Vec(4, position));
+		TD4Text *newItem = new TD4Text(box.size.x);
+		newItem->box.pos = Vec(4, position);
 		newItem->id = nextId++;
 		addClickHandler(newItem);
 		addNewTextWithHistory(newItem);
@@ -542,6 +566,20 @@ struct TD410 : SchemeModuleWidget {
 		}
 		return NULL;
 	}
+
+	void onResize(const event::Resize &e) override {
+		ModuleWidget::onResize(e);
+		onResized();
+	}
+	void onResized() {
+		for (TD4Text *text : textItems) {
+			text->box.size.x = box.size.x - 8;
+		}
+		if (module) {
+			TD_410 *td = dynamic_cast<TD_410 *>(module);
+			td->moduleSize = box.size.x;
+		}
+	}
 };
 
-Model *modelTD410 = createModel<Module, TD410>("TD-410");
+Model *modelTD410 = createModel<TD_410, TD410>("TD-410");
