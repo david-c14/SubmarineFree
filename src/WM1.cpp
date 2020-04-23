@@ -1,4 +1,4 @@
-//SubTag W10
+//SubTag W10 WP AM
 #include <settings.hpp>
 #include <system.hpp>
 #include <osdialog.h>

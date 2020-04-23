@@ -101,17 +101,22 @@ Scheme gScheme;
 SchemePanel::SchemePanel() {
 	isFlat = gScheme.isFlat;
 	scheme = gScheme.scheme;
-	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
+	canvas = new SchemeCanvasWidget();
 	addChild(canvas);
 }
 
-SchemePanel::SchemePanel(Vec size) {
-	isFlat = gScheme.isFlat;
-	scheme = gScheme.scheme;
-	SchemeCanvasWidget *canvas = new SchemeCanvasWidget();
-	addChild(canvas);
+SchemePanel::SchemePanel(Vec size) : SchemePanel() {
 	canvas->box.size = size;
 	box.size = size;
+}
+
+SchemePanel::SchemePanel(Vec size, float minimum, float maximum) : SchemePanel(size) {
+	leftHandle = createWidget<ResizeHandle>(Vec(2,2));
+	leftHandle->right = false;
+	addChild(leftHandle);
+	rightHandle = createWidget<ResizeHandle>(Vec(size.x - 10, 2));
+	rightHandle->right = true;
+	addChild(rightHandle);
 }
 
 void SchemePanel::step() {
@@ -125,6 +130,26 @@ void SchemePanel::step() {
 	scheme = gScheme.scheme;
 	//oversample = 2.0;
 	FramebufferWidget::step();
+}
+
+void SchemePanel::resize(Rect newBox, Rect oldBox) {
+	ModuleWidget *mw = getAncestorOfType<ModuleWidget>();
+	assert(mw);
+	mw->box = newBox;
+	if (!APP->scene->rack->requestModulePos(mw, newBox.pos)) {
+		mw->box = oldBox;
+	}
+	else {
+		resize(mw, newBox);
+	}
+}
+
+void SchemePanel::resize(ModuleWidget *mw, Rect newBox) {
+	box.size = newBox.size;
+	canvas->box.size = newBox.size;
+	rightHandle->box.pos.x = newBox.size.x - 10;
+	mw->setSize(newBox.size);
+	dirty = true;
 }
 
 void SchemeCanvasWidget::draw(const DrawArgs &args) {

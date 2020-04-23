@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.5
+- 23-Apr-2020 TD-316 Make resizeable
 - 15-Apr-2020 WM-101 persist width in Module not in Widget
 - 14-Apr-2020 HS-101 Trigger output pulse width changed to 1ms
 

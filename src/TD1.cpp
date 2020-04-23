@@ -1,4 +1,4 @@
-//SubTag W16
+//SubTag W16 AM WP
 
 #include "SubmarineFree.hpp"
 #include "window.hpp"
