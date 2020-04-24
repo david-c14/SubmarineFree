@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.5
+- 24-Apr-2020 TD-316 persist data in Module not in Widget
 - 23-Apr-2020 TD-410 Make resizeable
 - 23-Apr-2020 TD-316 Make resizeable
 - 15-Apr-2020 WM-101 persist width in Module not in Widget
