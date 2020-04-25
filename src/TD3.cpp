@@ -120,17 +120,6 @@ struct TD316 : SchemeModuleWidget {
 		addChild(textField);
 	}
 
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
-
-		//json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
-		//json_object_set_new(rootJ, "size", json_real(textField->fontSize));
-		//json_object_set_new(rootJ, "fg", json_string(color::toHexString(textField->color).c_str()));
-		//json_object_set_new(rootJ, "bg", json_string(color::toHexString(textField->bgColor).c_str()));
-
-		return rootJ;
-	}
-
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
 		TD_316 *td = dynamic_cast<TD_316 *>(module);
