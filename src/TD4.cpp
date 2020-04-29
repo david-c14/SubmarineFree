@@ -326,6 +326,14 @@ struct TD410 : SchemeModuleWidget {
 
 			menu->addChild(new MenuSeparator);
 			
+			EventWidgetMenuItem *duplicate = createMenuItem<EventWidgetMenuItem>("Duplicate");
+			duplicate->clickHandler = [=]() {
+				duplicateItem(textItem);
+			};
+			menu->addChild(duplicate);
+
+			menu->addChild(new MenuSeparator);
+			
 			EventWidgetMenuItem *deleteItem = createMenuItem<EventWidgetMenuItem>("Delete Label");
 			deleteItem->clickHandler = [=]() {
 				removeTextWithHistory(textItem);
@@ -516,7 +524,32 @@ struct TD410 : SchemeModuleWidget {
 		addText(newItem);
 	}
 
-	void addNewText() {
+	void duplicateItem(TD4Text *textItem) {
+		int index = nextId++;
+		int position = findPosition();
+		NVGcolor color = textItem->data->color;
+		std::string text = textItem->data->text;
+		int alignment = textItem->data->alignment;
+		addText(index, text, color, position, alignment);
+		int moduleId = module->id;
+		APP->history->push(new EventWidgetAction(
+			"TD-410 Duplicate Label",
+			[=]() {
+				TD410 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					mw->removeText(index);
+				}
+			},
+			[=]() {
+				TD410 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					mw->addText(index, text, color, position, alignment);
+				}
+			}
+		));
+	}
+
+	int findPosition() {
 		int position = clampPosition(0);
 		const int spacing = 20;
 		bool found = false;
@@ -536,6 +569,11 @@ struct TD410 : SchemeModuleWidget {
 				found = true;
 			}
 		}	
+		return position;
+	}
+
+	void addNewText() {
+		int position = findPosition();
 		TD4Data *newData = new TD4Data;
 		dynamic_cast<TD_410 *>(module)->dataItems.push_back(newData);
 		TD4Text *newItem = new TD4Text(box.size.x);
