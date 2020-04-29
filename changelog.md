@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.5
+- 29-Apr-2020 TD-410 Add duplicate label option
 - 29-Apr-2020 TD-410 persist data in Module not in Widget
 - 25-Apr-2020 TD-202 persist data in Module not in Widget
 - 25-Apr-2020 TD-116 persist data in Module not in Widget
