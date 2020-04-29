@@ -7,14 +7,19 @@ namespace {
 
 	unsigned int nextId = 0;
 
+	struct TD4Data {
+		std::string text = "New Label";
+		NVGcolor color = SUBLIGHTBLUE;
+		float position = 20;
+		int alignment = NVG_ALIGN_CENTER;
+	};
+
 	struct TD4Text : OpaqueWidget {
 		unsigned int id = 0;
+		TD4Data *data;
 		std::shared_ptr<Font> font;
-		NVGcolor color = SUBLIGHTBLUE;
-		std::string text = "New Label";
-		int alignment = NVG_ALIGN_CENTER;
 		std::function<void ()> addMenuHandler;
-		std::function<void (int posChange)> posHandler;
+		std::function<void (int oldPostion, int newPosition)> posHandler;
 		int oldPosition = 0;
 		TD4Text(float width) {
 			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
@@ -23,18 +28,18 @@ namespace {
 		void draw(const DrawArgs &args) override {
 			nvgFontFaceId(args.vg, font->handle);
 			nvgFontSize(args.vg, 20);
-			nvgFillColor(args.vg, color);
-			if (alignment & NVG_ALIGN_LEFT) {
+			nvgFillColor(args.vg, data->color);
+			if (data->alignment & NVG_ALIGN_LEFT) {
 				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, 0, box.size.y / 2, text.c_str(), NULL);
+				nvgText(args.vg, 0, box.size.y / 2, data->text.c_str(), NULL);
 			}
-			else if (alignment & NVG_ALIGN_RIGHT) {
+			else if (data->alignment & NVG_ALIGN_RIGHT) {
 				nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.x, box.size.y / 2, text.c_str(), NULL);
+				nvgText(args.vg, box.size.x, box.size.y / 2, data->text.c_str(), NULL);
 			}
 			else {
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.x / 2, box.size.y / 2, text.c_str(), NULL);
+				nvgText(args.vg, box.size.x / 2, box.size.y / 2, data->text.c_str(), NULL);
 			}
 		}
 		void onButton(const event::Button &e) override {
@@ -60,7 +65,7 @@ namespace {
 				e.consume(this);
 				if (box.pos.y != oldPosition) {
 					if (posHandler) {
-						posHandler(box.pos.y);
+						posHandler(oldPosition, box.pos.y);
 					}
 				}
 			}
@@ -78,18 +83,56 @@ namespace {
 } // end namespace
 
 struct TD_410 : Module {
+	std::vector<TD4Data *> dataItems;  
 	TD_410() : Module () {
 		config(0, 0, 0, 0);
 	}
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "width", json_real(moduleSize));
+		json_t *arr = json_array();
+		for (TD4Data *data : dataItems) {
+			json_t *item = json_object();
+			json_object_set_new(item, "text", json_string(data->text.c_str()));
+			json_object_set_new(item, "color", json_string(color::toHexString(data->color).c_str()));
+			json_object_set_new(item, "position", json_real(data->position));
+			json_object_set_new(item, "alignment", json_real(data->alignment));
+			json_array_append_new(arr, item);
+		}
+		json_object_set_new(rootJ, "items", arr);
 		return rootJ;
 	}
 	void dataFromJson(json_t *rootJ) override {
 		json_t *sizeJ = json_object_get(rootJ, "width");
 		if (sizeJ)
 			moduleSize = clamp(json_number_value(sizeJ), 75.0f, 300.0f);
+		json_t *a1 = json_object_get(rootJ, "items");
+		if (a1) {
+			int asize = json_array_size(a1);
+			for (int j = 0; j < asize; j++) {
+				json_t *i = json_array_get(a1, j);
+				if (i) {
+					TD4Data *item = new TD4Data;
+					json_t *text = json_object_get(i, "text");
+					if (text) {
+						item->text = json_string_value(text);
+					}
+					json_t *color = json_object_get(i, "color");
+					if (color) {
+						item->color = color::fromHexString(json_string_value(color));
+					}
+					json_t *pos = json_object_get(i, "position");
+					if (pos) {
+						item->position = json_number_value(pos);
+					}
+					json_t *align = json_object_get(i, "alignment");
+					if (align) {
+						item->alignment = json_number_value(align);
+					}
+					dataItems.push_back(item);
+				}
+			}
+		}
 	}
 	float moduleSize = 150.0f;
 };
@@ -105,55 +148,54 @@ struct TD410 : SchemeModuleWidget {
 		addChild(schemePanel);
 	}
 
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
-		json_t *arr = json_array();
-		for (TD4Text *text : textItems) {
-			json_t *item = json_object();
-			json_object_set_new(item, "text", json_string(text->text.c_str()));
-			json_object_set_new(item, "color", json_string(color::toHexString(text->color).c_str()));
-			json_object_set_new(item, "position", json_real(text->box.pos.y));
-			json_object_set_new(item, "alignment", json_real(text->alignment));
-			json_array_append_new(arr, item);
-		}
-		json_object_set_new(rootJ, "items", arr);
-		return rootJ;
-	}
-
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
+		TD_410 *tdModule = dynamic_cast<TD_410 *>(module);
+		if (!tdModule) return;
+		
+		for(TD4Data *data : tdModule->dataItems) {
+			TD4Text *item = new TD4Text(box.size.x);
+			item->data = data;
+			item->box.pos = Vec(4, 18);
+			addClickHandler(item);
+			item->id = nextId++;
+			item->box.pos.y = data->position = clampPosition(data->position);
+			addText(item);
+		}
 		json_t *a1 = json_object_get(rootJ, "items");
 		if (a1) {
 			int asize = json_array_size(a1);
 			for (int j = 0; j < asize; j++) {
 				json_t *i = json_array_get(a1, j);
 				if (i) {
+					TD4Data *data = new TD4Data;
+					tdModule->dataItems.push_back(data);
 					TD4Text *item = new TD4Text(box.size.x);
+					item->data = data;
 					item->box.pos = Vec(4, 18);
 					addClickHandler(item);
 					item->id = nextId++;
 					json_t *text = json_object_get(i, "text");
 					if (text) {
-						item->text = json_string_value(text);
+						data->text = json_string_value(text);
 					}
 					json_t *color = json_object_get(i, "color");
 					if (color) {
-						item->color = color::fromHexString(json_string_value(color));
+						data->color = color::fromHexString(json_string_value(color));
 					}
 					json_t *pos = json_object_get(i, "position");
 					if (pos) {
-						item->box.pos.y = clampPosition(json_number_value(pos));
+						item->box.pos.y = data->position = clampPosition(json_number_value(pos));
 					}
 					json_t *align = json_object_get(i, "alignment");
 					if (align) {
-						item->alignment = json_number_value(align);
+						data->alignment = json_number_value(align);
 					}
 					addText(item);
 				}
 			}
 		}
-		TD_410 *td = dynamic_cast<TD_410 *>(module);
-		box.size.x = td->moduleSize;
+		box.size.x = tdModule->moduleSize;
 		schemePanel->resize(this, box);
 	}
 
@@ -164,7 +206,7 @@ struct TD410 : SchemeModuleWidget {
 	void textNameSubMenu(Menu *menu, TD4Text *textItem) {
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
-		paramField->setText(textItem->text);
+		paramField->setText(textItem->data->text);
 		paramField->changeHandler = [=](std::string text) {
 			setText(textItem, text);
 		};
@@ -182,7 +224,7 @@ struct TD410 : SchemeModuleWidget {
 	void colorSubMenu(Menu *menu, TD4Text *textItem) {
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
-		paramField->setText(color::toHexString(textItem->color));
+		paramField->setText(color::toHexString(textItem->data->color));
 		paramField->changeHandler = [=](std::string text) {
 			if (text[0] != '#')
 				return;
@@ -208,11 +250,11 @@ struct TD410 : SchemeModuleWidget {
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
 		char str[20];
-		snprintf(str, 20, "%d", (int)(textItem->box.pos.y));
+		snprintf(str, 20, "%d", (int)(textItem->data->position));
 		paramField->setText(str);
 		paramField->changeHandler = [=](std::string text) {
 			try {
-				setPosition(textItem, clampPosition(stoi(text, NULL)));
+				setPosition(textItem, textItem->box.pos.y, clampPosition(stoi(text, NULL)));
 			}
 			catch (...) {
 			}
@@ -221,12 +263,12 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void addClickHandler(TD4Text *textItem) {
-		textItem->posHandler = [=](int newPosition) {
-			setPosition(textItem, newPosition);
+		textItem->posHandler = [=](int oldPosition, int newPosition) {
+			setPosition(textItem, oldPosition, newPosition);
 		};
 		textItem->addMenuHandler = [=]() {
 			Menu *menu = createMenu();
-			EventWidgetMenuItem *textMenu = createMenuItem<EventWidgetMenuItem>("Label: " + textItem->text);
+			EventWidgetMenuItem *textMenu = createMenuItem<EventWidgetMenuItem>("Label: " + textItem->data->text);
 			textMenu->rightText = SUBMENU;
 			textMenu->childMenuHandler = [=]() {
 				Menu *subMenu = new Menu();
@@ -235,7 +277,7 @@ struct TD410 : SchemeModuleWidget {
 			};
 			menu->addChild(textMenu);
 
-			EventWidgetMenuItem *colorMenu = createMenuItem<EventWidgetMenuItem>("Color: " + color::toHexString(textItem->color));
+			EventWidgetMenuItem *colorMenu = createMenuItem<EventWidgetMenuItem>("Color: " + color::toHexString(textItem->data->color));
 			colorMenu->rightText = SUBMENU;
 			colorMenu->childMenuHandler = [=]() {
 				Menu *subMenu = new Menu();
@@ -245,7 +287,7 @@ struct TD410 : SchemeModuleWidget {
 			menu->addChild(colorMenu);
 
 			char str[30];
-			snprintf(str, 20, "Position: %d", (int)(textItem->box.pos.y));
+			snprintf(str, 20, "Position: %d", (int)(textItem->data->position));
 			EventWidgetMenuItem *positionMenu = createMenuItem<EventWidgetMenuItem>(str);
 			positionMenu->rightText = SUBMENU;
 			positionMenu->childMenuHandler = [=]() {
@@ -257,7 +299,7 @@ struct TD410 : SchemeModuleWidget {
 
 			EventWidgetMenuItem *leftAlign = createMenuItem<EventWidgetMenuItem>("Left Align");
 			leftAlign->stepHandler = [=]() {
-				leftAlign->rightText = CHECKMARK(textItem->alignment & NVG_ALIGN_LEFT);
+				leftAlign->rightText = CHECKMARK(textItem->data->alignment & NVG_ALIGN_LEFT);
 			};
 			leftAlign->clickHandler = [=]() {
 				setAlignment(textItem, NVG_ALIGN_LEFT);
@@ -266,7 +308,7 @@ struct TD410 : SchemeModuleWidget {
 			
 			EventWidgetMenuItem *centerAlign = createMenuItem<EventWidgetMenuItem>("Center Align");
 			centerAlign->stepHandler = [=]() {
-				centerAlign->rightText = CHECKMARK(textItem->alignment & NVG_ALIGN_CENTER);
+				centerAlign->rightText = CHECKMARK(textItem->data->alignment & NVG_ALIGN_CENTER);
 			};
 			centerAlign->clickHandler = [=]() {
 				setAlignment(textItem, NVG_ALIGN_CENTER);
@@ -275,7 +317,7 @@ struct TD410 : SchemeModuleWidget {
 			
 			EventWidgetMenuItem *rightAlign = createMenuItem<EventWidgetMenuItem>("Right Align");
 			rightAlign->stepHandler = [=]() {
-				rightAlign->rightText = CHECKMARK(textItem->alignment & NVG_ALIGN_RIGHT);
+				rightAlign->rightText = CHECKMARK(textItem->data->alignment & NVG_ALIGN_RIGHT);
 			};
 			rightAlign->clickHandler = [=]() {
 				setAlignment(textItem, NVG_ALIGN_RIGHT);
@@ -301,8 +343,8 @@ struct TD410 : SchemeModuleWidget {
 	}
 	
 	void setText(TD4Text *textItem, std::string newText) {
-		std::string oldText = textItem->text;
-		textItem->text = newText;
+		std::string oldText = textItem->data->text;
+		textItem->data->text = newText;
 		if (!module)
 			return;
 		int moduleId = module->id;
@@ -315,7 +357,7 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->text = oldText;
+						foundItem->data->text = oldText;
 					}
 				}
 			},
@@ -324,15 +366,15 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem)
-						foundItem->text = newText;
+						foundItem->data->text = newText;
 				}
 			}
 		));
 	}
 
 	void setColor(TD4Text *textItem, NVGcolor newColor) {
-		NVGcolor oldColor = textItem->color;
-		textItem->color = newColor;
+		NVGcolor oldColor = textItem->data->color;
+		textItem->data->color = newColor;
 		if (!module)
 			return;
 		int moduleId = module->id;
@@ -345,7 +387,7 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->color = oldColor;
+						foundItem->data->color = oldColor;
 					}
 				}
 			},
@@ -354,7 +396,7 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->color = newColor;
+						foundItem->data->color = newColor;
 					}
 				}
 			}
@@ -362,8 +404,8 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void setAlignment(TD4Text *textItem, int newAlignment) {
-		int oldAlignment = textItem->alignment;
-		textItem->alignment = newAlignment;
+		int oldAlignment = textItem->data->alignment;
+		textItem->data->alignment = newAlignment;
 		if (!module)
 			return;
 		int moduleId = module->id;
@@ -376,7 +418,7 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->alignment = oldAlignment;
+						foundItem->data->alignment = oldAlignment;
 					}
 				}
 			},
@@ -385,19 +427,18 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->alignment = newAlignment;
+						foundItem->data->alignment = newAlignment;
 					}
 				}
 			}
 		));
 	}
 	
-	void setPosition(TD4Text *textItem, int newPosition) {
+	void setPosition(TD4Text *textItem, int oldPosition, int newPosition) {
 		newPosition = clampPosition(newPosition);
-		int oldPosition = textItem->box.pos.y;
 		if (newPosition == oldPosition)
 			return;
-		textItem->box.pos.y = newPosition;
+		textItem->box.pos.y = textItem->data->position = newPosition;
 		if (!module)
 			return;
 		int moduleId = module->id;
@@ -410,7 +451,7 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->box.pos.y = oldPosition;
+						foundItem->box.pos.y = foundItem->data->position = oldPosition;
 					}
 				}
 			},
@@ -419,7 +460,7 @@ struct TD410 : SchemeModuleWidget {
 				if (mw) {
 					TD4Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->box.pos.y = newPosition;
+						foundItem->box.pos.y = foundItem->data->position = newPosition;
 					}
 				}
 			}
@@ -445,6 +486,8 @@ struct TD410 : SchemeModuleWidget {
 
 	void removeText(TD4Text *text) {
 		removeChild(text);
+		TD_410 *td = dynamic_cast<TD_410 *>(module);
+		td->dataItems.erase(std::remove(td->dataItems.begin(), td->dataItems.end(), text->data), td->dataItems.end());
 		textItems.erase(std::remove(textItems.begin(), textItems.end(), text), textItems.end());
 	}
 
@@ -460,13 +503,16 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment) {
+		TD4Data *newData = new TD4Data;
+		dynamic_cast<TD_410 *>(module)->dataItems.push_back(newData);
 		TD4Text *newItem = new TD4Text(box.size.x);
-		newItem->box.pos = Vec(4, position);
+		newItem->data = newData;
+		newItem->box.pos = Vec(4, newData->position = position);
 		newItem->id = id;
 		addClickHandler(newItem);
-		newItem->color = color;
-		newItem->text = text;
-		newItem->alignment = alignment;
+		newData->color = color;
+		newData->text = text;
+		newData->alignment = alignment;
 		addText(newItem);
 	}
 
@@ -490,8 +536,11 @@ struct TD410 : SchemeModuleWidget {
 				found = true;
 			}
 		}	
+		TD4Data *newData = new TD4Data;
+		dynamic_cast<TD_410 *>(module)->dataItems.push_back(newData);
 		TD4Text *newItem = new TD4Text(box.size.x);
-		newItem->box.pos = Vec(4, position);
+		newItem->data = newData;
+		newItem->box.pos = Vec(4, newData->position = position);
 		newItem->id = nextId++;
 		addClickHandler(newItem);
 		addNewTextWithHistory(newItem);
@@ -503,10 +552,10 @@ struct TD410 : SchemeModuleWidget {
 			return;
 		int moduleId = module->id;
 		int index = newItem->id;
-		NVGcolor color = newItem->color;
-		std::string text = newItem->text;
+		NVGcolor color = newItem->data->color;
+		std::string text = newItem->data->text;
 		int position = newItem->box.pos.y;
-		int alignment = newItem->alignment;
+		int alignment = newItem->data->alignment;
 		
 		APP->history->push(new EventWidgetAction(
 			"TD-410 Add Label",
@@ -531,9 +580,9 @@ struct TD410 : SchemeModuleWidget {
 			return;
 		int moduleId = module->id;
 		unsigned int index = oldItem->id;
-		NVGcolor color = oldItem->color;
-		std::string text = oldItem->text;
-		int alignment = oldItem->alignment;
+		NVGcolor color = oldItem->data->color;
+		std::string text = oldItem->data->text;
+		int alignment = oldItem->data->alignment;
 		int position = oldItem->box.pos.y;
 	
 		APP->history->push(new EventWidgetAction(
