@@ -33,6 +33,7 @@ struct TD_202 : Module {
 	NVGcolor bg;
 	bool fgDirty = false;
 	bool bgDirty = false;
+	std::string text = "";
 	TD_202() : Module() {
 		config(0, 0, 0, 0);
 	}
@@ -63,6 +64,30 @@ struct TD_202 : Module {
 			}
 		}
 	}
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+
+		json_object_set_new(rootJ, "text", json_string(text.c_str()));
+		json_object_set_new(rootJ, "fg", json_string(color::toHexString(fg).c_str()));
+		json_object_set_new(rootJ, "bg", json_string(color::toHexString(bg).c_str()));
+
+		return rootJ;
+	}
+	void dataFromJson(json_t *rootJ) override {
+
+		json_t *textJ = json_object_get(rootJ, "text");
+		if (textJ)
+			text = json_string_value(textJ);
+		json_t *fgJ = json_object_get(rootJ, "fg");
+		if (fgJ) {
+			fg = color::fromHexString(json_string_value(fgJ));
+		}
+		json_t *bgJ = json_object_get(rootJ, "bg");
+		if (bgJ) {
+			bg = color::fromHexString(json_string_value(bgJ));
+		}
+	}
+
 };
 
 struct TD202 : SchemeModuleWidget {
@@ -81,18 +106,16 @@ struct TD202 : SchemeModuleWidget {
 		textField->box.size = Vec(350, 30);
 		tw->addChild(textField);
 	}
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
-
-		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
-		json_object_set_new(rootJ, "fg", json_string(color::toHexString(textField->color).c_str()));
-		json_object_set_new(rootJ, "bg", json_string(color::toHexString(textField->bgColor).c_str()));
-
-		return rootJ;
-	}
 
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
+		
+		TD_202 *tdModule = dynamic_cast<TD_202 *>(module);
+		if (tdModule) {
+			textField->text = tdModule->text;
+			textField->color = tdModule->fg;
+			textField->bgColor = tdModule->bg;
+		}
 
 		json_t *textJ = json_object_get(rootJ, "text");
 		if (textJ)
@@ -128,6 +151,9 @@ struct TD202 : SchemeModuleWidget {
 			textField->bgColor = tdModule->bg;
 			tdModule->bgDirty = false;
 		}
+		tdModule->text = textField->text;
+		tdModule->fg = textField->color;
+		tdModule->bg = textField->bgColor;
 	}
 
 	void appendContextMenu(Menu *menu) override {

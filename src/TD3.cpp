@@ -40,12 +40,34 @@ struct TD_316 : Module {
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
 		json_object_set_new(rootJ, "width", json_real(moduleSize));
+		json_object_set_new(rootJ, "text", json_string(text.c_str()));
+		json_object_set_new(rootJ, "size", json_real(fontSize));
+		json_object_set_new(rootJ, "fg", json_string(color::toHexString(fg).c_str()));
+		json_object_set_new(rootJ, "bg", json_string(color::toHexString(bg).c_str()));
 		return rootJ;
 	}
 	void dataFromJson(json_t *rootJ) override {
-		json_t *sizeJ = json_object_get(rootJ, "width");
-		if (sizeJ)
-			moduleSize = clamp(json_number_value(sizeJ), 75.0f, 300.0f);
+		json_t *widthJ = json_object_get(rootJ, "width");
+		if (widthJ) {
+			moduleSize = clamp(json_number_value(widthJ), 75.0f, 300.0f);
+		}
+		json_t *textJ = json_object_get(rootJ, "text");
+		if (textJ) {
+			text = json_string_value(textJ);
+		}
+		json_t *sizeJ = json_object_get(rootJ, "size");
+		if (sizeJ) {
+			fontSize = json_number_value(sizeJ);
+		}
+		json_t *fgJ = json_object_get(rootJ, "fg");
+		if (fgJ) {
+			fg = color::fromHexString(json_string_value(fgJ));
+		}
+		json_t *bgJ = json_object_get(rootJ, "bg");
+		if (bgJ) {
+			bg = color::fromHexString(json_string_value(bgJ));
+		}
+		
 	}
 	int reset = 0;
 	float fontSize = 12.0f;
@@ -54,7 +76,9 @@ struct TD_316 : Module {
 	bool fgDirty = false;
 	bool bgDirty = false;
 	bool fontSizeDirty = false;
+	bool textDirty = false;
 	float moduleSize = 240.0;
+	std::string text;
 };
 
 namespace {
@@ -96,19 +120,17 @@ struct TD316 : SchemeModuleWidget {
 		addChild(textField);
 	}
 
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
-
-		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
-		json_object_set_new(rootJ, "size", json_real(textField->fontSize));
-		json_object_set_new(rootJ, "fg", json_string(color::toHexString(textField->color).c_str()));
-		json_object_set_new(rootJ, "bg", json_string(color::toHexString(textField->bgColor).c_str()));
-
-		return rootJ;
-	}
-
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
+		TD_316 *td = dynamic_cast<TD_316 *>(module);
+		if (td) {
+			textField->text = td->text;
+			textField->fontSize = td->fontSize;
+			textField->color = td->fg;
+			textField->bgColor = td->bg;
+			box.size.x = td->moduleSize;
+			schemePanel->resize(this, box);
+		}
 
 		json_t *textJ = json_object_get(rootJ, "text");
 		if (textJ)
@@ -124,9 +146,6 @@ struct TD316 : SchemeModuleWidget {
 		if (bgJ) {
 			textField->bgColor = color::fromHexString(json_string_value(bgJ));
 		}
-		TD_316 *td = dynamic_cast<TD_316 *>(module);
-		box.size.x = td->moduleSize;
-		schemePanel->resize(this, box);
 		
 	}
 
@@ -154,6 +173,10 @@ struct TD316 : SchemeModuleWidget {
 			textField->bgColor = nvgRGB(0,0,0);	
 			tdModule->reset = 0;
 		}
+		tdModule->text = textField->text;
+		tdModule->fontSize = textField->fontSize;
+		tdModule->fg = textField->color;
+		tdModule->bg = textField->bgColor;
 		ModuleWidget::step();
 	}
 
