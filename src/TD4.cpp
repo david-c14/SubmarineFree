@@ -207,7 +207,7 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	int clampPosition(int input) {
-		return clamp(input, 13, (int)(box.size.y) - 33);
+		return clamp(input, 13, (int)(box.size.y) - 36);
 	}
 
 	int clampFontSize(int input) {
@@ -481,9 +481,9 @@ struct TD410 : SchemeModuleWidget {
 	
 	void setPosition(TD4Text *textItem, int oldPosition, int newPosition) {
 		newPosition = clampPosition(newPosition);
+		textItem->box.pos.y = textItem->data->position = newPosition;
 		if (newPosition == oldPosition)
 			return;
-		textItem->box.pos.y = textItem->data->position = newPosition;
 		if (!module)
 			return;
 		int moduleId = module->id;

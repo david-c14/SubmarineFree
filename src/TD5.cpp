@@ -22,7 +22,7 @@ namespace {
 		std::function<void ()> addMenuHandler;
 		std::function<void (int oldPostion, int newPosition)> posHandler;
 		int oldPosition = 0;
-		TD5Text(int dummy) {
+		TD5Text() {
 			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			this->box.size = Vec(20, 350);
 		}
@@ -59,7 +59,7 @@ namespace {
 			if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 				APP->window->cursorLock();
 				e.consume(this);
-				oldPosition = box.pos.y;
+				oldPosition = box.pos.x;
 			}
 			OpaqueWidget::onDragStart(e);
 		}
@@ -67,9 +67,9 @@ namespace {
 			if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 				APP->window->cursorUnlock();
 				e.consume(this);
-				if (box.pos.y != oldPosition) {
+				if (box.pos.x != oldPosition) {
 					if (posHandler) {
-						posHandler(oldPosition, box.pos.y);
+						posHandler(oldPosition, box.pos.x);
 					}
 				}
 			}
@@ -78,7 +78,7 @@ namespace {
 		void onDragMove(const event::DragMove &e) override {
 			if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 				e.consume(this);
-				box.pos.y += e.mouseDelta.y;
+				box.pos.x += e.mouseDelta.x;
 			}
 			OpaqueWidget::onDragMove(e);
 		}
@@ -163,15 +163,16 @@ struct TD510 : SchemeModuleWidget {
 		if (!tdModule) return;
 		
 		for(TD5Data *data : tdModule->dataItems) {
-			TD5Text *item = new TD5Text(box.size.x);
+			TD5Text *item = new TD5Text();
 			item->data = data;
-			item->box.pos = Vec(4, 18);
+			item->box.pos = Vec(4, 15);
 			addClickHandler(item);
 			item->id = nextId++;
-			item->box.size.y = data->fontSize = clampFontSize(data->fontSize);
-			item->box.pos.y = data->position = clampPosition(data->position);
+			item->box.size.x = data->fontSize = clampFontSize(data->fontSize);
+			item->box.pos.x = data->position;
 			addText(item);
 		}
+		box.size.x = tdModule->moduleSize;
 		json_t *a1 = json_object_get(rootJ, "items");
 		if (a1) {
 			int asize = json_array_size(a1);
@@ -180,9 +181,9 @@ struct TD510 : SchemeModuleWidget {
 				if (i) {
 					TD5Data *data = new TD5Data;
 					tdModule->dataItems.push_back(data);
-					TD5Text *item = new TD5Text(box.size.x);
+					TD5Text *item = new TD5Text();
 					item->data = data;
-					item->box.pos = Vec(4, 18);
+					item->box.pos = Vec(4, 15);
 					addClickHandler(item);
 					item->id = nextId++;
 					json_t *text = json_object_get(i, "text");
@@ -195,7 +196,7 @@ struct TD510 : SchemeModuleWidget {
 					}
 					json_t *pos = json_object_get(i, "position");
 					if (pos) {
-						item->box.pos.y = data->position = clampPosition(json_number_value(pos));
+						item->box.pos.x = data->position = json_number_value(pos);
 					}
 					json_t *align = json_object_get(i, "alignment");
 					if (align) {
@@ -205,12 +206,11 @@ struct TD510 : SchemeModuleWidget {
 				}
 			}
 		}
-		box.size.x = tdModule->moduleSize;
 		schemePanel->resize(this, box);
 	}
 
 	int clampPosition(int input) {
-		return clamp(input, 13, (int)(box.size.y) - 33);
+		return clamp(input, 4, (int)(box.size.x) - 28);
 	}
 
 	int clampFontSize(int input) {
@@ -268,7 +268,7 @@ struct TD510 : SchemeModuleWidget {
 		paramField->setText(str);
 		paramField->changeHandler = [=](std::string text) {
 			try {
-				setPosition(textItem, textItem->box.pos.y, clampPosition(stoi(text, NULL)));
+				setPosition(textItem, textItem->box.pos.x, clampPosition(stoi(text, NULL)));
 			}
 			catch (...) {
 			}
@@ -337,7 +337,7 @@ struct TD510 : SchemeModuleWidget {
 			};
 			menu->addChild(fontSizeMenu);
 
-			EventWidgetMenuItem *leftAlign = createMenuItem<EventWidgetMenuItem>("Left Align");
+			EventWidgetMenuItem *leftAlign = createMenuItem<EventWidgetMenuItem>("Top Align");
 			leftAlign->stepHandler = [=]() {
 				leftAlign->rightText = CHECKMARK(textItem->data->alignment & NVG_ALIGN_LEFT);
 			};
@@ -355,7 +355,7 @@ struct TD510 : SchemeModuleWidget {
 			};
 			menu->addChild(centerAlign);
 			
-			EventWidgetMenuItem *rightAlign = createMenuItem<EventWidgetMenuItem>("Right Align");
+			EventWidgetMenuItem *rightAlign = createMenuItem<EventWidgetMenuItem>("Bottom Align");
 			rightAlign->stepHandler = [=]() {
 				rightAlign->rightText = CHECKMARK(textItem->data->alignment & NVG_ALIGN_RIGHT);
 			};
@@ -484,9 +484,9 @@ struct TD510 : SchemeModuleWidget {
 	
 	void setPosition(TD5Text *textItem, int oldPosition, int newPosition) {
 		newPosition = clampPosition(newPosition);
+		textItem->box.pos.x = textItem->data->position = newPosition;
 		if (newPosition == oldPosition)
 			return;
-		textItem->box.pos.y = textItem->data->position = newPosition;
 		if (!module)
 			return;
 		int moduleId = module->id;
@@ -499,7 +499,7 @@ struct TD510 : SchemeModuleWidget {
 				if (mw) {
 					TD5Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->box.pos.y = foundItem->data->position = oldPosition;
+						foundItem->box.pos.x = foundItem->data->position = oldPosition;
 					}
 				}
 			},
@@ -508,7 +508,7 @@ struct TD510 : SchemeModuleWidget {
 				if (mw) {
 					TD5Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->box.pos.y = foundItem->data->position = newPosition;
+						foundItem->box.pos.x = foundItem->data->position = newPosition;
 					}
 				}
 			}
@@ -520,8 +520,8 @@ struct TD510 : SchemeModuleWidget {
 		if (newSize == oldSize)
 			return;
 		int oldPosition = textItem->data->position;
-		textItem->box.size.y = textItem->data->fontSize = newSize;
-		int newPosition = textItem->box.pos.y = textItem->data->position = clampPosition(textItem->data->position);
+		textItem->box.size.x = textItem->data->fontSize = newSize;
+		int newPosition = textItem->box.pos.x = textItem->data->position = clampPosition(textItem->data->position);
 		if (!module)
 			return;
 		int moduleId = module->id;
@@ -534,8 +534,8 @@ struct TD510 : SchemeModuleWidget {
 				if (mw) {
 					TD5Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->box.size.y = foundItem->data->fontSize = oldSize;
-						foundItem->box.pos.y = foundItem->data->position = oldPosition;
+						foundItem->box.size.x = foundItem->data->fontSize = oldSize;
+						foundItem->box.pos.x = foundItem->data->position = oldPosition;
 					}
 				}
 			},
@@ -544,8 +544,8 @@ struct TD510 : SchemeModuleWidget {
 				if (mw) {
 					TD5Text *foundItem = mw->getTextItem(index);
 					if (foundItem) {
-						foundItem->box.size.y = foundItem->data->fontSize = newSize;
-						foundItem->box.pos.y = foundItem->data->position = newPosition;
+						foundItem->box.size.x = foundItem->data->fontSize = newSize;
+						foundItem->box.pos.x = foundItem->data->position = newPosition;
 					}
 				}
 			}
@@ -590,10 +590,10 @@ struct TD510 : SchemeModuleWidget {
 	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment, int fontSize) {
 		TD5Data *newData = new TD5Data;
 		dynamic_cast<TD_510 *>(module)->dataItems.push_back(newData);
-		TD5Text *newItem = new TD5Text(box.size.x);
+		TD5Text *newItem = new TD5Text();
 		newItem->data = newData;
-		newItem->box.size.y = fontSize;
-		newItem->box.pos = Vec(4, newData->position = position);
+		newItem->box.size.x = fontSize;
+		newItem->box.pos = Vec(newData->position = position, 15);
 		newItem->id = id;
 		addClickHandler(newItem);
 		newData->color = color;
@@ -635,10 +635,10 @@ struct TD510 : SchemeModuleWidget {
 		while (!found) {
 			found = true;
 			for (TD5Text *text: textItems) {
-				if (abs(text->box.pos.y - position) < spacing) {
+				if (abs(text->box.pos.x - position) < spacing) {
 					found = false;
-					if ((text->box.pos.y + spacing) > position) {
-						position = text->box.pos.y + spacing;
+					if ((text->box.pos.x + spacing) > position) {
+						position = text->box.pos.x + spacing;
 					}
 					break;
 				} 
@@ -655,9 +655,9 @@ struct TD510 : SchemeModuleWidget {
 		int position = findPosition(20);
 		TD5Data *newData = new TD5Data;
 		dynamic_cast<TD_510 *>(module)->dataItems.push_back(newData);
-		TD5Text *newItem = new TD5Text(box.size.x);
+		TD5Text *newItem = new TD5Text();
 		newItem->data = newData;
-		newItem->box.pos = Vec(4, newData->position = position);
+		newItem->box.pos = Vec(newData->position = position, 4);
 		newItem->id = nextId++;
 		addClickHandler(newItem);
 		addNewTextWithHistory(newItem);
@@ -671,7 +671,7 @@ struct TD510 : SchemeModuleWidget {
 		int index = newItem->id;
 		NVGcolor color = newItem->data->color;
 		std::string text = newItem->data->text;
-		int position = newItem->box.pos.y;
+		int position = newItem->box.pos.x;
 		int alignment = newItem->data->alignment;
 		int fontSize = newItem->data->fontSize;
 		
@@ -701,7 +701,7 @@ struct TD510 : SchemeModuleWidget {
 		NVGcolor color = oldItem->data->color;
 		std::string text = oldItem->data->text;
 		int alignment = oldItem->data->alignment;
-		int position = oldItem->box.pos.y;
+		int position = oldItem->box.pos.x;
 		int fontSize = oldItem->data->fontSize;
 	
 		APP->history->push(new EventWidgetAction(
@@ -741,7 +741,7 @@ struct TD510 : SchemeModuleWidget {
 	}
 	void onResized() {
 		for (TD5Text *text : textItems) {
-			text->box.size.x = box.size.x - 8;
+			text->box.pos.x = text->data->position = clampPosition(text->data->position);
 		}
 		if (module) {
 			TD_510 *td = dynamic_cast<TD_510 *>(module);
