@@ -77,6 +77,7 @@ extern Model *modelTD116;
 extern Model *modelTD202;
 extern Model *modelTD316;
 extern Model *modelTD410;
+extern Model *modelTD510;
 extern Model *modelTF101;
 extern Model *modelTF102;
 extern Model *modelTM105;
