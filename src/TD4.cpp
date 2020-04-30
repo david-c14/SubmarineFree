@@ -12,6 +12,7 @@ namespace {
 		NVGcolor color = SUBLIGHTBLUE;
 		float position = 20;
 		int alignment = NVG_ALIGN_CENTER;
+		int fontSize = 20;
 	};
 
 	struct TD4Text : OpaqueWidget {
@@ -27,7 +28,7 @@ namespace {
 		}
 		void draw(const DrawArgs &args) override {
 			nvgFontFaceId(args.vg, font->handle);
-			nvgFontSize(args.vg, 20);
+			nvgFontSize(args.vg, data->fontSize);
 			nvgFillColor(args.vg, data->color);
 			if (data->alignment & NVG_ALIGN_LEFT) {
 				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
@@ -97,6 +98,7 @@ struct TD_410 : Module {
 			json_object_set_new(item, "color", json_string(color::toHexString(data->color).c_str()));
 			json_object_set_new(item, "position", json_real(data->position));
 			json_object_set_new(item, "alignment", json_real(data->alignment));
+			json_object_set_new(item, "fontSize", json_real(data->fontSize));
 			json_array_append_new(arr, item);
 		}
 		json_object_set_new(rootJ, "items", arr);
@@ -129,6 +131,10 @@ struct TD_410 : Module {
 					if (align) {
 						item->alignment = json_number_value(align);
 					}
+					json_t *fSize = json_object_get(i, "fontSize");
+					if (fSize) {
+						item->fontSize = json_number_value(fSize);
+					}
 					dataItems.push_back(item);
 				}
 			}
@@ -159,6 +165,7 @@ struct TD410 : SchemeModuleWidget {
 			item->box.pos = Vec(4, 18);
 			addClickHandler(item);
 			item->id = nextId++;
+			item->box.size.y = data->fontSize = clampFontSize(data->fontSize);
 			item->box.pos.y = data->position = clampPosition(data->position);
 			addText(item);
 		}
@@ -201,6 +208,10 @@ struct TD410 : SchemeModuleWidget {
 
 	int clampPosition(int input) {
 		return clamp(input, 13, (int)(box.size.y) - 33);
+	}
+
+	int clampFontSize(int input) {
+		return clamp(input, 6, 26);
 	}
 
 	void textNameSubMenu(Menu *menu, TD4Text *textItem) {
@@ -262,6 +273,22 @@ struct TD410 : SchemeModuleWidget {
 		menu->addChild(paramField);
 	}
 
+	void fontSizeSubMenu(Menu *menu, TD4Text *textItem) {
+		EventParamField *paramField = new EventParamField();
+		paramField->box.size.x = 100;
+		char str[20];
+		snprintf(str, 20, "%d", textItem->data->fontSize);
+		paramField->setText(str);
+		paramField->changeHandler = [=](std::string text) {
+			try {
+				setFontSize(textItem, textItem->data->fontSize, clampFontSize(stoi(text, NULL)));
+			}
+			catch (...) {
+			}
+		};
+		menu->addChild(paramField);
+	}
+
 	void addClickHandler(TD4Text *textItem) {
 		textItem->posHandler = [=](int oldPosition, int newPosition) {
 			setPosition(textItem, oldPosition, newPosition);
@@ -296,6 +323,16 @@ struct TD410 : SchemeModuleWidget {
 				return subMenu;
 			};
 			menu->addChild(positionMenu);
+
+			snprintf(str, 20, "Font Size: %d", textItem->data->fontSize);
+			EventWidgetMenuItem *fontSizeMenu = createMenuItem<EventWidgetMenuItem>(str);
+			fontSizeMenu->rightText = SUBMENU;
+			fontSizeMenu->childMenuHandler = [=]() {
+				Menu *subMenu = new Menu();
+				fontSizeSubMenu(subMenu, textItem);
+				return subMenu;
+			};
+			menu->addChild(fontSizeMenu);
 
 			EventWidgetMenuItem *leftAlign = createMenuItem<EventWidgetMenuItem>("Left Align");
 			leftAlign->stepHandler = [=]() {
@@ -475,6 +512,43 @@ struct TD410 : SchemeModuleWidget {
 		));
 	}
 
+	void setFontSize(TD4Text *textItem, int oldSize, int newSize) {
+		newSize = clampFontSize(newSize);
+		if (newSize == oldSize)
+			return;
+		int oldPosition = textItem->data->position;
+		textItem->box.size.y = textItem->data->fontSize = newSize;
+		int newPosition = textItem->box.pos.y = textItem->data->position = clampPosition(textItem->data->position);
+		if (!module)
+			return;
+		int moduleId = module->id;
+		unsigned int index = textItem->id;
+
+		APP->history->push(new EventWidgetAction(
+			"TD-410 Change Font Size",
+			[=]() {
+				TD410 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					TD4Text *foundItem = mw->getTextItem(index);
+					if (foundItem) {
+						foundItem->box.size.y = foundItem->data->fontSize = oldSize;
+						foundItem->box.pos.y = foundItem->data->position = oldPosition;
+					}
+				}
+			},
+			[=]() {
+				TD410 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					TD4Text *foundItem = mw->getTextItem(index);
+					if (foundItem) {
+						foundItem->box.size.y = foundItem->data->fontSize = newSize;
+						foundItem->box.pos.y = foundItem->data->position = newPosition;
+					}
+				}
+			}
+		));
+	}
+
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
 		EventWidgetMenuItem *mi = createMenuItem<EventWidgetMenuItem>("Add Label");
@@ -510,27 +584,30 @@ struct TD410 : SchemeModuleWidget {
 		textItems.push_back(textField);
 	}
 
-	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment) {
+	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment, int fontSize) {
 		TD4Data *newData = new TD4Data;
 		dynamic_cast<TD_410 *>(module)->dataItems.push_back(newData);
 		TD4Text *newItem = new TD4Text(box.size.x);
 		newItem->data = newData;
+		newItem->box.size.y = fontSize;
 		newItem->box.pos = Vec(4, newData->position = position);
 		newItem->id = id;
 		addClickHandler(newItem);
 		newData->color = color;
 		newData->text = text;
 		newData->alignment = alignment;
+		newData->fontSize = fontSize;
 		addText(newItem);
 	}
 
 	void duplicateItem(TD4Text *textItem) {
 		int index = nextId++;
-		int position = findPosition();
+		int fontSize = textItem->data->fontSize;
+		int position = findPosition(fontSize);
 		NVGcolor color = textItem->data->color;
 		std::string text = textItem->data->text;
 		int alignment = textItem->data->alignment;
-		addText(index, text, color, position, alignment);
+		addText(index, text, color, position, alignment, fontSize);
 		int moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"TD-410 Duplicate Label",
@@ -543,15 +620,14 @@ struct TD410 : SchemeModuleWidget {
 			[=]() {
 				TD410 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment);
+					mw->addText(index, text, color, position, alignment, fontSize);
 				}
 			}
 		));
 	}
 
-	int findPosition() {
+	int findPosition(int spacing) {
 		int position = clampPosition(0);
-		const int spacing = 20;
 		bool found = false;
 		while (!found) {
 			found = true;
@@ -573,7 +649,7 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void addNewText() {
-		int position = findPosition();
+		int position = findPosition(20);
 		TD4Data *newData = new TD4Data;
 		dynamic_cast<TD_410 *>(module)->dataItems.push_back(newData);
 		TD4Text *newItem = new TD4Text(box.size.x);
@@ -594,6 +670,7 @@ struct TD410 : SchemeModuleWidget {
 		std::string text = newItem->data->text;
 		int position = newItem->box.pos.y;
 		int alignment = newItem->data->alignment;
+		int fontSize = newItem->data->fontSize;
 		
 		APP->history->push(new EventWidgetAction(
 			"TD-410 Add Label",
@@ -606,7 +683,7 @@ struct TD410 : SchemeModuleWidget {
 			[=]() {
 				TD410 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment);
+					mw->addText(index, text, color, position, alignment, fontSize);
 				}
 			}
 		));
@@ -622,13 +699,14 @@ struct TD410 : SchemeModuleWidget {
 		std::string text = oldItem->data->text;
 		int alignment = oldItem->data->alignment;
 		int position = oldItem->box.pos.y;
+		int fontSize = oldItem->data->fontSize;
 	
 		APP->history->push(new EventWidgetAction(
 			"TD-410 Remove Label",
 			[=]() {
 				TD410 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment);
+					mw->addText(index, text, color, position, alignment, fontSize);
 				}
 			},
 			[=]() {
