@@ -13,15 +13,20 @@ namespace {
 		float position = 20;
 		int alignment = NVG_ALIGN_CENTER;
 		int fontSize = 20;
+		int flip = 0;
 	};
 
 	struct TD5Text : OpaqueWidget {
 		unsigned int id = 0;
-		TD5Data *data;
+		TD5Data *data = NULL;
 		std::shared_ptr<Font> font;
 		std::function<void ()> addMenuHandler;
 		std::function<void (int oldPostion, int newPosition)> posHandler;
 		int oldPosition = 0;
+		~TD5Text() {
+			if (data)
+				delete(data);
+		}
 		TD5Text() {
 			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			this->box.size = Vec(20, 350);
@@ -31,18 +36,30 @@ namespace {
 			nvgFontSize(args.vg, data->fontSize);
 			nvgFillColor(args.vg, data->color);
 			nvgSave(args.vg);
-			nvgRotate(args.vg, M_PI * 0.5f);
-			if (data->alignment & NVG_ALIGN_LEFT) {
-				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, 0, -box.size.x / 2, data->text.c_str(), NULL);
+			int alignment = data->alignment;
+			if (data->flip) {
+				nvgTranslate(args.vg, 0, box.size.y);
+				nvgRotate(args.vg, M_PI * -0.5f);
+				if (data->alignment == 1)
+					alignment = 4;
+				else if (data->alignment == 4)
+					alignment = 1;
 			}
-			else if (data->alignment & NVG_ALIGN_RIGHT) {
+			else {
+				nvgTranslate(args.vg, box.size.x, 0);
+				nvgRotate(args.vg, M_PI * 0.5f);
+			}
+			if (alignment & NVG_ALIGN_LEFT) {
+				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+				nvgText(args.vg, 0, box.size.x / 2, data->text.c_str(), NULL);
+			}
+			else if (alignment & NVG_ALIGN_RIGHT) {
 				nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.y, -box.size.x / 2, data->text.c_str(), NULL);
+				nvgText(args.vg, box.size.y, box.size.x / 2, data->text.c_str(), NULL);
 			}
 			else {
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.y / 2, -box.size.x / 2, data->text.c_str(), NULL);
+				nvgText(args.vg, box.size.y / 2, box.size.x / 2, data->text.c_str(), NULL);
 			}
 			nvgRestore(args.vg);
 		}
@@ -574,6 +591,7 @@ struct TD510 : SchemeModuleWidget {
 		TD_510 *td = dynamic_cast<TD_510 *>(module);
 		td->dataItems.erase(std::remove(td->dataItems.begin(), td->dataItems.end(), text->data), td->dataItems.end());
 		textItems.erase(std::remove(textItems.begin(), textItems.end(), text), textItems.end());
+		delete text;
 	}
 
 	void removeText(unsigned int index) {
@@ -637,8 +655,11 @@ struct TD510 : SchemeModuleWidget {
 			for (TD5Text *text: textItems) {
 				if (abs(text->box.pos.x - position) < spacing) {
 					found = false;
-					if ((text->box.pos.x + spacing) > position) {
-						position = text->box.pos.x + spacing;
+					if ((text->box.pos.x + text->data->fontSize) > position) {
+						position = text->box.pos.x + text->data->fontSize;
+					}
+					else {
+						position += 5;
 					}
 					break;
 				} 
@@ -657,7 +678,7 @@ struct TD510 : SchemeModuleWidget {
 		dynamic_cast<TD_510 *>(module)->dataItems.push_back(newData);
 		TD5Text *newItem = new TD5Text();
 		newItem->data = newData;
-		newItem->box.pos = Vec(newData->position = position, 4);
+		newItem->box.pos = Vec(newData->position = position, 15);
 		newItem->id = nextId++;
 		addClickHandler(newItem);
 		addNewTextWithHistory(newItem);

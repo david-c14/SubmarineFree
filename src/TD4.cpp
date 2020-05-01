@@ -17,11 +17,15 @@ namespace {
 
 	struct TD4Text : OpaqueWidget {
 		unsigned int id = 0;
-		TD4Data *data;
+		TD4Data *data = NULL;
 		std::shared_ptr<Font> font;
 		std::function<void ()> addMenuHandler;
 		std::function<void (int oldPostion, int newPosition)> posHandler;
 		int oldPosition = 0;
+		~TD4Text() {
+			if (data)
+				delete data;
+		}
 		TD4Text(float width) {
 			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			this->box.size = Vec(width - 8.0f, 20);
@@ -571,6 +575,7 @@ struct TD410 : SchemeModuleWidget {
 		TD_410 *td = dynamic_cast<TD_410 *>(module);
 		td->dataItems.erase(std::remove(td->dataItems.begin(), td->dataItems.end(), text->data), td->dataItems.end());
 		textItems.erase(std::remove(textItems.begin(), textItems.end(), text), textItems.end());
+		delete text;
 	}
 
 	void removeText(unsigned int index) {
@@ -634,8 +639,11 @@ struct TD410 : SchemeModuleWidget {
 			for (TD4Text *text: textItems) {
 				if (abs(text->box.pos.y - position) < spacing) {
 					found = false;
-					if ((text->box.pos.y + spacing) > position) {
-						position = text->box.pos.y + spacing;
+					if ((text->box.pos.y + text->data->fontSize) > position) {
+						position = text->box.pos.y + text->data->fontSize;
+					}
+					else {
+						position += 5;
 					}
 					break;
 				} 
