@@ -34,6 +34,8 @@ namespace {
 			nvgFontFaceId(args.vg, font->handle);
 			nvgFontSize(args.vg, data->fontSize);
 			nvgFillColor(args.vg, data->color);
+			nvgSave(args.vg);
+			nvgScissor(args.vg, args.clipBox.pos.x, args.clipBox.pos.y, args.clipBox.size.x, args.clipBox.size.y);	
 			if (data->alignment & NVG_ALIGN_LEFT) {
 				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 				nvgText(args.vg, 0, box.size.y / 2, data->text.c_str(), NULL);
@@ -46,6 +48,7 @@ namespace {
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
 				nvgText(args.vg, box.size.x / 2, box.size.y / 2, data->text.c_str(), NULL);
 			}
+			nvgRestore(args.vg);
 		}
 		void onButton(const event::Button &e) override {
 			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {

@@ -36,6 +36,7 @@ namespace {
 			nvgFontSize(args.vg, data->fontSize);
 			nvgFillColor(args.vg, data->color);
 			nvgSave(args.vg);
+			nvgScissor(args.vg, args.clipBox.pos.x, args.clipBox.pos.y, args.clipBox.size.x, args.clipBox.size.y);
 			int alignment = data->alignment;
 			if (data->flip) {
 				nvgTranslate(args.vg, 0, box.size.y);
@@ -119,6 +120,7 @@ struct TD_510 : Module {
 			json_object_set_new(item, "position", json_real(data->position));
 			json_object_set_new(item, "alignment", json_real(data->alignment));
 			json_object_set_new(item, "fontSize", json_real(data->fontSize));
+			json_object_set_new(item, "flip", json_real(data->flip));
 			json_array_append_new(arr, item);
 		}
 		json_object_set_new(rootJ, "items", arr);
@@ -154,6 +156,10 @@ struct TD_510 : Module {
 					json_t *fSize = json_object_get(i, "fontSize");
 					if (fSize) {
 						item->fontSize = json_number_value(fSize);
+					}
+					json_t *flip = json_object_get(i, "flip");
+					if (flip) {
+						item->flip = json_number_value(flip);
 					}
 					dataItems.push_back(item);
 				}
@@ -236,7 +242,7 @@ struct TD510 : SchemeModuleWidget {
 
 	void textNameSubMenu(Menu *menu, TD5Text *textItem) {
 		EventParamField *paramField = new EventParamField();
-		paramField->box.size.x = 100;
+		paramField->box.size.x = 250;
 		paramField->setText(textItem->data->text);
 		paramField->changeHandler = [=](std::string text) {
 			setText(textItem, text);
@@ -380,6 +386,15 @@ struct TD510 : SchemeModuleWidget {
 				setAlignment(textItem, NVG_ALIGN_RIGHT);
 			};
 			menu->addChild(rightAlign);
+
+			EventWidgetMenuItem *flip = createMenuItem<EventWidgetMenuItem>("Flip");
+			flip->stepHandler = [=]() {
+				flip->rightText = CHECKMARK(textItem->data->flip);
+			};
+			flip->clickHandler = [=]() {
+				setFlip(textItem, !(textItem->data->flip));
+			};
+			menu->addChild(flip);
 
 			menu->addChild(new MenuSeparator);
 			
@@ -569,6 +584,37 @@ struct TD510 : SchemeModuleWidget {
 		));
 	}
 
+	void setFlip(TD5Text *textItem, int flip) {
+		if (!module)
+			return;
+		textItem->data->flip = flip;
+		int moduleId = module->id;
+		unsigned int index = textItem->id;
+		
+		APP->history->push(new EventWidgetAction(
+			"TD-510 Flip Text Direction",
+			[=]() {
+				TD510 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					TD5Text *foundItem = mw->getTextItem(index);
+					if (foundItem) {
+						foundItem->data->flip = !flip;
+					}
+				}
+			},
+			[=]() {
+				TD510 *mw = getModuleWidgetById(moduleId);
+				if (mw) {
+					TD5Text *foundItem = mw->getTextItem(index);
+					if (foundItem) {
+						foundItem->data->flip = flip;
+					}
+				}
+			}
+		));
+		
+	}
+
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
 		EventWidgetMenuItem *mi = createMenuItem<EventWidgetMenuItem>("Add Label");
@@ -605,7 +651,7 @@ struct TD510 : SchemeModuleWidget {
 		textItems.push_back(textField);
 	}
 
-	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment, int fontSize) {
+	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment, int fontSize, int flip) {
 		TD5Data *newData = new TD5Data;
 		dynamic_cast<TD_510 *>(module)->dataItems.push_back(newData);
 		TD5Text *newItem = new TD5Text();
@@ -618,6 +664,7 @@ struct TD510 : SchemeModuleWidget {
 		newData->text = text;
 		newData->alignment = alignment;
 		newData->fontSize = fontSize;
+		newData->flip = flip;
 		addText(newItem);
 	}
 
@@ -628,7 +675,8 @@ struct TD510 : SchemeModuleWidget {
 		NVGcolor color = textItem->data->color;
 		std::string text = textItem->data->text;
 		int alignment = textItem->data->alignment;
-		addText(index, text, color, position, alignment, fontSize);
+		int flip = textItem->data->flip;
+		addText(index, text, color, position, alignment, fontSize, flip);
 		int moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Duplicate Label",
@@ -641,7 +689,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment, fontSize);
+					mw->addText(index, text, color, position, alignment, fontSize, flip);
 				}
 			}
 		));
@@ -695,6 +743,7 @@ struct TD510 : SchemeModuleWidget {
 		int position = newItem->box.pos.x;
 		int alignment = newItem->data->alignment;
 		int fontSize = newItem->data->fontSize;
+		int flip = newItem->data->flip;
 		
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Add Label",
@@ -707,7 +756,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment, fontSize);
+					mw->addText(index, text, color, position, alignment, fontSize, flip);
 				}
 			}
 		));
@@ -724,13 +773,14 @@ struct TD510 : SchemeModuleWidget {
 		int alignment = oldItem->data->alignment;
 		int position = oldItem->box.pos.x;
 		int fontSize = oldItem->data->fontSize;
+		int flip = oldItem->data->flip;
 	
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Remove Label",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment, fontSize);
+					mw->addText(index, text, color, position, alignment, fontSize, flip);
 				}
 			},
 			[=]() {
