@@ -378,6 +378,13 @@
 			"tags": ["VISUAL"]
 		},
 		{
+			"slug":"TD-510",
+			"name":"TD-510",
+			"description": "TD-510 Vertical Text Display",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/master/manual/TD.md",
+			"tags": ["VISUAL"]
+		},
+		{
 			"slug":"TF-101",
 			"name":"TF-101",
 			"description": "TF-101 Text Display Format Control",

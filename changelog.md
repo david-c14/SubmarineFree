@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.5
+- 30-Apr-2020 TD-510 Vertical multiple label textbox
 - 30-Apr-2020 TD-410 Add font size option
 - 29-Apr-2020 TD-410 Add duplicate label option
 - 29-Apr-2020 TD-410 persist data in Module not in Widget
