@@ -5,8 +5,6 @@
 
 namespace {
 
-	unsigned int nextId = 0;
-
 	struct TD5Data {
 		std::string text = "New Label";
 		NVGcolor color = SUBLIGHTBLUE;
@@ -17,7 +15,6 @@ namespace {
 	};
 
 	struct TD5Text : OpaqueWidget {
-		unsigned int id = 0;
 		TD5Data *data = NULL;
 		std::shared_ptr<Font> font;
 		std::function<void ()> addMenuHandler;
@@ -190,7 +187,6 @@ struct TD510 : SchemeModuleWidget {
 			item->data = data;
 			item->box.pos = Vec(4, 15);
 			addClickHandler(item);
-			item->id = nextId++;
 			item->box.size.x = data->fontSize = clampFontSize(data->fontSize);
 			item->box.pos.x = data->position;
 			addText(item);
@@ -208,7 +204,6 @@ struct TD510 : SchemeModuleWidget {
 					item->data = data;
 					item->box.pos = Vec(4, 15);
 					addClickHandler(item);
-					item->id = nextId++;
 					json_t *text = json_object_get(i, "text");
 					if (text) {
 						data->text = json_string_value(text);
@@ -238,6 +233,25 @@ struct TD510 : SchemeModuleWidget {
 
 	int clampFontSize(int input) {
 		return clamp(input, 6, 26);
+	}
+
+	unsigned int index(TD5Text *textItem) {
+		unsigned int i = 0;
+		for (TD5Text *item : textItems) {
+			if (item == textItem)
+				return i;
+			i++;
+		}
+		return 0;
+	}
+
+	void insert(unsigned int index) {
+		TD5Text *textItem = textItems.back();
+		textItems.pop_back();
+		TD_510 *tdModule = dynamic_cast<TD_510 *>(module);
+		tdModule->dataItems.pop_back();
+		tdModule->dataItems.insert(tdModule->dataItems.begin() + index, textItem->data);
+		textItems.insert(textItems.begin() + index, textItem);
 	}
 
 	void textNameSubMenu(Menu *menu, TD5Text *textItem) {
@@ -414,11 +428,9 @@ struct TD510 : SchemeModuleWidget {
 		};
 	}
 
-	TD5Text *getTextItem(unsigned int itemId) {
-		for (TD5Text *textItem : textItems) {
-			if (textItem->id == itemId)
-				return textItem;
-		}
+	TD5Text *getTextItem(unsigned int index) {
+		if (index < textItems.size())
+			return textItems[index];
 		return NULL;
 	}
 	
@@ -428,14 +440,14 @@ struct TD510 : SchemeModuleWidget {
 		if (!module)
 			return;
 		int moduleId = module->id;
-		unsigned int index = textItem->id;
+		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Change Label",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->data->text = oldText;
 					}
@@ -444,7 +456,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem)
 						foundItem->data->text = newText;
 				}
@@ -458,14 +470,14 @@ struct TD510 : SchemeModuleWidget {
 		if (!module)
 			return;
 		int moduleId = module->id;
-		unsigned int index = textItem->id;
+		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Change Color",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->data->color = oldColor;
 					}
@@ -474,7 +486,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->data->color = newColor;
 					}
@@ -489,14 +501,14 @@ struct TD510 : SchemeModuleWidget {
 		if (!module)
 			return;
 		int moduleId = module->id;
-		unsigned int index = textItem->id;
+		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Change Alignment",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->data->alignment = oldAlignment;
 					}
@@ -505,7 +517,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->data->alignment = newAlignment;
 					}
@@ -522,14 +534,14 @@ struct TD510 : SchemeModuleWidget {
 		if (!module)
 			return;
 		int moduleId = module->id;
-		unsigned int index = textItem->id;
+		unsigned int id = index(textItem);
 
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Change Position",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->box.pos.x = foundItem->data->position = oldPosition;
 					}
@@ -538,7 +550,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->box.pos.x = foundItem->data->position = newPosition;
 					}
@@ -557,14 +569,14 @@ struct TD510 : SchemeModuleWidget {
 		if (!module)
 			return;
 		int moduleId = module->id;
-		unsigned int index = textItem->id;
+		unsigned int id = index(textItem);
 
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Change Font Size",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->box.size.x = foundItem->data->fontSize = oldSize;
 						foundItem->box.pos.x = foundItem->data->position = oldPosition;
@@ -574,7 +586,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->box.size.x = foundItem->data->fontSize = newSize;
 						foundItem->box.pos.x = foundItem->data->position = newPosition;
@@ -589,14 +601,14 @@ struct TD510 : SchemeModuleWidget {
 			return;
 		textItem->data->flip = flip;
 		int moduleId = module->id;
-		unsigned int index = textItem->id;
+		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Flip Text Direction",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->data->flip = !flip;
 					}
@@ -605,7 +617,7 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					TD5Text *foundItem = mw->getTextItem(index);
+					TD5Text *foundItem = mw->getTextItem(id);
 					if (foundItem) {
 						foundItem->data->flip = flip;
 					}
@@ -651,14 +663,13 @@ struct TD510 : SchemeModuleWidget {
 		textItems.push_back(textField);
 	}
 
-	void addText(unsigned int id, std::string text, NVGcolor color, int position, int alignment, int fontSize, int flip) {
+	void addText(std::string text, NVGcolor color, int position, int alignment, int fontSize, int flip) {
 		TD5Data *newData = new TD5Data;
 		dynamic_cast<TD_510 *>(module)->dataItems.push_back(newData);
 		TD5Text *newItem = new TD5Text();
 		newItem->data = newData;
 		newItem->box.size.x = fontSize;
 		newItem->box.pos = Vec(newData->position = position, 15);
-		newItem->id = id;
 		addClickHandler(newItem);
 		newData->color = color;
 		newData->text = text;
@@ -669,27 +680,27 @@ struct TD510 : SchemeModuleWidget {
 	}
 
 	void duplicateItem(TD5Text *textItem) {
-		int index = nextId++;
 		int fontSize = textItem->data->fontSize;
 		int position = findPosition(fontSize);
 		NVGcolor color = textItem->data->color;
 		std::string text = textItem->data->text;
 		int alignment = textItem->data->alignment;
 		int flip = textItem->data->flip;
-		addText(index, text, color, position, alignment, fontSize, flip);
+		addText(text, color, position, alignment, fontSize, flip);
+		unsigned int id = textItems.size() - 1;
 		int moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Duplicate Label",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->removeText(index);
+					mw->removeText(id);
 				}
 			},
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment, fontSize, flip);
+					mw->addText(text, color, position, alignment, fontSize, flip);
 				}
 			}
 		));
@@ -727,7 +738,6 @@ struct TD510 : SchemeModuleWidget {
 		TD5Text *newItem = new TD5Text();
 		newItem->data = newData;
 		newItem->box.pos = Vec(newData->position = position, 15);
-		newItem->id = nextId++;
 		addClickHandler(newItem);
 		addNewTextWithHistory(newItem);
 	}
@@ -737,7 +747,7 @@ struct TD510 : SchemeModuleWidget {
 		if (!module)
 			return;
 		int moduleId = module->id;
-		int index = newItem->id;
+		int id = index(newItem);
 		NVGcolor color = newItem->data->color;
 		std::string text = newItem->data->text;
 		int position = newItem->box.pos.x;
@@ -750,43 +760,42 @@ struct TD510 : SchemeModuleWidget {
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->removeText(index);
+					mw->removeText(id);
 				}
 			},
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment, fontSize, flip);
+					mw->addText(text, color, position, alignment, fontSize, flip);
 				}
 			}
 		));
 	}
 
 	void removeTextWithHistory(TD5Text *oldItem) {
-		removeText(oldItem);
-		if (!module)
-			return;
 		int moduleId = module->id;
-		unsigned int index = oldItem->id;
+		unsigned int id = index(oldItem);
 		NVGcolor color = oldItem->data->color;
 		std::string text = oldItem->data->text;
 		int alignment = oldItem->data->alignment;
 		int position = oldItem->box.pos.x;
 		int fontSize = oldItem->data->fontSize;
 		int flip = oldItem->data->flip;
+		removeText(oldItem);
 	
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Remove Label",
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->addText(index, text, color, position, alignment, fontSize, flip);
+					mw->addText(text, color, position, alignment, fontSize, flip);
+					mw->insert(id);
 				}
 			},
 			[=]() {
 				TD510 *mw = getModuleWidgetById(moduleId);
 				if (mw) {
-					mw->removeText(index);
+					mw->removeText(id);
 				}
 			}
 		));
