@@ -125,7 +125,7 @@ namespace {
 			float fade = clamp((inputs[controls->cv].isConnected()?params[controls->polar].getValue() * 5.0f + inputs[controls->cv].getVoltage():params[controls->fader].getValue())/10.0f, 0.0f, 1.0f);
 			int mode = 0;
 			if (params[controls->mode].getValue() > 1.5f) {
-				mode = controls->correlator->correlate(inputs[controls->a].getVoltage(), inputs[controls->b].getVoltage());
+				mode = controls->correlator->correlate(inputs[controls->a].getVoltageSum(), inputs[controls->b].getVoltageSum());
 				if (controls->correlator->correlation < -0.1f) {
 					lights[controls->light3].setBrightness(0.0f);
 					lights[controls->light3 + 1].setBrightness(1.0f);
