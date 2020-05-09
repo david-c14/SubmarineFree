@@ -454,10 +454,10 @@ struct AO1 : Module {
 	void process(const ProcessArgs &args) override {
 		float vx[x];
 		for (unsigned int ix = 0; ix < x; ix++) {
-			vx[ix] = inputs[INPUT_X_1 + ix].getVoltage();
+			vx[ix] = inputs[INPUT_X_1 + ix].getVoltageSum();
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			float vy = inputs[INPUT_Y_1 + iy].getVoltage();
+			float vy = inputs[INPUT_Y_1 + iy].getVoltageSum();
 			for (unsigned int ix = 0; ix < x; ix++) {
 				unsigned int f = params[PARAM_FUNC_1 + ix + iy * x].getValue();
 				if (f >= functions.size())

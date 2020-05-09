@@ -14,6 +14,8 @@ Text or formatting information can be sent into the TD-116 through the Torpedo i
 
 The TD-316 is a similar device to the TD-116 but with a 20% larger text display. Although the TD-316 does not feature Torpedo ports, it can still be formatted using the context menu or an extension device.
 
+The TD-316 is resizable using the drag handles in the top corners of the device.
+
 The [TF-101](TF.md) or [TF-102](TF.md) are suitable devices to control the formatting.
 
 #### TD-202 Vertical Text Display
@@ -37,6 +39,24 @@ The TD-410 is a 10-HP text display which can show multiple labels. It can be use
 
 Using the context menu, you can add labels to the device.
 
-Each label has a context menu through which you can change the text, color, alignment and position of the label.
+Each label has a context menu through which you can change the text, color, alignment, size and position of the label.
 
 The labels can be dragged up and down the device to the position that you need.
+
+The TD-410 is resizable using the drag handles in the top corners of the device.
+
+#### TD-510 Vertical Multiple Label Display
+
+![View of the Vertical Multiple Lable Display](TD-510.png "Vertical Multiple Label Display")
+
+## Basic Operation
+
+The TD-510 is as 10-HP text display which can show multiple labels in a vertical orientation. It can be used above or below another device to lable the inputs or signal channels that you are using on that device.
+
+Using the context menu, you can add labels to the device.
+
+Each label has a context menu through which you can change the text, color, alignment, size, position and orientation of the label.
+
+The labels can be dragged left and right to the position that you need.
+
+The TD-510 is resizable using the drag handles in the top corners of the device.

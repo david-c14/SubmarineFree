@@ -11,7 +11,7 @@ The scope can store up to 64 seconds of data, even at 768KHz.
 
 ## Trigger
 
-The scope can be triggered either by a gate or trigger pulse to the TRIGGER input, or by manually pressing the STORE button. Once triggered, a 10 ms 10V pulse is sent through the TRIGGER output, allowing multiple HS-101 devices to be synchronised, even when manually triggered.
+The scope can be triggered either by a gate or trigger pulse to the TRIGGER input, or by manually pressing the STORE button. Once triggered, a 1 ms 10V pulse is sent through the TRIGGER output, allowing multiple HS-101 devices to be synchronised, even when manually triggered.
 
 ## Length
 

@@ -1,3 +1,4 @@
+//SubTag W1 W2 W4 W8 W10 W12 W16 W20 W24 W32
 #include "SubmarineFree.hpp"
 
 template <int x>

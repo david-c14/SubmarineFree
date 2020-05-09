@@ -332,12 +332,38 @@ extern Scheme gScheme;
 
 struct SchemeCanvasWidget; 
 
+//////////////////
+// ResizeHandle
+//////////////////
+
+struct ResizeHandle : OpaqueWidget {
+	bool right = false;
+	Vec dragPos;
+	Rect originalBox;
+
+	ResizeHandle();
+
+	void onDragStart(const event::DragStart& e) override;
+
+	void onDragMove(const event::DragMove& e) override;
+
+	void draw(const DrawArgs& args) override;
+};
+
 struct SchemePanel : FramebufferWidget {
+	SchemeCanvasWidget *canvas;
 	bool isFlat;
+	ResizeHandle *leftHandle;
+	ResizeHandle *rightHandle;
+	float minWidth = 60.0f;
+	float maxWidth = 300.0f;
 	int scheme;
 	SchemePanel();
 	SchemePanel(Vec size);
+	SchemePanel(Vec size, float minimum, float maximum);
 	void step() override;
+	void resize(Rect newBox, Rect oldBox);
+	void resize(ModuleWidget *mw, Rect newBox);
 };
 
 struct SchemeCanvasWidget : Widget {
@@ -498,17 +524,23 @@ struct EventParamField : ui::TextField {
 // SizeableModuleWidget
 //////////////////
 
+struct SizeableModule : Module {
+	float size = 0;
+	json_t *dataToJson() override;
+	void dataFromJson(json_t *rootJ) override;
+};
+
 struct SizeableModuleWidget : SchemeModuleWidget {
+	SizeableModule *sizeableModule = NULL;
+	float fullSize = 0.0f;
 	bool stabilized = false;
-	float fullSize = 0;
 	SchemePanel *panel;
-	SizeableModuleWidget(float size);
+	SizeableModuleWidget(SizeableModule *module, float size);
 	void Resize();
 	void Minimize(bool minimize);
 	void ShiftOthers(float delta);
-	json_t *toJson() override;
 	void fromJson(json_t *rootJ) override;
-	virtual void onResize();
+	virtual void onResized();
 };
 
 struct MinButton : EventWidgetButtonBase {

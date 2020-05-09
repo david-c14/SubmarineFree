@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.1.5
+- 07-May-2020 Issue #116 - Sum Polyphonic inputs for AO-XXX and XF-XXX
+- 30-Apr-2020 TD-510 Vertical multiple label textbox
+- 30-Apr-2020 TD-410 Add font size option
+- 29-Apr-2020 TD-410 Add duplicate label option
+- 29-Apr-2020 TD-410 persist data in Module not in Widget
+- 25-Apr-2020 TD-202 persist data in Module not in Widget
+- 25-Apr-2020 TD-116 persist data in Module not in Widget
+- 24-Apr-2020 TD-316 persist data in Module not in Widget
+- 23-Apr-2020 TD-410 Make resizeable
+- 23-Apr-2020 TD-316 Make resizeable
+- 15-Apr-2020 WM-101 persist width in Module not in Widget
+- 14-Apr-2020 HS-101 Trigger output pulse width changed to 1ms
+
 ## v1.1.4
 - 06-Apr-2020 Tidy plugin manifest to suit library
 - 02-Apr-2020 Add HS-101 Hi-Res Storage Scope

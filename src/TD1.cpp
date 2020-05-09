@@ -1,4 +1,4 @@
-//SubTag W16
+//SubTag W16 AM WP
 
 #include "SubmarineFree.hpp"
 #include "window.hpp"
@@ -56,7 +56,9 @@ struct TD_116 : Module {
 		inPort.process();
 		outPort.process();
 	}
-	void sendText(std::string text) {
+	void sendText(std::string textValue) {
+		text = textValue;
+		
 		json_t *rootJ = json_object();;
 
 		// text
@@ -68,6 +70,40 @@ struct TD_116 : Module {
 		reset = 1;
 		Module::onReset();
 	}
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+
+		json_object_set_new(rootJ, "text", json_string(text.c_str()));
+		json_object_set_new(rootJ, "size", json_real(fontSize));
+		json_object_set_new(rootJ, "fg", json_string(color::toHexString(fg).c_str()));
+		json_object_set_new(rootJ, "bg", json_string(color::toHexString(bg).c_str()));
+
+		return rootJ;
+	}
+	void dataFromJson(json_t *rootJ) override {
+
+		json_t *textJ = json_object_get(rootJ, "text");
+		if (textJ) {
+			text = json_string_value(textJ);
+			isDirty = true;
+		}
+		json_t *sizeJ = json_object_get(rootJ, "size");
+		if (sizeJ) {
+			fontSize = json_number_value(sizeJ);
+			isDirtyC = true;
+		}
+		json_t *fgJ = json_object_get(rootJ, "fg");
+		if (fgJ) {
+			fg = color::fromHexString(json_string_value(fgJ));
+			isDirtyC = true;
+		}
+		json_t *bgJ = json_object_get(rootJ, "bg");
+		if (bgJ) {
+			bg = color::fromHexString(json_string_value(bgJ));
+			isDirtyC = true;
+		}
+	}
+
 	std::string text;
 	int reset = 0;
 	float fontSize = 12.0f;
@@ -160,19 +196,15 @@ struct TD116 : SchemeModuleWidget {
 		addChild(textField);
 	}
 
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
-
-		json_object_set_new(rootJ, "text", json_string(textField->text.c_str()));
-		json_object_set_new(rootJ, "size", json_real(textField->fontSize));
-		json_object_set_new(rootJ, "fg", json_string(color::toHexString(textField->color).c_str()));
-		json_object_set_new(rootJ, "bg", json_string(color::toHexString(textField->bgColor).c_str()));
-
-		return rootJ;
-	}
-
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
+		TD_116 *tdModule = dynamic_cast<TD_116 *>(module);
+		if (tdModule) {
+			textField->text = tdModule->text;
+			textField->fontSize = tdModule->fontSize;
+			textField->color = tdModule->fg;
+			textField->bgColor = tdModule->bg;
+		}
 
 		json_t *textJ = json_object_get(rootJ, "text");
 		if (textJ)
@@ -212,6 +244,10 @@ struct TD116 : SchemeModuleWidget {
 			textField->bgColor = nvgRGB(0,0,0);	
 			tdModule->reset = 0;
 		}
+		tdModule->text = textField->text;
+		tdModule->fontSize = textField->fontSize;
+		tdModule->fg = textField->color;
+		tdModule->bg = textField->bgColor;
 		ModuleWidget::step();
 	}
 
