@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.6
+- 09-May-2020 Correct use of integer abs to float fabs
 - 09-May-2020 Move from deprecated SVGWidget to SvgWidget
 
 ## v1.1.5

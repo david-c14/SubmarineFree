@@ -651,7 +651,7 @@ struct TD410 : SchemeModuleWidget {
 		while (!found) {
 			found = true;
 			for (TD4Text *text: textItems) {
-				if (abs(text->box.pos.y - position) < spacing) {
+				if (fabs(text->box.pos.y - position) < spacing) {
 					found = false;
 					if ((text->box.pos.y + text->data->fontSize) > position) {
 						position = text->box.pos.y + text->data->fontSize;

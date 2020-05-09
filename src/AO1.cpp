@@ -168,8 +168,8 @@ namespace {
 		{ CATEGORY, Y SC SX,		   	LAMBDA(  powf( y , c * x )	   ) },
 #undef CATEGORY
 #define CATEGORY 9
-                { CATEGORY, P X A C P,               	LAMBDA(  abs( x + c )           ) }, // Modulus
-		{ CATEGORY, P Y A C P,               	LAMBDA(  abs( y + c )           ) },
+                { CATEGORY, P X A C P,               	LAMBDA(  std::abs( x + c )           ) }, // Modulus
+		{ CATEGORY, P Y A C P,               	LAMBDA(  std::abs( y + c )           ) },
 #undef CATEGORY
 #define CATEGORY 10
 		{ CATEGORY, MIN OP X A C COMMA Y CP, 	LAMBDA(  std::min( x + c, y )   ) }, // Minmax

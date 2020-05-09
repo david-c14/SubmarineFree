@@ -712,7 +712,7 @@ struct TD510 : SchemeModuleWidget {
 		while (!found) {
 			found = true;
 			for (TD5Text *text: textItems) {
-				if (abs(text->box.pos.x - position) < spacing) {
+				if (fabs(text->box.pos.x - position) < spacing) {
 					found = false;
 					if ((text->box.pos.x + text->data->fontSize) > position) {
 						position = text->box.pos.x + text->data->fontSize;
