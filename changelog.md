@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.6
+- 12-May-2020 Deal with warning over hidden send methods in torpedo
+- 09-May-2020 Correct use of integer abs to float fabs
+- 09-May-2020 Move from deprecated SVGWidget to SvgWidget
+
 ## v1.1.5
 - 07-May-2020 Issue #116 - Sum Polyphonic inputs for AO-XXX and XF-XXX
 - 30-Apr-2020 TD-510 Vertical multiple label textbox

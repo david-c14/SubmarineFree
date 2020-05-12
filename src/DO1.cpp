@@ -529,7 +529,7 @@ struct DO1 : DS_Module {
 		loadJson();
 	}
 	void process(const ProcessArgs &args) override {
-		unsigned int maxPoly = 1;
+		unsigned int maxPoly = 0;
 		for (unsigned int ix = 0; ix < x; ix++) {
 			unsigned int channels = inputs[INPUT_1 + ix].getChannels();
 			maxPoly = (maxPoly > channels)?maxPoly:channels;

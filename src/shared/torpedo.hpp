@@ -123,6 +123,8 @@ namespace Torpedo {
 		MessageOutputPort(Module *module, unsigned int portNum) : QueuedOutputPort(module, portNum) {_appId.assign("MESG");}
 
 		virtual void send(std::string pluginName, std::string moduleName, std::string message);
+		private:
+			using QueuedOutputPort::send;
 	};
 
 	struct MessageInputPort : RawInputPort {
@@ -140,6 +142,8 @@ namespace Torpedo {
 		PatchOutputPort(Module *module, unsigned int portNum) : QueuedOutputPort(module, portNum) {_appId.assign("PTCH");}
 
 		virtual void send(std::string pluginName, std::string moduleName, json_t *rootJ);
+		private:
+			using QueuedOutputPort::send;
 	};
 
 	struct PatchInputPort : RawInputPort {

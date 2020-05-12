@@ -279,7 +279,7 @@ struct SubLightSlider : LightKnob {
 	void onDragMove(const event::DragMove &e) override;
 };
 
-struct SubLogo : SVGWidget{};
+struct SubLogo : SvgWidget{};
 //////////////////
 // Lights
 //////////////////
