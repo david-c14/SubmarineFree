@@ -2425,20 +2425,44 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	}
 };
 
+struct WM_102 : Module {
+	enum ParamIds {
+		PARAM_DRAW_3D,
+		PARAM_LOCKED,
+		NUM_PARAMS
+	};
+	enum InputIds {
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		NUM_OUTPUTS
+	};
+	enum LightIds {
+		NUM_LIGHTS
+	};
+
+	WM_102() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configParam(PARAM_DRAW_3D, 0, 1, 1);
+		configParam(PARAM_LOCKED, 0, 1, 0);
+	}
+};
+
 struct WM102 : SchemeModuleWidget, WM_Base {
 	std::vector<NVGcolor> colors;
 	std::vector<std::string> labels;
 	SchemePanel *schemePanel;
-	bool draw3d = true;
-	bool locked = false;
 	int changeTracker = 0;
-	WM102(Module *module) {
+	WM102(WM_102 *module) {
 		setModule(module);
 		this->box.size = Vec(150, 380);
 		schemePanel = new SchemePanel(this->box.size);
 		addChild(schemePanel);
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		bool draw3d = true;
+		if (module)
+			draw3d = module->params[WM_102::PARAM_DRAW_3D].getValue();
 		drawBase(vg, "WM-102");
 		Rect renderBox;
 		renderBox.pos = Vec(0, 15);
@@ -2449,6 +2473,8 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		nvgRestore(vg);
 	}
 	void appendContextMenu(Menu *menu) override {
+		if(!module)
+			return;
 		SchemeModuleWidget::appendContextMenu(menu);
 		menu->addChild(new MenuEntry);
 		EventWidgetMenuItem *mi = createMenuItem<EventWidgetMenuItem>("Load collection");
@@ -2458,26 +2484,28 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		menu->addChild(mi);
 		EventWidgetMenuItem *opt3d = createMenuItem<EventWidgetMenuItem>("3D billboard");
 		opt3d->stepHandler = [=]() {
-			opt3d->rightText = CHECKMARK(draw3d);
+			opt3d->rightText = CHECKMARK(module->params[WM_102::PARAM_DRAW_3D].getValue());
 		};
 		opt3d->clickHandler = [=]() {
-			draw3d = !draw3d;
+			module->params[WM_102::PARAM_DRAW_3D].setValue(!(module->params[WM_102::PARAM_DRAW_3D].getValue()));
 			this->schemePanel->dirty = true;
 		};
 		menu->addChild(opt3d);
 		EventWidgetMenuItem *lockMi = createMenuItem<EventWidgetMenuItem>("Lock colors");
 		lockMi->stepHandler = [=]() {
-			lockMi->rightText = CHECKMARK(locked);
+			lockMi->rightText = CHECKMARK(module->params[WM_102::PARAM_LOCKED].getValue());
 		};
 		lockMi->clickHandler = [=]() {
-			locked = !locked;
+			module->params[WM_102::PARAM_LOCKED].setValue(!(module->params[WM_102::PARAM_LOCKED].getValue()));
 			changeTracker--;
 		};
 		menu->addChild(lockMi);
 	}
 	void step() override {
 		SchemeModuleWidget::step();
-		if (locked)
+		if (!module)
+			return;
+		if (module->params[WM_102::PARAM_LOCKED].getValue())
 			return;
 		if (changeTracker == changeMarker)
 			return;
@@ -2506,7 +2534,8 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		delete cb;
 		json_decref(rootJ);
 		schemePanel->dirty = true;
-		locked = true;
+		if (module)
+			module->params[WM_102::PARAM_LOCKED].setValue(1);
 	}
 	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
 		ColorCollectionButton *btn = new ColorCollectionButton();
@@ -2533,30 +2562,37 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			}
 			json_object_set_new(rootJ, "labels", a2);
 		}
-		json_object_set_new(rootJ, "billboard", json_real(draw3d));
-		json_object_set_new(rootJ, "locked", json_real(locked));
 		return rootJ;
 	}
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
+		if (module) {
+			module->params[WM_102::PARAM_LOCKED].setValue(0);
+		}
 		json_t *v1 = json_object_get(rootJ, "billboard");
 		if (v1) {
-			draw3d = clamp((int)json_number_value(v1), 0, 1);
+			if (module) {
+				module->params[WM_102::PARAM_DRAW_3D].setValue(clamp((int)json_number_value(v1), 0, 1));
+			}
 		}
-		locked = false;
 		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
 		colors = cb->colors;
 		labels = cb->labels;
 		delete cb;
 		schemePanel->dirty = true;
-		if (colors.size())
-			locked = true;
+		if (colors.size()) {
+			if (module) {
+				module->params[WM_102::PARAM_LOCKED].setValue(1);
+			}
+		}
 		v1 = json_object_get(rootJ, "locked");
 		if (v1) {
-			locked = clamp((int)json_number_value(v1), 0, 1);
+			if (module) {
+				module->params[WM_102::PARAM_LOCKED].setValue(clamp((int)json_number_value(v1), 0, 1));
+			}
 		}
 	}
 };
 
 Model *modelWM101 = createModel<SizeableModule, WM101>("WM-101");
-Model *modelWM102 = createModel<Module, WM102>("WM-102");
+Model *modelWM102 = createModel<WM_102, WM102>("WM-102");
