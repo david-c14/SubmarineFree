@@ -471,32 +471,9 @@ struct ColorCollectionButton : EventWidgetButtonBase {
 	}
 };
 
-struct WM_Base {
-	virtual void loadCollectionFromDisk(std::string path) {
-	}
+struct WM_JsonLoader {
 	virtual ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) {
 		return NULL;
-	}
-	void loadCollectionDialog() {
-		std::string dir = asset::user("SubmarineFree");
-		system::createDirectory(dir);
-		std::string filename = "";
-		
-		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
-		DEFER({
-			osdialog_filters_free(filters);
-		});
-
-		char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
-		if (!pathC) {
-			// Fail silently
-			return;
-		}
-		DEFER({
-			std::free(pathC);
-		});
-
-		loadCollectionFromDisk(pathC);
 	}
 	ColorCollectionButton *loadCollectionFromJson(json_t *json) {
 		json_t *n1 = json_object_get(json, "name");	
@@ -528,6 +505,32 @@ struct WM_Base {
 		}
 		cb = addCollection(n1?json_string_value(n1):"[Unnamed]", colors, labels);
 		return cb;
+	}
+};
+
+struct WM_Base : WM_JsonLoader {
+	virtual void loadCollectionFromDisk(std::string path) {
+	}
+	void loadCollectionDialog() {
+		std::string dir = asset::user("SubmarineFree");
+		system::createDirectory(dir);
+		std::string filename = "";
+		
+		osdialog_filters* filters = osdialog_filters_parse("Submarine Wire Manager Collection(.wmCollection):wmCollection");
+		DEFER({
+			osdialog_filters_free(filters);
+		});
+
+		char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
+		if (!pathC) {
+			// Fail silently
+			return;
+		}
+		DEFER({
+			std::free(pathC);
+		});
+
+		loadCollectionFromDisk(pathC);
 	}
 	void drawBillboardBase(NVGcontext *vg, rack::math::Rect box, std::vector<NVGcolor> currentColors, std::vector<std::string> currentLabels, bool draw3d) {
 		float blockHeight = box.size.y / currentColors.size();
@@ -2425,101 +2428,32 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	}
 };
 
-struct WM102 : SchemeModuleWidget, WM_Base {
+struct WM_102 : Module, WM_JsonLoader {
+	enum ParamIds {
+		PARAM_DRAW_3D,
+		PARAM_LOCKED,
+		NUM_PARAMS
+	};
+	enum InputIds {
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		NUM_OUTPUTS
+	};
+	enum LightIds {
+		NUM_LIGHTS
+	};
+
 	std::vector<NVGcolor> colors;
 	std::vector<std::string> labels;
-	SchemePanel *schemePanel;
-	bool draw3d = true;
-	bool locked = false;
-	int changeTracker = 0;
-	WM102(Module *module) {
-		setModule(module);
-		this->box.size = Vec(150, 380);
-		schemePanel = new SchemePanel(this->box.size);
-		addChild(schemePanel);
-	}
-	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
-		drawBase(vg, "WM-102");
-		Rect renderBox;
-		renderBox.pos = Vec(0, 15);
-		renderBox.size = Vec(box.size.x, box.size.y - 30);
-		nvgSave(vg);
-		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
-		drawBillboardBase(vg, renderBox, colors, labels, draw3d);
-		nvgRestore(vg);
-	}
-	void appendContextMenu(Menu *menu) override {
-		SchemeModuleWidget::appendContextMenu(menu);
-		menu->addChild(new MenuEntry);
-		EventWidgetMenuItem *mi = createMenuItem<EventWidgetMenuItem>("Load collection");
-		mi->clickHandler = [=]() {
-			this->loadCollectionDialog();
-		};
-		menu->addChild(mi);
-		EventWidgetMenuItem *opt3d = createMenuItem<EventWidgetMenuItem>("3D billboard");
-		opt3d->stepHandler = [=]() {
-			opt3d->rightText = CHECKMARK(draw3d);
-		};
-		opt3d->clickHandler = [=]() {
-			draw3d = !draw3d;
-			this->schemePanel->dirty = true;
-		};
-		menu->addChild(opt3d);
-		EventWidgetMenuItem *lockMi = createMenuItem<EventWidgetMenuItem>("Lock colors");
-		lockMi->stepHandler = [=]() {
-			lockMi->rightText = CHECKMARK(locked);
-		};
-		lockMi->clickHandler = [=]() {
-			locked = !locked;
-			changeTracker--;
-		};
-		menu->addChild(lockMi);
-	}
-	void step() override {
-		SchemeModuleWidget::step();
-		if (locked)
-			return;
-		if (changeTracker == changeMarker)
-			return;
-		changeTracker = changeMarker;
-		if (masterWireManager) {
-			colors = masterWireManager->currentCollectionColors();
-			labels = masterWireManager->currentCollectionLabels();
-			schemePanel->dirty = true;
-		}
-	}
-	void loadCollectionFromDisk(std::string pathC) override {
-		json_error_t error;
-		FILE *file = fopen(pathC.c_str(), "r");
-		if (!file) {
-			return;
-		}
-		json_t *rootJ = json_loadf(file, 0, &error);
-		fclose(file);
-		if (!rootJ) {
-			WARN("Submarine Free WM-102: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-			return;
-		}
-		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
-		colors = cb->colors;
-		labels = cb->labels;
-		delete cb;
-		json_decref(rootJ);
-		schemePanel->dirty = true;
-		locked = true;
-	}
-	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
-		ColorCollectionButton *btn = new ColorCollectionButton();
-		btn->box.pos = Vec(0, 0);
-		btn->box.size = Vec(140, 24);
-		btn->name = name;
-		btn->colors = colors;
-		btn->labels = labels;
-		return btn;
-	}
-	json_t *toJson() override {
-		json_t *rootJ = ModuleWidget::toJson();
 
+	WM_102() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configParam(PARAM_DRAW_3D, 0, 1, 1);
+		configParam(PARAM_LOCKED, 0, 1, 0);
+	}
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
 		json_t *a1 = json_array();
 		for (NVGcolor col: colors) {
 			std::string s = color::toHexString(col);
@@ -2533,30 +2467,152 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			}
 			json_object_set_new(rootJ, "labels", a2);
 		}
-		json_object_set_new(rootJ, "billboard", json_real(draw3d));
-		json_object_set_new(rootJ, "locked", json_real(locked));
 		return rootJ;
 	}
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-		json_t *v1 = json_object_get(rootJ, "billboard");
-		if (v1) {
-			draw3d = clamp((int)json_number_value(v1), 0, 1);
-		}
-		locked = false;
+	void dataFromJson(json_t *rootJ) override {
 		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
 		colors = cb->colors;
 		labels = cb->labels;
 		delete cb;
+		if (colors.size()) {
+			params[PARAM_LOCKED].setValue(1);
+		}
+	}
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
+		ColorCollectionButton *btn = new ColorCollectionButton();
+		btn->colors = colors;
+		btn->labels = labels;
+		return btn;
+	}
+};
+
+struct WM102 : SchemeModuleWidget, WM_Base {
+	SchemePanel *schemePanel;
+	int changeTracker = 0;
+	WM102(WM_102 *module) {
+		setModule(module);
+		this->box.size = Vec(150, 380);
+		schemePanel = new SchemePanel(this->box.size);
+		addChild(schemePanel);
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		if (!module)
+			return;
+		WM_102 *wm = dynamic_cast<WM_102 *>(module);
+		bool draw3d = module->params[WM_102::PARAM_DRAW_3D].getValue();
+		drawBase(vg, "WM-102");
+		Rect renderBox;
+		renderBox.pos = Vec(0, 15);
+		renderBox.size = Vec(box.size.x, box.size.y - 30);
+		nvgSave(vg);
+		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
+		drawBillboardBase(vg, renderBox, wm->colors, wm->labels, draw3d);
+		nvgRestore(vg);
+	}
+	void appendContextMenu(Menu *menu) override {
+		if(!module)
+			return;
+		SchemeModuleWidget::appendContextMenu(menu);
+		menu->addChild(new MenuEntry);
+		EventWidgetMenuItem *mi = createMenuItem<EventWidgetMenuItem>("Load collection");
+		mi->clickHandler = [=]() {
+			this->loadCollectionDialog();
+		};
+		menu->addChild(mi);
+		EventWidgetMenuItem *opt3d = createMenuItem<EventWidgetMenuItem>("3D billboard");
+		opt3d->stepHandler = [=]() {
+			opt3d->rightText = CHECKMARK(module->params[WM_102::PARAM_DRAW_3D].getValue());
+		};
+		opt3d->clickHandler = [=]() {
+			module->params[WM_102::PARAM_DRAW_3D].setValue(!(module->params[WM_102::PARAM_DRAW_3D].getValue()));
+			this->schemePanel->dirty = true;
+		};
+		menu->addChild(opt3d);
+		EventWidgetMenuItem *lockMi = createMenuItem<EventWidgetMenuItem>("Lock colors");
+		lockMi->stepHandler = [=]() {
+			lockMi->rightText = CHECKMARK(module->params[WM_102::PARAM_LOCKED].getValue());
+		};
+		lockMi->clickHandler = [=]() {
+			module->params[WM_102::PARAM_LOCKED].setValue(!(module->params[WM_102::PARAM_LOCKED].getValue()));
+			changeTracker--;
+		};
+		menu->addChild(lockMi);
+	}
+	void step() override {
+		SchemeModuleWidget::step();
+		if (!module)
+			return;
+		if (module->params[WM_102::PARAM_LOCKED].getValue())
+			return;
+		if (changeTracker == changeMarker)
+			return;
+		changeTracker = changeMarker;
+		if (masterWireManager) {
+			WM_102 *wm = dynamic_cast<WM_102 *>(module);
+			wm->colors = masterWireManager->currentCollectionColors();
+			wm->labels = masterWireManager->currentCollectionLabels();
+			schemePanel->dirty = true;
+		}
+	}
+	void loadCollectionFromDisk(std::string pathC) override {
+		if (!module)
+			return;
+		WM_102 *wm = dynamic_cast<WM_102 *>(module);
+		json_error_t error;
+		FILE *file = fopen(pathC.c_str(), "r");
+		if (!file) {
+			return;
+		}
+		json_t *rootJ = json_loadf(file, 0, &error);
+		fclose(file);
+		if (!rootJ) {
+			WARN("Submarine Free WM-102: JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+			return;
+		}
+		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
+		if (cb->colors.size()) {
+			wm->colors = cb->colors;
+			wm->labels = cb->labels;
+		}
+		delete cb;
+		json_decref(rootJ);
 		schemePanel->dirty = true;
-		if (colors.size())
-			locked = true;
+		module->params[WM_102::PARAM_LOCKED].setValue(1);
+	}
+	ColorCollectionButton *addCollection(std::string name, std::vector<NVGcolor> colors, std::vector<std::string> labels) override {
+		ColorCollectionButton *btn = new ColorCollectionButton();
+		btn->box.pos = Vec(0, 0);
+		btn->box.size = Vec(140, 24);
+		btn->name = name;
+		btn->colors = colors;
+		btn->labels = labels;
+		return btn;
+	}
+	void fromJson(json_t *rootJ) override {
+		ModuleWidget::fromJson(rootJ);
+		if (!module) 
+			return;
+		WM_102 *wm = dynamic_cast<WM_102 *>(module);
+		json_t *v1 = json_object_get(rootJ, "billboard");
+		if (v1) {
+			module->params[WM_102::PARAM_DRAW_3D].setValue(clamp((int)json_number_value(v1), 0, 1));
+		}
+		ColorCollectionButton *cb = loadCollectionFromJson(rootJ);
+		if (cb->colors.size()) {
+			wm->colors = cb->colors;
+			wm->labels = cb->labels;
+		}
+		delete cb;
+		schemePanel->dirty = true;
+		if (wm->colors.size()) {
+			module->params[WM_102::PARAM_LOCKED].setValue(1);
+		}
 		v1 = json_object_get(rootJ, "locked");
 		if (v1) {
-			locked = clamp((int)json_number_value(v1), 0, 1);
+			module->params[WM_102::PARAM_LOCKED].setValue(clamp((int)json_number_value(v1), 0, 1));
 		}
 	}
 };
 
 Model *modelWM101 = createModel<SizeableModule, WM101>("WM-101");
-Model *modelWM102 = createModel<Module, WM102>("WM-102");
+Model *modelWM102 = createModel<WM_102, WM102>("WM-102");
