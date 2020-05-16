@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.6
+- 16-May-2020 WM-102 persist data in Module not in Widget
 - 12-May-2020 Deal with warning over hidden send methods in torpedo
 - 09-May-2020 Correct use of integer abs to float fabs
 - 09-May-2020 Move from deprecated SVGWidget to SvgWidget
