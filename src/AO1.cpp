@@ -375,49 +375,74 @@ namespace {
 #undef F
 #undef LAM
 
-	struct AOFuncDisplay : Knob {
+	struct AOKnob : Knob {
 		Module *module;
 		int index;
+	};
+
+	struct AOFuncLight : LightWidget {
+		AOKnob *knob;
+		void draw(const DrawArgs &args) override;
+	};
+
+	struct AOFuncDisplay : AOKnob {
+		AOFuncLight *light;
 		AOFuncDisplay() {
 			box.size.x = 80;
 			box.size.y = 15;
 			snap = true;
 			smooth = false;
 			speed = 0.5f;
-		}
-		void draw(const DrawArgs &args) override {
-			if (module) {
-				nvgFontSize(args.vg, 16);
-				nvgFontFaceId(args.vg, gScheme.font()->handle);
-				nvgFillColor(args.vg, SUBLIGHTBLUE);
-				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-				nvgText(args.vg, 41.5, 13, functions[APP->engine->getParam(module, index)].name.c_str(), NULL);
-			}
+			light = new AOFuncLight();
+			light->box.pos = Vec(0,0);
+			light->box.size = box.size;
+			light->knob = this;
+			addChild(light);
 		}
 		void onButton(const event::Button &e) override;
 	};
 
-	struct AOConstDisplay : Knob {
-		Module *module;
-		int index;
+	void AOFuncLight::draw(const DrawArgs &args) {
+		if (knob->module) {
+			nvgFontSize(args.vg, 16);
+			nvgFontFaceId(args.vg, gScheme.font()->handle);
+			nvgFillColor(args.vg, SUBLIGHTBLUE);
+			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+			nvgText(args.vg, 41.5, 13, functions[APP->engine->getParam(knob->module, knob->index)].name.c_str(), NULL);
+		}
+	}
+
+	struct AOConstLight : LightWidget {
+		AOKnob *knob;
+		void draw(const DrawArgs &args) override;
+	};
+
+	struct AOConstDisplay : AOKnob {
+		AOConstLight *light;
 		AOConstDisplay() {
 			box.size.x = 80;
 			box.size.y = 15;
 			snap = true;
 			speed = 0.005;
-		}
-		void draw(const DrawArgs &args) override {
-			if (module) {
-				char mtext[41];
-				sprintf(mtext, "C=%4.2f", ((int)APP->engine->getParam(module, index))/100.0f);
-				nvgFontSize(args.vg, 16);
-				nvgFontFaceId(args.vg, gScheme.font()->handle);
-				nvgFillColor(args.vg, SUBLIGHTBLUE);
-				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-				nvgText(args.vg, 41.5, 13, mtext, NULL);
-			}
+			light = new AOConstLight();
+			light->box.pos = Vec(0,0);
+			light->box.size = box.size;
+			light->knob = this;
+			addChild(light);
 		}
 	};
+
+	void AOConstLight::draw(const DrawArgs &args) {
+		if (knob->module) {
+			char mtext[41];
+			sprintf(mtext, "C=%4.2f", ((int)APP->engine->getParam(knob->module, knob->index))/100.0f);
+			nvgFontSize(args.vg, 16);
+			nvgFontFaceId(args.vg, gScheme.font()->handle);
+			nvgFillColor(args.vg, SUBLIGHTBLUE);
+			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+			nvgText(args.vg, 41.5, 13, mtext, NULL);
+		}
+	}
 
 } // end namespace
 
@@ -523,7 +548,7 @@ namespace {
 	void AOFuncDisplay::onButton(const event::Button &e) {
 		if (module) {
 			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-				e.consume(this);
+				e.consume((Knob *)this);
 				Menu *menu = createMenu();
 				FCopyMenu *cm = new FCopyMenu();
 				cm->module = module;

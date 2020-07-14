@@ -180,7 +180,7 @@ struct EO_102 : Module {
 	
 namespace {
 
-	struct EO_Display : TransparentWidget {
+	struct EO_Display : LightWidget {
 		EO_102 *module;
 		PortWidget *ports[2];
 	
@@ -343,7 +343,7 @@ namespace {
 		}
 	};
 	
-	struct EO_Measure : TransparentWidget {
+	struct EO_Measure : LightWidget {
 		EO_102 *module;
 		char measureText[41] = "";
 		NVGcolor col;

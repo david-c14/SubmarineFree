@@ -167,6 +167,8 @@ struct BulkKnob : BulkParamWidget {
 	void randomize() override;
 };
 
+struct LightKnobLight;
+
 struct BaseLightKnob
 {
 	/** Angles in radians */
@@ -175,6 +177,7 @@ struct BaseLightKnob
 	/** Radii in standard units */
 	float radius = 19.0;
 	int enabled = 1;
+	LightKnobLight *light;
 	NVGcolor color = SUBLIGHTBLUE;
 	virtual void doDraw(const rack::widget::Widget::DrawArgs &args);
 	void setEnabled(int val);
@@ -184,8 +187,20 @@ struct BaseLightKnob
 	virtual float getBLKMaxValue() { return 1.0f; }
 };
 
+struct LightKnobLight : LightWidget {
+	BaseLightKnob *knob;
+	void draw(const DrawArgs &args) override;
+};
+
 struct LightKnob : BaseLightKnob, Knob {
-	LightKnob() {smooth = false;}
+	LightKnob() {
+		smooth = false;
+		light = new LightKnobLight();
+		light->box.pos = Vec(0,0);
+		light->box.size = Vec(radius * 2, radius * 2);
+		light->knob = this;
+		addChild(light);
+	}
 	float getBLKValue() override {
 		if (paramQuantity)
 			return paramQuantity->getValue();
@@ -203,11 +218,19 @@ struct LightKnob : BaseLightKnob, Knob {
 	}
 	void draw(const DrawArgs &args) override {
 		doDraw(args);
+		Knob::draw(args);
 	}
 };
 
 struct BulkLightKnob : BaseLightKnob, BulkKnob {
-	BulkLightKnob() {smooth = false;}
+	BulkLightKnob() {
+		smooth = false;
+		light = new LightKnobLight();
+		light->box.pos = Vec(0,0);
+		light->box.size = Vec(radius * 2, radius * 2);
+		light->knob = this;
+		addChild(light);
+	}
 	float getBLKValue() override {
 		if (value)
 			return *value;
@@ -221,6 +244,7 @@ struct BulkLightKnob : BaseLightKnob, BulkKnob {
 	}
 	void draw(const DrawArgs &args) override {
 		doDraw(args);
+		BulkKnob::draw(args);
 	}
 };
 
@@ -278,6 +302,7 @@ struct SubLightSlider : LightKnob {
 	void draw(const DrawArgs &args) override;
 	void onDragMove(const event::DragMove &e) override;
 };
+
 
 struct SubLogo : SvgWidget{};
 //////////////////

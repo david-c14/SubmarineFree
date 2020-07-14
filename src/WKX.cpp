@@ -288,7 +288,7 @@ namespace {
 			wkModule->params[WK_101::PARAM_1 + i].setValue(tunings[i]);
 	}
 	
-	struct WK_Display : TransparentWidget {
+	struct WK_Display : LightWidget {
 		WK_101 *module;
 		int index;
 		char dspText[20];
