@@ -8,14 +8,18 @@
 #include "../SubmarineFree.hpp"
 #include "color.hpp"
 
-void LightButton::draw(const DrawArgs &args) {
-	float value = 0.0f;
-	if (paramQuantity) {
-		value = paramQuantity->getValue();
-	}
+LightButton::LightButton() {
+	box.size.x = 16.0f;
+	box.size.y = 16.0f;
+	light = new LightButtonLight();
+	light->box.pos = Vec(0,0);
+	light->box.size = box.size;
+	light->button = this;
+	addChild(light);
+}
 
+void LightButton::draw(const DrawArgs &args) {
 	nvgSave(args.vg);
-	NVGcolor lcol = (value > 0.5f)?color:nvgRGB(0x4a,0x4a,0x4a);
 
 	// Shadow
 	if (!gScheme.isFlat) {
@@ -42,8 +46,20 @@ void LightButton::draw(const DrawArgs &args) {
 		nvgStroke(args.vg);
 	}
 
-	Rect lightbox = Rect(Vec(box.size.x / 4.0f, box.size.y / 4.0f), Vec(box.size.x / 2.0f, box.size.y / 4.0f));	
+	nvgRestore(args.vg);
+	Widget::draw(args);
+}
 
+void LightButtonLight::draw(const DrawArgs &args) {
+	float value = 0.0f;
+	if (button->paramQuantity) {
+		value = button->paramQuantity->getValue();
+	}
+
+	Rect lightbox = Rect(Vec(box.size.x / 4.0f, box.size.y / 4.0f), Vec(box.size.x / 2.0f, box.size.y / 4.0f));	
+	NVGcolor lcol = (value > 0.5f)?button->color:nvgRGB(0x4a,0x4a,0x4a);
+
+	nvgSave(args.vg);
 	// Light
 	{
 		nvgBeginPath(args.vg);
@@ -75,4 +91,5 @@ void LightButton::draw(const DrawArgs &args) {
 		nvgFill(args.vg);	
 	}
 	nvgRestore(args.vg);
+
 }

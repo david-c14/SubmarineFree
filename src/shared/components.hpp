@@ -83,14 +83,17 @@ struct SubSwitchHorz : k {
 // Buttons
 //////////////////
 
+struct LightButtonLight;
+
 struct LightButton : app::Switch {
 	NVGcolor color = SUBLIGHTBLUE;
-	LightButton() {
-		//minValue = 0.0f;
-		//maxValue = 1.0f;	
-		box.size.x = 16.0f;
-		box.size.y = 16.0f;
-	}
+	LightButtonLight *light;
+	LightButton(); 
+	void draw(const DrawArgs &args) override;
+};
+
+struct LightButtonLight : LightWidget {
+	LightButton *button;
 	void draw(const DrawArgs &args) override;
 };
 
