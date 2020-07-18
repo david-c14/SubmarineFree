@@ -1468,7 +1468,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	void setDefaults() {
 		// add some useful color conventions
 
-		// Omri Cohen's colors as shown here  <https://github.com/david-c14/ModularFungi/blob/master/res/Colors.png>
+		// Omri Cohen's colors as shown here  <https://github.com/david-c14/ModularFungi/blob/main/res/Colors.png>
 		scrollWidget->container->clearChildren();
 		addColor(color::fromHexString("#c91847"), "Audio", 		true);  // audio
 		addColor(color::fromHexString("#0986ad"), "Clk/Trig/Gate", 	false);  // clock/trigger/gate

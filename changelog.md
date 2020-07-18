@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.6
+- 18-Jul-2020 Correct urls that refer to master
 - 15-Jul-2020 Make devices work with Modular Fungi LightsOff
 - 04-Jul-2020 Bug fix - #127 BP-102 incorrect behaviour
 - 16-May-2020 WM-102 persist data in Module not in Widget
