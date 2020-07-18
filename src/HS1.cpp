@@ -152,14 +152,14 @@ struct HS_101 : Module {
 };
 	
 namespace {
-	struct HS_Display : OpaqueWidget {
+
+	struct HS_DisplayLight : LightWidget {
 		HS_101 *module;
 		PortWidget *port;
 		int minX, maxX;
 		int originalMinX, originalMaxX;
 		float minY, maxY;
 		int mipEntry = -1;
-		ui::Tooltip *tooltip = NULL;
 
 		void draw(const DrawArgs &args) override {
 			if (!module) {
@@ -265,6 +265,11 @@ namespace {
 			nvgStrokeColor(vg, SUBLIGHTBLUETRANS);
 			nvgStroke(vg);
 		}
+	};
+
+	struct HS_Display : OpaqueWidget {
+		HS_DisplayLight *light;
+		ui::Tooltip *tooltip = NULL;
 
 		void setTooltip(ui::Tooltip *tooltip) {
 			if (this->tooltip) {
@@ -277,9 +282,9 @@ namespace {
 			}
 		}
 		void onEnter(const event::Enter& e) override {
-			if (module) {
+			if (light->module) {
 				std::string text;
-				text = module->dataCaptured?"":"No Data";
+				text = light->module->dataCaptured?"":"No Data";
 				ui::Tooltip *tooltip = new ui::Tooltip;
 				tooltip->text = text;
 				setTooltip(tooltip);
@@ -306,22 +311,22 @@ namespace {
 			return string::f("%6.3f", input);
 		}
 		void onHover(const event::Hover& e) override {
-			if (module) {
-				if (module->dataCaptured) {
+			if (light->module) {
+				if (light->module->dataCaptured) {
 					if (tooltip) {
-						float voltage = rescale(e.pos.y, box.size.y - 2, 2, minY, maxY);
-						int sample = rescale(e.pos.x, 0, box.size.x, originalMinX, originalMaxX);
-						float time = rescale(sample, 0, module->bufferCount, 0, module->time); 
-						int mipSample = rescale(e.pos.x, 0, box.size.x, minX, maxX);
+						float voltage = rescale(e.pos.y, box.size.y - 2, 2, light->minY, light->maxY);
+						int sample = rescale(e.pos.x, 0, box.size.x, light->originalMinX, light->originalMaxX);
+						float time = rescale(sample, 0, light->module->bufferCount, 0, light->module->time); 
+						int mipSample = rescale(e.pos.x, 0, box.size.x, light->minX, light->maxX);
 						
 						std::string text;
-						if (mipEntry == -1) {
-							float voltageAtSample = module->buffer[sample];
+						if (light->mipEntry == -1) {
+							float voltageAtSample = light->module->buffer[sample];
 							text = "Sampled Voltage: " + scale(voltageAtSample) + "V";
 						}
 						else {
-							float minVoltage = module->mipEntries[mipEntry][mipSample * 2];
-							float maxVoltage = module->mipEntries[mipEntry][mipSample * 2 + 1];
+							float minVoltage = light->module->mipEntries[light->mipEntry][mipSample * 2];
+							float maxVoltage = light->module->mipEntries[light->mipEntry][mipSample * 2 + 1];
 							text = "Signal Voltage: " + scale(minVoltage) + "V - " + scale(maxVoltage) + "V";
 						}
 						text = "Voltage: " + scale(voltage) + "V\n" +
@@ -343,7 +348,7 @@ namespace {
 		}
 	};
 
-	struct HS_Info : TransparentWidget {
+	struct HS_Info : LightWidget {
 		HS_101 *module;
 		HS_Display *display;
 		void draw(const DrawArgs &args) override {
@@ -375,8 +380,8 @@ namespace {
 			if (std::isfinite(module->minValue)) 
 				nvgText(args.vg, 2, 36, string::f("min %.3fV", module->minValue).c_str(), NULL);
 			nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE);
-			if (display->mipEntry > -1) {
-				nvgText(args.vg, box.size.x -2, 12, string::f("Mipped %dx", 4 << (2 * display->mipEntry)).c_str(), NULL);
+			if (display->light->mipEntry > -1) {
+				nvgText(args.vg, box.size.x -2, 12, string::f("Mipped %dx", 4 << (2 * display->light->mipEntry)).c_str(), NULL);
 			}
 			nvgText(args.vg, box.size.x - 2, 24, string::f("%.3fMb", module->bufferSize / 1000000.0f).c_str(), NULL);
 			if (std::isfinite(module->maxValue))
@@ -384,39 +389,6 @@ namespace {
 		}
 	};
 
-/*
-	struct EO_Measure_Horz : EO_Measure {
-		void updateText() override {
-			if (!module) {
-				return;
-			} 
-			float deltaTime = powf(2.0f, module->params[HS_101::PARAM_TIME].getValue());
-			int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
-			frameCount *= BUFFER_SIZE;
-			float width = (float)frameCount * fabs(module->params[HS_101::PARAM_INDEX_1].getValue() - module->params[HS_101::PARAM_INDEX_2].getValue()) / APP->engine->getSampleRate(); 
-			
-			if (width < 0.00000995f)
-				sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
-			else if (width < 0.0000995f)
-				sprintf(measureText, "%4.2f\xc2\xb5s", width * 1000000.0f);
-			else if (width < 0.000995f)
-				sprintf(measureText, "%4.1f\xc2\xb5s", width * 1000000.0f);
-			else if (width < 0.00995f)
-				sprintf(measureText, "%4.3fms", width * 1000.0f);
-			else if (width < 0.0995f)
-				sprintf(measureText, "%4.2fms", width * 1000.0f);
-			else if (width < 0.995f)
-				sprintf(measureText, "%4.1fms", width * 1000.0f);
-			else if (width < 9.95f)
-				sprintf(measureText, "%4.3fs", width);
-			else if (width < 99.5f)
-				sprintf(measureText, "%4.2fs", width);
-			else
-				sprintf(measureText, "%4.1fs", width);
-		}
-	};
-
-*/
 } // end namespace
 
 struct HS101 : SchemeModuleWidget {
@@ -426,11 +398,17 @@ struct HS101 : SchemeModuleWidget {
 		this->box.size = Vec(450, 380);
 		addChild(new SchemePanel(this->box.size));
 
+		HS_DisplayLight *light = new HS_DisplayLight();
+		light->module = module;
+		light->box.pos = Vec(2.5, 14);
+		light->box.size = Vec(445, 310);
+
 		HS_Display *display = new HS_Display();
-		display->module = module;
+		display->light = light;
 		display->box.pos = Vec(2.5, 14);
 		display->box.size = Vec(445, 310);
 		addChild(display);
+		addChild(light);
 
 		HS_Info *info = new HS_Info();
 		info->module = module;
@@ -441,7 +419,7 @@ struct HS101 : SchemeModuleWidget {
 
 		PortWidget *port = createInputCentered<SilverPort>(Vec(17, 341), module, HS_101::INPUT_1);
 		addInput(port);
-		display->port = port;
+		light->port = port;
 
 		addInput(createInputCentered<SilverPort>(Vec(47, 341), module, HS_101::INPUT_TRIGGER));
 		addOutput(createOutputCentered<SilverPort>(Vec(72, 341), module, HS_101::OUTPUT_TRIGGER));
