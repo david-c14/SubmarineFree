@@ -52,6 +52,8 @@ extern Model *modelLD106;
 
 extern Model *modelLT116;
 
+extern Model *modelMZ999;
+
 extern Model *modelNG106;
 extern Model *modelNG112;
 
