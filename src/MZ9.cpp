@@ -3,7 +3,7 @@
 #include "SubmarineFree.hpp"
 #include <chrono>
 
-struct MZ_999 : Module {
+struct MZ_909: Module {
 	enum ParamIds {
 		PARAM_ON,
 		NUM_PARAMS
@@ -20,7 +20,7 @@ struct MZ_999 : Module {
 		NUM_LIGHTS
 	};
 	
-	MZ_999() : Module() {
+	MZ_909() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_ON, 1.0f, 2.0f, 1.0f, "On");
 	}
@@ -34,21 +34,21 @@ struct MZ_999 : Module {
 	}
 };
 
-struct MZ999 : SchemeModuleWidget {
+struct MZ909 : SchemeModuleWidget {
 	LightButton *onButton;
-	MZ999(MZ_999 *module) {
+	MZ909(MZ_909 *module) {
 		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
 
-		addInput(createInputCentered<SilverPort>(Vec(15, 285), module, MZ_999::INPUT_1));
-		addOutput(createOutputCentered<SilverPort>(Vec(15, 325), module, MZ_999::OUTPUT_1));
-		onButton = createParamCentered<LightButton>(Vec(15, 40), module, MZ_999::PARAM_ON);
+		addInput(createInputCentered<SilverPort>(Vec(15, 285), module, MZ_909::INPUT_1));
+		addOutput(createOutputCentered<SilverPort>(Vec(15, 325), module, MZ_909::OUTPUT_1));
+		onButton = createParamCentered<LightButton>(Vec(15, 40), module, MZ_909::PARAM_ON);
 		addParam(onButton);
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
-		drawBase(vg, "MZ-999");
+		drawBase(vg, "MZ-909");
 		
 		drawText(vg, 15, 60, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ON"); 
 		drawText(vg, 15, 308, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN"); 
@@ -58,16 +58,15 @@ struct MZ999 : SchemeModuleWidget {
 		SchemeModuleWidget::step();
 		if (module) {
 			unsigned int count = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-			if (module->params[MZ_999::PARAM_ON].getValue() > 1.5f)
+			if (module->params[MZ_909::PARAM_ON].getValue() > 1.5f)
 				count *= 2;
 			count %= 1000;
-			count /= 10;
-			count -= 50;
+			count -= 500;
 			count = abs(count);
-			float lerp = count / 50.0f;
+			float lerp = count / 500.0f;
 			onButton->color = nvgLerpRGBA(nvgRGB(0,0,0), SUBLIGHTBLUE, lerp);
 		}
 	}
 };
 
-Model *modelMZ999 = createModel<MZ_999, MZ999>("MZ-999");
+Model *modelMZ909 = createModel<MZ_909, MZ909>("MZ-909");

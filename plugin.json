@@ -245,9 +245,9 @@
 			"tags": ["UTILITY"]
 		},
 		{
-			"slug":"MZ-999",
-			"name":"MZ-999",
-			"description": "MZ-999 Masterizer",
+			"slug":"MZ-909",
+			"name":"MZ-909",
+			"description": "MZ-909 Masterizer",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/MZ.md",
 			"tags": ["POLYPHONIC"]
 		},
