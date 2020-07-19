@@ -31,15 +31,7 @@ struct BP1_1 : BP1<1> {
 
 struct BP1_2 : BP1<2> {
 	SubText *textField;
-	BP1_2(Module *module) : BP1<2>(module) {
-		MouseTransformWidget *tw = createWidget<MouseTransformWidget>(Vec(2, 15));
-		tw->rotate(M_PI / 2.0f);
-		addChild(tw);
-
-		textField = createWidget<SubText>(Vec(0, -25));
-		textField->box.size = Vec(350, 25);
-		tw->addChild(textField);
-	}
+	BP1_2(Module *module) : BP1<2>(module) {}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBackground(vg);
 		drawLogo(vg, 5, 365, 1, 0);

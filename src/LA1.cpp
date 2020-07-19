@@ -163,7 +163,7 @@ struct LA_108 : DS_Module {
 };
 
 namespace {	
-	struct LA_Display : TransparentWidget {
+	struct LA_Display : LightWidget {
 		LA_108 *module;
 		PortWidget *ports[8];
 	
@@ -292,7 +292,7 @@ namespace {
 		}
 	};
 
-	struct LA_Measure : TransparentWidget {
+	struct LA_Measure : LightWidget {
 		LA_108 *module;
 		char measureText[41];
 	

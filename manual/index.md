@@ -39,6 +39,9 @@ Schmitt Trigger Line Drivers to produce clean 0/5V logic signals
 # [LT](LT.md)
 Linear Transformations
 
+# [MZ](MZ.md)
+Masterizer
+
 # [NG](NG.md)
 Logical NOT gates
 
