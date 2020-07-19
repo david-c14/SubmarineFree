@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.6
+- 19-Jul-2020 Added MZ-909 Masterizer
 - 18-Jul-2020 Correct urls that refer to master
 - 15-Jul-2020 Make devices work with Modular Fungi LightsOff
 - 04-Jul-2020 Bug fix - #127 BP-102 incorrect behaviour
