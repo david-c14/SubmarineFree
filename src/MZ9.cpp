@@ -61,10 +61,8 @@ struct MZ909 : SchemeModuleWidget {
 			if (module->params[MZ_909::PARAM_ON].getValue() > 1.5f)
 				count *= 2;
 			count %= 1000;
-			count -= 500;
-			count = abs(count);
-			float lerp = count / 500.0f;
-			onButton->color = nvgLerpRGBA(nvgRGB(0,0,0), SUBLIGHTBLUE, lerp);
+			float lerp = ((float)count - 500.0f) / 500.0f;
+			onButton->color = nvgLerpRGBA(nvgRGB(0,0,0), SUBLIGHTBLUE, std::abs(lerp));
 		}
 	}
 };
