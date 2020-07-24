@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.7
+- 24-Jul-2020 Bug fix for MZ-909 manual. Thank you Ryan Monro.
+
 ## v1.1.6
 - 19-Jul-2020 Added MZ-909 Masterizer
 - 18-Jul-2020 Correct urls that refer to master
