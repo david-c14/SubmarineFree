@@ -175,6 +175,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"EN-104",
+			"name":"EN-104",
+			"description": "EN-104 Quad ADSR Enveloper Generator",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/EN.md",
+			"tags": ["ENVELOPE", "MULTIPLE"]
+		},
+		{
 			"slug":"EO-102",
 			"name":"EO-102",
 			"description": "EO-102 Envelope Oscilloscope",

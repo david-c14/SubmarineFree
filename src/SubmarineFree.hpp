@@ -36,6 +36,7 @@ extern Model *modelDO110;
 extern Model *modelDO115;
 extern Model *modelDO120;
 
+extern Model *modelEN104;
 extern Model *modelEO102;
 
 extern Model *modelFF110;
