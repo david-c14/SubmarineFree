@@ -48,6 +48,7 @@ struct EN_104 : Module {
 		
 	}
 	dsp::SchmittTrigger trigger;
+	dsp::SchmittTrigger gate;
 	unsigned char skipParams = 0;
 	__m128 level = _mm_set_ps1(0.0f);
 	__m128 attack;
@@ -58,99 +59,6 @@ struct EN_104 : Module {
 	void process(const ProcessArgs &args) override;
 	void getParams();
 };
-
-static inline void sseProcess(float phase, float ports[]) {
-/*
-	//Calculate wave from param and input clamp to 0-10 and separate into int and remainder
-	__m128 wave = _mm_add_ps(_mm_load_ps(ports + 16), _mm_load_ps(ports + 20));
-	wave = _mm_max_ps(wave, _mm_set_ps1(0.0f));
-	wave = _mm_min_ps(wave, _mm_set_ps1(10.0f)); 
-	__m128i waveType = _mm_cvttps_epi32(wave);
-	wave = _mm_sub_ps(wave, _mm_cvtepi32_ps(waveType));
-
-	//Calculate multiplier from param and input (scaled to 0-10V) clamp between 1 and 16 and floor
-	__m128 mult = _mm_add_ps(_mm_mul_ps(_mm_load_ps(ports + 12), _mm_set_ps1(1.6f)),_mm_load_ps(ports+8));
-	mult = _mm_max_ps(mult, _mm_set_ps1(1.0f));
-	mult = _mm_min_ps(mult, _mm_set_ps1(16.0f));
-	mult = truncx(mult); 
-	
-	//Calculate phase from base phase, param and input (scaled to +/- 2 cycles), multiply by the multiplier and fmod
-	__m128 offset = _mm_add_ps(_mm_set_ps1(phase), _mm_add_ps(_mm_mul_ps(_mm_load_ps(ports + 4), _mm_set_ps1(0.4f)), _mm_load_ps(ports)));
-	offset = fmodx(_mm_mul_ps(offset, mult));
-
-	// Sine wave
-	__m128 workingWave = sin_ps(offset); 
-
-	__m128 iWave = _mm_sub_ps(_mm_set_ps1(1.0f), wave);
-	__m128 mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(5)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(0))));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(10))));
-	__m128 output = _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask);
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(4)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(9))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
-
-	// Half sine wave
-	__m128 v5 = _mm_set_ps1(5.0f);
-	__m128 sign = _mm_set_ps1(-0.0f);
-	workingWave = _mm_andnot_ps(sign, workingWave);
-	workingWave = _mm_add_ps(workingWave, workingWave);
-	workingWave = _mm_sub_ps(workingWave, v5);
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(2)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(9))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(1)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(8))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
-
-	// Sawtooth wave
-	offset = _mm_mul_ps(offset, v5);
-	offset = _mm_add_ps(offset, offset);
-	mask = _mm_cmpgt_ps(offset, v5);
-	workingWave = _mm_sub_ps(offset, _mm_and_ps(mask, _mm_set_ps1(10.0f)));
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(1)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(7))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(0)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(6))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
-	
-	// Triangle wave
-	workingWave = _mm_add_ps(offset, offset);
-	workingWave = _mm_sub_ps(workingWave, v5);
-	workingWave = _mm_andnot_ps(sign, workingWave);
-	workingWave = _mm_sub_ps(workingWave, _mm_set_ps1(10.0f));
-	workingWave = _mm_andnot_ps(sign, workingWave);
-	workingWave = _mm_sub_ps(workingWave, v5);
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(3)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(6))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(2)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(5))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
-
-	// Square wave
-	mask = _mm_and_ps(sign, workingWave);
-	workingWave = _mm_xor_ps(mask, v5);
-	
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(4)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(8))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, iWave), mask));
-
-	mask = _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(3)));
-	mask = _mm_or_ps(mask, _mm_castsi128_ps(_mm_cmpeq_epi32(waveType, _mm_set1_epi32(7))));
-	output = _mm_add_ps(output, _mm_and_ps(_mm_mul_ps(workingWave, wave), mask));
-
-	_mm_store_ps(ports, output);
-*/
-}
 
 void EN_104::getParams() {
 	alignas(16) float a[4];
@@ -165,60 +73,52 @@ void EN_104::getParams() {
 		r[i] = clamp(params[PARAM_R1 + i].getValue() + inputs[INPUT_R1 + i].getVoltage(), 0.0f, 10.0f);
 		t[i] = clamp(params[PARAM_T1 + i].getValue() + inputs[INPUT_T1 + i].getVoltage(), 0.0f, 10.0f);
 	}
-	attack = _mm_load_ps(a);
-	decay = _mm_load_ps(d);
+	attack = _mm_mul_ps(_mm_set_ps1(0.001f), _mm_load_ps(a));
+	decay = _mm_mul_ps(_mm_set_ps1(0.001f), _mm_load_ps(d));
 	sustain = _mm_load_ps(s);
-	release = _mm_load_ps(r);
+	release = _mm_mul_ps(_mm_set_ps1(0.001f), _mm_load_ps(r));
 }
 
 void EN_104::process(const ProcessArgs &args) {
-	float triggerVal = inputs[INPUT_TRIGGER].getVoltage();
-	float gateVal = inputs[INPUT_GATE].getVoltage();
-	bool gate = 0;
-	bool triggered = 0;
-	int triggerType = inputs[INPUT_TRIGGER].isConnected() * 2 + inputs[INPUT_GATE].isConnected();
-	switch (triggerType) {
-		case 1: 		// Trigger not connected, gate connected
-			if (trigger.process(rescale(gateVal, 2.4f, 2.5f, 0.0f, 1.0f))) {
-				triggered = true;
-			}
-			break;
-		case 2:			// Trigger connected, gate not connected
-			if (trigger.process(rescale(triggerVal, 2.4f, 2.5f, 0.0f, 1.0f))) {
-				triggered = true;
-			}
-			break;
-		case 3:			// Trigger connected, gate connected 
-			if (trigger.process(rescale(triggerVal, 2.4f, 2.5f, 0.0f, 1.0f))) {
-				triggered = true;
-			}
-			break;
-		default:		// Nothing connected
-			break;
-	}
+	alignas(16) float out[4];
 	if (!skipParams++) {
 		getParams();
 	}
-/*
-	float freq = baseFreq * powf(2.0f, (params[PARAM_TUNE].getValue() + 3.0f * dsp::quadraticBipolar(params[PARAM_FINE].getValue())) * (1.0f / 12.0f) + (inputs[INPUT_TUNE].isConnected()?inputs[INPUT_TUNE].getVoltage():0.0f));
-	float deltaTime = freq * args.sampleTime;
-	phase += deltaTime;
-	while(phase > 1.0f)
-		phase -= 1.0f;
-	alignas(16) float ports[24];
-	for (int i = 0; i < 4; i++) {
-		ports[0 + i] = params[PARAM_PHASE_1 + i].getValue();
-		ports[4 + i] = inputs[INPUT_PHASE_1 + i].isConnected()?inputs[INPUT_PHASE_1 + i].getVoltage():0.0f;
-		ports[8 + i] = params[PARAM_MULT_1 + i].getValue();
-		ports[12 + i] = inputs[INPUT_MULT_1 + i].isConnected()?inputs[INPUT_MULT_1 + i].getVoltage():0.0f;
-		ports[16 + i] = params[PARAM_WAVE_1 + i].getValue();
-		ports[20 + i] = inputs[INPUT_WAVE_1 + i].isConnected()?inputs[INPUT_WAVE_1 + i].getVoltage():0.0f;
+	float triggerVal = inputs[INPUT_TRIGGER].getVoltage();
+	float gateVal = inputs[INPUT_GATE].getVoltage();
+	bool gated = gateVal > 0.5f;
+	unsigned char triggered = trigger.process(rescale(triggerVal, 2.4f, 2.5f, 0.0f, 1.0f));
+	if (!inputs[INPUT_TRIGGER].isConnected()) {
+		triggered = gate.process(rescale(gateVal, 2.4f, 2.5f, 0.0f, 1.0f));
 	}
-	sseProcess(phase + 5, ports);
-	for (int i = 0; i < 4; i++) {
-		outputs[OUTPUT_1 + i].setVoltage(ports[i]);
+	if (gated) {
+		phase = _mm_or_ps(phase, _mm_castsi128_ps(_mm_set1_epi8(triggered * 255)));
+		level = _mm_add_ps(level, _mm_and_ps(phase, attack));
+		level = _mm_sub_ps(level, _mm_andnot_ps(phase, decay));
+		level = _mm_min_ps(level, _mm_set_ps1(triggered));
+		level = _mm_max_ps(level, _mm_andnot_ps(phase, sustain));
+		_mm_store_ps(out, level);
 	}
-*/
+	else {
+		_mm_store_ps(out, attack);
+		float a = out[0];
+		phase = _mm_or_ps(phase, _mm_castsi128_ps(_mm_set1_epi8(triggered * 255)));
+		_mm_store_ps(out, phase);
+		float p = out[0];
+		_mm_store_ps(out, _mm_and_ps(phase, attack));
+		float l = out[0];
+		level = _mm_add_ps(level, _mm_and_ps(phase, attack));
+		level = _mm_sub_ps(level, _mm_andnot_ps(phase, release));
+		level = _mm_min_ps(level, _mm_set_ps1(1.0f));
+		_mm_store_ps(out, level);
+		float o = out[0];
+		level = _mm_max_ps(level, _mm_set_ps1(0.0f));
+		_mm_store_ps(out, level);
+		DEBUG("%f %f %f %f %f", level, a, p, l, o);
+	}
+	for (int i = 0; i < 4; i++) {
+		outputs[OUTPUT_1 + i].setVoltage(out[i]);
+	}
 }
 
 struct EN104 : SchemeModuleWidget {
