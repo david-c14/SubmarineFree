@@ -41,9 +41,9 @@ struct EN_104 : Module {
 		for(unsigned int i = 0; i < 4; i++) {
 			configParam(PARAM_A1 + i, 0.0f, 10.0f, 5.0f, string::f("Operator #%d Attack Rack", i + 1));
 			configParam(PARAM_D1 + i, 0.0f, 10.0f, 5.0f, string::f("Operator #%d Decay Rate", i + 1));
-			configParam(PARAM_S1 + i, 0.0f, 10.0f, 5.0f, string::f("Operator #%d Sustain Level", i + 1));
+			configParam(PARAM_S1 + i, 0.0f, 1.0f, 0.5f, string::f("Operator #%d Sustain Level", i + 1));
 			configParam(PARAM_R1 + i, 0.0f, 10.0f, 5.0f, string::f("Operator #%d Release Rate", i + 1));
-			configParam(PARAM_T1 + i, 0.0f, 10.0f, 5.0f, string::f("Operator #%d Total Level", i + 1));
+			configParam(PARAM_T1 + i, 0.0f, 1.0f, 0.5f, string::f("Operator #%d Total Level", i + 1));
 		}
 		
 	}
@@ -56,6 +56,7 @@ struct EN_104 : Module {
 	__m128 sustain;
 	__m128 release;
 	__m128 phase = _mm_set_ps1(0.0f);
+	__m128 total;
 	void process(const ProcessArgs &args) override;
 	void getParams();
 };
@@ -77,13 +78,18 @@ void EN_104::getParams() {
 	decay = _mm_mul_ps(_mm_set_ps1(0.001f), _mm_load_ps(d));
 	sustain = _mm_load_ps(s);
 	release = _mm_mul_ps(_mm_set_ps1(0.001f), _mm_load_ps(r));
+	total = _mm_load_ps(t);
 }
 
 void EN_104::process(const ProcessArgs &args) {
-	alignas(16) float out[4];
+	alignas(16) float v[4];
 	if (!skipParams++) {
 		getParams();
 	}
+	for (int i = 0; i < 4; i++) {
+		v[i] = inputs[INPUT_1].getVoltage();
+	}
+	__m128 voltage = _mm_load_ps(v);
 	float triggerVal = inputs[INPUT_TRIGGER].getVoltage();
 	float gateVal = inputs[INPUT_GATE].getVoltage();
 	bool gated = gateVal > 0.5f;
@@ -92,32 +98,26 @@ void EN_104::process(const ProcessArgs &args) {
 		triggered = gate.process(rescale(gateVal, 2.4f, 2.5f, 0.0f, 1.0f));
 	}
 	if (gated) {
+		__m128 minGate = _mm_min_ps(level, sustain);
 		phase = _mm_or_ps(phase, _mm_castsi128_ps(_mm_set1_epi8(triggered * 255)));
 		level = _mm_add_ps(level, _mm_and_ps(phase, attack));
 		level = _mm_sub_ps(level, _mm_andnot_ps(phase, decay));
-		level = _mm_min_ps(level, _mm_set_ps1(triggered));
-		level = _mm_max_ps(level, _mm_andnot_ps(phase, sustain));
-		_mm_store_ps(out, level);
+		phase = _mm_and_ps(phase, _mm_cmpge_ps(_mm_set_ps1(1.0f), level));
+		level = _mm_min_ps(level, _mm_set_ps1(1.0f));
+		level = _mm_max_ps(level, _mm_andnot_ps(phase, minGate));
+		_mm_store_ps(v, _mm_mul_ps(_mm_mul_ps(level, total), voltage));
 	}
 	else {
-		_mm_store_ps(out, attack);
-		float a = out[0];
 		phase = _mm_or_ps(phase, _mm_castsi128_ps(_mm_set1_epi8(triggered * 255)));
-		_mm_store_ps(out, phase);
-		float p = out[0];
-		_mm_store_ps(out, _mm_and_ps(phase, attack));
-		float l = out[0];
 		level = _mm_add_ps(level, _mm_and_ps(phase, attack));
 		level = _mm_sub_ps(level, _mm_andnot_ps(phase, release));
+		phase = _mm_and_ps(phase, _mm_cmpge_ps(_mm_set_ps1(1.0f), level));
 		level = _mm_min_ps(level, _mm_set_ps1(1.0f));
-		_mm_store_ps(out, level);
-		float o = out[0];
 		level = _mm_max_ps(level, _mm_set_ps1(0.0f));
-		_mm_store_ps(out, level);
-		DEBUG("%f %f %f %f %f", level, a, p, l, o);
+		_mm_store_ps(v, _mm_mul_ps(_mm_mul_ps(level, total), voltage));
 	}
 	for (int i = 0; i < 4; i++) {
-		outputs[OUTPUT_1 + i].setVoltage(out[i]);
+		outputs[OUTPUT_1 + i].setVoltage(v[i]);
 	}
 }
 
