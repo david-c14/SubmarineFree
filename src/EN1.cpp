@@ -39,11 +39,11 @@ struct EN_104 : Module {
 () : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for(unsigned int i = 0; i < 4; i++) {
-			configParam(PARAM_A1 + i, 0.0f, 4.0f, 0.5f, string::f("Operator #%d Attack Rack", i + 1));
-			configParam(PARAM_D1 + i, 0.0f, 4.0f, 0.5f, string::f("Operator #%d Decay Rate", i + 1));
-			configParam(PARAM_S1 + i, 0.0f, 1.0f, 0.5f, string::f("Operator #%d Sustain Level", i + 1));
-			configParam(PARAM_R1 + i, 0.0f, 4.0f, 0.5f, string::f("Operator #%d Release Rate", i + 1));
-			configParam(PARAM_T1 + i, 0.0f, 1.0f, 0.5f, string::f("Operator #%d Total Level", i + 1));
+			configParam(PARAM_A1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Attack Rack", i + 1), " ms", 10000.0f, 1.0f);
+			configParam(PARAM_D1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Decay Rate", i + 1), " ms", 10000.0f, 1.0f);
+			configParam(PARAM_S1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Sustain Level", i + 1));
+			configParam(PARAM_R1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Release Rate", i + 1), " ms", 10000.0f, 1.0f);
+			configParam(PARAM_T1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Total Level", i + 1));
 		}
 		
 	}
@@ -67,23 +67,29 @@ void EN_104::getParams(const ProcessArgs &args) {
 	alignas(16) float s[4];
 	alignas(16) float r[4];
 	alignas(16) float t[4];
-	float delta = args.sampleTime * 1000.0f;
+	float delta = args.sampleTime * 0.1f;
 	for (unsigned int i = 0; i < 4; i++) {
-		a[i] = clamp(params[PARAM_A1 + i].getValue() + inputs[INPUT_A1 + i].getVoltage() * 0.4f, 0.0f, 4.0f);
-		a[i] = delta * pow(10.0f, 1-a[i] * a[i]);
-		d[i] = clamp(params[PARAM_D1 + i].getValue() + inputs[INPUT_D1 + i].getVoltage() * 0.4f, 0.0f, 4.0f);
-		d[i] = delta * (1 - (d[i] * d[i]));
+		a[i] = clamp(params[PARAM_A1 + i].getValue() + inputs[INPUT_A1 + i].getVoltage() * 0.1f, 0.0f, 1.0f);
+		a[i] = delta * pow(10000.0f, 1.0f - a[i]);
+		d[i] = clamp(params[PARAM_D1 + i].getValue() + inputs[INPUT_D1 + i].getVoltage() * 0.1f, 0.0f, 1.0f);
+		d[i] = delta * pow(10000.0f, 1.0f - d[i]);
 		s[i] = clamp(params[PARAM_S1 + i].getValue() + inputs[INPUT_S1 + i].getVoltage() * 0.1f, 0.0f, 1.0f);
-		r[i] = clamp(params[PARAM_R1 + i].getValue() + inputs[INPUT_R1 + i].getVoltage() * 0.4f, 0.0f, 4.0f);
-		r[i] = delta * (1 - (r[i] * r[i]));
+		r[i] = clamp(params[PARAM_R1 + i].getValue() + inputs[INPUT_R1 + i].getVoltage() * 0.1f, 0.0f, 1.0f);
+		r[i] = delta * pow(10000.0f, 1.0f - r[i]);
 		t[i] = clamp(params[PARAM_T1 + i].getValue() + inputs[INPUT_T1 + i].getVoltage() * 0.1f, 0.0f, 1.0f);
 	}
-	DEBUG("%f %f %f %f", a[0], a[1], a[2], a[3]);
 	attack = _mm_load_ps(a);
 	decay = _mm_load_ps(d);
 	sustain = _mm_load_ps(s);
 	release = _mm_load_ps(r);
 	total = _mm_load_ps(t);
+	/* // Move exponential from for loop to down here
+	attack = _mm_sub_ps(_mm_set_ps1(1.0f), attack);
+	decay = _mm_sub_ps(_mm_set_ps1(1.0f), decay);
+	release = _mm_sub_ps(_mm_set_ps1(1.0f), release);
+	attack = _mm_pow_ps(_mm_set_ps1(10000.0f), attack); // actually implement _mm_pow_ps 
+	*/
+
 }
 
 void EN_104::process(const ProcessArgs &args) {
