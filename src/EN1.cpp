@@ -39,11 +39,11 @@ struct EN_104 : Module {
 () : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for(unsigned int i = 0; i < 4; i++) {
-			configParam(PARAM_A1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Attack Rack", i + 1), " ms", 10000.0f, 1.0f);
-			configParam(PARAM_D1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Decay Rate", i + 1), " ms", 10000.0f, 1.0f);
-			configParam(PARAM_S1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Sustain Level", i + 1));
-			configParam(PARAM_R1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Release Rate", i + 1), " ms", 10000.0f, 1.0f);
-			configParam(PARAM_T1 + i, 0.0f, 1.0f, 0.2f, string::f("Operator #%d Total Level", i + 1));
+			configParam(PARAM_A1 + i, 0.0f, 1.0f, 0.25f, string::f("Operator #%d Attack Rack", i + 1), " ms", 10000.0f, 1.0f);
+			configParam(PARAM_D1 + i, 0.0f, 1.0f, 0.25f, string::f("Operator #%d Decay Rate", i + 1), " ms", 10000.0f, 1.0f);
+			configParam(PARAM_S1 + i, 0.0f, 1.0f, 0.8f, string::f("Operator #%d Sustain Level", i + 1), "%", 0.0f, 100.0f);
+			configParam(PARAM_R1 + i, 0.0f, 1.0f, 0.25f, string::f("Operator #%d Release Rate", i + 1), " ms", 10000.0f, 1.0f);
+			configParam(PARAM_T1 + i, 0.0f, 1.0f, 1.0f, string::f("Operator #%d Total Level", i + 1), "%", 0.0f, 100.0f);
 		}
 		
 	}
