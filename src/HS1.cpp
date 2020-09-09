@@ -45,7 +45,7 @@ struct HS_101 : Module {
 	
 	HS_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_TIME, -4.0f, 6.0f, -4.0f, "Time base", "s", 2.0f);
+		configParam(PARAM_TIME, -10.0f, 6.0f, -4.0f, "Time base", "s", 2.0f);
 		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f, "Run");
 		configParam(PARAM_X_PAN, 0.0f, 1.0f, 0.5f, "X Pan", "%", 0.0f, 100.0f);
 		configParam(PARAM_X_SCALE, 0.0f, +18.0f, 0.0f, "X Zoom", "x", 2.0f);

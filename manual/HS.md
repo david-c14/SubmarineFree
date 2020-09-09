@@ -15,7 +15,7 @@ The scope can be triggered either by a gate or trigger pulse to the TRIGGER inpu
 
 ## Length
 
-The LENGTH knob will adjust the storage time resolution of the scope. The length of the storage buffer can be adjusted from 1 sixteenth of a second up to 64 seconds.
+The LENGTH knob will adjust the storage time resolution of the scope. The length of the storage buffer can be adjusted from 1 thousandth of a second up to 64 seconds.
 
 ## Viewing
 

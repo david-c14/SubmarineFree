@@ -64,7 +64,7 @@ struct LA_108 : DS_Module {
 		configParam(PARAM_EDGE, 0.0f, 1.0f, 0.0f, "Trigger on falling edge");
 		configParam(PARAM_RUN, 0.0f, 1.0f, 0.0f, "One shot mode");
 		configParam(PARAM_RESET, 0.0f, 1.0f, 0.0f, "Reset");
-		configParam(PARAM_TIME, -6.0f, -16.0f, -14.0f, "Time base");
+		configParam(PARAM_TIME, -2.0f, -16.0f, -14.0f, "Time base");
 		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left index position");
 		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right index position");
 		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f, "Pre-trigger buffer size");

@@ -11,7 +11,7 @@
 	"donateUrl": "https://www.paypal.me/SubmarineFree",
         "pluginUrl": "https://github.com/david-c14/SubmarineFree/blob/main/README.md",
 	"changelogUrl": "https://github.com/david-c14/SubmarineFree/blob/main/changelog.md",
-	"version": "1.1.6",
+	"version": "1.1.7",
 	"modules": [
 		{
 			"slug":"AG-104",
@@ -151,28 +151,35 @@
 			"name":"DO-105",
 			"description": "DO-105 Digital Operators",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
-			"tags": ["LOGIC", "MULTIPLE"]
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
 		},
 		{
 			"slug":"DO-110",
 			"name":"DO-110",
 			"description": "DO-110 Digital Operators",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
-			"tags": ["LOGIC", "MULTIPLE"]
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
 		},
 		{
 			"slug":"DO-115",
 			"name":"DO-115",
 			"description": "DO-115 Digital Operators",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
-			"tags": ["LOGIC", "MULTIPLE"]
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
 		},
 		{
 			"slug":"DO-120",
 			"name":"DO-120",
 			"description": "DO-120 Digital Operators",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
-			"tags": ["LOGIC", "MULTIPLE"]
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
+			"slug":"EN-104",
+			"name":"EN-104",
+			"description": "EN-104 Quad ADSR Enveloper Generator",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/EN.md",
+			"tags": ["ENVELOPE GENERATOR", "VCA", "MULTIPLE"]
 		},
 		{
 			"slug":"EO-102",
@@ -242,7 +249,7 @@
 			"name":"LT-116",
 			"description": "LT-116 Linear Transformations",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/LT.md",
-			"tags": ["UTILITY"]
+			"tags": ["UTILITY", "POLYPHONIC"]
 		},
 		{
 			"slug":"MZ-909",

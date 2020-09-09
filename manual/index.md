@@ -21,6 +21,9 @@ Digital Noise Source
 # [DS](DS.md)
 Digital Suite
 
+# [EN](EN.md)
+Envelope Generator
+
 # [EO](EO.md)
 Envelope Oscilloscope
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.7
+- 09-Sep-2020 Bug fix #141 TD-3/4/5 minimum width
+- 05-Sep-2020 Add EN-104 Envelope generator
+- 30-Jul-2020 Extend time-base of HS-101 down to as short as 1/1000 of a second
+- 30-Jul-2020 Extend time-base of LA-108 to as long as 128 seconds
+- 24-Jul-2020 Bug fix for MZ-909 manual. Thank you Ryan Monro.
+
 ## v1.1.6
 - 19-Jul-2020 Added MZ-909 Masterizer
 - 18-Jul-2020 Correct urls that refer to master
