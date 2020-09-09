@@ -111,7 +111,7 @@ struct TD316 : SchemeModuleWidget {
 	TD316(TD_316 *module) {
 		setModule(module);
 		this->box.size = Vec(240, 380);
-		schemePanel = new SchemePanel(this->box.size, 75, 300);
+		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
 		addChild(schemePanel);
 
 		textField = createWidget<TD3Text>(Vec(4, 18));
