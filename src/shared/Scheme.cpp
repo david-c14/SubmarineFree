@@ -111,6 +111,8 @@ SchemePanel::SchemePanel(Vec size) : SchemePanel() {
 }
 
 SchemePanel::SchemePanel(Vec size, float minimum, float maximum) : SchemePanel(size) {
+	minWidth = minimum;
+	maxWidth = maximum;
 	leftHandle = createWidget<ResizeHandle>(Vec(2,2));
 	leftHandle->right = false;
 	addChild(leftHandle);
