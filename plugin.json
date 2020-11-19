@@ -420,6 +420,13 @@
 			"tags": ["UTILITY"]
 		},
 		{
+			"slug":"VM-102",
+			"name":"VM-102",
+			"description": "VM-102 2-Channel VU-Meter",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/VM.md",
+			"tags": ["UTILITY", "VISUAL", "DUAL", "POLYPHONIC"]
+		},
+		{
 			"slug":"WK-101",
 			"name":"WK-101",
 			"description": "WK-101 Das Wohltemperierte Klavier",
