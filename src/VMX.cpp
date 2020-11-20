@@ -2,6 +2,21 @@
 
 #include "SubmarineFree.hpp"
 
+/*
+
+Difference function for mass-damped spring needle VU-meter 
+
+a₀⋅y₀ = b₀⋅x₀ + b₁⋅x₋₁ + b₂⋅x₋₂ - a₁⋅y₋₁ - a₂⋅y₋₂
+
+a₀ = 4 + 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
+a₁ = -8 + 2⋅ωn²⋅Td
+a₂ = 4 - 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
+b₀ = ωn²⋅Td²
+b₁ = 2⋅ωn²⋅Td²
+b₂ = ωn²⋅Td²
+
+*/
+
 namespace {
 	enum ParamIds {
 		PARAM_IMPEDANCE,
@@ -18,25 +33,47 @@ namespace {
 	enum LightIds {
 		NUM_LIGHTS
 	};
+
+	const double zeta = 0.81272; 
+	const double omega_n = 13.5119;
+	const double omega_n2 = omega_n * omega_n;
+
+	struct Coefficients {
+		double a0;
+		double a1;
+		double a2;
+		double b0_2;
+		double b1;
+
+		Coefficients(float sampleTime) {
+			Recalculate(sampleTime);
+		}
+		
+		void Recalculate(float Td) {
+			double Td2omega_n2        = Td * Td * omega_n2;
+			double zeta_omega_n_Td4   = 4 * zeta * omega_n * Td;
+
+			a0   = 1.0f / (4 + zeta_omega_n_Td4 + Td2omega_n2);
+			a1   = -8 + 2 * Td2omega_n2;
+			a2   = 4 - zeta_omega_n_Td4 + Td2omega_n2; 
+			b0_2 = Td2omega_n2;
+			b1   = b0_2 * 2.0f;
+		}
+	};
 }
 
-/*
-
-a₀⋅y₀ = b₀⋅x₀ + b₁⋅x₋₁ + b₂⋅x₋₂ - a₁⋅y₋₁ - a₂⋅y₋₂
-
-a₀ = 4 + 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
-a₁ = -8 + 2⋅ωn²⋅Td
-a₂ = 4 - 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
-b₀ = ωn²⋅Td²
-b₁ = 2⋅ωn²⋅Td²
-b₂ = ωn²⋅Td²
+struct VM_ : Module {
+	VM_() : Module() { }
+	Coefficients c { { APP->engine->getSampleTime() } };
+	void onSampleRateChange() override {
+		c.Recalculate(APP->engine->getSampleTime());
+	}
+};
 
 
-*/
+struct VM_102 : VM_ {
 
-struct VM_102 : Module {
-
-	VM_102() : Module() {
+	VM_102() : VM_() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_IMPEDANCE, 0.0f, +1.0f, 0.0f, "Impedance", "\xe2\x84\xa6");
 	}
@@ -54,18 +91,9 @@ struct VM_102 : Module {
 		x_0 = abs(x_0);
 		y_2 = y_1;
 		y_1 = y_0;
-		double eta = 0.81272;
-		double wn = 13.5119;
-		double Td = args.sampleTime;
-		double a0 = 4 + 4 * eta * wn * Td + wn * wn * Td * Td;
-		double a1 = -8 + 2 * wn * wn * Td * Td;
-		double a2 = 4 - 4 * eta * wn * Td + wn * wn * Td * Td; 
-		double b0 = Td * Td * wn * wn;
-		double b1 = b0 * 2.0f;
-		double b2 = b0;
 	
-		y_0 = - a1 * y_1 - a2 * y_2 + b0 * x_0 + b1 * x_1 + b2 * x_2;
-		y_0 /= a0;
+		y_0 = - c.a1 * y_1 - c.a2 * y_2 + c.b0_2 * x_0 + c.b1 * x_1 + c.b0_2 * x_2;
+		y_0 *= c.a0;
 		outputs[OUTPUT_1].setVoltage(y_0, 0);
 		
 	}
