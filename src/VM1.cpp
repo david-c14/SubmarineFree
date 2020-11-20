@@ -20,6 +20,20 @@ namespace {
 	};
 }
 
+/*
+
+a₀⋅y₀ = b₀⋅x₀ + b₁⋅x₋₁ + b₂⋅x₋₂ - a₁⋅y₋₁ - a₂⋅y₋₂
+
+a₀ = 4 + 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
+a₁ = -8 + 2⋅ωn²⋅Td
+a₂ = 4 - 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
+b₀ = ωn²⋅Td²
+b₁ = 2⋅ωn²⋅Td²
+b₂ = ωn²⋅Td²
+
+
+*/
+
 struct VM_102 : Module {
 
 	VM_102() : Module() {
