@@ -37,7 +37,7 @@ struct VM_102 : Module {
 		x_2 = x_1;
 		x_1 = x_0;
 		x_0 = inputs[INPUT_1].getVoltage(0);
-		x_0 = x_0 * x_0;
+		x_0 = abs(x_0);
 		y_2 = y_1;
 		y_1 = y_0;
 		double eta = 0.81272;
