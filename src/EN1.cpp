@@ -98,7 +98,7 @@ void EN_104::process(const ProcessArgs &args) {
 		getParams(args);
 	}
 	for (int i = 0; i < 4; i++) {
-		v[i] = inputs[INPUT_1].getVoltage();
+		v[i] = inputs[INPUT_1 + i].getVoltage();
 	}
 	__m128 voltage = _mm_load_ps(v);
 	float triggerVal = inputs[INPUT_TRIGGER].getVoltage();

@@ -3,6 +3,9 @@
 ## v1.1.9
 - 20-Nov-2020 VM-XXX VU Meters
 
+## v1.1.8
+- 12-Sep-2020 Bug fix #145 EN-104 inputs
+
 ## v1.1.7
 - 09-Sep-2020 Bug fix #141 TD-3/4/5 minimum width
 - 05-Sep-2020 Add EN-104 Envelope generator
