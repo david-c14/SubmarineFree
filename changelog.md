@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.8
+## v1.1.9
 - 20-Nov-2020 VM-XXX VU Meters
 
 ## v1.1.7
