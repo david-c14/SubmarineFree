@@ -81,6 +81,13 @@ namespace {
 	
 		void draw(const DrawArgs &args) override {
 			float meter = rescale(value, -20.0f, 3.0f, 0.0f, box.size.y);
+			if (value > 0.0f) {
+				nvgBeginPath(args.vg);
+				nvgFillColor(args.vg, SUBLIGHTRED);
+				nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter);
+				nvgFill(args.vg);
+				meter = rescale(0, -20.0f, 3.0f, 0.0f, box.size.y);
+			}
 			nvgBeginPath(args.vg);
 			nvgFillColor(args.vg, SUBLIGHTBLUE);
 			nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter); 
@@ -109,21 +116,8 @@ namespace {
 			nvgFill(args.vg);
 
 			float zeroPoint = rescale(0.0f, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
-			nvgBeginPath(args.vg);
-			nvgArc(args.vg,
-				box.size.x * 0.5f,
-				box.size.y,
-				box.size.y * 0.8f,
-				M_PI * -0.75f,
-				-zeroPoint,
-				NVG_CW);
-			for (int i = -20; i <= 0; i++) {
-				float tick = rescale(i, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-				nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
-				nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
-			}
-			nvgStroke(args.vg);
+
+			nvgLineCap(args.vg, NVG_ROUND);
 			nvgStrokeColor(args.vg, SUBLIGHTRED);
 			nvgBeginPath(args.vg);
 			nvgArc(args.vg,
@@ -134,6 +128,22 @@ namespace {
 				M_PI * -0.25f,
 				NVG_CW);
 			for (int i = 1; i <= 3; i++) {
+				float tick = rescale(i, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+				nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
+				nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
+			}
+			nvgStroke(args.vg);
+
+			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
+			nvgBeginPath(args.vg);
+			nvgArc(args.vg,
+				box.size.x * 0.5f,
+				box.size.y,
+				box.size.y * 0.8f,
+				M_PI * -0.75f,
+				-zeroPoint,
+				NVG_CW);
+			for (int i = -20; i <= 0; i++) {
 				float tick = rescale(i, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
 				nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
 				nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
@@ -414,7 +424,7 @@ struct VM201 : VMxxx {
 
 		display = new VM_NeedleDisplay();
 		display->box.pos = Vec(10, 20);
-		display->box.size = Vec(130, 100);
+		display->box.size = Vec(130, 90);
 		addChild(display);
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_xx1::INPUT_1));
@@ -444,12 +454,12 @@ struct VM202 : VMxxx {
 
 		display1 = new VM_NeedleDisplay();
 		display1->box.pos = Vec(10, 20);
-		display1->box.size = Vec(130, 100);
+		display1->box.size = Vec(130, 90);
 		addChild(display1);
 
 		display2 = new VM_NeedleDisplay();
-		display2->box.pos = Vec(10, 140);
-		display2->box.size = Vec(130, 100);
+		display2->box.pos = Vec(10, 120);
+		display2->box.size = Vec(130, 90);
 		addChild(display2);
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_202::INPUT_1));
