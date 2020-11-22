@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.9
+- 22-Nov-2020 Add visuals menu to scopes (missing since addition of "Match Cable Colors")
 - 20-Nov-2020 VM-XXX VU Meters
 
 ## v1.1.8

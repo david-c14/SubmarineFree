@@ -19,6 +19,17 @@ b₂ = ωn²⋅Td²
 
 namespace {
 
+	enum ParamIds {
+		PARAM_LOAD,
+		PARAM_ATTENUATOR,
+		NUM_PARAMS
+	};
+	enum OutputIds {
+		NUM_OUTPUTS
+	};
+	enum LightIds {
+		NUM_LIGHTS
+	};
 	const double zeta = 0.81272; 
 	const double omega_n = 13.5119;
 	const double omega_n2 = omega_n * omega_n;
@@ -57,7 +68,7 @@ namespace {
 		void process(Coefficients *c, float sample) {
 			x_2 = x_1;
 			x_1 = x_0;
-			x_0 = std::abs(sample) + 0.000000001;
+			x_0 = std::abs(sample);
 			y_2 = y_1;
 			y_1 = y_0;
 		
@@ -81,6 +92,14 @@ namespace {
 	struct VM_NeedleDisplay : LightWidget {
 		float value = 0.0f;
 	
+		void drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt) {
+			nvgFontFaceId(vg, gScheme.font(vg));
+			nvgFontSize(vg, size * 90 / SVG_DPI);
+			nvgTextAlign(vg, align);
+			nvgFillColor(vg, col);
+			nvgText(vg, x, y, txt, NULL);
+		}
+
 		void draw(const DrawArgs &args) override {
 			
 			float meter = rescale(value, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
@@ -90,28 +109,60 @@ namespace {
 			nvgFill(args.vg);
 
 			float zeroPoint = rescale(0.0f, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			nvgStrokeWidth(args.vg, 5);
 			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
 			nvgBeginPath(args.vg);
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.9f,
+				box.size.y * 0.8f,
 				M_PI * -0.75f,
 				-zeroPoint,
 				NVG_CW);
+			for (int i = -20; i <= 0; i++) {
+				float tick = rescale(i, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+				nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
+				nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
+			}
 			nvgStroke(args.vg);
 			nvgStrokeColor(args.vg, SUBLIGHTRED);
 			nvgBeginPath(args.vg);
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.9f,
+				box.size.y * 0.8f,
 				-zeroPoint,
 				M_PI * -0.25f,
 				NVG_CW);
+			for (int i = 1; i <= 3; i++) {
+				float tick = rescale(i, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+				nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
+				nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
+			}
 			nvgStroke(args.vg);
-	
+
+			drawText(args.vg, box.size.x * 0.5, box.size.y * 0.9, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
+			drawText(args.vg, 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
+			drawText(args.vg, box.size.x - 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
+			float tick = rescale(-20, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "20");
+			tick = rescale(-15, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "15");
+			tick = rescale(-10, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "10");
+			tick = rescale(-6, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "6");
+			tick = rescale(-3, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "3");
+			drawText(args.vg, box.size.x * 0.5 + cos(zeroPoint) * box.size.y * 0.65f, box.size.y - sin(zeroPoint) * box.size.y * 0.7f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "0");
+			tick = rescale(3, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "3");
 
 			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
 			nvgBeginPath(args.vg);
@@ -125,25 +176,50 @@ namespace {
 
 }
 
+struct VM_Base : Module {
+	VM_Base() : Module() { }
+	
+	Menu * addLoadMenu() {
+		Menu *menu = new Menu();
+		Module * module = this;
+		EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>("150\xe2\x84\xa6");
+		m->clickHandler = [=]() {
+			APP->engine->setParam(module, PARAM_LOAD, 150);
+		};
+		menu->addChild(m);
+		m = createMenuItem<EventWidgetMenuItem>("600\xe2\x84\xa6");
+		m->clickHandler = [=]() {
+			APP->engine->setParam(module, PARAM_LOAD, 600);
+		};
+		menu->addChild(m);
+		m = createMenuItem<EventWidgetMenuItem>("1000\xe2\x84\xa6");
+		m->clickHandler = [=]() {
+			APP->engine->setParam(module, PARAM_LOAD, 1000);
+		};
+		menu->addChild(m);
+		return menu;
+	}
+
+	void addMenu(Menu *menu) {
+		char loadStr[50];
+		sprintf(loadStr, "Load Resistor (%d\xe2\x84\xa6)", (int)(params[PARAM_LOAD].getValue()));
+		EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>(loadStr);
+		m->rightText = SUBMENU;
+		m->childMenuHandler = [=]() {
+			return addLoadMenu();
+		};
+		menu->addChild(m);
+	}
+};
+
 template <int x>
-struct VM_ : Module {
-	enum ParamIds {
-		PARAM_LOAD,
-		PARAM_ATTENUATOR,
-		NUM_PARAMS
-	};
+struct VM_ : VM_Base {
 	enum InputIds {
 		INPUT_1,
 		NUM_INPUTS = INPUT_1 + x
 	};
-	enum OutputIds {
-		NUM_OUTPUTS
-	};
-	enum LightIds {
-		NUM_LIGHTS
-	};
 
-	VM_() : Module() { 
+	VM_() : VM_Base() { 
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_LOAD, 50.0f, 20000.0f, 600.0f, "Load Resistor", "\xe2\x84\xa6");
 		configParam(PARAM_ATTENUATOR, -2.0f, 4.0f, 0.0f, "Attenuator", "x", 2.0f);
@@ -158,6 +234,9 @@ struct VM_ : Module {
 		double vRef = 1 / std::sqrt(params[PARAM_LOAD].getValue() * 0.001);
 		double atten = params[PARAM_ATTENUATOR].getValue() * 6.0f;
 		double sample = 20 * std::log10(y_0 * vRef) - atten;
+		if (std::isnan(sample)) {
+			sample = -20.0f;
+		}
 		sample = clamp(sample, -20.0f, 3.0f);	
 		return sample;
 	}
@@ -205,11 +284,23 @@ struct VM_202 : VM_<2> {
 	}
 };
 
-struct VM101 : SchemeModuleWidget {
+struct VMxxx : SchemeModuleWidget {
+	VMxxx() : SchemeModuleWidget() { }
+
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		VM_Base *module = dynamic_cast<VM_Base *>(this->module);
+		if (module) {
+			module->addMenu(menu);
+		}
+	}
+};
+
+struct VM101 : VMxxx {
 	const float displayHeight = 12;
 	const float displayPos = 19.5;
 	VM_LinearDisplay *display;
-	VM101(VM_xx1 *module) : SchemeModuleWidget() {
+	VM101(VM_xx1 *module) : VMxxx() {
 		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
@@ -220,7 +311,7 @@ struct VM101 : SchemeModuleWidget {
 		addChild(display);
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_xx1::INPUT_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, VM_xx1::PARAM_ATTENUATOR));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-101");
@@ -244,8 +335,7 @@ struct VM101 : SchemeModuleWidget {
 		drawText(vg, 5, displayPos + 3 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "0");
 		drawText(vg, 5, displayPos + 4 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "-");
 		drawText(vg, 5, displayPos + 6 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "3");
-		drawText(vg, 5, displayPos + 8 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "5");
-		drawText(vg, 5, displayPos + 10 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "7");
+		drawText(vg, 5, displayPos + 9 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "6");
 		drawText(vg, 5, displayPos + 13 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "10");
 		drawText(vg, 5, displayPos + 18 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "15");
 		drawText(vg, 5, displayPos + 23 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "20");
@@ -257,37 +347,14 @@ struct VM101 : SchemeModuleWidget {
 		}	
 		SchemeModuleWidget::step();
 	}
-
-	void appendContextMenu(Menu *menu) override {
-		SchemeModuleWidget::appendContextMenu(menu);
-		VM_xx1 *module = dynamic_cast<VM_xx1 *>(this->module);
-		if (module) {
-			menu->addChild(new MenuEntry);
-			EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>("150\xe2\x84\xa6");
-			m->clickHandler = [=]() {
-				APP->engine->setParam(module, VM_xx1::PARAM_LOAD, 150);
-			};
-			menu->addChild(m);
-			m = createMenuItem<EventWidgetMenuItem>("600\xe2\x84\xa6");
-			m->clickHandler = [=]() {
-				APP->engine->setParam(module, VM_xx1::PARAM_LOAD, 600);
-			};
-			menu->addChild(m);
-			m = createMenuItem<EventWidgetMenuItem>("1000\xe2\x84\xa6");
-			m->clickHandler = [=]() {
-				APP->engine->setParam(module, VM_xx1::PARAM_LOAD, 1000);
-			};
-			menu->addChild(m);
-		}
-	}
 };
 
-struct VM102 : SchemeModuleWidget {
+struct VM102 : VMxxx {
 	const float displayHeight = 12;
 	const float displayPos = 19.5;
 	VM_LinearDisplay *display1;
 	VM_LinearDisplay *display2;
-	VM102(VM_102 *module) : SchemeModuleWidget() {
+	VM102(VM_102 *module) : VMxxx() {
 		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
@@ -303,7 +370,7 @@ struct VM102 : SchemeModuleWidget {
 		addChild(display2);
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_102::INPUT_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, VM_102::PARAM_ATTENUATOR));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-102");
@@ -323,8 +390,7 @@ struct VM102 : SchemeModuleWidget {
 		drawText(vg, 15, displayPos + 3 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "0");
 		drawText(vg, 15, displayPos + 4 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "-");
 		drawText(vg, 15, displayPos + 6 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "3");
-		drawText(vg, 15, displayPos + 8 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "5");
-		drawText(vg, 15, displayPos + 10 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "7");
+		drawText(vg, 15, displayPos + 9 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "6");
 		drawText(vg, 15, displayPos + 13 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "10");
 		drawText(vg, 15, displayPos + 18 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "15");
 		drawText(vg, 15, displayPos + 23 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "20");
@@ -339,9 +405,9 @@ struct VM102 : SchemeModuleWidget {
 	}
 };
 
-struct VM201 : SchemeModuleWidget {
+struct VM201 : VMxxx {
 	VM_NeedleDisplay *display;
-	VM201(VM_xx1 *module) : SchemeModuleWidget() {
+	VM201(VM_xx1 *module) : VMxxx() {
 		setModule(module);
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
@@ -352,12 +418,12 @@ struct VM201 : SchemeModuleWidget {
 		addChild(display);
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_xx1::INPUT_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, VM_xx1::PARAM_ATTENUATOR));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-201");
 		drawText(vg, 20, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
-		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR (\xe2\x84\xa6)");
+		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR");
 	}
 	void step() override {
 		if (module) {
@@ -368,10 +434,10 @@ struct VM201 : SchemeModuleWidget {
 	}
 };
 
-struct VM202 : SchemeModuleWidget {
+struct VM202 : VMxxx {
 	VM_NeedleDisplay *display1;
 	VM_NeedleDisplay *display2;
-	VM202(VM_202 *module) : SchemeModuleWidget() {
+	VM202(VM_202 *module) : VMxxx() {
 		setModule(module);
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
@@ -388,12 +454,12 @@ struct VM202 : SchemeModuleWidget {
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_202::INPUT_1));
 		addInput(createInputCentered<RedPort>(Vec(55,330), module, VM_202::INPUT_1 + 1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, VM_202::PARAM_ATTENUATOR));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-202");
 		drawText(vg, 37.5f, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
-		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR (\xe2\x84\xa6)");
+		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR");
 	}
 	void step() override {
 		if (module) {
