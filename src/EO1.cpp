@@ -485,7 +485,7 @@ struct EO102 : SchemeModuleWidget {
 	void appendContextMenu(Menu *menu) override {
 		if (!module)
 			return;
-		menu->addChild(new MenuSeparator);
+		SchemeModuleWidget::appendContextMenu(menu);
 		EventWidgetMenuItem *vmi = createMenuItem<EventWidgetMenuItem>("Match Cable Colors");
 		vmi->stepHandler = [=]() {
 			vmi->rightText = CHECKMARK(module->params[EO_102::PARAM_COLORS].getValue());

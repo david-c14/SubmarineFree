@@ -440,7 +440,7 @@ struct HS101 : SchemeModuleWidget {
 	void appendContextMenu(Menu *menu) override {
 		if (!module)
 			return;
-		menu->addChild(new MenuSeparator);
+		SchemeModuleWidget::appendContextMenu(menu);
 		EventWidgetMenuItem *vmi = createMenuItem<EventWidgetMenuItem>("Match Cable Colors");
 		vmi->stepHandler = [=]() {
 			vmi->rightText = CHECKMARK(module->params[HS_101::PARAM_COLORS].getValue());
