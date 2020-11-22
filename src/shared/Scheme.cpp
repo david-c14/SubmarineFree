@@ -159,6 +159,7 @@ void SchemeCanvasWidget::draw(const DrawArgs &args) {
 	nvgSave(args.vg);
 	smw->render(args.vg, this);
 	nvgRestore(args.vg);
+	/*
 	// Standard Panel Border
 	NVGcolor borderColor = nvgRGBAf(0.5, 0.5, 0.5, 0.5);
 	nvgBeginPath(args.vg);
@@ -166,6 +167,7 @@ void SchemeCanvasWidget::draw(const DrawArgs &args) {
 	nvgStrokeColor(args.vg, borderColor);
 	nvgStrokeWidth(args.vg, 1.0);
 	nvgStroke(args.vg);
+	*/
 	Widget::draw(args);
 }
 

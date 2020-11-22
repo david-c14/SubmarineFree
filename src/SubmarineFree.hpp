@@ -58,6 +58,9 @@ extern Model *modelMZ909;
 extern Model *modelNG106;
 extern Model *modelNG112;
 
+extern Model *modelOA103;
+extern Model *modelOA105;
+
 extern Model *modelOG104;
 extern Model *modelOG106;
 
