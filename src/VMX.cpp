@@ -128,7 +128,8 @@ namespace {
 template <int x>
 struct VM_ : Module {
 	enum ParamIds {
-		PARAM_IMPEDANCE,
+		PARAM_LOAD,
+		PARAM_ATTENUATOR,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -144,13 +145,21 @@ struct VM_ : Module {
 
 	VM_() : Module() { 
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_IMPEDANCE, 50.0f, 20000.0f, 600.0f, "Impedance", "\xe2\x84\xa6");
+		configParam(PARAM_LOAD, 50.0f, 20000.0f, 600.0f, "Load Resistor", "\xe2\x84\xa6");
+		configParam(PARAM_ATTENUATOR, -2.0f, 4.0f, 0.0f, "Attenuator", "x", 2.0f);
 	}
 
 	Coefficients c { { APP->engine->getSampleTime() } };
 
 	void onSampleRateChange() override {
 		c.Recalculate(APP->engine->getSampleTime());
+	}
+	double calculate(double y_0) {
+		double vRef = 1 / std::sqrt(params[PARAM_LOAD].getValue() * 0.001);
+		double atten = params[PARAM_ATTENUATOR].getValue() * 6.0f;
+		double sample = 20 * std::log10(y_0 * vRef) - atten;
+		sample = clamp(sample, -20.0f, 3.0f);	
+		return sample;
 	}
 };
 
@@ -211,7 +220,7 @@ struct VM101 : SchemeModuleWidget {
 		addChild(display);
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_xx1::INPUT_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, VM_xx1::PARAM_IMPEDANCE));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, VM_xx1::PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-101");
@@ -244,12 +253,32 @@ struct VM101 : SchemeModuleWidget {
 	void step() override {
 		if (module) {
 			VM_xx1 *vmModule = dynamic_cast<VM_xx1 *>(module);
-			double vRef = M_PI * 0.5 / std::sqrt(vmModule->params[VM_xx1::PARAM_IMPEDANCE].getValue() * 0.001);
-			double sample = 20 * std::log10(vmModule->samples.y_0 * vRef);
-			sample = clamp(sample, -20.0f, 3.0f);	
-			display->value = sample;
+			display->value = vmModule->calculate(vmModule->samples.y_0);
 		}	
 		SchemeModuleWidget::step();
+	}
+
+	void appendContextMenu(Menu *menu) override {
+		SchemeModuleWidget::appendContextMenu(menu);
+		VM_xx1 *module = dynamic_cast<VM_xx1 *>(this->module);
+		if (module) {
+			menu->addChild(new MenuEntry);
+			EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>("150\xe2\x84\xa6");
+			m->clickHandler = [=]() {
+				APP->engine->setParam(module, VM_xx1::PARAM_LOAD, 150);
+			};
+			menu->addChild(m);
+			m = createMenuItem<EventWidgetMenuItem>("600\xe2\x84\xa6");
+			m->clickHandler = [=]() {
+				APP->engine->setParam(module, VM_xx1::PARAM_LOAD, 600);
+			};
+			menu->addChild(m);
+			m = createMenuItem<EventWidgetMenuItem>("1000\xe2\x84\xa6");
+			m->clickHandler = [=]() {
+				APP->engine->setParam(module, VM_xx1::PARAM_LOAD, 1000);
+			};
+			menu->addChild(m);
+		}
 	}
 };
 
@@ -274,7 +303,7 @@ struct VM102 : SchemeModuleWidget {
 		addChild(display2);
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_102::INPUT_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, VM_102::PARAM_IMPEDANCE));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, VM_102::PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-102");
@@ -303,14 +332,8 @@ struct VM102 : SchemeModuleWidget {
 	void step() override {
 		if (module) {
 			VM_102 *vmModule = dynamic_cast<VM_102 *>(module);
-			double vRef = M_PI * 0.5 / std::sqrt(vmModule->params[VM_102::PARAM_IMPEDANCE].getValue() * 0.001);
-			double sample = 20 * std::log10(vmModule->samples_1.y_0 * vRef);
-			sample = clamp(sample, -20.0f, 3.0f);	
-			display1->value = sample;
-
-			sample = 20 * std::log10(vmModule->samples_2.y_0 * vRef);
-			sample = clamp(sample, -20.0f, 3.0f);	
-			display2->value = sample;
+			display1->value = vmModule->calculate(vmModule->samples_1.y_0);
+			display2->value = vmModule->calculate(vmModule->samples_2.y_0);
 		}	
 		SchemeModuleWidget::step();
 	}
@@ -329,20 +352,17 @@ struct VM201 : SchemeModuleWidget {
 		addChild(display);
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_xx1::INPUT_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, VM_xx1::PARAM_IMPEDANCE));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, VM_xx1::PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-201");
 		drawText(vg, 20, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
-		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IMPEDANCE (\xe2\x84\xa6)");
+		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR (\xe2\x84\xa6)");
 	}
 	void step() override {
 		if (module) {
 			VM_xx1 *vmModule = dynamic_cast<VM_xx1 *>(module);
-			double vRef = M_PI * 0.5 / std::sqrt(vmModule->params[VM_xx1::PARAM_IMPEDANCE].getValue() * 0.001);
-			double sample = 20 * std::log10(vmModule->samples.y_0 * vRef);
-			sample = clamp(sample, -20.0f, 3.0f);	
-			display->value = sample;
+			display->value = vmModule->calculate(vmModule->samples.y_0);
 		}	
 		SchemeModuleWidget::step();
 	}
@@ -368,24 +388,18 @@ struct VM202 : SchemeModuleWidget {
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_202::INPUT_1));
 		addInput(createInputCentered<RedPort>(Vec(55,330), module, VM_202::INPUT_1 + 1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, VM_202::PARAM_IMPEDANCE));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, VM_202::PARAM_ATTENUATOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-202");
 		drawText(vg, 37.5f, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
-		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IMPEDANCE (\xe2\x84\xa6)");
+		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR (\xe2\x84\xa6)");
 	}
 	void step() override {
 		if (module) {
 			VM_202 *vmModule = dynamic_cast<VM_202 *>(module);
-			double vRef = M_PI * 0.5 / std::sqrt(vmModule->params[VM_202::PARAM_IMPEDANCE].getValue() * 0.001);
-			double sample = 20 * std::log10(vmModule->samples_1.y_0 * vRef);
-			sample = clamp(sample, -20.0f, 3.0f);	
-			display1->value = sample;
-
-			sample = 20 * std::log10(vmModule->samples_2.y_0 * vRef);
-			sample = clamp(sample, -20.0f, 3.0f);	
-			display2->value = sample;
+			display1->value = vmModule->calculate(vmModule->samples_1.y_0);
+			display2->value = vmModule->calculate(vmModule->samples_2.y_0);
 		}	
 		SchemeModuleWidget::step();
 	}
