@@ -29,6 +29,27 @@ float DS_Module::output(int state) {
 	return state?voltage1:voltage0;
 } 
 
+unsigned int DS_Module::getInput(int channels, unsigned int bitArray, int input) {
+	if (!inputs[input].isConnected()) {
+		return bitArray;
+	}
+	for (int i = channels; i > 0; i--) {
+		bitArray <<= 1;
+		if (inputs[input].getVoltage(i-1) > midpoint()) {
+			bitArray++;
+		}
+	}
+	return bitArray;
+}
+
+void DS_Module::setOutput(int channels, int output, unsigned int value) {
+	outputs[output].setChannels(channels);
+	for (int i = 0; i < channels; i++) {
+		outputs[output].setVoltage((value & 0x1)?voltage1:voltage0, i);
+		value >>= 1;
+	}
+}
+
 struct DS_ParentMenuItem : MenuItem {
 	DS_Module *module;
 	Menu *createChildMenu() override {

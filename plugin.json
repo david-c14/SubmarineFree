@@ -28,6 +28,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"AG-202",
+			"name":"AG-202",
+			"description": "AG-202 4-input Polyphonic AND Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AG.md",
+			"tags": ["LOGIC", "DUAL"]
+		},
+		{
 			"slug":"A0-106",
 			"name":"AO-106",
 			"description": "AO-106 Arithmetic Operators",
