@@ -28,6 +28,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"AG-202",
+			"name":"AG-202",
+			"description": "AG-202 4-input Polyphonic AND Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
+		},
+		{
 			"slug":"A0-106",
 			"name":"AO-106",
 			"description": "AO-106 Arithmetic Operators",
@@ -273,6 +280,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"NG-206",
+			"name":"NG-206",
+			"description": "NG-206 Polyphonic NOT Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/NG.md",
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
 			"slug":"OA-103",
 			"name":"OA-103",
 			"description": "OA-103 Op-Amps",
@@ -299,6 +313,13 @@
 			"description": "OG-106 OR Gates",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OG.md",
 			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"OG-202",
+			"name":"OG-202",
+			"description": "OG-202 4-Channel Polyphonic OR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		},
 		{
 			"slug":"PG-104",
@@ -537,6 +558,13 @@
 			"description": "XG-104 XOR Gates",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
 			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"XG-202",
+			"name":"XG-202",
+			"description": "XG-202 4-Input Polyphonic XOR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		},
 		{
 			"slug":"XG-106",

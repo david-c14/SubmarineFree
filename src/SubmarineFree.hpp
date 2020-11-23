@@ -9,6 +9,7 @@ extern Plugin *pluginInstance;
 
 extern Model *modelAG104;
 extern Model *modelAG106;
+extern Model *modelAG202;
 
 extern Model *modelAO106;
 extern Model *modelAO112;
@@ -57,12 +58,14 @@ extern Model *modelMZ909;
 
 extern Model *modelNG106;
 extern Model *modelNG112;
+extern Model *modelNG206;
 
 extern Model *modelOA103;
 extern Model *modelOA105;
 
 extern Model *modelOG104;
 extern Model *modelOG106;
+extern Model *modelOG202;
 
 extern Model *modelPG104;
 extern Model *modelPG112;
@@ -108,6 +111,7 @@ extern Model *modelXF301;
 
 extern Model *modelXG104;
 extern Model *modelXG106;
+extern Model *modelXG202;
 
 extern Model *modelXX219;
 

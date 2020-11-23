@@ -2,6 +2,7 @@
 ### [Part of the Digital Suite](DS.md)
 #### XG-104 XOR Gates
 #### XG-106 XOR Gates
+#### XG-202 XOR Gates
 
 ![View of the XOR Gates](XG.png "XOR Gates")
 
@@ -22,3 +23,8 @@ An input not connected will be ignored.
 ## XG-104
 
 The XG-104 provides four two-input XOR gates in a small form factor. Otherwise functionality is as for the XG-106 above.
+
+## XG-202
+
+The XG-202 providers two four-input polyphonic XOR gates in a small form factor. The number of channels in the output equals the number of channels in the first input.
+
