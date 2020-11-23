@@ -48,6 +48,9 @@ Masterizer
 # [NG](NG.md)
 Logical NOT gates
 
+# [OA](OA.md)
+Operation Amplifiers
+
 # [OG](OG.md)
 Logical OR gates
 
@@ -71,6 +74,9 @@ Text Format Controller
 
 # [TM](TM.md)
 Torpedo Message Merge
+
+# [VM](VM.md)
+ANSI C16.5-1942 VU Meter
 
 # [WK](WK.md)
 Das Wohltemperierte Klavier - Unequal Temperament Quantizer

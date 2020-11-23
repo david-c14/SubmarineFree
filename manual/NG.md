@@ -2,6 +2,7 @@
 ### [Part of the Digital Suite](DS.md)
 #### NG-106 NOT Gates
 #### NG-112 NOT Gates
+#### NG-206 NOT Gates
 
 ![View of the NOT Gates](NG.png "NOT Gates")
 
@@ -21,4 +22,8 @@ By connected a single output to the input of another gate, it is possible to gen
 
 ## NG-106
 
-The NG-106 provides six two-input NOT gates in a small form factor. Otherwise functionality is as for the NG-112 above.
+The NG-106 provides six NOT gates in a small form factor. Otherwise functionality is as for the NG-112 above.
+
+## NG-202
+
+The NG-202 provides six polyphonic NOT gates in a small form factor.

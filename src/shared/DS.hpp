@@ -10,6 +10,8 @@ struct DS_Module : Module {
 	void dataFromJson(json_t *) override;
 	void onReset() override;
 	void appendContextMenu(Menu *);
+	unsigned int getInput(int channels, unsigned int bitArray, int input);
+	void setOutput(int channels, int output, unsigned int bitArray);
 };
 
 struct DS_MenuItem : MenuItem {

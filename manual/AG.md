@@ -2,6 +2,7 @@
 ### [Part of the Digital Suite](DS.md)
 #### AG-104 AND Gates
 #### AG-106 AND Gates
+#### AG-202 Polyphonic AND Gates
 
 
 ![View of the AND Gates](AG.png "AND Gates")
@@ -23,3 +24,7 @@ An input not connected will be ignored.
 ## AG-104
 
 The AG-104 provides four two-input AND gates in a small form factor. Otherwise functionality is as for the AG-106 above.
+
+## AG-202
+
+The AG-202 provides two four-input polyphonic AND gates in a small form factor. The number of output channels matches the number of channels in the first input.

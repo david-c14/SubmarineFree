@@ -8,6 +8,7 @@
 #### [LA-108 8-Channel Logic Analyser](LA.md)
 #### [LD-106 Line Drivers](LD.md)
 #### [NG-112 NOT Gates](NG.md)
+#### [OA-105 Op-Amps](OA.md)
 #### [OG-106 OR Gates](OG.md)
 #### [PG-112 Pulse Generators](PG.md)
 #### [XG-106 XOR Gates](XG.md)
@@ -25,3 +26,7 @@ The voltage range of the digital gates can be configured from the context menu. 
 ## Ports
 
 Digital ports have been fitted with blue sockets to indicate that they are expecting digital signals. All such ports will comfortably accept analog audio or control voltages.
+
+## Polyphonic
+
+The AG-202, OG-202, NG-206 and XG-202 devices are polyphonic and will carry out up to 16 bitwise operations in parallel.
