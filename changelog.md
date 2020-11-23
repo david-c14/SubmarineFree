@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.9
+- 23-Nov-2020 Add DS-2 series polyphonic logic gates
 - 22-Nov-2020 Add OA-1xx Operation Amplifiers
 - 22-Nov-2020 Add visuals menu to scopes (missing since addition of "Match Cable Colors")
 - 20-Nov-2020 VM-1xx and VM-2xx VU Meters

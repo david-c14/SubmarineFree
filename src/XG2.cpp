@@ -2,7 +2,7 @@
 
 #include "shared/DS.hpp"
 
-struct OG_2 : DS_Module {
+struct XG_2 : DS_Module {
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -26,7 +26,7 @@ struct OG_2 : DS_Module {
 		NUM_LIGHTS
 	};
 
-	OG_2() : DS_Module() {
+	XG_2() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 	}
 
@@ -39,28 +39,28 @@ struct OG_2 : DS_Module {
 			}
 			int channels = inputs[INPUT_A_1 + i].getChannels();
 			accumulator = getInput(channels, 0x0, INPUT_A_1 + i);
-			accumulator |= getInput(channels, 0x0, INPUT_B_1 + i);
-			accumulator |= getInput(channels, 0x0, INPUT_C_1 + i);
-			accumulator |= getInput(channels, 0x0, INPUT_D_1 + i);
+			accumulator ^= getInput(channels, 0x0, INPUT_B_1 + i);
+			accumulator ^= getInput(channels, 0x0, INPUT_C_1 + i);
+			accumulator ^= getInput(channels, 0x0, INPUT_D_1 + i);
 			setOutput(channels, OUTPUT_1, accumulator);
 		}
 	}
 };
 
-struct OG202 : SchemeModuleWidget {
-	OG202(OG_2 *module) {
+struct XG202 : SchemeModuleWidget {
+	XG202(XG_2 *module) {
 		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
 		for (int i = 0; i < 2; i++) {
 			int offset = 188 * i;
-			addInput(createInputCentered<BluePort>(Vec(15,31.5 + offset), module, OG_2::INPUT_A_1 + i));
-			addInput(createInputCentered<BluePort>(Vec(15,59.5 + offset), module, OG_2::INPUT_B_1 + i));
-			addInput(createInputCentered<BluePort>(Vec(15,87.5 + offset), module, OG_2::INPUT_C_1 + i));
-			addInput(createInputCentered<BluePort>(Vec(15,115.5 + offset), module, OG_2::INPUT_D_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,31.5 + offset), module, XG_2::INPUT_A_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,59.5 + offset), module, XG_2::INPUT_B_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,87.5 + offset), module, XG_2::INPUT_C_1 + i));
+			addInput(createInputCentered<BluePort>(Vec(15,115.5 + offset), module, XG_2::INPUT_D_1 + i));
 
-			addOutput(createOutputCentered<BluePort>(Vec(15,150.5 + offset), module, OG_2::OUTPUT_1 + i));
+			addOutput(createOutputCentered<BluePort>(Vec(15,150.5 + offset), module, XG_2::OUTPUT_1 + i));
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -71,8 +71,8 @@ struct OG202 : SchemeModuleWidget {
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
-		drawBase(vg, "OG-202");
+		drawBase(vg, "XG-202");
 	}
 };
 
-Model *modelOG202 = createModel<OG_2, OG202>("OG-202");
+Model *modelXG202 = createModel<XG_2, XG202>("XG-202");

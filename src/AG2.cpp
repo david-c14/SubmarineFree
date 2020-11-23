@@ -34,6 +34,7 @@ struct AG_2 : DS_Module {
 		for (unsigned int i = 0; i < 2; i++) {
 			unsigned int accumulator; 
 			if (!inputs[INPUT_A_1 + i].isConnected()) {
+				setOutput(1, OUTPUT_1 + i, 0x0);
 				continue;
 			}
 			int channels = inputs[INPUT_A_1 + i].getChannels();

@@ -2,6 +2,7 @@
 ### [Part of the Digital Suite](DS.md)
 #### OG-104 OR Gates
 #### OG-106 OR Gates
+#### OG-202 OR Gates
 
 ![View of the OR Gates](OG.png "OR Gates")
 
@@ -22,3 +23,7 @@ An input not connected will be ignored.
 ## OG-104
 
 The OG-104 provides four two-input OR gates in a small form factor. Otherwise functionality is as for the OG-106 above.
+
+## OG-202
+
+The OG-202 provides two four-input polyphonic OR gates in a small form factor. The number of channels in the output is equal to the number of channels in the first input.

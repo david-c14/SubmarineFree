@@ -280,6 +280,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"NG-206",
+			"name":"NG-206",
+			"description": "NG-206 Polyphonic NOT Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/NG.md",
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
 			"slug":"OA-103",
 			"name":"OA-103",
 			"description": "OA-103 Op-Amps",
@@ -551,6 +558,13 @@
 			"description": "XG-104 XOR Gates",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
 			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"XG-202",
+			"name":"XG-202",
+			"description": "XG-202 4-Input Polyphonic XOR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		},
 		{
 			"slug":"XG-106",
