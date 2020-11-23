@@ -8,6 +8,7 @@
 #### [LA-108 8-Channel Logic Analyser](LA.md)
 #### [LD-106 Line Drivers](LD.md)
 #### [NG-112 NOT Gates](NG.md)
+#### [OA-105 Op-Amps](OA.md)
 #### [OG-106 OR Gates](OG.md)
 #### [PG-112 Pulse Generators](PG.md)
 #### [XG-106 XOR Gates](XG.md)

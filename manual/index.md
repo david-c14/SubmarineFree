@@ -48,6 +48,9 @@ Masterizer
 # [NG](NG.md)
 Logical NOT gates
 
+# [OA](OA.md)
+Operation Amplifiers
+
 # [OG](OG.md)
 Logical OR gates
 
