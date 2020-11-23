@@ -32,7 +32,7 @@
 			"name":"AG-202",
 			"description": "AG-202 4-input Polyphonic AND Gates",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AG.md",
-			"tags": ["LOGIC", "DUAL"]
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		},
 		{
 			"slug":"A0-106",
@@ -306,6 +306,13 @@
 			"description": "OG-106 OR Gates",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OG.md",
 			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"OG-202",
+			"name":"OG-202",
+			"description": "OG-202 4-Channel Polyphonic OR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		},
 		{
 			"slug":"PG-104",

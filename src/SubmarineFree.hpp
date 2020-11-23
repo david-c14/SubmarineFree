@@ -64,6 +64,7 @@ extern Model *modelOA105;
 
 extern Model *modelOG104;
 extern Model *modelOG106;
+extern Model *modelOG202;
 
 extern Model *modelPG104;
 extern Model *modelPG112;
