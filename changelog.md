@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.10
+- 26-Nov-2020 Add exponential response to VM-needle
+
 ## v1.1.9
 - 23-Nov-2020 Add DS-2 series polyphonic logic gates
 - 22-Nov-2020 Add OA-1xx Operation Amplifiers
