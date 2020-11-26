@@ -2496,8 +2496,10 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		addChild(schemePanel);
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
-		if (!module)
+		if (!module) {
+			drawBase(vg, "WM-102");
 			return;
+		}
 		WM_102 *wm = dynamic_cast<WM_102 *>(module);
 		bool draw3d = module->params[WM_102::PARAM_DRAW_3D].getValue();
 		drawBase(vg, "WM-102");
