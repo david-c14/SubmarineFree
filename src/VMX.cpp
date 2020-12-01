@@ -8,12 +8,20 @@ Difference function for mass-damped spring needle VU-meter
 
 a₀⋅y₀ = b₀⋅x₀ + b₁⋅x₋₁ + b₂⋅x₋₂ - a₁⋅y₋₁ - a₂⋅y₋₂
 
+ζ  =  0.81272 (damping ratio)
+ωn = 13.5119  (undamped natural frequency)
+
 a₀ = 4 + 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
 a₁ = -8 + 2⋅ωn²⋅Td
 a₂ = 4 - 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
 b₀ = ωn²⋅Td²
 b₁ = 2⋅ωn²⋅Td²
 b₂ = ωn²⋅Td²
+
+Derived from work by Bryce E. Lobdell and Jont B. Allen
+
+Lobdell, B. E., and Allen, J. B. (2007). "A model of the VU (volume-unit) meter, with speech applications" J. Acoust. Soc. Am., February 2007, 279-285
+[DOI: 10.1121/1.2387130]
 
 */
 
