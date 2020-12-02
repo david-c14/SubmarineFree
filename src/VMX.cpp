@@ -118,14 +118,14 @@ namespace {
 		}
 		void drawText(NVGcontext *vg, float point, NVGcolor col, const char *txt) {
 			float tick = squareScale(point, M_PI * 0.75, M_PI * 0.25);
-			drawText(vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+			drawText(vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.77f,
 				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, col, txt);
 		}
 
 		void addTick(const DrawArgs &args, float point) {
 			float tick = squareScale(point, M_PI * 0.75, M_PI * 0.25);
-			nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
-			nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
+			nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.85f, box.size.y - sin(tick) * box.size.y * 0.85f);
+			nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.9f, box.size.y - sin(tick) * box.size.y * 0.9f);
 		}
 
 		void draw(const DrawArgs &args) override {
@@ -145,7 +145,7 @@ namespace {
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.8f,
+				box.size.y * 0.9f,
 				-zeroPoint,
 				M_PI * -0.25f,
 				NVG_CW);
@@ -160,7 +160,7 @@ namespace {
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.8f,
+				box.size.y * 0.9f,
 				M_PI * -0.75f,
 				-zeroPoint,
 				NVG_CW);
@@ -179,8 +179,8 @@ namespace {
 			nvgStroke(args.vg);
 
 			drawText(args.vg, box.size.x * 0.5, box.size.y * 0.7, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
-			drawText(args.vg, 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
-			drawText(args.vg, box.size.x - 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
+			drawText(args.vg, 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
+			drawText(args.vg, box.size.x - 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
 			drawText(args.vg, -27, nvgRGB(0,0,0), "20");
 			drawText(args.vg, -10, nvgRGB(0,0,0), "10");
 			drawText(args.vg, -7, nvgRGB(0,0,0), "7");
@@ -213,7 +213,7 @@ namespace {
 			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
 			nvgBeginPath(args.vg);
 			nvgMoveTo(args.vg, box.size.x * 0.5f, box.size.y);
-			nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.8f, box.size.y - sin(meter) * box.size.y * 0.8f);
+			nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.9f, box.size.y - sin(meter) * box.size.y * 0.9f);
 			nvgStrokeWidth(args.vg, 1);
 			nvgStroke(args.vg);
 		}
