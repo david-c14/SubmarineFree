@@ -1,14 +1,13 @@
 # Arithmetic Operators
 #### AO-106 6 Algorithm Arithmetic Operators
-#### AO-112 12 Algorithm Arithmetic Operators
-#### AO-118 18 Algorithm Arithmetic Operators
-#### AO-124 24 Algorithm Arithmetic Operators
-#### AO-136 36 Algorithm Arithmetic Operators
-
 ![View of the AO-106 - Arithmetic Operators](AO-106.m.png "Arithmetic Operators")
+#### AO-112 12 Algorithm Arithmetic Operators
 ![View of the AO-112 - Arithmetic Operators](AO-112.m.png "Arithmetic Operators")
+#### AO-118 18 Algorithm Arithmetic Operators
 ![View of the AO-118 - Arithmetic Operators](AO-118.m.png "Arithmetic Operators")
+#### AO-124 24 Algorithm Arithmetic Operators
 ![View of the AO-124 - Arithmetic Operators](AO-124.m.png "Arithmetic Operators")
+#### AO-136 36 Algorithm Arithmetic Operators
 ![View of the AO-136 - Arithmetic Operators](AO-136.m.png "Arithmetic Operators")
 
 ## Basic Operation
