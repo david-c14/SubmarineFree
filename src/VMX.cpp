@@ -118,14 +118,14 @@ namespace {
 		}
 		void drawText(NVGcontext *vg, float point, NVGcolor col, const char *txt) {
 			float tick = squareScale(point, M_PI * 0.75, M_PI * 0.25);
-			drawText(vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
+			drawText(vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.77f,
 				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, col, txt);
 		}
 
 		void addTick(const DrawArgs &args, float point) {
 			float tick = squareScale(point, M_PI * 0.75, M_PI * 0.25);
-			nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
-			nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
+			nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.85f, box.size.y - sin(tick) * box.size.y * 0.85f);
+			nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.9f, box.size.y - sin(tick) * box.size.y * 0.9f);
 		}
 
 		void draw(const DrawArgs &args) override {
@@ -145,7 +145,7 @@ namespace {
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.8f,
+				box.size.y * 0.9f,
 				-zeroPoint,
 				M_PI * -0.25f,
 				NVG_CW);
@@ -160,7 +160,7 @@ namespace {
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.8f,
+				box.size.y * 0.9f,
 				M_PI * -0.75f,
 				-zeroPoint,
 				NVG_CW);
@@ -178,13 +178,15 @@ namespace {
 			addTick(args, -20.0f);
 			nvgStroke(args.vg);
 
-			drawText(args.vg, box.size.x * 0.5, box.size.y * 0.9, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
-			drawText(args.vg, 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
-			drawText(args.vg, box.size.x - 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
+			drawText(args.vg, box.size.x * 0.5, box.size.y * 0.7, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
+			drawText(args.vg, 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
+			drawText(args.vg, box.size.x - 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
 			drawText(args.vg, -27, nvgRGB(0,0,0), "20");
 			drawText(args.vg, -10, nvgRGB(0,0,0), "10");
-			drawText(args.vg, -6, nvgRGB(0,0,0), "6");
+			drawText(args.vg, -7, nvgRGB(0,0,0), "7");
+			drawText(args.vg, -5, nvgRGB(0,0,0), "5");
 			drawText(args.vg, -3, nvgRGB(0,0,0), "3");
+			drawText(args.vg, -1, nvgRGB(0,0,0), "1");
 			drawText(args.vg, 0, nvgRGB(0,0,0), "0");
 			drawText(args.vg, 1, SUBLIGHTRED, "1");
 			drawText(args.vg, 2, SUBLIGHTRED, "2");
@@ -211,7 +213,7 @@ namespace {
 			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
 			nvgBeginPath(args.vg);
 			nvgMoveTo(args.vg, box.size.x * 0.5f, box.size.y);
-			nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.8f, box.size.y - sin(meter) * box.size.y * 0.8f);
+			nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.9f, box.size.y - sin(meter) * box.size.y * 0.9f);
 			nvgStrokeWidth(args.vg, 1);
 			nvgStroke(args.vg);
 		}
@@ -366,7 +368,6 @@ struct VM101 : VMxxx {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-101");
-		drawText(vg, 25, 332, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "\xe2\x84\xa6");
 		nvgStrokeWidth(vg, 1);
 		nvgBeginPath(vg);
 		nvgStrokeColor(vg, SUBLIGHTRED);
@@ -444,7 +445,6 @@ struct VM102 : VMxxx {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-102");
-		drawText(vg, 25.0f, 332.0f, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8.0f, gScheme.getContrast(module), "\xe2\x84\xa6");
 		nvgStrokeWidth(vg, 1);
 		nvgBeginPath(vg);
 		nvgStrokeColor(vg, SUBLIGHTRED);
