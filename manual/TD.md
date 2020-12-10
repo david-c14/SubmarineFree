@@ -1,8 +1,7 @@
 # Formattable Text Display
 #### TD-116 Formattable Text Display
-
-![View of the Formattable Text Display](TD.png "Formattable Text Display")
-![View of the Formattable Text Display](TD-316.png "Formattable Text Display")
+![View of the Formattable Text Display](TD-116.m.png "Formattable Text Display")
+![View of the Formattable Text Display](TD-316.m.png "Formattable Text Display")
 
 ## Basic Operation
 
@@ -19,8 +18,7 @@ The TD-316 is resizable using the drag handles in the top corners of the device.
 The [TF-101](TF.md) or [TF-102](TF.md) are suitable devices to control the formatting.
 
 #### TD-202 Vertical Text Display
-
-![View of the Vertical Text Display](TD-202.png "Vertical Text Display")
+![View of the Vertical Text Display](TD-202.m.png "Vertical Text Display")
 
 ## Basic Operation
 
@@ -30,8 +28,7 @@ sections of a patch.
 The colors of the TD-202 can be adjusted using the context menu. Or by using an extension device such as the [TF-101](TF.md) or [TF-102](TF.md).
 
 #### TD-410 Multiple Label Display
-
-![View of the Multiple Label Display](TD-410.png "Multiple Label Display")
+![View of the Multiple Label Display](TD-410.m.png "Multiple Label Display")
 
 ## Basic Operation
 
@@ -46,8 +43,7 @@ The labels can be dragged up and down the device to the position that you need.
 The TD-410 is resizable using the drag handles in the top corners of the device.
 
 #### TD-510 Vertical Multiple Label Display
-
-![View of the Vertical Multiple Lable Display](TD-510.png "Vertical Multiple Label Display")
+![View of the Vertical Multiple Lable Display](TD-510.m.png "Vertical Multiple Label Display")
 
 ## Basic Operation
 

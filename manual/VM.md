@@ -1,10 +1,12 @@
 # VU Meter
 #### VM-101 Compact VU Meter
+![View of the Dual Vintage VU Meter](VM-101.m.png "VU Meter")
 #### VM-102 Compact Dual VU Meter
+![View of the Dual Vintage VU Meter](VM-102.m.png "VU Meter")
 #### VM-201 Vintage VU Meter
+![View of the Dual Vintage VU Meter](VM-201.m.png "VU Meter")
 #### VM-202 Dual Vintage VU Meter
-
-![View of the Dual Vintage VU Meter](VM.png "VU Meter")
+![View of the Dual Vintage VU Meter](VM-202.m.png "VU Meter")
 
 ## Basic Operation
 

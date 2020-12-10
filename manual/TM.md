@@ -1,7 +1,6 @@
 # Torpedo Message Merge
 #### TM-105 - 5 port Torpedo Message Merge
-
-![View of the Torpedo Message Merge](TM.png "Torpedo Message Merge")
+![View of the Torpedo Message Merge](TM-105.m.png "Torpedo Message Merge")
 
 ## Basic Operation
 
