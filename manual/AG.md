@@ -4,8 +4,7 @@
 #### AG-106 AND Gates
 #### AG-202 Polyphonic AND Gates
 
-
-![View of the AND Gates](AG.png "AND Gates")
+![View of the AND Gates](AG-106.m.png "AND Gates")
 
 ## Basic Operation
 
@@ -22,9 +21,11 @@ Any output not connected will be normalled into a third input on the gate below.
 An input not connected will be ignored.
 
 ## AG-104
+![View of the AND Gates](AG-104.m.png "AND Gates")
 
 The AG-104 provides four two-input AND gates in a small form factor. Otherwise functionality is as for the AG-106 above.
 
 ## AG-202
+![View of the AND Gates](AG-202.m.png "AND Gates")
 
 The AG-202 provides two four-input polyphonic AND gates in a small form factor. The number of output channels matches the number of channels in the first input.
