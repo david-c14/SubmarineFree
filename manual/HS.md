@@ -1,7 +1,7 @@
 # Hi-Resolution Storage Scope
 #### HS-101 Hi-Res Storage Scope
 
-![View of the Storage Scope](HS.png "Hi-Res Storage Scope")
+![View of the Storage Scope](HS-101.m.png "Hi-Res Storage Scope")
 
 ## Basic Operation
 

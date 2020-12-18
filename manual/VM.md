@@ -1,10 +1,12 @@
 # VU Meter
 #### VM-101 Compact VU Meter
+![View of the Dual Vintage VU Meter](VM-101.m.png "VU Meter")
 #### VM-102 Compact Dual VU Meter
+![View of the Dual Vintage VU Meter](VM-102.m.png "VU Meter")
 #### VM-201 Vintage VU Meter
+![View of the Dual Vintage VU Meter](VM-201.m.png "VU Meter")
 #### VM-202 Dual Vintage VU Meter
-
-![View of the Dual Vintage VU Meter](VM.png "VU Meter")
+![View of the Dual Vintage VU Meter](VM-202.m.png "VU Meter")
 
 ## Basic Operation
 
@@ -21,6 +23,8 @@ The default load resistor can be swapped out for either a 150Ω or 1000Ω resist
 ## Attenuator
 
 An attenuator circuit is applied to the input signal, before the meter. So that by applying an attenuation, the signal range to be metered can be adjusted. Applying a 4x attenuation to the input, will allow signals of 4 times the voltage to be measured.
+
+For a sinusoidal bipolar wave with a peak of 5V, the RMS is approximately 3.5V.  So selecting an attenuation of 3.5 and a load of 1000Ω will measure roughly 0dbVU.  Most audio waveforms have more power than a pure sine wave.
 
 ## Inputs
 

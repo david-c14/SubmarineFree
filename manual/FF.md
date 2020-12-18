@@ -1,11 +1,13 @@
 # Flip-Flops
 ### [Part of the Digital Suite](DS.md)
 #### FF-110 10-Stage Flip-Flop Cascade
+![View of the Flip-Flop modules](FF-110.m.png "Flip-Flop Range")
 #### FF-120 20-Stage Flip-Flop Cascade
+![View of the Flip-Flop modules](FF-120.m.png "Flip-Flop Range")
 #### FF-206 6 Edge Triggered Flip-Flops
+![View of the Flip-Flop modules](FF-206.m.png "Flip-Flop Range")
 #### FF-212 12 Edge Triggered Flip-Flops
-
-![View of the Flip-Flop modules](FF.png "Flip-Flop Range")
+![View of the Flip-Flop modules](FF-212.m.png "Flip-Flop Range")
 
 ## Basic Operation
 

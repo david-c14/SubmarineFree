@@ -2,7 +2,7 @@
 ### [Part of the Digital Suite](DS.md)
 #### LA-108 8-Channel Logic Analyser
 
-![View of the Logic Analyser](LA.png "Logic Analyser")
+![View of the Logic Analyser](LA-108.m.png "Logic Analyser")
 
 ## Basic Operation
 

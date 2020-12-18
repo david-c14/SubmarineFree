@@ -1,11 +1,14 @@
 # Sources and Sinks - Lightweight voltage sources 
 #### SS-112 - 12 Voltage Sinks
+![View of the Sources and Sinks Range](SS-112.m.png "Sources and Sinks")
 #### SS-208 - 8 Irrational Voltage Sources
+![View of the Sources and Sinks Range](SS-208.m.png "Sources and Sinks")
 #### SS-212 - 12 Chromatic Voltage Sources
+![View of the Sources and Sinks Range](SS-212.m.png "Sources and Sinks")
 #### SS-220 - 120 Chromatic Voltage Sources
+![View of the Sources and Sinks Range](SS-220.m.png "Sources and Sinks")
 #### SS-221 - 21 Voltage Sources
-
-![View of the Sources and Sinks Range](SS.png "Sources and Sinks")
+![View of the Sources and Sinks Range](SS-221.m.png "Sources and Sinks")
 
 ## Basic Operation
 
