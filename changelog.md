@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.1.10
+- 10-Dec-2020 Update images in manual
 - 26-Nov-2020 Add exponential response to VM-needle
 - 26-Nov-2020 Fix bug rendering WM-102 in module browser
 
