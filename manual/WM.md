@@ -88,8 +88,6 @@ In this way you can keep the WM-101 Wire Manager in your patch for ready access,
 
 ## Billboard
 
-![View of the Wire Manager Billboard](WM-Billboard.png "Billboard View")
-
 The billboard control at the top right of the module will switch to a billboard display, suitable for use as a key when recording videos. By default the billboard displays wires with a rounded effect but you can have flat colors by adjusting the "3D billboard?" setting.
 
 You can switch back to the standard view by clicking on the arrow at the top left of the module.
