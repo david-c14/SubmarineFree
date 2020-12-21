@@ -1,5 +1,7 @@
 ## [Get Latest Builds](https://github.com/david-c14/SubmarineFree/releases)
 
+## [Visual menu (skins)](Visual.md)
+
 # [AG](AG.md)
 Logical AND gates
 
