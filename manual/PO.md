@@ -1,8 +1,8 @@
 # Phase Oscillators
 #### PO-101 Phased VCO
+![View of the Phased VCO](PO-101.m.png "Phased VCO")
 #### PO-102 Phased LFO
-
-![View of the Phased VCO](PO-101.png "Phased VCO")
+![View of the Phased LFO](PO-102.m.png "Phased LFO")
 
 ## Basic Operation
 
@@ -11,8 +11,7 @@ The PO-101 and PO-102 devices are digital oscillators which offer a choice of 5 
 16 fixed phase outputs are provided, dividing the cycle into 12 and 8 equal parts. In addition 4 further adjustable phase outputs are provided. The phase of these outputs can be controlled using a control knob, and/or an associated CV input.
 
 #### PO-204 Phase Modulation Engine
-
-![View of the Phase Modulation Engine](PO-204.png "Phase Modulation Engine")
+![View of the Phase Modulation Engine](PO-204.m.png "Phase Modulation Engine")
 
 ## Basic Operation
 

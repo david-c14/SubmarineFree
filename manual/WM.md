@@ -1,8 +1,8 @@
 # Wire Manager
 #### WM-101 Wire Manager
+![View of the Wire Manager](WM-101.m.png "Wire Manager")
 #### WM-102 Wire Manager Billboard
-
-![View of the Wire Manager](WM.png "Wire Manager")
+![View of the Wire Manager](WM-102.m.png "Wire Manager")
 
 The wire manager offers the ability to choose more colors for the patch cables that you use in your patches. It also has highlighting options 
 which some users may find useful in tracing wires around the patch.
@@ -87,8 +87,6 @@ When the module is minimized, a Restore button is visible in the centre of the m
 In this way you can keep the WM-101 Wire Manager in your patch for ready access, without taking up more space than is necessary.
 
 ## Billboard
-
-![View of the Wire Manager Billboard](WM-Billboard.png "Billboard View")
 
 The billboard control at the top right of the module will switch to a billboard display, suitable for use as a key when recording videos. By default the billboard displays wires with a rounded effect but you can have flat colors by adjusting the "3D billboard?" setting.
 

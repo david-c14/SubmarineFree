@@ -8,12 +8,20 @@ Difference function for mass-damped spring needle VU-meter
 
 a₀⋅y₀ = b₀⋅x₀ + b₁⋅x₋₁ + b₂⋅x₋₂ - a₁⋅y₋₁ - a₂⋅y₋₂
 
+ζ  =  0.81272 (damping ratio)
+ωn = 13.5119  (undamped natural frequency)
+
 a₀ = 4 + 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
 a₁ = -8 + 2⋅ωn²⋅Td
 a₂ = 4 - 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
 b₀ = ωn²⋅Td²
 b₁ = 2⋅ωn²⋅Td²
 b₂ = ωn²⋅Td²
+
+Derived from work by Bryce E. Lobdell and Jont B. Allen
+
+Lobdell, B. E., and Allen, J. B. (2007). "A model of the VU (volume-unit) meter, with speech applications" J. Acoust. Soc. Am., February 2007, 279-285
+[DOI: 10.1121/1.2387130]
 
 */
 
@@ -76,28 +84,30 @@ namespace {
 		}
 	};
 
+	float squareScale(float x, float min, float max) {
+		x = rescale(x, -20.0f, 3.0f, 0.0f, 1.0f);
+		x *= x * x;
+		return rescale(x, 0.0f, 1.0f, min, max);
+	}
+
 	struct VM_LinearDisplay : LightWidget {
 		float value = 0.0f;
 	
 		void draw(const DrawArgs &args) override {
-			float meter = rescale(value, -20.0f, 3.0f, 0.0f, box.size.y);
-			if (value > 0.0f) {
-				nvgBeginPath(args.vg);
-				nvgFillColor(args.vg, SUBLIGHTRED);
-				nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter);
-				nvgFill(args.vg);
-				meter = rescale(0, -20.0f, 3.0f, 0.0f, box.size.y);
-			}
+			float zeroPoint = squareScale(0, box.size.y, 0);
+			float meter = squareScale(value, 0.0f, box.size.y);
+			
+			NVGpaint grad = nvgLinearGradient(args.vg, 0, zeroPoint - 10.0f, 0, zeroPoint + 10.0f, SUBLIGHTRED, nvgRGB(30,255,0));
+			nvgFillPaint(args.vg, grad);
+			
 			nvgBeginPath(args.vg);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
 			nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter); 
 			nvgFill(args.vg);
 			Widget::draw(args);
 		}
 	};
 
-	struct VM_NeedleDisplay : LightWidget {
-		float value = 0.0f;
+	struct VM_NeedleCanvas : Widget {
 	
 		void drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt) {
 			nvgFontFaceId(vg, gScheme.font(vg));
@@ -106,84 +116,108 @@ namespace {
 			nvgFillColor(vg, col);
 			nvgText(vg, x, y, txt, NULL);
 		}
+		void drawText(NVGcontext *vg, float point, NVGcolor col, const char *txt) {
+			float tick = squareScale(point, M_PI * 0.75, M_PI * 0.25);
+			drawText(vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.77f,
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, col, txt);
+		}
+
+		void addTick(const DrawArgs &args, float point) {
+			float tick = squareScale(point, M_PI * 0.75, M_PI * 0.25);
+			nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.85f, box.size.y - sin(tick) * box.size.y * 0.85f);
+			nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.9f, box.size.y - sin(tick) * box.size.y * 0.9f);
+		}
 
 		void draw(const DrawArgs &args) override {
-			
-			float meter = rescale(value, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			// White backpanel
 			nvgBeginPath(args.vg);
 			nvgFillColor(args.vg, nvgRGB(255,255,255));
 			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
 			nvgFill(args.vg);
 
-			float zeroPoint = rescale(0.0f, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
+			// Change from black to red scale
+			float zeroPoint = squareScale(0.0f, M_PI * 0.75, M_PI * 0.25);
 
+			// Red arc
 			nvgLineCap(args.vg, NVG_ROUND);
 			nvgStrokeColor(args.vg, SUBLIGHTRED);
 			nvgBeginPath(args.vg);
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.8f,
+				box.size.y * 0.9f,
 				-zeroPoint,
 				M_PI * -0.25f,
 				NVG_CW);
-			for (int i = 1; i <= 3; i++) {
-				float tick = rescale(i, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-				nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
-				nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
-			}
+			addTick(args, 1.0f);
+			addTick(args, 2.0f);
+			addTick(args, 3.0f);
 			nvgStroke(args.vg);
 
+			// Black arc
 			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
 			nvgBeginPath(args.vg);
 			nvgArc(args.vg,
 				box.size.x * 0.5f,
 				box.size.y,
-				box.size.y * 0.8f,
+				box.size.y * 0.9f,
 				M_PI * -0.75f,
 				-zeroPoint,
 				NVG_CW);
-			for (int i = -20; i <= 0; i++) {
-				float tick = rescale(i, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-				nvgMoveTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.75f);
-				nvgLineTo(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.8f, box.size.y - sin(tick) * box.size.y * 0.8f);
-			}
+			addTick(args, 0.0f);
+			addTick(args, -1.0f);
+			addTick(args, -2.0f);
+			addTick(args, -3.0f);
+			addTick(args, -4.0f);
+			addTick(args, -5.0f);
+			addTick(args, -6.0f);
+			addTick(args, -7.0f);
+			addTick(args, -8.0f);
+			addTick(args, -9.0f);
+			addTick(args, -10.0f);
+			addTick(args, -20.0f);
 			nvgStroke(args.vg);
 
-			drawText(args.vg, box.size.x * 0.5, box.size.y * 0.9, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
-			drawText(args.vg, 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
-			drawText(args.vg, box.size.x - 10, 30, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
-			float tick = rescale(-20, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "20");
-			tick = rescale(-15, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "15");
-			tick = rescale(-10, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "10");
-			tick = rescale(-6, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "6");
-			tick = rescale(-3, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "3");
-			drawText(args.vg, box.size.x * 0.5 + cos(zeroPoint) * box.size.y * 0.65f, box.size.y - sin(zeroPoint) * box.size.y * 0.7f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "0");
-			tick = rescale(3, -20.0f, 3.0f, M_PI * 0.75, M_PI * 0.25);
-			drawText(args.vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.65f, box.size.y - sin(tick) * box.size.y * 0.7f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, nvgRGB(0,0,0), "3");
+			drawText(args.vg, box.size.x * 0.5, box.size.y * 0.7, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
+			drawText(args.vg, 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
+			drawText(args.vg, box.size.x - 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
+			drawText(args.vg, -27, nvgRGB(0,0,0), "20");
+			drawText(args.vg, -10, nvgRGB(0,0,0), "10");
+			drawText(args.vg, -7, nvgRGB(0,0,0), "7");
+			drawText(args.vg, -5, nvgRGB(0,0,0), "5");
+			drawText(args.vg, -3, nvgRGB(0,0,0), "3");
+			drawText(args.vg, -1, nvgRGB(0,0,0), "1");
+			drawText(args.vg, 0, nvgRGB(0,0,0), "0");
+			drawText(args.vg, 1, SUBLIGHTRED, "1");
+			drawText(args.vg, 2, SUBLIGHTRED, "2");
+			drawText(args.vg, 3.3, SUBLIGHTRED, "3");
 
-			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
-			nvgBeginPath(args.vg);
-			nvgMoveTo(args.vg, box.size.x * 0.5f, box.size.y);
-			nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.8f, box.size.y - sin(meter) * box.size.y * 0.8f);
-			nvgStrokeWidth(args.vg, 1);
-			nvgStroke(args.vg);
 			Widget::draw(args);
 		}
 	};
 
+	struct VM_NeedleDisplay : LightWidget {
+		float value = 0.0f;
+		FramebufferWidget *fb;
+		VM_NeedleDisplay(float width, float height) : LightWidget() {
+			box.size = Vec(width, height);
+			fb = new FramebufferWidget();
+			VM_NeedleCanvas *canvas = new VM_NeedleCanvas();
+			canvas->box.size = box.size;
+			fb->addChild(canvas);
+			addChild(fb);
+		}
+		void draw(const DrawArgs &args) override {
+			Widget::draw(args);
+			float meter = squareScale(value, M_PI * 0.75, M_PI * 0.25);
+			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
+			nvgBeginPath(args.vg);
+			nvgMoveTo(args.vg, box.size.x * 0.5f, box.size.y);
+			nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.9f, box.size.y - sin(meter) * box.size.y * 0.9f);
+			nvgStrokeWidth(args.vg, 1);
+			nvgStroke(args.vg);
+		}
+	};
 }
 
 struct VM_Base : Module {
@@ -307,8 +341,8 @@ struct VMxxx : SchemeModuleWidget {
 };
 
 struct VM101 : VMxxx {
-	const float displayHeight = 12;
-	const float displayPos = 19.5;
+	const float displayHeight = 276.0f;
+	const float displayPos = 19.5f;
 	VM_LinearDisplay *display;
 	VM101(VM_xx1 *module) : VMxxx() {
 		setModule(module);
@@ -317,38 +351,54 @@ struct VM101 : VMxxx {
 
 		display = new VM_LinearDisplay();
 		display->box.pos = Vec(10, displayPos);
-		display->box.size = Vec(10, displayHeight * 23.0f);
+		display->box.size = Vec(10, displayHeight);
 		addChild(display);
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_xx1::INPUT_1));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, PARAM_ATTENUATOR));
 	}
+	void addTick(NVGcontext *vg, float point) {
+		float tick = displayPos + squareScale(point, displayHeight, 0.0f);
+		nvgMoveTo(vg, 10, tick);
+		nvgLineTo(vg, 28, tick);
+	}
+	void addText(NVGcontext *vg, float point, NVGcolor col, const char *txt) {
+		float tick = displayPos + squareScale(point, displayHeight, 0.0f);	
+		drawText(vg, 5.0f, tick, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8.0f, col, txt);
+	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-101");
-		drawText(vg, 25, 332, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "\xe2\x84\xa6");
-		for(unsigned int i = 0; i <= 23; i++) {
-			nvgBeginPath(vg);
-			nvgStrokeColor(vg, (i < 3)?SUBLIGHTRED:gScheme.getContrast(module));
-			nvgStrokeWidth(vg, 1);
-			nvgMoveTo(vg, 10, displayPos + i * displayHeight);
-			nvgLineTo(vg, 20, displayPos + i * displayHeight);
-			if (i % 2) {
-				if (i > 2) {
-					nvgLineTo(vg, 28, displayPos + i * displayHeight);
-				}
-			}
-			nvgStroke(vg);
-		}
-		drawText(vg, 5, displayPos, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, SUBLIGHTRED, "3"); 
-		drawText(vg, 5, displayPos + 2 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, SUBLIGHTRED, "+"); 
-		drawText(vg, 25, displayPos + 2.5 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "%"); 
-		drawText(vg, 5, displayPos + 3 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "0");
-		drawText(vg, 5, displayPos + 4 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "-");
-		drawText(vg, 5, displayPos + 6 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "3");
-		drawText(vg, 5, displayPos + 9 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "6");
-		drawText(vg, 5, displayPos + 13 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "10");
-		drawText(vg, 5, displayPos + 18 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "15");
-		drawText(vg, 5, displayPos + 23 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "20");
+		nvgStrokeWidth(vg, 1);
+		nvgBeginPath(vg);
+		nvgStrokeColor(vg, SUBLIGHTRED);
+		addTick(vg, 3);
+		addTick(vg, 2);
+		addTick(vg, 1);
+		nvgStroke(vg);
+
+		nvgBeginPath(vg);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
+		addTick(vg, 0);
+		addTick(vg, -1);
+		addTick(vg, -2);
+		addTick(vg, -3);
+		addTick(vg, -4);
+		addTick(vg, -5);
+		addTick(vg, -6);
+		addTick(vg, -7);
+		addTick(vg, -8);
+		addTick(vg, -9);
+		addTick(vg, -10);
+		addTick(vg, -20);
+		nvgStroke(vg);
+		addText(vg, 3, SUBLIGHTRED, "3"); 
+		addText(vg, 1, SUBLIGHTRED, "+"); 
+		addText(vg, 0, gScheme.getContrast(module), "0");
+		addText(vg, -1, gScheme.getContrast(module), "-");
+		addText(vg, -3, gScheme.getContrast(module), "3");
+		addText(vg, -6, gScheme.getContrast(module), "6");
+		addText(vg, -10, gScheme.getContrast(module), "10");
+		addText(vg, -20, gScheme.getContrast(module), "20");
 	}
 	void step() override {
 		if (module) {
@@ -360,8 +410,8 @@ struct VM101 : VMxxx {
 };
 
 struct VM102 : VMxxx {
-	const float displayHeight = 12;
-	const float displayPos = 19.5;
+	const float displayHeight = 276.0f;
+	const float displayPos = 19.5f;
 	VM_LinearDisplay *display1;
 	VM_LinearDisplay *display2;
 	VM102(VM_102 *module) : VMxxx() {
@@ -371,39 +421,60 @@ struct VM102 : VMxxx {
 
 		display1 = new VM_LinearDisplay();
 		display1->box.pos = Vec(2, displayPos);
-		display1->box.size = Vec(8, displayHeight * 23.0f);
+		display1->box.size = Vec(8, displayHeight);
 		addChild(display1);
 
 		display2 = new VM_LinearDisplay();
 		display2->box.pos = Vec(20, displayPos);
-		display2->box.size = Vec(8, displayHeight * 23.0f);
+		display2->box.size = Vec(8, displayHeight);
 		addChild(display2);
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_102::INPUT_1));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, PARAM_ATTENUATOR));
 	}
+	void addTick(NVGcontext *vg, float point) {
+		float tick = displayPos + squareScale(point, displayHeight, 0.0f);
+		nvgMoveTo(vg, 2, tick);
+		nvgLineTo(vg, 10, tick);
+		nvgMoveTo(vg, 20, tick);
+		nvgLineTo(vg, 28, tick);
+	}
+	void addText(NVGcontext *vg, float point, NVGcolor col, const char *txt) {
+		float tick = displayPos + squareScale(point, displayHeight, 0.0f);	
+		drawText(vg, 15.0f, tick, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8.0f, col, txt);
+	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-102");
-		drawText(vg, 25, 332, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "\xe2\x84\xa6");
-		for(unsigned int i = 0; i <= 23; i++) {
-			nvgBeginPath(vg);
-			nvgStrokeColor(vg, (i < 3)?SUBLIGHTRED:gScheme.getContrast(module));
-			nvgStrokeWidth(vg, 1);
-			nvgMoveTo(vg, 2, displayPos + i * displayHeight);
-			nvgLineTo(vg, 10, displayPos + i * displayHeight);
-			nvgMoveTo(vg, 20, displayPos + i * displayHeight);
-			nvgLineTo(vg, 28, displayPos + i * displayHeight);
-			nvgStroke(vg);
-		}
-		drawText(vg, 15, displayPos, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, SUBLIGHTRED, "3"); 
-		drawText(vg, 15, displayPos + 2 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, SUBLIGHTRED, "+"); 
-		drawText(vg, 15, displayPos + 3 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "0");
-		drawText(vg, 15, displayPos + 4 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "-");
-		drawText(vg, 15, displayPos + 6 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "3");
-		drawText(vg, 15, displayPos + 9 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "6");
-		drawText(vg, 15, displayPos + 13 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "10");
-		drawText(vg, 15, displayPos + 18 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "15");
-		drawText(vg, 15, displayPos + 23 * displayHeight, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "20");
+		nvgStrokeWidth(vg, 1);
+		nvgBeginPath(vg);
+		nvgStrokeColor(vg, SUBLIGHTRED);
+		addTick(vg, 1);
+		addTick(vg, 2);
+		addTick(vg, 3);
+		nvgStroke(vg);
+		nvgBeginPath(vg);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
+		addTick(vg, 0);
+		addTick(vg, -1);
+		addTick(vg, -2);
+		addTick(vg, -3);
+		addTick(vg, -4);
+		addTick(vg, -5);
+		addTick(vg, -6);
+		addTick(vg, -7);
+		addTick(vg, -8);
+		addTick(vg, -9);
+		addTick(vg, -10);
+		addTick(vg, -20);
+		nvgStroke(vg);
+		addText(vg, 3.0f, SUBLIGHTRED, "3"); 
+		addText(vg, 1.0f, SUBLIGHTRED, "+"); 
+		addText(vg, 0.0f, gScheme.getContrast(module), "0");
+		addText(vg, -1.0f, gScheme.getContrast(module), "-");
+		addText(vg, -3.0f, gScheme.getContrast(module), "3");
+		addText(vg, -6.0f, gScheme.getContrast(module), "6");
+		addText(vg, -10.0f, gScheme.getContrast(module), "10");
+		addText(vg, -20.0f, gScheme.getContrast(module), "20");
 	}
 	void step() override {
 		if (module) {
@@ -422,9 +493,8 @@ struct VM201 : VMxxx {
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		display = new VM_NeedleDisplay();
+		display = new VM_NeedleDisplay(130, 90);
 		display->box.pos = Vec(10, 20);
-		display->box.size = Vec(130, 90);
 		addChild(display);
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_xx1::INPUT_1));
@@ -452,14 +522,12 @@ struct VM202 : VMxxx {
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		display1 = new VM_NeedleDisplay();
+		display1 = new VM_NeedleDisplay(130, 90);
 		display1->box.pos = Vec(10, 20);
-		display1->box.size = Vec(130, 90);
 		addChild(display1);
 
-		display2 = new VM_NeedleDisplay();
+		display2 = new VM_NeedleDisplay(130, 90);
 		display2->box.pos = Vec(10, 120);
-		display2->box.size = Vec(130, 90);
 		addChild(display2);
 
 		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_202::INPUT_1));

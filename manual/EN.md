@@ -2,7 +2,7 @@
 #### EN-104 Envelope Generator
 
 
-![View of the Envelope Generator](EN.png "Envelope Generator")
+![View of the Envelope Generator](EN-104.m.png "Envelope Generator")
 
 ## Basic Operation
 

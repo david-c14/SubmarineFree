@@ -1,11 +1,11 @@
 # Logical AND Gates
 ### [Part of the Digital Suite](DS.md)
 #### AG-104 AND Gates
+![View of the AND Gates](AG-104.m.png "AND Gates")
 #### AG-106 AND Gates
+![View of the AND Gates](AG-106.m.png "AND Gates")
 #### AG-202 Polyphonic AND Gates
-
-
-![View of the AND Gates](AG.png "AND Gates")
+![View of the AND Gates](AG-202.m.png "AND Gates")
 
 ## Basic Operation
 

@@ -1,7 +1,7 @@
 # Masterizer
 #### MZ-909 Masterizer
 
-![View of the Masterizer](MZ.png "Masterizer")
+![View of the Masterizer](MZ-909.m.png "Masterizer")
 
 ## Features
 

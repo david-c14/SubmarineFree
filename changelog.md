@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.10
+- 10-Dec-2020 Update images in manual
+- 26-Nov-2020 Add exponential response to VM-needle
+- 26-Nov-2020 Fix bug rendering WM-102 in module browser
+
 ## v1.1.9
 - 23-Nov-2020 Add DS-2 series polyphonic logic gates
 - 22-Nov-2020 Add OA-1xx Operation Amplifiers

@@ -1,10 +1,9 @@
 # Pulse Generators
 ### [Part of the Digital Suite](DS.md)
 #### PG-104 Pulse Generators
+![View of the Pulse Generators](PG-104.m.png "Pulse Generators")
 #### PG-112 Pulse Generators
-
-
-![View of the Pulse Generators](PG.png "Pulse Generators")
+![View of the Pulse Generators](PG-112.m.png "Pulse Generators")
 
 ## Basic Operation
 

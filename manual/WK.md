@@ -1,7 +1,6 @@
 # Das Wohltemperierte Klavier - Unequal Temperament Quantizer
 #### WK-101 Das Wohltemperierte Klavier
-
-![View of the Das Wohltemperierte Klavier](WK-101.png "Das Wohltemperierte Klavier")
+![View of the Das Wohltemperierte Klavier](WK-101.m.png "Das Wohltemperierte Klavier")
 
 ## Basic Operation
 
@@ -12,8 +11,7 @@ The currently recognized pitch is indicated by a small blue led in the centre of
 The context menu offers presets which you can configure. See below for more details
 
 #### WK-205 Das Wohltemperierte Klavier Nano
-
-![View of the Das Wohltemperierte Klavier nano](WK-205.png "Das Wohltemperierte Klavier nano")
+![View of the Das Wohltemperierte Klavier nano](WK-205.m.png "Das Wohltemperierte Klavier nano")
 
 ## Basic Operation
 
