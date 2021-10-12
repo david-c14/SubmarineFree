@@ -68,7 +68,7 @@ void SizeableModuleWidget::ShiftOthers(float delta) {
 		return;
 	if (delta == 0.0f)
 		return;
-	for (Widget *w : APP->scene->rack->moduleContainer->children) {
+	for (Widget *w : APP->scene->rack->getModuleContainer()->children) {
 		if (this == w)
 			continue;
 		if (this->box.pos.x > w->box.pos.x) 
@@ -78,7 +78,7 @@ void SizeableModuleWidget::ShiftOthers(float delta) {
 		w->box.pos.x += delta;
 	}
 }
-
+/*
 void SizeableModuleWidget::fromJson(json_t *rootJ) {
 	ModuleWidget::fromJson(rootJ);
 	if (!sizeableModule)
@@ -89,6 +89,7 @@ void SizeableModuleWidget::fromJson(json_t *rootJ) {
 	Minimize(sizeableModule->size < 16.0f);
 	APP->scene->rack->requestModulePos(this, box.pos);
 }
+*/
 
 void SizeableModuleWidget::onResized() {
 }

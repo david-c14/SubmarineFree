@@ -52,8 +52,8 @@ void LightButton::draw(const DrawArgs &args) {
 
 void LightButtonLight::draw(const DrawArgs &args) {
 	float value = 0.0f;
-	if (button->paramQuantity) {
-		value = button->paramQuantity->getValue();
+	if (button->getParamQuantity()) {
+		value = button->getParamQuantity()->getValue();
 	}
 
 	Rect lightbox = Rect(Vec(box.size.x / 4.0f, box.size.y / 4.0f), Vec(box.size.x / 2.0f, box.size.y / 4.0f));	

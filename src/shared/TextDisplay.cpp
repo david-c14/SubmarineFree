@@ -1,13 +1,17 @@
 #include "../SubmarineFree.hpp"
-#include "window.hpp"
+#include "window/Window.hpp"
 
 int SubText::getTextPosition(Vec mousePos) {
-    bndSetFont(font->handle);
-    int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
-      box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-      -1, fontSize, text.c_str(), mousePos.x, mousePos.y);
-    bndSetFont(APP->window->uiFont->handle);
-    return textPos;
+	std::shared_ptr<window::Font> font = APP->window->loadFont("");
+	if (font && font->handle >= 0) {
+    		bndSetFont(font->handle);
+		int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
+	      		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
+	      		-1, fontSize, text.c_str(), mousePos.x, mousePos.y);
+	    	bndSetFont(APP->window->uiFont->handle);
+	    	return textPos;
+	}
+	return 0;
 }
 
 void SubText::draw(const DrawArgs &args) {
@@ -19,7 +23,8 @@ void SubText::draw(const DrawArgs &args) {
 	nvgFill(args.vg);
 
 	//Text
-	if (font->handle >= 0) {
+	std::shared_ptr<window::Font> font = APP->window->loadFont("");
+	if (font && font->handle >= 0) {
 		bndSetFont(font->handle);
 		
 		NVGcolor highlightColor = color;
@@ -29,9 +34,9 @@ void SubText::draw(const DrawArgs &args) {
 		bndIconLabelCaret(args.vg, textOffset.x, textOffset.y,
 			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
 			-1, color, fontSize, text.c_str(), highlightColor, begin, end);
+    		bndSetFont(APP->window->uiFont->handle);
 	}
 	nvgResetScissor(args.vg);
-	bndSetFont(APP->window->uiFont->handle);
 }
 
 void SubText::appendContextMenu(Menu *menu) {

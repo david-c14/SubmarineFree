@@ -8,11 +8,11 @@
 #include "../SubmarineFree.hpp"
 #include "color.hpp"
 
-void BaseLightKnob::setEnabled(int val) {
+void LightKnob::setEnabled(int val) {
 	enabled = val;
 }
 
-void BaseLightKnob::setRadius(int r) {
+void LightKnob::setRadius(int r) {
 	Widget *w = dynamic_cast<Widget *>(this);
 	radius = r;
 	w->box.size.x = r * 2;
@@ -21,7 +21,7 @@ void BaseLightKnob::setRadius(int r) {
 	light->box.size.y = r * 2;
 }
 
-void BaseLightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
+void LightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 	nvgSave(args.vg);
 
 	// Shadow
@@ -57,9 +57,9 @@ void BaseLightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 
 void LightKnobLight::draw(const DrawArgs &args) {
 	NVGcolor lcol = knob->enabled?knob->color:nvgRGB(0x4a,0x4a,0x4a);
-	float value = knob->getBLKValue();
-	float minValue = knob->getBLKMinValue();
-	float maxValue = knob->getBLKMaxValue();
+	float value = knob->getParamQuantity()->getValue();
+	float minValue = knob->getParamQuantity()->getMinValue();
+	float maxValue = knob->getParamQuantity()->getMaxValue();
 	float angle;
 	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
 		angle = rescale(value, minValue, maxValue, knob->minAngle, knob->maxAngle);

@@ -77,7 +77,7 @@ void SilverPort::draw(const DrawArgs &args) {
 		nvgCircle(args.vg, radius, radius, 8.0);
 		nvgPathWinding(args.vg, NVG_HOLE);
 		nvgStrokeWidth(args.vg, 0.80645);
-		if (type == app::PortWidget::OUTPUT) {
+		if (type == engine::Port::OUTPUT) {
 			if (gScheme.isFlat) {
 				nvgFillColor(args.vg, color::mult(col, nvgRGB(0x80, 0x80, 0x80)));
 			}

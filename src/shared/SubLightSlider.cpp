@@ -8,7 +8,7 @@
 #include "../SubmarineFree.hpp"
 #include "color.hpp"
 	void SubLightSlider::draw(const DrawArgs &args) {
-		float offset = rescale(paramQuantity->getValue(), paramQuantity->getMinValue(), paramQuantity->getMaxValue(), 0, box.size.y - 12);
+		float offset = rescale(getParamQuantity()->getValue(), getParamQuantity()->getMinValue(), getParamQuantity()->getMaxValue(), 0, box.size.y - 12);
 		NVGcolor lcol = enabled?color:nvgRGB(0x4a,0x4a,0x4a);
 		
 		nvgFillColor(args.vg, nvgRGB(0, 0, 0));	

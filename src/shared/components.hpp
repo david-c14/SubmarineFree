@@ -98,82 +98,17 @@ struct LightButtonLight : LightWidget {
 };
 
 //////////////////
-// BulkParams
-//////////////////
-
-struct BulkParamWidget : widget::OpaqueWidget {
-	Module *module;
-	int paramId;
-	float *value = NULL;
-	float minValue = .0f;
-	float maxValue = 1.0f;
-	float defaultValue = .0f;
-	ui::Tooltip* tooltip = NULL;
-	std::string description;
-	std::string label;
-	std::string unit;
-	/** Set to 0 for linear, positive for exponential, negative for logarithmic. */
-	float displayBase = 0.f;
-	float displayMultiplier = 1.f;
-	float displayOffset = 0.f;
-
-	void onButton(const event::Button& e) override;
-	void onDoubleClick(const event::DoubleClick& e) override;
-	void onEnter(const event::Enter& e) override;
-	void onLeave(const event::Leave& e) override;
-
-	/** For legacy patch loading */
-	void fromJson(json_t* rootJ);
-	void createContextMenu();
-	void resetAction();
-	virtual void reset() {}
-	virtual void randomize() {}
-
-	std::function<void(ui::Menu *)> contextMenuCallback;
-
-	std::string getString();
-	float getDisplayValue();
-	void setDisplayValue(float displayValue);
-	std::string getDisplayValueString();
-	void setDisplayValueString(std::string s);
-	
-	static void setBulkParamValue(int thisModuleId, int thisParamId, float thisValue);
-};
-
-struct BulkParamTooltip : ui::Tooltip {
-	BulkParamWidget* bulkParamWidget;
-
-	void step() override;
-};
-
-//////////////////
 // Knobs
 //////////////////
 
-struct BulkKnob : BulkParamWidget {
-	/** Multiplier for mouse movement to adjust knob value */
-	float speed = 1.0;
-	float oldValue = .0f;
-	bool smooth = true;
-	/** Enable snapping at integer values */
-	bool snap = false;
-	float snapValue = NAN;
-	/** Drag horizontally instead of vertically */
-	bool horizontal = false;
+struct LightKnob;
 
-	void onHover(const event::Hover& e) override;
-	void onButton(const event::Button& e) override;
-	void onDragStart(const event::DragStart& e) override;
-	void onDragEnd(const event::DragEnd& e) override;
-	void onDragMove(const event::DragMove& e) override;
-	void reset() override;
-	void randomize() override;
+struct LightKnobLight : LightWidget {
+	LightKnob *knob;
+	void draw(const DrawArgs &args) override;
 };
 
-struct LightKnobLight;
-
-struct BaseLightKnob
-{
+struct LightKnob : Knob {
 	/** Angles in radians */
 	float minAngle = -0.83*M_PI;
 	float maxAngle = 0.83*M_PI;
@@ -185,17 +120,6 @@ struct BaseLightKnob
 	virtual void doDraw(const rack::widget::Widget::DrawArgs &args);
 	void setEnabled(int val);
 	void setRadius(int r);
-	virtual float getBLKValue() { return 0.0f; } 
-	virtual float getBLKMinValue() { return -1.0f; }
-	virtual float getBLKMaxValue() { return 1.0f; }
-};
-
-struct LightKnobLight : LightWidget {
-	BaseLightKnob *knob;
-	void draw(const DrawArgs &args) override;
-};
-
-struct LightKnob : BaseLightKnob, Knob {
 	LightKnob() {
 		smooth = false;
 		light = new LightKnobLight();
@@ -204,50 +128,9 @@ struct LightKnob : BaseLightKnob, Knob {
 		light->knob = this;
 		addChild(light);
 	}
-	float getBLKValue() override {
-		if (paramQuantity)
-			return paramQuantity->getValue();
-		return BaseLightKnob::getBLKValue();
-	}
-	float getBLKMinValue() override {
-		if (paramQuantity)
-			return paramQuantity->getMinValue();
-		return BaseLightKnob::getBLKMinValue();
-	}
-	float getBLKMaxValue() override {
-		if (paramQuantity)
-			return paramQuantity->getMaxValue();
-		return BaseLightKnob::getBLKMaxValue();
-	}
 	void draw(const DrawArgs &args) override {
 		doDraw(args);
 		Knob::draw(args);
-	}
-};
-
-struct BulkLightKnob : BaseLightKnob, BulkKnob {
-	BulkLightKnob() {
-		smooth = false;
-		light = new LightKnobLight();
-		light->box.pos = Vec(0,0);
-		light->box.size = Vec(radius * 2, radius * 2);
-		light->knob = this;
-		addChild(light);
-	}
-	float getBLKValue() override {
-		if (value)
-			return *value;
-		return BaseLightKnob::getBLKValue();
-	}
-	float getBLKMinValue() override {
-		return minValue;
-	}
-	float getBLKMaxValue() override {
-		return maxValue;
-	}
-	void draw(const DrawArgs &args) override {
-		doDraw(args);
-		BulkKnob::draw(args);
 	}
 };
 
@@ -567,7 +450,7 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 	void Resize();
 	void Minimize(bool minimize);
 	void ShiftOthers(float delta);
-	void fromJson(json_t *rootJ) override;
+//	void dataFromJson(json_t *rootJ) override;
 	virtual void onResized();
 };
 

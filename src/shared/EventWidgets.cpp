@@ -116,7 +116,7 @@ void EventWidgetSlider::onDoubleClick(const event::DoubleClick &e) {
 }
 
 void EventWidgetSlider::onEnter(const event::Enter &e) {
-	if (settings::paramTooltip && !tooltip) {
+	if (settings::tooltips && !tooltip) {
 		tooltip = new EventWidgetSliderTooltip();
 		tooltip->slider = this;
 		APP->scene->addChild(tooltip);
@@ -260,7 +260,7 @@ void EventWidgetMenuItem::step() {
 
 void EventParamField::step() {
 	// Keep selected
-	APP->event->setSelected(this);
+	APP->event->setSelectedWidget(this);
 	TextField::step();
 }
 
