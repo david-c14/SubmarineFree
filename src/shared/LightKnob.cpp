@@ -17,8 +17,6 @@ void LightKnob::setRadius(int r) {
 	radius = r;
 	w->box.size.x = r * 2;
 	w->box.size.y = r * 2;
-	light->box.size.x = r * 2;
-	light->box.size.y = r * 2;
 }
 
 void LightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
@@ -52,24 +50,26 @@ void LightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 		nvgFillColor(args.vg, nvgRGB(10,10,10));
 		nvgFill(args.vg);
 	}
-	nvgRestore(args.vg);	
-}
 
-void LightKnobLight::draw(const DrawArgs &args) {
-	NVGcolor lcol = knob->enabled?knob->color:nvgRGB(0x4a,0x4a,0x4a);
-	float value = knob->getParamQuantity()->getValue();
-	float minValue = knob->getParamQuantity()->getMinValue();
-	float maxValue = knob->getParamQuantity()->getMaxValue();
+	NVGcolor lcol = enabled?color:nvgRGB(0x4a, 0x4a, 0x4a);
 	float angle;
+	float value = 0.0f;
+	float minValue = -1.0f;
+	float maxValue = 1.0f;
+	if (getParamQuantity()) {
+		value = getParamQuantity()->getValue();
+		minValue = getParamQuantity()->getMinValue();
+		maxValue = getParamQuantity()->getMaxValue();
+	}
 	if (std::isfinite(minValue) && std::isfinite(maxValue)) {
-		angle = rescale(value, minValue, maxValue, knob->minAngle, knob->maxAngle);
+		angle = rescale(value, minValue, maxValue, minAngle, maxAngle);
 	}
 	else {
-		angle = rescale(value, -1.0, 1.0, knob->minAngle, knob->maxAngle);
+		angle = rescale(value, -1.0, 1.0, minAngle, maxAngle);
 		angle = fmodf(angle, 2*M_PI);
 	}
-	float cx = (1.0f + sinf(angle) * 0.7f) * knob->radius;
-	float cy = (1.0f - cosf(angle) * 0.7f) * knob->radius;
+	float cx = (1.0f + sinf(angle) * 0.7f) * radius;
+	float cy = (1.0f - cosf(angle) * 0.7f) * radius;
 	float lradius = mm2px(0.544);
 	float oradius = lradius + 15.0;
 	
@@ -77,16 +77,16 @@ void LightKnobLight::draw(const DrawArgs &args) {
 	{
 		nvgSave(args.vg);
 		nvgBeginPath(args.vg);
-		nvgTranslate(args.vg, knob->radius, knob->radius);
+		nvgTranslate(args.vg, radius, radius);
 		nvgRotate(args.vg, angle);
-		nvgRect(args.vg, knob->radius * -0.05, knob->radius * -0.9, knob->radius * 0.1, knob->radius * 0.4);
+		nvgRect(args.vg, radius * -0.05, radius * -0.9, radius * 0.1, radius * 0.4);
 		if (gScheme.isFlat) {
 			nvgFillColor(args.vg, lcol);
 		}
 		else {
 			NVGpaint paint;
 			NVGcolor ocol = color::mult(lcol, 0.1);
-			paint = nvgRadialGradient(args.vg, 0, knob->radius * -0.7, knob->radius * 0.05, knob->radius * 0.2, lcol, ocol);
+			paint = nvgRadialGradient(args.vg, 0, radius * -0.7, radius * 0.05, radius * 0.2, lcol, ocol);
 			nvgFillPaint(args.vg, paint);
 		}
 		nvgFill(args.vg);
@@ -105,4 +105,5 @@ void LightKnobLight::draw(const DrawArgs &args) {
 		nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
 		nvgFill(args.vg);	
 	}
+	nvgRestore(args.vg);	
 }

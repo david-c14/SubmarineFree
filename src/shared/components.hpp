@@ -101,12 +101,6 @@ struct LightButtonLight : LightWidget {
 // Knobs
 //////////////////
 
-struct LightKnob;
-
-struct LightKnobLight : LightWidget {
-	LightKnob *knob;
-	void draw(const DrawArgs &args) override;
-};
 
 struct LightKnob : Knob {
 	/** Angles in radians */
@@ -115,18 +109,12 @@ struct LightKnob : Knob {
 	/** Radii in standard units */
 	float radius = 19.0;
 	int enabled = 1;
-	LightKnobLight *light;
 	NVGcolor color = SUBLIGHTBLUE;
 	virtual void doDraw(const rack::widget::Widget::DrawArgs &args);
 	void setEnabled(int val);
 	void setRadius(int r);
 	LightKnob() {
 		smooth = false;
-		light = new LightKnobLight();
-		light->box.pos = Vec(0,0);
-		light->box.size = Vec(radius * 2, radius * 2);
-		light->knob = this;
-		addChild(light);
 	}
 	void draw(const DrawArgs &args) override {
 		doDraw(args);
@@ -216,11 +204,8 @@ struct Scheme {
 	void setColors();
 	void save();
 	std::shared_ptr<Font> font();
-	int font(NVGcontext *vg);
 	bool isFlat = false;
 	int scheme = Blue;
-	std::shared_ptr<Font> _font = NULL;
-	bool _fontLoaded = false;
 	NVGcolor getBackground(Module *module) { return module?background:_background; }
 	NVGcolor getAlternative(Module *module) { return module?alternative:_alternative; }
 	NVGcolor getContrast(Module *module) { return module?contrast:_contrast; }

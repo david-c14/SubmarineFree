@@ -81,19 +81,8 @@ void Scheme::setColors() {
 }
 
 std::shared_ptr<Font> Scheme::font() {
-	if (!_fontLoaded) {
-		_fontLoaded = true;
-		_font = APP->window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));	
-	}
+	std::shared_ptr<Font> _font = APP->window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));	
 	return _font;
-}
-
-int Scheme::font(NVGcontext *vg) {
-	int ret = nvgFindFont(vg, "subDejaVu");
-	if (ret != -1) {
-		return ret;
-	}
-	return nvgCreateFont(vg, "subDejaVu", asset::system("res/fonts/DejaVuSans.ttf").c_str());
 }
 
 Scheme gScheme;
@@ -270,7 +259,7 @@ void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float s
 }
 
 void SchemeModuleWidget::drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt) {
-	nvgFontFaceId(vg, gScheme.font(vg));
+	nvgFontFaceId(vg, gScheme.font()->handle);
 	nvgFontSize(vg, size * 90 / SVG_DPI);
 	nvgTextAlign(vg, align);
 	nvgFillColor(vg, col);

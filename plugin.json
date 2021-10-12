@@ -82,6 +82,13 @@
 			"description": "BP-132 Blanking Plate",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/BP.md",
 			"tags": ["BLANK"]
+		},
+		{
+			"slug":"LA-108",
+			"name":"LA-108",
+			"description": "LA-108 Logic Analyser",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/LA.md",
+			"tags": ["LOGIC", "VISUAL"]
 		}
 	]
 }

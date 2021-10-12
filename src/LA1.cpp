@@ -363,14 +363,14 @@ struct LA108 : SchemeModuleWidget {
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(31.5, 313.5), module, LA_108::LIGHT_EXT));
 
 		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(58, 320), module, LA_108::PARAM_TRIGGER));
-		addParam(createParamCentered<SubSwitch2>(Vec(89, 320.5), module, LA_108::PARAM_EDGE));
-		addParam(createParamCentered<SubSwitch2>(Vec(115, 320.5), module, LA_108::PARAM_RUN));
-		resetButton = createParamCentered<LightButton>(Vec(159, 320), module, LA_108::PARAM_RESET);
-		addParam(resetButton);
-		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1));
-		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2));
-		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE));
+		//addParam(createParamCentered<SubSwitch2>(Vec(89, 320.5), module, LA_108::PARAM_EDGE));
+		//addParam(createParamCentered<SubSwitch2>(Vec(115, 320.5), module, LA_108::PARAM_RUN));
+		//resetButton = createParamCentered<LightButton>(Vec(159, 320), module, LA_108::PARAM_RESET);
+		//addParam(resetButton);
+		//addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME));
+		//addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1));
+		//addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2));
+		//addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE));
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);

@@ -47,7 +47,7 @@ extern Model *modelBP132;
 
 //extern Model *modelHS101;
 
-//extern Model *modelLA108;
+extern Model *modelLA108;
 
 //extern Model *modelLD103;
 //extern Model *modelLD106;
