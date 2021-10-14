@@ -60,15 +60,33 @@ struct LA_108 : DS_Module {
 
 	LA_108() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_TRIGGER, 0.0f, 8.0f, 0.0f, "Trigger input", "", 0.f, 1.f, 1.f);
-		configParam(PARAM_EDGE, 0.0f, 1.0f, 0.0f, "Trigger on falling edge");
-		configParam(PARAM_RUN, 0.0f, 1.0f, 0.0f, "One shot mode");
-		configParam(PARAM_RESET, 0.0f, 1.0f, 0.0f, "Reset");
-		configParam(PARAM_TIME, -2.0f, -16.0f, -14.0f, "Time base");
-		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left index position");
-		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right index position");
-		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f, "Pre-trigger buffer size");
-		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
+		configSwitch(PARAM_TRIGGER, 0, 8, 0, "Trigger Input", { "Signal 1", "Signal 2", "Signal 3", "Signal 4", "Signal 5", "Signal 6", "Signal 7", "Signal 8", "External" });
+		configSwitch(PARAM_EDGE, 0, 1, 0, "Trigger on", { "Rising Edge", "Falling Edge" });
+		configSwitch(PARAM_RUN, 0, 1, 0, "Trigger Mode", { "Continuous", "One-Shot" });
+		configSwitch(PARAM_RESET, 0, 1, 0, "Reset", { "Off", "Waiting" });
+		configParam(PARAM_TIME, -2.0f, -16.0f, -14.0f, "Time Base", " Samples", 2.0f, 65536 * 512, 0.0f);
+		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left Index Position", "%", 0.0f, 100.0f, 0.0f);
+		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right Index Position", "%", 0.0f, 100.0f, 0.0f);
+		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f, "Pre-trigger Buffer Size", " Samples");
+		configSwitch(PARAM_COLORS, 0, 1, 0, "Match cable colors", { "Off", "On" });
+		configInput(INPUT_1, "Signal 1");
+		configInput(INPUT_2, "Signal 2");
+		configInput(INPUT_3, "Signal 3");
+		configInput(INPUT_4, "Signal 4");
+		configInput(INPUT_5, "Signal 5");
+		configInput(INPUT_6, "Signal 6");
+		configInput(INPUT_7, "Signal 7");
+		configInput(INPUT_8, "Signal 8");
+		configInput(INPUT_EXT, "External Trigger");
+		configLight(LIGHT_1, "Trigger on Signal 1");
+		configLight(LIGHT_2, "Trigger on Signal 2");
+		configLight(LIGHT_3, "Trigger on Signal 3");
+		configLight(LIGHT_4, "Trigger on Signal 4");
+		configLight(LIGHT_5, "Trigger on Signal 5");
+		configLight(LIGHT_6, "Trigger on Signal 6");
+		configLight(LIGHT_7, "Trigger on Signal 7");
+		configLight(LIGHT_8, "Trigger on Signal 8");
+		configLight(LIGHT_EXT, "Trigger on External Signal");
 	}
 
 	void startFrame() {
@@ -163,7 +181,7 @@ struct LA_108 : DS_Module {
 };
 
 namespace {	
-	struct LA_Display : LightWidget {
+	struct LA_Display : Widget {
 		LA_108 *module;
 		PortWidget *ports[8];
 	
@@ -271,16 +289,22 @@ namespace {
 				drawEasterEgg(args.vg);
 				return;
 			}
-			for (int i = 0; i < 8; i++) {
-				if (module->inputs[LA_108::INPUT_1 + i].isConnected()) {
-					NVGcolor col = getColor(i);
-					drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i, col); 
+		}
+
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				for (int i = 0; i < 8; i++) {
+					if (module->inputs[LA_108::INPUT_1 + i].isConnected()) {
+						NVGcolor col = getColor(i);
+						drawTrace(args.vg, module->buffer[i], 32.5f + 35 * i, col); 
+					}
 				}
+				drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
+				drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
+				drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].getValue(), 0.0f, 32.0f) / BUFFER_SIZE);
+				drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
 			}
-			drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
-			drawIndex(args.vg, clamp(module->params[LA_108::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
-			drawMask(args.vg, clamp(module->params[LA_108::PARAM_PRE].getValue(), 0.0f, 32.0f) / BUFFER_SIZE);
-			drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
+			Widget::drawLayer(args, layer);
 		}
 		
 		NVGcolor getColor(int i) {
@@ -292,42 +316,41 @@ namespace {
 		}
 	};
 
-	struct LA_Measure : LightWidget {
+	struct LA_Measure : Widget {
 		LA_108 *module;
 		char measureText[41];
 	
-		void draw(const DrawArgs &args) override {
-			if (!module) {
-				return;
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (module && (layer == 1)) {
+				float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].getValue());
+				int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
+				frameCount *= BUFFER_SIZE;
+				float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].getValue() - module->params[LA_108::PARAM_INDEX_2].getValue()) / APP->engine->getSampleRate(); 
+				
+				if (width < 0.00000995f)
+					sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
+				else if (width < 0.0000995f)
+					sprintf(measureText, "%4.2f\xc2\xb5s", width * 1000000.0f);
+				else if (width < 0.000995f)
+					sprintf(measureText, "%4.1f\xc2\xb5s", width * 1000000.0f);
+				else if (width < 0.00995f)
+					sprintf(measureText, "%4.3fms", width * 1000.0f);
+				else if (width < 0.0995f)
+					sprintf(measureText, "%4.2fms", width * 1000.0f);
+				else if (width < 0.995f)
+					sprintf(measureText, "%4.1fms", width * 1000.0f);
+				else if (width < 9.95f)
+					sprintf(measureText, "%4.3fs", width);
+				else if (width < 99.5f)
+					sprintf(measureText, "%4.2fs", width);
+				else
+					sprintf(measureText, "%4.1fs", width);
+				nvgFontSize(args.vg, 14);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 27, 12, measureText, NULL);
 			}
-			float deltaTime = powf(2.0f, module->params[LA_108::PARAM_TIME].getValue());
-			int frameCount = (int)ceilf(deltaTime * APP->engine->getSampleRate());
-			frameCount *= BUFFER_SIZE;
-			float width = (float)frameCount * fabs(module->params[LA_108::PARAM_INDEX_1].getValue() - module->params[LA_108::PARAM_INDEX_2].getValue()) / APP->engine->getSampleRate(); 
-			
-			if (width < 0.00000995f)
-				sprintf(measureText, "%4.3f\xc2\xb5s", width * 1000000.0f);
-			else if (width < 0.0000995f)
-				sprintf(measureText, "%4.2f\xc2\xb5s", width * 1000000.0f);
-			else if (width < 0.000995f)
-				sprintf(measureText, "%4.1f\xc2\xb5s", width * 1000000.0f);
-			else if (width < 0.00995f)
-				sprintf(measureText, "%4.3fms", width * 1000.0f);
-			else if (width < 0.0995f)
-				sprintf(measureText, "%4.2fms", width * 1000.0f);
-			else if (width < 0.995f)
-				sprintf(measureText, "%4.1fms", width * 1000.0f);
-			else if (width < 9.95f)
-				sprintf(measureText, "%4.3fs", width);
-			else if (width < 99.5f)
-				sprintf(measureText, "%4.2fs", width);
-			else
-				sprintf(measureText, "%4.1fs", width);
-			nvgFontSize(args.vg, 14);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-			nvgText(args.vg, 27, 12, measureText, NULL);
 		}
 	};
 
@@ -363,14 +386,14 @@ struct LA108 : SchemeModuleWidget {
 		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(31.5, 313.5), module, LA_108::LIGHT_EXT));
 
 		addParam(createParamCentered<SnapKnob<MedKnob<LightKnob>>>(Vec(58, 320), module, LA_108::PARAM_TRIGGER));
-		//addParam(createParamCentered<SubSwitch2>(Vec(89, 320.5), module, LA_108::PARAM_EDGE));
-		//addParam(createParamCentered<SubSwitch2>(Vec(115, 320.5), module, LA_108::PARAM_RUN));
-		//resetButton = createParamCentered<LightButton>(Vec(159, 320), module, LA_108::PARAM_RESET);
-		//addParam(resetButton);
-		//addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME));
-		//addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1));
-		//addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2));
-		//addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE));
+		addParam(createParamCentered<SubSwitch2>(Vec(89, 320.5), module, LA_108::PARAM_EDGE));
+		addParam(createParamCentered<SubSwitch2>(Vec(115, 320.5), module, LA_108::PARAM_RUN));
+		resetButton = createParamCentered<LightButton>(Vec(159, 320), module, LA_108::PARAM_RESET);
+		addParam(resetButton);
+		addParam(createParamCentered<MedKnob<LightKnob>>(Vec(190, 320), module, LA_108::PARAM_TIME));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(226, 327), module, LA_108::PARAM_INDEX_1));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(254, 327), module, LA_108::PARAM_INDEX_2));
+		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(283, 327), module, LA_108::PARAM_PRE));
 	}
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);

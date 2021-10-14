@@ -83,18 +83,13 @@ struct SubSwitchHorz : k {
 // Buttons
 //////////////////
 
-struct LightButtonLight;
-
 struct LightButton : app::Switch {
 	NVGcolor color = SUBLIGHTBLUE;
-	LightButtonLight *light;
 	LightButton(); 
 	void draw(const DrawArgs &args) override;
-};
-
-struct LightButtonLight : LightWidget {
-	LightButton *button;
-	void draw(const DrawArgs &args) override;
+	void drawLayer(const DrawArgs &args, int layer) override;
+	void drawLight(const DrawArgs &args, bool enabled);
+	void drawHalo(const DrawArgs &args);
 };
 
 //////////////////
@@ -110,16 +105,15 @@ struct LightKnob : Knob {
 	float radius = 19.0;
 	int enabled = 1;
 	NVGcolor color = SUBLIGHTBLUE;
-	virtual void doDraw(const rack::widget::Widget::DrawArgs &args);
 	void setEnabled(int val);
 	void setRadius(int r);
 	LightKnob() {
 		smooth = false;
 	}
-	void draw(const DrawArgs &args) override {
-		doDraw(args);
-		Knob::draw(args);
-	}
+	void draw(const DrawArgs &args) override;
+	void drawLayer(const DrawArgs &args, int layer) override;
+	void drawLight(const DrawArgs &args);
+	void drawHalo(const DrawArgs &args);
 };
 
 template <class K>

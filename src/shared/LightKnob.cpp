@@ -19,7 +19,7 @@ void LightKnob::setRadius(int r) {
 	w->box.size.y = r * 2;
 }
 
-void LightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
+void LightKnob::draw(const DrawArgs &args) {
 	nvgSave(args.vg);
 
 	// Shadow
@@ -51,6 +51,27 @@ void LightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 		nvgFill(args.vg);
 	}
 
+	if (!enabled) {
+		drawLight(args);
+	}
+
+	
+	nvgRestore(args.vg);	
+	Knob::draw(args);
+}
+
+void LightKnob::drawLayer(const DrawArgs& args, int layer) {
+	if (layer == 1) {
+		if (enabled) {
+			drawLight(args);
+			drawHalo(args);
+		}
+	
+	}
+	Widget::drawLayer(args, layer);
+}
+
+void LightKnob::drawLight(const DrawArgs &args) {
 	NVGcolor lcol = enabled?color:nvgRGB(0x4a, 0x4a, 0x4a);
 	float angle;
 	float value = 0.0f;
@@ -68,11 +89,7 @@ void LightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 		angle = rescale(value, -1.0, 1.0, minAngle, maxAngle);
 		angle = fmodf(angle, 2*M_PI);
 	}
-	float cx = (1.0f + sinf(angle) * 0.7f) * radius;
-	float cy = (1.0f - cosf(angle) * 0.7f) * radius;
-	float lradius = mm2px(0.544);
-	float oradius = lradius + 15.0;
-	
+
 	// Light
 	{
 		nvgSave(args.vg);
@@ -92,18 +109,49 @@ void LightKnob::doDraw(const rack::widget::Widget::DrawArgs &args) {
 		nvgFill(args.vg);
 		nvgRestore(args.vg);
 	}
+}
+
+void LightKnob::drawHalo(const DrawArgs &args) {
+		// Don't draw halo if rendering in a framebuffer, e.g. screenshots or Module Browser
+		if (args.fb)
+			return;
 	
-	// Halo
-	if (!gScheme.isFlat) {
+		const float halo = settings::haloBrightness;
+		if (halo == 0.f)
+			return;
+	
+		// If light is off, rendering the halo gives no effect.
+		if (color.r == 0.f && color.g == 0.f && color.b == 0.f)
+			return;
+
+		// Halo
+		float angle;
+		float value = 0.0f;
+		float minValue = -1.0f;
+		float maxValue = 1.0f;
+		if (getParamQuantity()) {
+			value = getParamQuantity()->getValue();
+			minValue = getParamQuantity()->getMinValue();
+			maxValue = getParamQuantity()->getMaxValue();
+		}
+		if (std::isfinite(minValue) && std::isfinite(maxValue)) {
+			angle = rescale(value, minValue, maxValue, minAngle, maxAngle);
+		}
+		else {
+			angle = rescale(value, -1.0, 1.0, minAngle, maxAngle);
+			angle = fmodf(angle, 2*M_PI);
+		}
+		float cx = (1.0f + sinf(angle) * 0.7f) * radius;
+		float cy = (1.0f - cosf(angle) * 0.7f) * radius;
+		float lradius = mm2px(0.544);
+		float oradius = lradius + 15.0;
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, cx - oradius, cy - oradius, 2 * oradius, 2 * oradius);
 		NVGpaint paint;
-		NVGcolor icol = color::mult(lcol, 0.08);
+		NVGcolor icol = color::mult(color, halo);
 		NVGcolor ocol = nvgRGB(0, 0, 0);
 		paint = nvgRadialGradient(args.vg, cx, cy, lradius, oradius, icol, ocol);
 		nvgFillPaint(args.vg, paint);
-		nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
+		nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
 		nvgFill(args.vg);	
-	}
-	nvgRestore(args.vg);	
 }
