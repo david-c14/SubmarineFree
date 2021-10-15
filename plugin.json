@@ -35,6 +35,13 @@
 			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		},
 		{
+			"slug":"BB-120",
+			"name":"BB-120",
+			"description": "BB-120 20-Stage Bucket Brigade Sample and Hold",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/BB.md",
+			"tags": ["LOGIC", "DELAY", "SAMPLE AND HOLD", "MULTIPLE"]
+		},
+		{
 			"slug":"BP-101",
 			"name":"BP-101",
 			"description": "BP-101 Blanking Plate",
@@ -105,6 +112,41 @@
 			"tags": ["BLANK"]
 		},
 		{
+			"slug":"DN-112",
+			"name":"DN-112",
+			"description": "DN-112 Digital Noise",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DN.md",
+			"tags": ["DIGITAL", "NOISE", "MULTIPLE"]
+		},
+		{
+			"slug":"FF-110",
+			"name":"FF-110",
+			"description": "FF-110 10-Stage Flip-Flop Counter",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/FF.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"FF-120",
+			"name":"FF-120",
+			"description": "FF-120 20-Stage Flip-Flop Counter",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/FF.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"FF-206",
+			"name":"FF-206",
+			"description": "FF-206 Edge Triggered Flip-Flops",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/FF.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"FF-212",
+			"name":"FF-212",
+			"description": "FF-212 Edge Triggered Flip-Flops",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/FF.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
 			"slug":"LA-108",
 			"name":"LA-108",
 			"description": "LA-108 Logic Analyser",
@@ -145,6 +187,20 @@
 			"description": "NG-206 Polyphonic NOT Gates",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/NG.md",
 			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
+			"slug":"OA-103",
+			"name":"OA-103",
+			"description": "OA-103 Op-Amps",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OA.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"OA-105",
+			"name":"OA-105",
+			"description": "OA-105 Op-Amps",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OA.md",
+			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
 			"slug":"OG-104",

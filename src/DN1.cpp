@@ -28,6 +28,7 @@ struct DN_1 : DS_Module {
 		std::uniform_int_distribution<int> distribution(1, 0xffffffffu);
 		for (unsigned int i = 0; i < x; i++) {
 			lfsr[i] = distribution(generator);
+			configOutput(OUTPUT_1 + i, "Noise Signal " + std::to_string(i + 1));
 		}
 	}
 
