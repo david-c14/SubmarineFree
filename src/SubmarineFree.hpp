@@ -17,7 +17,7 @@ extern Model *modelAG202;
 //extern Model *modelAO124;
 //extern Model *modelAO136;
 
-//extern Model *modelBB120;
+extern Model *modelBB120;
 
 extern Model *modelBP101;
 extern Model *modelBP102;
@@ -30,7 +30,7 @@ extern Model *modelBP120;
 extern Model *modelBP124;
 extern Model *modelBP132;
 
-//extern Model *modelDN112;
+extern Model *modelDN112;
 
 //extern Model *modelDO105;
 //extern Model *modelDO110;
@@ -40,10 +40,10 @@ extern Model *modelBP132;
 //extern Model *modelEN104;
 //extern Model *modelEO102;
 
-//extern Model *modelFF110;
-//extern Model *modelFF120;
-//extern Model *modelFF206;
-//extern Model *modelFF212;
+extern Model *modelFF110;
+extern Model *modelFF120;
+extern Model *modelFF206;
+extern Model *modelFF212;
 
 //extern Model *modelHS101;
 
@@ -60,8 +60,8 @@ extern Model *modelNG106;
 extern Model *modelNG112;
 extern Model *modelNG206;
 
-//extern Model *modelOA103;
-//extern Model *modelOA105;
+extern Model *modelOA103;
+extern Model *modelOA105;
 
 extern Model *modelOG104;
 extern Model *modelOG106;

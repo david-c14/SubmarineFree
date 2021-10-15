@@ -6,6 +6,7 @@
 - 14-Oct-2021 Port LA-108 to v2
 - 15-Oct-2021 Port AG-xxx OG-xxx NG-xxx XG-xxx LD-xxx and PG-xxx to v2
 - 15-Oct-2021 Persist DS suite voltage range between devices. When voltage is changed, new devices use the same option
+- 15-Oct-2021 Port BB-xxx DN-xxx FF-xxx OA-xxx to v2
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual
