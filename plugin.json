@@ -14,6 +14,27 @@
 	"version": "2.0.1",
 	"modules": [
 		{
+			"slug":"AG-104",
+			"name":"AG-104",
+			"description": "AG-104 AND Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"AG-106",
+			"name":"AG-106",
+			"description": "AG-106 AND Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"AG-202",
+			"name":"AG-202",
+			"description": "AG-202 4-input Polyphonic AND Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
+		},
+		{
 			"slug":"BP-101",
 			"name":"BP-101",
 			"description": "BP-101 Blanking Plate",
@@ -89,6 +110,97 @@
 			"description": "LA-108 Logic Analyser",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/LA.md",
 			"tags": ["LOGIC", "VISUAL"]
+		},
+		{
+			"slug":"LD-103",
+			"name":"LD-103",
+			"description": "LD-103 Schmitt Trigger Line Drivers",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/LD.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"LD-106",
+			"name":"LD-106",
+			"description": "LD-106 Schmitt Trigger Line Drivers",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/LD.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"NG-106",
+			"name":"NG-106",
+			"description": "NG-106 NOT Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/NG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"NG-112",
+			"name":"NG-112",
+			"description": "NG-112 NOT Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/NG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"NG-206",
+			"name":"NG-206",
+			"description": "NG-206 Polyphonic NOT Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/NG.md",
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
+			"slug":"OG-104",
+			"name":"OG-104",
+			"description": "OG-104 OR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"OG-106",
+			"name":"OG-106",
+			"description": "OG-106 OR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"OG-202",
+			"name":"OG-202",
+			"description": "OG-202 4-Channel Polyphonic OR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/OG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
+		},
+		{
+			"slug":"PG-104",
+			"name":"PG-104",
+			"description": "PG-104 Pulse Generators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/PG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"PG-112",
+			"name":"PG-112",
+			"description": "PG-112 Pulse Generators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/PG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"XG-104",
+			"name":"XG-104",
+			"description": "XG-104 XOR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"XG-106",
+			"name":"XG-106",
+			"description": "XG-106 XOR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
+			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"XG-202",
+			"name":"XG-202",
+			"description": "XG-202 4-Input Polyphonic XOR Gates",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
+			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		}
 	]
 }

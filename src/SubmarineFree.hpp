@@ -7,9 +7,9 @@ extern Plugin *pluginInstance;
 
 // Forward-declare each Model, defined in each module source file
 
-//extern Model *modelAG104;
-//extern Model *modelAG106;
-//extern Model *modelAG202;
+extern Model *modelAG104;
+extern Model *modelAG106;
+extern Model *modelAG202;
 
 //extern Model *modelAO106;
 //extern Model *modelAO112;
@@ -49,26 +49,26 @@ extern Model *modelBP132;
 
 extern Model *modelLA108;
 
-//extern Model *modelLD103;
-//extern Model *modelLD106;
+extern Model *modelLD103;
+extern Model *modelLD106;
 
 //extern Model *modelLT116;
 
 //extern Model *modelMZ909;
 
-//extern Model *modelNG106;
-//extern Model *modelNG112;
-//extern Model *modelNG206;
+extern Model *modelNG106;
+extern Model *modelNG112;
+extern Model *modelNG206;
 
 //extern Model *modelOA103;
 //extern Model *modelOA105;
 
-//extern Model *modelOG104;
-//extern Model *modelOG106;
-//extern Model *modelOG202;
+extern Model *modelOG104;
+extern Model *modelOG106;
+extern Model *modelOG202;
 
-//extern Model *modelPG104;
-//extern Model *modelPG112;
+extern Model *modelPG104;
+extern Model *modelPG112;
 
 //extern Model *modelPO101;
 //extern Model *modelPO102;
@@ -109,9 +109,9 @@ extern Model *modelLA108;
 //extern Model *modelXF202;
 //extern Model *modelXF301;
 
-//extern Model *modelXG104;
-//extern Model *modelXG106;
-//extern Model *modelXG202;
+extern Model *modelXG104;
+extern Model *modelXG106;
+extern Model *modelXG202;
 
 //extern Model *modelXX219;
 

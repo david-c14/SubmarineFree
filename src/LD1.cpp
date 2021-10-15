@@ -44,12 +44,13 @@ namespace {
 		float cutoff;
 		float width;
 		unsigned int deviceCount;
-		int cutoffParamIndex;
-		int widthParamIndex;
+		ParamWidget** cutoffWidgets;
+		ParamWidget** widthWidgets;
 		void onAction(const event::Action &e) override {
 			for (unsigned int i = 0; i < deviceCount; i++) {
-				APP->engine->setParam(module, cutoffParamIndex + i, cutoff);
-				APP->engine->setParam(module, widthParamIndex + i, width);
+
+				cutoffWidgets[i]->getParamQuantity()->setValue(cutoff);
+				widthWidgets[i]->getParamQuantity()->setValue(width);
 			}
 		}
 	};
@@ -59,6 +60,8 @@ namespace {
 		unsigned int deviceCount;
 		int cutoffParamIndex;
 		int widthParamIndex;
+		ParamWidget **cutoffWidgets;
+		ParamWidget **widthWidgets;
 		Menu *createChildMenu() override {
 			Menu *menu = new Menu();
 			LDMenuItem *menuItem = createMenuItem<LDMenuItem>("Cutoff 5V");
@@ -66,32 +69,32 @@ namespace {
 			menuItem->cutoff = 5.0f;
 			menuItem->width = 1.0f;
 			menuItem->deviceCount = deviceCount;
-			menuItem->cutoffParamIndex = cutoffParamIndex;
-			menuItem->widthParamIndex = widthParamIndex;
+			menuItem->cutoffWidgets = cutoffWidgets;
+			menuItem->widthWidgets = widthWidgets;
 			menu->addChild(menuItem);
 			menuItem = createMenuItem<LDMenuItem>("Cutoff 0V");
 			menuItem->module = module;
 			menuItem->cutoff = 0.0f;
 			menuItem->width = 0.0f;
 			menuItem->deviceCount = deviceCount;
-			menuItem->cutoffParamIndex = cutoffParamIndex;
-			menuItem->widthParamIndex = widthParamIndex;
+			menuItem->cutoffWidgets = cutoffWidgets;
+			menuItem->widthWidgets = widthWidgets;
 			menu->addChild(menuItem);
 			menuItem = createMenuItem<LDMenuItem>("Cutoff 2.5V");
 			menuItem->module = module;
 			menuItem->cutoff = 2.5f;
 			menuItem->width = 0.5f;
 			menuItem->deviceCount = deviceCount;
-			menuItem->cutoffParamIndex = cutoffParamIndex;
-			menuItem->widthParamIndex = widthParamIndex;
+			menuItem->cutoffWidgets = cutoffWidgets;
+			menuItem->widthWidgets = widthWidgets;
 			menu->addChild(menuItem);
 			menuItem = createMenuItem<LDMenuItem>("TTL Levels");
 			menuItem->module = module;
 			menuItem->cutoff = 1.4f;
 			menuItem->width = 0.6f;
 			menuItem->deviceCount = deviceCount;
-			menuItem->cutoffParamIndex = cutoffParamIndex;
-			menuItem->widthParamIndex = widthParamIndex;
+			menuItem->cutoffWidgets = cutoffWidgets;
+			menuItem->widthWidgets = widthWidgets;
 			menu->addChild(menuItem);
 			
 			return menu;
@@ -102,6 +105,8 @@ namespace {
 
 struct LD103 : SchemeModuleWidget {
 	static const int deviceCount = 3;	
+	ParamWidget* cutoffWidgets[deviceCount];
+	ParamWidget* widthWidgets[deviceCount];
 	LD103(LD_1<deviceCount> *module) {
 		setModule(module);
 		this->box.size = Vec(30, 380);
@@ -112,9 +117,10 @@ struct LD103 : SchemeModuleWidget {
 			addInput(createInputCentered<SilverPort>(Vec(15,31.5 + offset), module, LD_1<3>::INPUT_1 + i));
 
 			addOutput(createOutputCentered<BluePort>(Vec(15,115.5 + offset), module, LD_1<3>::OUTPUT_1 + i));
-
-			addParam(createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i));
-			addParam(createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i));
+			cutoffWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 57.5 + offset), module, LD_1<3>::PARAM_CUTOFF_1 + i);
+			widthWidgets[i] = createParamCentered<TinyKnob<LightKnob>>(Vec(15, 89.5 + offset), module, LD_1<3>::PARAM_WIDTH_1 + i);
+			addParam(cutoffWidgets[i]);
+			addParam(widthWidgets[i]);
 		}
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -123,8 +129,8 @@ struct LD103 : SchemeModuleWidget {
 			LDParentMenuItem *menuItem = createMenuItem<LDParentMenuItem>("Input Range");
 			menuItem->module = module;
 			menuItem->deviceCount = deviceCount;
-			menuItem->cutoffParamIndex = LD_1<3>::PARAM_CUTOFF_1;
-			menuItem->widthParamIndex = LD_1<3>::PARAM_WIDTH_1;
+			menuItem->cutoffWidgets = cutoffWidgets;
+			menuItem->widthWidgets = widthWidgets;
 			menuItem->rightText = SUBMENU;
 			menu->addChild(menuItem);
 		}
@@ -153,6 +159,8 @@ struct LD103 : SchemeModuleWidget {
 
 struct LD106 : SchemeModuleWidget {
 	static const int deviceCount = 6;	
+	ParamWidget* cutoffWidgets[deviceCount];
+	ParamWidget* widthWidgets[deviceCount];
 	LD106(LD_1<deviceCount> *module) {
 		setModule(module);
 		this->box.size = Vec(90, 380);
@@ -164,8 +172,10 @@ struct LD106 : SchemeModuleWidget {
 
 			addOutput(createOutputCentered<BluePort>(Vec(74.5,31.5 + offset), module, LD_1<6>::OUTPUT_1 + i));
 
-			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i));
-			addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i));
+			cutoffWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(16, 59 + offset), module, LD_1<6>::PARAM_CUTOFF_1 + i);
+			widthWidgets[i] = createParamCentered<SmallKnob<LightKnob>>(Vec(74, 59 + offset), module, LD_1<6>::PARAM_WIDTH_1 + i);
+			addParam(cutoffWidgets[i]);
+			addParam(widthWidgets[i]);
 		}
 	}
 	void appendContextMenu(Menu *menu) override{
@@ -175,8 +185,8 @@ struct LD106 : SchemeModuleWidget {
 			menuItem->module = module;
 			menuItem->rightText = SUBMENU;
 			menuItem->deviceCount = deviceCount;
-			menuItem->cutoffParamIndex = LD_1<6>::PARAM_CUTOFF_1;
-			menuItem->widthParamIndex = LD_1<6>::PARAM_WIDTH_1;
+			menuItem->cutoffWidgets = cutoffWidgets;
+			menuItem->widthWidgets = widthWidgets;
 			menu->addChild(menuItem);
 		}
 		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);

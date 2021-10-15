@@ -1,5 +1,10 @@
 #include "DS.hpp"
 
+namespace SubmarineDS {
+	float globalVL = 0.0f;
+	float globalVH = 10.0f;
+}
+
 float DS_Module::midpoint() {
 	return (voltage0 * 0.5f + voltage1 * 0.5f);
 }
@@ -93,6 +98,8 @@ void DS_Module::appendContextMenu(Menu *menu) {
 void DS_MenuItem::onAction(const event::Action &e) {
 	module->voltage0 = vl;
 	module->voltage1 = vh;
+	SubmarineDS::globalVL = vl;
+	SubmarineDS::globalVH = vh;
 }
 
 void DS_MenuItem::step() {

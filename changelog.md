@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.0.0
+- 11-Oct-2021 Port shared components to v2
+- 11-Oct-2021 Port Blanking plates to v2
+- 14-Oct-2021 Port LA-108 to v2
+- 15-Oct-2021 Port AG-xxx OG-xxx NG-xxx XG-xxx LD-xxx and PG-xxx to v2
+- 15-Oct-2021 Persist DS suite voltage range between devices. When voltage is changed, new devices use the same option
+
 ## v1.1.10
 - 10-Dec-2020 Update images in manual
 - 26-Nov-2020 Add exponential response to VM-needle

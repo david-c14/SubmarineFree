@@ -1,8 +1,13 @@
 #include "../SubmarineFree.hpp"
 
+namespace SubmarineDS {
+	extern float globalVL;
+	extern float globalVH;
+}
+
 struct DS_Module : Module {
-	float voltage0 = 0.0f;
-	float voltage1 = 10.0f;
+	float voltage0 = SubmarineDS::globalVL;
+	float voltage1 = SubmarineDS::globalVH;
 	float midpoint();
 	float output(int);
 	DS_Module() {}
