@@ -284,14 +284,11 @@ namespace {
 			nvgFill(vg);
 		}
 	
-		void draw(const DrawArgs &args) override {
+		void drawLayer(const DrawArgs &args, int layer) override {
 			if (!module) {
 				drawEasterEgg(args.vg);
 				return;
 			}
-		}
-
-		void drawLayer(const DrawArgs &args, int layer) override {
 			if (layer == 1) {
 				for (int i = 0; i < 8; i++) {
 					if (module->inputs[LA_108::INPUT_1 + i].isConnected()) {
@@ -351,6 +348,7 @@ namespace {
 				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
 				nvgText(args.vg, 27, 12, measureText, NULL);
 			}
+			Widget::drawLayer(args, layer);
 		}
 	};
 
