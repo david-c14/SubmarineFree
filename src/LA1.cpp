@@ -64,10 +64,10 @@ struct LA_108 : DS_Module {
 		configSwitch(PARAM_EDGE, 0, 1, 0, "Trigger on", { "Rising Edge", "Falling Edge" });
 		configSwitch(PARAM_RUN, 0, 1, 0, "Trigger Mode", { "Continuous", "One-Shot" });
 		configSwitch(PARAM_RESET, 0, 1, 0, "Reset", { "Off", "Waiting" });
-		configParam(PARAM_TIME, -2.0f, -16.0f, -14.0f, "Time Base", " Samples", 2.0f, 65536 * 512, 0.0f);
+		configParam(PARAM_TIME, -2.0f, -16.0f, -14.0f, "Time Base", " Samples per point", 2.0f, 65536, 0.0f);
 		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left Index Position", "%", 0.0f, 100.0f, 0.0f);
 		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right Index Position", "%", 0.0f, 100.0f, 0.0f);
-		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f, "Pre-trigger Buffer Size", " Samples");
+		configParam(PARAM_PRE, 0.0f, 32.0f, 0.0f, "Pre-trigger Buffer Size", " Points");
 		configSwitch(PARAM_COLORS, 0, 1, 0, "Match cable colors", { "Off", "On" });
 		configInput(INPUT_1, "Signal 1");
 		configInput(INPUT_2, "Signal 2");

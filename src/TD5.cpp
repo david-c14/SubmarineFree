@@ -1,7 +1,6 @@
 //SubTag W10 WP AM
 
 #include "SubmarineFree.hpp"
-#include "window.hpp"
 
 namespace {
 
@@ -16,7 +15,6 @@ namespace {
 
 	struct TD5Text : OpaqueWidget {
 		TD5Data *data = NULL;
-		std::shared_ptr<Font> font;
 		std::function<void ()> addMenuHandler;
 		std::function<void (int oldPostion, int newPosition)> posHandler;
 		int oldPosition = 0;
@@ -25,10 +23,10 @@ namespace {
 				delete(data);
 		}
 		TD5Text() {
-			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			this->box.size = Vec(20, 350);
 		}
 		void draw(const DrawArgs &args) override {
+			std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			nvgFontFaceId(args.vg, font->handle);
 			nvgFontSize(args.vg, data->fontSize);
 			nvgFillColor(args.vg, data->color);
@@ -175,56 +173,6 @@ struct TD510 : SchemeModuleWidget {
 		this->box.size = Vec(150, 380);
 		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
 		addChild(schemePanel);
-	}
-
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-		TD_510 *tdModule = dynamic_cast<TD_510 *>(module);
-		if (!tdModule) return;
-		
-		for(TD5Data *data : tdModule->dataItems) {
-			TD5Text *item = new TD5Text();
-			item->data = data;
-			item->box.pos = Vec(4, 15);
-			addClickHandler(item);
-			item->box.size.x = data->fontSize = clampFontSize(data->fontSize);
-			item->box.pos.x = data->position;
-			addText(item);
-		}
-		box.size.x = tdModule->moduleSize;
-		json_t *a1 = json_object_get(rootJ, "items");
-		if (a1) {
-			int asize = json_array_size(a1);
-			for (int j = 0; j < asize; j++) {
-				json_t *i = json_array_get(a1, j);
-				if (i) {
-					TD5Data *data = new TD5Data;
-					tdModule->dataItems.push_back(data);
-					TD5Text *item = new TD5Text();
-					item->data = data;
-					item->box.pos = Vec(4, 15);
-					addClickHandler(item);
-					json_t *text = json_object_get(i, "text");
-					if (text) {
-						data->text = json_string_value(text);
-					}
-					json_t *color = json_object_get(i, "color");
-					if (color) {
-						data->color = color::fromHexString(json_string_value(color));
-					}
-					json_t *pos = json_object_get(i, "position");
-					if (pos) {
-						item->box.pos.x = data->position = json_number_value(pos);
-					}
-					json_t *align = json_object_get(i, "alignment");
-					if (align) {
-						data->alignment = json_number_value(align);
-					}
-					addText(item);
-				}
-			}
-		}
-		schemePanel->resize(this, box);
 	}
 
 	int clampPosition(int input) {
@@ -802,7 +750,7 @@ struct TD510 : SchemeModuleWidget {
 	}
 
 	TD510 *getModuleWidgetById(int moduleId) {
-		for (Widget *widget : APP->scene->rack->moduleContainer->children) {
+		for (Widget *widget : APP->scene->rack->getModuleContainer()->children) {
 			TD510 *mw = dynamic_cast<TD510 *>(widget);
 			if (mw) {
 				if (mw->module) {

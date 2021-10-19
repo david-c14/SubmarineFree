@@ -238,6 +238,41 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"TD-116",
+			"name":"TD-116",
+			"description": "TD-116 Text Display",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
+			"tags": ["VISUAL"]
+		},
+		{
+			"slug":"TD-202",
+			"name":"TD-202",
+			"description": "TD-202 Vertical Text Display",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
+			"tags": ["VISUAL"]
+		},
+		{
+			"slug":"TD-316",
+			"name":"TD-316",
+			"description": "TD-316 Text Display",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
+			"tags": ["VISUAL"]
+		},
+		{
+			"slug":"TD-410",
+			"name":"TD-410",
+			"description": "TD-410 Text Display",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
+			"tags": ["VISUAL"]
+		},
+		{
+			"slug":"TD-510",
+			"name":"TD-510",
+			"description": "TD-510 Vertical Text Display",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
+			"tags": ["VISUAL"]
+		},
+		{
 			"slug":"XG-104",
 			"name":"XG-104",
 			"description": "XG-104 XOR Gates",

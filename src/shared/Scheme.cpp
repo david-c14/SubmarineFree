@@ -140,6 +140,8 @@ void SchemePanel::resize(ModuleWidget *mw, Rect newBox) {
 	canvas->box.size = newBox.size;
 	rightHandle->box.pos.x = newBox.size.x - 10;
 	mw->setSize(newBox.size);
+	if (resizeHandler) 
+		resizeHandler();
 	dirty = true;
 }
 

@@ -254,6 +254,7 @@ struct SchemePanel : FramebufferWidget {
 	void step() override;
 	void resize(Rect newBox, Rect oldBox);
 	void resize(ModuleWidget *mw, Rect newBox);
+	std::function<void()> resizeHandler;
 };
 
 struct SchemeCanvasWidget : Widget {
@@ -289,11 +290,14 @@ struct SubText : LedDisplayTextField {
 	}
 	int getTextPosition(Vec mousePos) override; 
 	void draw(const DrawArgs &args) override;
+	void drawLayer(const DrawArgs &args, int layer) override;
+	void onChange(const ChangeEvent &e) override;
 	void appendContextMenu(Menu *menu);
 	MenuItem *createForegroundMenuItem(std::string label, NVGcolor color);
 	MenuItem *createBackgroundMenuItem(std::string label, NVGcolor color);
 	virtual void foregroundMenu(Menu *menu);
 	virtual void backgroundMenu(Menu *menu);
+	std::function<void()> changeHandler;
 };
 
 //////////////////
@@ -312,6 +316,7 @@ struct MouseTransformWidget:Widget {
 	void rotate(float angle);
 	void scale(Vec s);
 	void draw(const DrawArgs &args) override;
+	void drawLayer(const DrawArgs &args, int layer) override;
 	void onButton(const event::Button &e) override;
 	void onHover(const event::Hover &e) override;
 	void onHoverKey(const event::HoverKey &e) override;

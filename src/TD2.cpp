@@ -1,7 +1,7 @@
 //SubTag W2 WP AM
 
 #include "SubmarineFree.hpp"
-#include "window.hpp"
+
 
 struct TDVText : SubText {
 	TDVText() {
@@ -31,6 +31,7 @@ struct TDVText : SubText {
 struct TD_202 : Module {
 	NVGcolor fg;
 	NVGcolor bg;
+	bool txtDirty = false;
 	bool fgDirty = false;
 	bool bgDirty = false;
 	std::string text = "";
@@ -53,6 +54,7 @@ struct TD_202 : Module {
 		}
 	}
 	void process(const ProcessArgs &args) override {
+		/*
 		if (leftExpander.module) {
 			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
 				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
@@ -63,6 +65,7 @@ struct TD_202 : Module {
 				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
 			}
 		}
+		*/
 	}
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
@@ -76,15 +79,19 @@ struct TD_202 : Module {
 	void dataFromJson(json_t *rootJ) override {
 
 		json_t *textJ = json_object_get(rootJ, "text");
-		if (textJ)
+		if (textJ) {
 			text = json_string_value(textJ);
-		json_t *fgJ = json_object_get(rootJ, "fg");
-		if (fgJ) {
+			txtDirty = true;
+		}
+		json_t *fgJ = json_object_get(rootJ, "fg"); 
+		if (fgJ) { 
 			fg = color::fromHexString(json_string_value(fgJ));
+			fgDirty = true;
 		}
 		json_t *bgJ = json_object_get(rootJ, "bg");
 		if (bgJ) {
 			bg = color::fromHexString(json_string_value(bgJ));
+			bgDirty = true;
 		}
 	}
 
@@ -92,6 +99,12 @@ struct TD_202 : Module {
 
 struct TD202 : SchemeModuleWidget {
 	TDVText *textField;
+
+	void textChanged() {
+		TD_202 *tdm = dynamic_cast<TD_202 *>(module);
+		if (tdm) 
+			tdm->text = textField->text;
+	}
 
 	TD202(Module *module) {
 		setModule(module);
@@ -104,30 +117,8 @@ struct TD202 : SchemeModuleWidget {
 
 		textField = createWidget<TDVText>(Vec(0, -25));
 		textField->box.size = Vec(350, 30);
+		textField->changeHandler = [=]() { textChanged(); };
 		tw->addChild(textField);
-	}
-
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-		
-		TD_202 *tdModule = dynamic_cast<TD_202 *>(module);
-		if (tdModule) {
-			textField->text = tdModule->text;
-			textField->color = tdModule->fg;
-			textField->bgColor = tdModule->bg;
-		}
-
-		json_t *textJ = json_object_get(rootJ, "text");
-		if (textJ)
-			textField->text = json_string_value(textJ);
-		json_t *fgJ = json_object_get(rootJ, "fg");
-		if (fgJ) {
-			textField->color = color::fromHexString(json_string_value(fgJ));
-		}
-		json_t *bgJ = json_object_get(rootJ, "bg");
-		if (bgJ) {
-			textField->bgColor = color::fromHexString(json_string_value(bgJ));
-		}
 	}
 
 	void step() override {
@@ -151,6 +142,10 @@ struct TD202 : SchemeModuleWidget {
 			textField->bgColor = tdModule->bg;
 			tdModule->bgDirty = false;
 		}
+		if (tdModule->txtDirty) {
+			textField->text = tdModule->text;
+			tdModule->txtDirty = false;
+		}
 		tdModule->text = textField->text;
 		tdModule->fg = textField->color;
 		tdModule->bg = textField->bgColor;
@@ -164,6 +159,7 @@ struct TD202 : SchemeModuleWidget {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TD-202");
 	}
+
 };
 
 Model *modelTD202 = createModel<TD_202, TD202>("TD-202");
