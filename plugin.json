@@ -240,6 +240,7 @@
 		{
 			"slug":"TD-116",
 			"name":"TD-116",
+			"hidden":true,
 			"description": "TD-116 Text Display",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
 			"tags": ["VISUAL"]

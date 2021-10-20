@@ -25,39 +25,42 @@ namespace {
 		TD5Text() {
 			this->box.size = Vec(20, 350);
 		}
-		void draw(const DrawArgs &args) override {
-			std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
-			nvgFontFaceId(args.vg, font->handle);
-			nvgFontSize(args.vg, data->fontSize);
-			nvgFillColor(args.vg, data->color);
-			nvgSave(args.vg);
-			nvgScissor(args.vg, args.clipBox.pos.x, args.clipBox.pos.y, args.clipBox.size.x, args.clipBox.size.y);
-			int alignment = data->alignment;
-			if (data->flip) {
-				nvgTranslate(args.vg, 0, box.size.y);
-				nvgRotate(args.vg, M_PI * -0.5f);
-				if (data->alignment == 1)
-					alignment = 4;
-				else if (data->alignment == 4)
-					alignment = 1;
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+				nvgFontFaceId(args.vg, font->handle);
+				nvgFontSize(args.vg, data->fontSize);
+				nvgFillColor(args.vg, data->color);
+				nvgSave(args.vg);
+				nvgScissor(args.vg, args.clipBox.pos.x, args.clipBox.pos.y, args.clipBox.size.x, args.clipBox.size.y);
+				int alignment = data->alignment;
+				if (data->flip) {
+					nvgTranslate(args.vg, 0, box.size.y);
+					nvgRotate(args.vg, M_PI * -0.5f);
+					if (data->alignment == 1)
+						alignment = 4;
+					else if (data->alignment == 4)
+						alignment = 1;
+				}
+				else {
+					nvgTranslate(args.vg, box.size.x, 0);
+					nvgRotate(args.vg, M_PI * 0.5f);
+				}
+				if (alignment & NVG_ALIGN_LEFT) {
+					nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+					nvgText(args.vg, 0, box.size.x / 2, data->text.c_str(), NULL);
+				}
+				else if (alignment & NVG_ALIGN_RIGHT) {
+					nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
+					nvgText(args.vg, box.size.y, box.size.x / 2, data->text.c_str(), NULL);
+				}
+				else {
+					nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+					nvgText(args.vg, box.size.y / 2, box.size.x / 2, data->text.c_str(), NULL);
+				}
+				nvgRestore(args.vg);
 			}
-			else {
-				nvgTranslate(args.vg, box.size.x, 0);
-				nvgRotate(args.vg, M_PI * 0.5f);
-			}
-			if (alignment & NVG_ALIGN_LEFT) {
-				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, 0, box.size.x / 2, data->text.c_str(), NULL);
-			}
-			else if (alignment & NVG_ALIGN_RIGHT) {
-				nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.y, box.size.x / 2, data->text.c_str(), NULL);
-			}
-			else {
-				nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.y / 2, box.size.x / 2, data->text.c_str(), NULL);
-			}
-			nvgRestore(args.vg);
+			Widget::drawLayer(args, layer);
 		}
 		void onButton(const event::Button &e) override {
 			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
@@ -123,8 +126,10 @@ struct TD_510 : Module {
 	}
 	void dataFromJson(json_t *rootJ) override {
 		json_t *sizeJ = json_object_get(rootJ, "width");
-		if (sizeJ)
+		if (sizeJ) {
 			moduleSize = clamp(json_number_value(sizeJ), 75.0f, 300.0f);
+			lblDirty = true;
+		}
 		json_t *a1 = json_object_get(rootJ, "items");
 		if (a1) {
 			int asize = json_array_size(a1);
@@ -157,11 +162,13 @@ struct TD_510 : Module {
 						item->flip = json_number_value(flip);
 					}
 					dataItems.push_back(item);
+					lblDirty = true;
 				}
 			}
 		}
 	}
 	float moduleSize = 150.0f;
+	bool lblDirty = false;
 };
 
 struct TD510 : SchemeModuleWidget {
@@ -172,6 +179,7 @@ struct TD510 : SchemeModuleWidget {
 		setModule(module);
 		this->box.size = Vec(150, 380);
 		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
+		schemePanel->resizeHandler = [=]() { onResized(); };
 		addChild(schemePanel);
 	}
 
@@ -617,6 +625,7 @@ struct TD510 : SchemeModuleWidget {
 		TD5Text *newItem = new TD5Text();
 		newItem->data = newData;
 		newItem->box.size.x = fontSize;
+		newItem->box.size.y = box.size.y - 30;
 		newItem->box.pos = Vec(newData->position = position, 15);
 		addClickHandler(newItem);
 		newData->color = color;
@@ -763,10 +772,34 @@ struct TD510 : SchemeModuleWidget {
 		return NULL;
 	}
 
+	void step() override {
+		TD_510 *tdm = dynamic_cast<TD_510 *>(module);
+		if (!tdm)
+			return;
+		if (tdm->lblDirty) {
+			box.size.x = tdm->moduleSize;
+			schemePanel->resize(this, box);
+
+			for(TD5Data *data : tdm->dataItems) {
+				TD5Text *item = new TD5Text();
+				item->data = data;
+				item->box.pos = Vec(4, 15);
+				addClickHandler(item);
+				item->box.size.x = data->fontSize = clampFontSize(data->fontSize);
+				item->box.size.y = box.size.y - 30;
+				
+				item->box.pos.x = data->position;
+				addText(item);
+			}
+			tdm->lblDirty = false;
+		}
+	}
+
 	void onResize(const event::Resize &e) override {
 		ModuleWidget::onResize(e);
 		onResized();
 	}
+
 	void onResized() {
 		for (TD5Text *text : textItems) {
 			text->box.pos.x = text->data->position = clampPosition(text->data->position);
