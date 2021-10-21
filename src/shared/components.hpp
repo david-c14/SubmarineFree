@@ -19,6 +19,16 @@
 // Ports
 //////////////////
 
+struct DeprecatedPort : PortWidget {
+	DeprecatedPort() {
+		box.size.x = 0;
+		box.size.y = 0;
+	}
+	void draw(const DrawArgs &args) override {
+		Widget::draw(args);
+	}
+};
+
 struct SilverPort : PortWidget {
 	NVGcolor col = nvgRGB(0xf0, 0xf0, 0xf0);
 	SilverPort() {
@@ -36,9 +46,9 @@ struct BluePort : SilverPort {
 	BluePort() { col = SUBLIGHTBLUE; }
 };
 
-struct BlackPort : SilverPort {
-	BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
-};
+//struct BlackPort : SilverPort {
+	//BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
+//};
 
 //////////////////
 // Switches

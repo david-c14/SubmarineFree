@@ -32,7 +32,6 @@ struct TD_116 : Module {
 		}
 	}
 	void process(const ProcessArgs &args) override {
-		/*
 		if (leftExpander.module) {
 			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
 				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
@@ -43,7 +42,6 @@ struct TD_116 : Module {
 				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
 			}
 		}
-		*/
 	}
 	void sendText(std::string textValue) {
 		text = textValue;
@@ -135,8 +133,8 @@ struct TD116 : SchemeModuleWidget {
 		this->box.size = Vec(240, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		addInput(createInputCentered<BlackPort>(Vec(16.5,31.5), module, 0));
-		addOutput(createOutputCentered<BlackPort>(Vec(223.5,31.5), module, 0));	
+		addInput(createInputCentered<DeprecatedPort>(Vec(16.5,31.5), module, 0));
+		addOutput(createOutputCentered<DeprecatedPort>(Vec(223.5,31.5), module, 0));	
 
 		textField = createWidget<TD1Text>(mm2px(Vec(3.39962, 15.8373)));
 		textField->box.size = mm2px(Vec(74.480, 102.753));

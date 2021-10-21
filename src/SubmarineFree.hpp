@@ -87,9 +87,8 @@ extern Model *modelTD202;
 extern Model *modelTD316;
 extern Model *modelTD410;
 extern Model *modelTD510;
-//extern Model *modelTF101;
-//extern Model *modelTF102;
-//extern Model *modelTM105;
+extern Model *modelTF101;
+extern Model *modelTF102;
 
 //extern Model *modelVM101;
 //extern Model *modelVM102;

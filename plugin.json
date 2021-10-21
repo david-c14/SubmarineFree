@@ -274,6 +274,20 @@
 			"tags": ["VISUAL"]
 		},
 		{
+			"slug":"TF-101",
+			"name":"TF-101",
+			"description": "TF-101 Text Display Format Control",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TF.md",
+			"tags": ["VISUAL"]
+		},
+		{
+			"slug":"TF-102",
+			"name":"TF-102",
+			"description": "TF-102 Text Display Format Control",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TF.md",
+			"tags": ["VISUAL"]
+		},
+		{
 			"slug":"XG-104",
 			"name":"XG-104",
 			"description": "XG-104 XOR Gates",

@@ -1,7 +1,6 @@
 //SubTag W2 W6
 
 #include "SubmarineFree.hpp"
-#include "shared/torpedo.hpp"
 
 template<bool hasParams>
 struct TF : Module  {
@@ -41,7 +40,6 @@ struct TF : Module  {
 
 	float prevValues[7] {NAN,NAN,NAN,NAN,NAN,NAN,NAN};
 	int isDirty = false;
-	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);	
 	float messages[2][7] = {{NAN,NAN,NAN,NAN,NAN,NAN,NAN},{NAN,NAN,NAN,NAN,NAN,NAN,NAN}};
 	TF() : Module() {
 		config(hasParams * NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -54,11 +52,20 @@ struct TF : Module  {
 			configParam(PARAM_BG_BLUE, 0.0f, 1.0f, 0.0f, "Background blue", "%", 0.f, 100.f);
 			configParam(PARAM_FONT_SIZE, 6.0f, 26.0f, 12.0f, "Font size", "pts");
 		}
+		configInput(INPUT_FG_RED, "Foreground Red");
+		configInput(INPUT_FG_GREEN, "Foreground Green");
+		configInput(INPUT_FG_BLUE, "Foreground Blue");
+		configInput(INPUT_BG_RED, "Background Red");
+		configInput(INPUT_BG_GREEN, "Background Green");
+		configInput(INPUT_BG_BLUE, "Background Blue");
+		configInput(INPUT_FONT_SIZE, "Text Size");
+		configOutput(OUTPUT_TOR, "Deprecated");
+		configLight(LIGHT_FG_RED, "Foreground Colour");
+		configLight(LIGHT_BG_RED, "Background Colour");
 		prevValues[0] = 0.1569f;
 		prevValues[1] = 0.6902f;
 		prevValues[2] = 0.9529f;
 		prevValues[6] = 12.0f;
-		outPort.size(1);
 		leftExpander.producerMessage = rightExpander.producerMessage = messages[0];
 		leftExpander.consumerMessage = rightExpander.consumerMessage = messages[1];	
 	}
@@ -85,9 +92,7 @@ struct TF : Module  {
 				json_object_set_new(rootJ, "bg", json_string(encodeColor(prevValues[3], prevValues[4], prevValues[5]).c_str()));
 			if (hasParams || inputs[INPUT_FONT_SIZE].isConnected())
 				json_object_set_new(rootJ, "size", json_real(prevValues[6]));
-			outPort.send("SubmarineFree", "TDNotesColor", rootJ);
 		}
-		outPort.process();
 		float *message = (float *)(leftExpander.producerMessage);
 		if (hasParams || inputs[INPUT_FG_RED].isConnected() || inputs[INPUT_FG_GREEN].isConnected() || inputs[INPUT_FG_BLUE].isConnected()) {
 			message[0] = prevValues[0];
@@ -162,7 +167,7 @@ struct TF101 : SchemeModuleWidget {
 		addChild(createLightCentered<MediumLight<RGBLight>>(Vec(14.5, 55.5), module, TF<true>::LIGHT_FG_RED));
 		addChild(createLightCentered<MediumLight<RGBLight>>(Vec(14.5, 189.5), module, TF<true>::LIGHT_BG_RED));
 
-		addOutput(createOutputCentered<BlackPort>(Vec(73.5,31.5), module, TF<true>::OUTPUT_TOR));
+		addOutput(createOutputCentered<DeprecatedPort>(Vec(73.5,31.5), module, TF<true>::OUTPUT_TOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TF-101");
@@ -178,7 +183,6 @@ struct TF101 : SchemeModuleWidget {
 		nvgMoveTo(vg, 4, 315.5);
 		nvgLineTo(vg, 86, 315.5);
 		nvgStroke(vg);
-		drawText(vg, 59, 35, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
 		drawText(vg, 55, 57, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "FOREGROUND");
 		drawText(vg, 55, 191, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "BACKGROUND");
 		drawText(vg, 55, 325, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "TEXT-SIZE");
@@ -208,7 +212,7 @@ struct TF102 : SchemeModuleWidget {
 		addChild(createLightCentered<MediumLight<RGBLight>>(Vec(15, 71), module, TF<true>::LIGHT_FG_RED));
 		addChild(createLightCentered<MediumLight<RGBLight>>(Vec(15, 186), module, TF<true>::LIGHT_BG_RED));
 
-		addOutput(createOutputCentered<BlackPort>(Vec(15,40), module, TF<true>::OUTPUT_TOR));
+		addOutput(createOutputCentered<DeprecatedPort>(Vec(15,40), module, TF<true>::OUTPUT_TOR));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TF-102");
@@ -224,7 +228,6 @@ struct TF102 : SchemeModuleWidget {
 		nvgMoveTo(vg, 2, 285);
 		nvgLineTo(vg, 28, 285);
 		nvgStroke(vg);
-		drawText(vg, 15, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
 		drawText(vg, 15, 65, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "FORE");
 		drawText(vg, 15, 180, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "BACK");
 		drawText(vg, 15, 295, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SIZE");

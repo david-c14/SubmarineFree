@@ -21,7 +21,6 @@ struct TD_316 : Module {
 		}
 	}
 	void process(const ProcessArgs &args) override {
-		/*
 		if (leftExpander.module) {
 			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
 				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
@@ -32,7 +31,6 @@ struct TD_316 : Module {
 				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
 			}
 		}
-		*/
 	}
 	void onReset() override {
 		reset = 1;
