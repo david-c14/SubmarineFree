@@ -288,6 +288,20 @@
 			"tags": ["VISUAL"]
 		},
 		{
+			"slug":"WM-101",
+			"name":"WM-101",
+			"description":"WM-101 Wire Manager",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/WM.md",
+			"tags": ["UTILITY"]
+		},
+		{
+			"slug":"WM-102",
+			"name":"WM-102",
+			"description":"WM-102 Wire Manager Billboard",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/WM.md",
+			"tags": ["BLANK", "UTILITY"]
+		},
+		{
 			"slug":"XG-104",
 			"name":"XG-104",
 			"description": "XG-104 XOR Gates",

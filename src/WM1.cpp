@@ -627,7 +627,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	ModuleWidget *lastHover = NULL;
 	bool highlightIsDirty = true;
 
-	int cableCount = 0;
+	int64_t cableCount = 0;
 	Widget *lastCable = NULL;
 	unsigned int newColorIndex = 0;
 
@@ -1130,7 +1130,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		}
 		if (!stabilized) {
 			stabilized = true;
-			cableCount = APP->scene->rack->cableContainer->children.size();
+			cableCount = APP->scene->rack->getCableContainer()->children.size();
 		}
 		if (masterWireManager != this) {
 			if (masterWireManager) {
@@ -1142,11 +1142,12 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 			}
 			takeMasterSlot();
 		}
-		int newSize = APP->scene->rack->cableContainer->children.size();
+		int64_t newSize = APP->scene->rack->getCableContainer()->children.size();
+		
 		if (newSize < cableCount) {
 			cableCount = newSize;
 			if (cableCount) 
-				lastCable = APP->scene->rack->cableContainer->children.back();
+				lastCable = APP->scene->rack->getCableContainer()->children.back();
 			else
 				lastCable = NULL;
 		}
@@ -1158,14 +1159,14 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 				APP->history->push(complex);
 				cableCount = 0;
 			}
-			std::list<Widget *>::reverse_iterator iterator = APP->scene->rack->cableContainer->children.rbegin();
-			for (int i = 0; i < newSize - cableCount; i++) {
+			std::list<Widget *>::reverse_iterator iterator = APP->scene->rack->getCableContainer()->children.rbegin();
+			for (int64_t i = 0; i < newSize - cableCount; i++) {
 				colorCable(*iterator, complex);
 				++iterator;
 			}
 			cableCount = newSize;
 			if (cableCount)
-				lastCable = APP->scene->rack->cableContainer->children.back();
+				lastCable = APP->scene->rack->getCableContainer()->children.back();
 			else
 				lastCable = NULL;
 			highlightIsDirty = true;		
@@ -1173,7 +1174,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		if (wirePanel->visible && APP->scene->rack->incompleteCable) {
 			colorCable(APP->scene->rack->incompleteCable,NULL);
 		}
-		highlightWires();
+		//highlightWires();
 		SizeableModuleWidget::step();
 	}
 	void highlightWires() {
@@ -1191,7 +1192,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		}
 		if (highlightIsDirty) {
 			highlightIsDirty = false;
-			for (Widget *widget : APP->scene->rack->cableContainer->children) {
+			for (Widget *widget : APP->scene->rack->getCableContainer()->children) {
 				CableWidget *cable = dynamic_cast<CableWidget *>(widget);
 				if (focusedModuleWidget) {
 					if (!cable->outputPort || !cable->inputPort) {
@@ -1219,7 +1220,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	}
 	void colorCable(Widget *widget, history::ComplexAction *complex) {
 		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
-		if (cable->cable->id > -1 && !complex && redoCheck->selected && !wirePanel->visible)
+		if (cable->cable && cable->cable->id > -1 && !complex && redoCheck->selected && !wirePanel->visible)
 			return;
 		NVGcolor oldColor = cable->color;
 		if (wirePanel->visible) {
@@ -1235,7 +1236,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		if (!complex)
 			return;
 		NVGcolor newColor = cable->color;
-		int id = cable->cable->id;
+		int64_t id = cable->cable->id;
 		complex->push(
 			new EventWidgetAction("Color Cable",
 				[id, oldColor](){
@@ -1503,7 +1504,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		}
 		
 		addColor(nvgRGB(0xff, 0xae, 0xc9), "", false);
-		addColor(nvgRGB(0xb7, 0x00, 0xb5), "", false);
+		//addColor(nvgRGB(0xb7, 0x00, 0xb5), "", false);
 		addColor(nvgRGB(0x80, 0x80, 0x80), "", false);
 		addColor(nvgRGB(0xff, 0xff, 0xff), "", false);
 		addColor(nvgRGB(0x10, 0x0f, 0x12), "", false);
@@ -1816,7 +1817,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		Menu *menu = createMenu();
 		if (forcePosition) {
 			// put the name field under the mouse
-			menu->box.pos = APP->window->mousePos.minus(Vec(100, 12));
+			menu->box.pos = APP->scene->rack->getMousePos().minus(Vec(100, 12));
 		}
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
@@ -1976,7 +1977,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		// Append .vcv extension if no extension was given.
 		std::string pathStr = pathC;
-		if (string::filenameExtension(string::filename(pathStr)) == "") {
+		if (system::getExtension(system::getFilename(pathStr)) == "") {
 			pathStr += ".wmCollection";
 		}
 
@@ -2590,6 +2591,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		btn->labels = labels;
 		return btn;
 	}
+	/*
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
 		if (!module) 
@@ -2614,6 +2616,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			module->params[WM_102::PARAM_LOCKED].setValue(clamp((int)json_number_value(v1), 0, 1));
 		}
 	}
+	*/
 };
 
 Model *modelWM101 = createModel<SizeableModule, WM101>("WM-101");
