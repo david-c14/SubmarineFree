@@ -9,16 +9,17 @@ json_t *SizeableModule::dataToJson() {
 
 void SizeableModule::dataFromJson(json_t *rootJ) {
 	json_t *widthJ = json_object_get(rootJ, "width");
-	if (widthJ)
-		size = json_number_value(widthJ);
+	if (widthJ) {
+		loadedSize = json_number_value(widthJ);
+	}
 }
 
 SizeableModuleWidget::SizeableModuleWidget(SizeableModule *sm, float size) {
 	sizeableModule = sm;
+	fullSize = size;
 	if (sm) {
 		sm->size = size;
 	}
-	fullSize = size;
 	this->box.size = Vec(size, 380);
 	panel = new SchemePanel(this->box.size);
 	addChild(panel);

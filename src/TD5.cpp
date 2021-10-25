@@ -128,7 +128,6 @@ struct TD_510 : Module {
 		json_t *sizeJ = json_object_get(rootJ, "width");
 		if (sizeJ) {
 			moduleSize = clamp(json_number_value(sizeJ), 75.0f, 300.0f);
-			lblDirty = true;
 		}
 		json_t *a1 = json_object_get(rootJ, "items");
 		if (a1) {
@@ -177,7 +176,7 @@ struct TD510 : SchemeModuleWidget {
 
 	TD510(TD_510 *module) {
 		setModule(module);
-		this->box.size = Vec(150, 380);
+		this->box.size = Vec(module ? (module->moduleSize) : 150, 380);
 		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
 		schemePanel->resizeHandler = [=]() { onResized(); };
 		addChild(schemePanel);
@@ -777,8 +776,6 @@ struct TD510 : SchemeModuleWidget {
 		if (!tdm)
 			return;
 		if (tdm->lblDirty) {
-			box.size.x = tdm->moduleSize;
-			schemePanel->resize(this, box);
 
 			for(TD5Data *data : tdm->dataItems) {
 				TD5Text *item = new TD5Text();

@@ -146,6 +146,7 @@ void SchemePanel::resize(ModuleWidget *mw, Rect newBox) {
 }
 
 void SchemeCanvasWidget::draw(const DrawArgs &args) {
+
 	SchemeModuleWidget *smw = dynamic_cast<SchemeModuleWidget *>(parent->parent);
 	nvgSave(args.vg);
 	smw->render(args.vg, this);

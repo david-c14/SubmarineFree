@@ -431,6 +431,7 @@ struct EventParamField : ui::TextField {
 
 struct SizeableModule : Module {
 	float size = 0;
+	float loadedSize = 0;
 	json_t *dataToJson() override;
 	void dataFromJson(json_t *rootJ) override;
 };

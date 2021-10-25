@@ -675,7 +675,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		backPanel = new BackPanel();
 		backPanel->box.pos = Vec(10, 15);
-		backPanel->box.size = Vec(box.size.x - 20, box.size.y - 30);
+		backPanel->box.size = Vec(130, box.size.y - 30);
 		addChild(backPanel);
 		scrollWidget = new ScrollWidget();
 		scrollWidget->box.pos = Vec(0, 21);
@@ -719,7 +719,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		deleteLabel = new EventWidgetLabel();
 		deleteLabel->box.pos = Vec(15, 195);
-		deleteLabel->box.size = Vec(box.size.x - 40, 19);
+		deleteLabel->box.size = Vec(110, 19);
 		deleteConfirmPanel->addChild(deleteLabel);
 		
 		deleteOkButton = new EventWidgetButton();
@@ -755,7 +755,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		billboardPanel = new BillboardPanel();
 		billboardPanel->box.pos = Vec(0, 15);
-		billboardPanel->box.size = Vec(box.size.x, box.size.y - 30);
+		billboardPanel->box.size = Vec(150, box.size.y - 30);
 		billboardPanel->visible = false;
 		billboardPanel->drawHandler = [=](const DrawArgs &args) { 
 			this->drawBillboard(args);
@@ -789,7 +789,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		varyCheck = new EventWidgetCheckBox();
 		varyCheck->label = "Variation";
 		varyCheck->box.pos = Vec(10, 5);
-		varyCheck->box.size = Vec(box.size.x - 40, 19);
+		varyCheck->box.size = Vec(110, 19);
 		varyCheck->changeHandler = [=]() { this->varyCheckChanged(); };
 		settingsPanel->addChild(varyCheck);
 
@@ -813,7 +813,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		varyH = new EventWidgetSlider();
 		varyH->box.pos = Vec(20, 25);
-		varyH->box.size = Vec(box.size.x - 50, 19);
+		varyH->box.size = Vec(100, 19);
 		varyH->value = 0.1f;
 		varyH->textHandler = [](float value) -> std::string {
 			return string::f("%.4g%s", value * 360.0, "\xC2\xB0");
@@ -841,7 +841,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	
 		varyS = new EventWidgetSlider();
 		varyS->box.pos = Vec(20, 45);
-		varyS->box.size = Vec(box.size.x - 50, 19);
+		varyS->box.size = Vec(100, 19);
 		varyS->value = 0.1f;
 		varyS->textHandler = percentageTextHandler;
 		varyS->label = "Saturation";
@@ -867,7 +867,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	
 		varyL = new EventWidgetSlider();
 		varyL->box.pos = Vec(20, 65);
-		varyL->box.size = Vec(box.size.x - 50, 19);
+		varyL->box.size = Vec(100, 19);
 		varyL->value = 0.1f;
 		varyL->textHandler = percentageTextHandler;
 		varyL->label = "Lightness";
@@ -894,13 +894,13 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		EventWidgetLabel *highlightLabel = new EventWidgetLabel();
 		highlightLabel->label = "Highlighting";
 		highlightLabel->box.pos = Vec(10, 105);
-		highlightLabel->box.size = Vec(box.size.x - 40, 19);
+		highlightLabel->box.size = Vec(110, 19);
 		settingsPanel->addChild(highlightLabel);
 
 		highlightOff = new EventWidgetRadioButton();
 		highlightOff->label = "Off";
 		highlightOff->box.pos = Vec(10, 125);
-		highlightOff->box.size = Vec(box.size.x - 40, 19);
+		highlightOff->box.size = Vec(110, 19);
 		highlightOff->selected = true;
 		highlightOff->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_OFF);
@@ -911,7 +911,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		highlightLow = new EventWidgetRadioButton();
 		highlightLow->label = "When hovering";
 		highlightLow->box.pos = Vec(10, 145);
-		highlightLow->box.size = Vec(box.size.x - 40, 19);
+		highlightLow->box.size = Vec(110, 19);
 		highlightLow->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_LOW);
 			this->saveSettings();
@@ -921,7 +921,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		highlightOn = new EventWidgetRadioButton();
 		highlightOn->label = "Always On";
 		highlightOn->box.pos = Vec(10, 165);
-		highlightOn->box.size = Vec(box.size.x - 40, 19);
+		highlightOn->box.size = Vec(110, 19);
 		highlightOn->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_ON);
 			this->saveSettings();
@@ -930,7 +930,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		highlightSlider = new EventWidgetSlider();
 		highlightSlider->box.pos = Vec(10, 185);
-		highlightSlider->box.size = Vec(box.size.x - 40, 21);
+		highlightSlider->box.size = Vec(110, 21);
 		highlightSlider->value = 0.1f;
 		highlightSlider->textHandler = percentageTextHandler;
 		highlightSlider->label = "Opacity";
@@ -959,14 +959,14 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		redoCheck = new EventWidgetCheckBox();
 		redoCheck->label = "Redo colors?";
 		redoCheck->box.pos = Vec(10, 220);
-		redoCheck->box.size = Vec(box.size.x - 40, 19);
+		redoCheck->box.size = Vec(110, 19);
 		redoCheck->changeHandler = [=]() { this->redoCheckChanged(); };
 		settingsPanel->addChild(redoCheck);
 
 		billboard3d = new EventWidgetCheckBox();
 		billboard3d->label = "3D billboard?";
 		billboard3d->box.pos = Vec(10, 255);
-		billboard3d->box.size = Vec(box.size.x - 40, 19);
+		billboard3d->box.size = Vec(110, 19);
 		billboard3d->selected = 1;
 		billboard3d->changeHandler = [=]() { this->billboard3dChanged(); };
 		settingsPanel->addChild(billboard3d);
@@ -1005,11 +1005,23 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		blockingButton->clickHandler = [=]() { this->takeMasterSlot(); };
 		blockingPanel->addChild(blockingButton);
 
-		if (!module)
+		if (module) {
+			setInitialSize(module);
+		}
+		else {
 			loadSettings();
+		}
 	}
 	~WM101() {
 		this->_delete();
+	}
+	void setInitialSize(SizeableModule *module) {
+		if (module->loadedSize == 0)
+			return;
+		if (module->loadedSize == module->size)
+			return;
+		module->size = module->loadedSize;
+		Minimize(module->size < 16.0f);
 	}
 	void onHoverKey(const event::HoverKey &e) override {
 		ModuleWidget::onHoverKey(e);
@@ -1128,6 +1140,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		if (!module) {
 			return;
 		}
+	
 		if (!stabilized) {
 			stabilized = true;
 			cableCount = APP->scene->rack->getCableContainer()->children.size();
@@ -1174,7 +1187,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		if (wirePanel->visible && APP->scene->rack->incompleteCable) {
 			colorCable(APP->scene->rack->incompleteCable,NULL);
 		}
-		//highlightWires();
+		highlightWires();
 		SizeableModuleWidget::step();
 	}
 	void highlightWires() {
@@ -1504,7 +1517,6 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		}
 		
 		addColor(nvgRGB(0xff, 0xae, 0xc9), "", false);
-		//addColor(nvgRGB(0xb7, 0x00, 0xb5), "", false);
 		addColor(nvgRGB(0x80, 0x80, 0x80), "", false);
 		addColor(nvgRGB(0xff, 0xff, 0xff), "", false);
 		addColor(nvgRGB(0x10, 0x0f, 0x12), "", false);
