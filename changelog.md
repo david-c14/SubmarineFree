@@ -8,6 +8,8 @@
 - 15-Oct-2021 Persist DS suite voltage range between devices. When voltage is changed, new devices use the same option
 - 15-Oct-2021 Port BB-xxx DN-xxx FF-xxx OA-xxx to v2
 - 25-Oct-2021 Port Text devices and Wiremanager
+- 26-Oct-2021 Port HS-101 and EO-102 to v2
+- 26-Oct-2021 Port EN-104 PO-101 PO-102 PO-202 and SN-101 to v2
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual

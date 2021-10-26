@@ -25,7 +25,7 @@ void init(rack::Plugin *p) {
 	//p->addModel(modelDO110);
 	//p->addModel(modelDO115);
 	//p->addModel(modelDO120);
-	//p->addModel(modelEN104);
+	p->addModel(modelEN104);
 	p->addModel(modelEO102);
 	p->addModel(modelFF110);
 	p->addModel(modelFF120);
@@ -47,11 +47,11 @@ void init(rack::Plugin *p) {
 	p->addModel(modelOG202);
 	p->addModel(modelPG104);
 	p->addModel(modelPG112);
-	//p->addModel(modelPO101);
-	//p->addModel(modelPO102);
-	//p->addModel(modelPO204);
+	p->addModel(modelPO101);
+	p->addModel(modelPO102);
+	p->addModel(modelPO204);
 
-	//p->addModel(modelSN101);
+	p->addModel(modelSN101);
 
 	//p->addModel(modelSS112);
 	//p->addModel(modelSS208);

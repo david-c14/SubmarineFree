@@ -109,14 +109,17 @@ struct SN_1 : Module {
 
 	SN_1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_FREQ, -54.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
+		configParam(PARAM_FREQ, -126.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
 		configParam(PARAM_EVOL, 0.0f, 1.0f, 0.0f, "Evolution");
 		configParam(PARAM_LENGTH, 2.0f, maxGridWidth, effectiveGridWidth, "Cycle Length");
-		configParam(PARAM_HARM_2, 0.0f, 1.0f, 0.0f, "2x Harmonic");
-		configParam(PARAM_HARM_3, 0.0f, 1.0f, 0.0f, "3x Harmonic");
-		configParam(PARAM_HARM_4, 0.0f, 1.0f, 0.0f, "4x Harmonic");
-		configParam(PARAM_HARM_5, 0.0f, 1.0f, 0.0f, "5x Harmonic");
-		configParam(PARAM_HARM_8, 0.0f, 1.0f, 0.0f, "8x Harmonic");
+		configSwitch(PARAM_HARM_2, 0.0f, 1.0f, 0.0f, "2x Harmonic", { "Off", "On" });
+		configSwitch(PARAM_HARM_3, 0.0f, 1.0f, 0.0f, "3x Harmonic", { "Off", "On" });
+		configSwitch(PARAM_HARM_4, 0.0f, 1.0f, 0.0f, "4x Harmonic", { "Off", "On" });
+		configSwitch(PARAM_HARM_5, 0.0f, 1.0f, 0.0f, "5x Harmonic", { "Off", "On" });
+		configSwitch(PARAM_HARM_8, 0.0f, 1.0f, 0.0f, "8x Harmonic", { "Off", "On" });
+		configInput(INPUT_FREQ, "Frequency");
+		configInput(INPUT_EVOL, "Evolution");
+		configOutput(OUTPUT_1, "Signal");
 		initLFSR(lfsr);
 		initGridRow();
 		shiftGridRows();
@@ -291,7 +294,7 @@ struct SN101 : SchemeModuleWidget {
 	}
 	void step() override {
 		if (module) {
-			lengthKnob->color = (APP->engine->getParam(module, SN_1::PARAM_LENGTH) == dynamic_cast<SN_1 *>(module)->effectiveGridWidth)?SUBLIGHTBLUE:SUBLIGHTRED;
+			lengthKnob->color = (lengthKnob->getParamQuantity()->getValue() == dynamic_cast<SN_1 *>(module)->effectiveGridWidth)?SUBLIGHTBLUE:SUBLIGHTRED;
 		}	
 		SchemeModuleWidget::step();
 	}

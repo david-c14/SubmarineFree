@@ -119,6 +119,13 @@
 			"tags": ["DIGITAL", "NOISE", "MULTIPLE"]
 		},
 		{
+			"slug":"EN-104",
+			"name":"EN-104",
+			"description": "EN-104 Quad ADSR Enveloper Generator",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/EN.md",
+			"tags": ["ENVELOPE GENERATOR", "VCA", "MULTIPLE"]
+		},
+		{
 			"slug":"EO-102",
 			"name":"EO-102",
 			"description": "EO-102 Envelope Oscilloscope",
@@ -250,6 +257,34 @@
 			"description": "PG-112 Pulse Generators",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/PG.md",
 			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"PO-101",
+			"name":"PO-101",
+			"description": "PO-101 Phased VCO",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/PO.md",
+			"tags": ["OSCILLATOR", "MULTIPLE", "DIGITAL"]
+		},
+		{
+			"slug":"PO-102",
+			"name":"PO-102",
+			"description": "PO-102 Phased LFO",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/PO.md",
+			"tags": ["OSCILLATOR", "MULTIPLE", "DIGITAL"]
+		},
+		{
+			"slug":"PO-204",
+			"name":"PO-204",
+			"description": "PO-204 Phase Modulation Engine",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/PO.md",
+			"tags": ["OSCILLATOR", "QUAD", "DIGITAL"]
+		},
+		{
+			"slug":"SN-101",
+			"name":"SN-101",
+			"description": "SN-101 Smooth Noise Generator",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/SN.md",
+			"tags": ["OSCILLATOR", "NOISE"]
 		},
 		{
 			"slug":"TD-116",

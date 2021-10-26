@@ -39,12 +39,25 @@ struct EN_104 : Module {
 () : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for(unsigned int i = 0; i < 4; i++) {
-			configParam(PARAM_A1 + i, 0.0f, 1.0f, 0.25f, string::f("Operator #%d Attack Rack", i + 1), " ms", 10000.0f, 1.0f);
+			configParam(PARAM_A1 + i, 0.0f, 1.0f, 0.25f, string::f("Operator #%d Attack Rate", i + 1), " ms", 10000.0f, 1.0f);
 			configParam(PARAM_D1 + i, 0.0f, 1.0f, 0.25f, string::f("Operator #%d Decay Rate", i + 1), " ms", 10000.0f, 1.0f);
 			configParam(PARAM_S1 + i, 0.0f, 1.0f, 0.8f, string::f("Operator #%d Sustain Level", i + 1), "%", 0.0f, 100.0f);
 			configParam(PARAM_R1 + i, 0.0f, 1.0f, 0.25f, string::f("Operator #%d Release Rate", i + 1), " ms", 10000.0f, 1.0f);
 			configParam(PARAM_T1 + i, 0.0f, 1.0f, 1.0f, string::f("Operator #%d Total Level", i + 1), "%", 0.0f, 100.0f);
+			configInput(INPUT_1 + i, string::f("Operator #%d", i + 1));
+			configInput(INPUT_A1 + i, string::f("Operator #%d Attack Rate", i + 1));
+			configInput(INPUT_D1 + i, string::f("Operator #%d Decay Rate", i + 1));
+			configInput(INPUT_S1 + i, string::f("Operator #%d Sustain Level", i + 1));
+			configInput(INPUT_R1 + i, string::f("Operator #%d Release Rate", i + 1));
+			configInput(INPUT_T1 + i, string::f("Operator #%d Total Level", i + 1));
+			configOutput(OUTPUT_1 + i, string::f("Operator #%d", i + 1));
+			configLight(LIGHT_A1 + i, string::f("Operator #%d Attack Phase", i + 1));
+			configLight(LIGHT_D1 + i, string::f("Operator #%d Decay Phase", i + 1));
+			configLight(LIGHT_S1 + i, string::f("Operator #%d Sustain Phase", i + 1));
+			configLight(LIGHT_R1 + i, string::f("Operator #%d Release Phase", i + 1));
 		}
+		configInput(INPUT_TRIGGER, "Trigger");
+		configInput(INPUT_GATE, "Gate");
 		
 	}
 	dsp::SchmittTrigger trigger;
@@ -94,6 +107,9 @@ void EN_104::getParams(const ProcessArgs &args) {
 
 void EN_104::process(const ProcessArgs &args) {
 	alignas(16) float v[4];
+	alignas(16) float p[4];
+	int baseLight;
+	int otherLight;
 	if (!skipParams++) {
 		getParams(args);
 	}
@@ -117,6 +133,9 @@ void EN_104::process(const ProcessArgs &args) {
 		level = _mm_min_ps(level, _mm_set_ps1(1.0f));
 		level = _mm_max_ps(level, _mm_andnot_ps(phase, minGate));
 		_mm_store_ps(v, _mm_mul_ps(_mm_mul_ps(level, total), voltage));
+		_mm_store_ps(p, phase);
+		baseLight = LIGHT_A1;
+		otherLight = LIGHT_D1;
 	}
 	else {
 		phase = _mm_or_ps(phase, _mm_castsi128_ps(_mm_set1_epi8(triggered * 255)));
@@ -126,9 +145,16 @@ void EN_104::process(const ProcessArgs &args) {
 		level = _mm_min_ps(level, _mm_set_ps1(1.0f));
 		level = _mm_max_ps(level, _mm_set_ps1(0.0f));
 		_mm_store_ps(v, _mm_mul_ps(_mm_mul_ps(level, total), voltage));
+		_mm_store_ps(p, phase);
+		baseLight = LIGHT_D1;
+		otherLight = LIGHT_A1;
 	}
 	for (int i = 0; i < 4; i++) {
 		outputs[OUTPUT_1 + i].setVoltage(v[i]);
+		lights[baseLight + i].setBrightness(p[i] != 0);
+		lights[baseLight + i + 8].setBrightness((p[i] == 0) && (v[i] != 0));
+		lights[otherLight + i].setBrightness(0);
+		lights[otherLight + i + 8].setBrightness(0);
 	}
 }
 
@@ -153,10 +179,10 @@ struct EN104 : SchemeModuleWidget {
 			addInput(createInputCentered<SilverPort>(Vec(75, 137 + 70 * i), module, EN_104::INPUT_S1 + i));
 			addInput(createInputCentered<SilverPort>(Vec(105, 137 + 70 * i), module, EN_104::INPUT_R1 + i));
 			addInput(createInputCentered<SilverPort>(Vec(135, 137 + 70 * i), module, EN_104::INPUT_T1 + i));
-			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(23, 80 + 70 * i), module, EN_104::LIGHT_A1 + i));
-			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(53, 80 + 70 * i), module, EN_104::LIGHT_D1 + i));
-			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(83, 80 + 70 * i), module, EN_104::LIGHT_S1 + i));
-			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(113, 80 + 70 * i), module, EN_104::LIGHT_R1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(23, 150 + 70 * i), module, EN_104::LIGHT_A1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(53, 150 + 70 * i), module, EN_104::LIGHT_D1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(83, 150 + 70 * i), module, EN_104::LIGHT_S1 + i));
+			addChild(createLightCentered<TinyLight<BlueLight>>(Vec(113, 150 + 70 * i), module, EN_104::LIGHT_R1 + i));
 		}
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {

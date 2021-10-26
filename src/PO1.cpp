@@ -52,11 +52,36 @@ struct PO_101 : Module {
 	PO_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_FINE, -1.0f, +1.0f, 0.0f, "Fine frequency");
-		configParam(PARAM_WAVE, 0.0f, +4.0f, 0.0f, "Wave shape");
+		configSwitch(PARAM_WAVE, 0.0f, +4.0f, 0.0f, "Wave shape", { "Sine", "Triangle", "Sawtooth", "Square", "Rectified Sine" });
 		for (unsigned int i = 0; i < 4; i++) {
-			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f, "Phase shift", "\xc2\xb0", 0.f, 360.f);
+			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f, string::f("Phase shift #%d", i + 1), "\xc2\xb0", 0.f, 360.f);
 		}
 		configParam(PARAM_TUNE, -54.0f, +54.0f, 0.0f, "Frequency", " Hz", dsp::FREQ_SEMITONE, dsp::FREQ_C4);
+		configInput(INPUT_NOTE_CV, "CV");
+		configInput(INPUT_PHASE_1, "Phase shift #1");
+		configInput(INPUT_PHASE_2, "Phase shift #2");
+		configInput(INPUT_PHASE_3, "Phase shift #3");
+		configInput(INPUT_PHASE_4, "Phase shift #4");
+		configOutput(OUTPUT_1, "0\xc2\xb0");
+		configOutput(OUTPUT_2, "30\xc2\xb0");
+		configOutput(OUTPUT_3, "45\xc2\xb0");
+		configOutput(OUTPUT_4, "60\xc2\xb0");
+		configOutput(OUTPUT_5, "90\xc2\xb0");
+		configOutput(OUTPUT_6, "120\xc2\xb0");
+		configOutput(OUTPUT_7, "135\xc2\xb0");
+		configOutput(OUTPUT_8, "150\xc2\xb0");
+		configOutput(OUTPUT_9, "180\xc2\xb0");
+		configOutput(OUTPUT_10, "210\xc2\xb0");
+		configOutput(OUTPUT_11, "225\xc2\xb0");
+		configOutput(OUTPUT_12, "240\xc2\xb0");
+		configOutput(OUTPUT_13, "270\xc2\xb0");
+		configOutput(OUTPUT_14, "300\xc2\xb0");
+		configOutput(OUTPUT_15, "315\xc2\xb0");
+		configOutput(OUTPUT_16, "330\xc2\xb0");
+		configOutput(OUTPUT_17, "Custom #1");
+		configOutput(OUTPUT_18, "Custom #2");
+		configOutput(OUTPUT_19, "Custom #3");
+		configOutput(OUTPUT_20, "Custom #4");
 	}
 	void process(const ProcessArgs &args) override;
 	float phase = 0.0f;

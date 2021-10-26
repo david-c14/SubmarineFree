@@ -37,7 +37,7 @@ extern Model *modelDN112;
 //extern Model *modelDO115;
 //extern Model *modelDO120;
 
-//extern Model *modelEN104;
+extern Model *modelEN104;
 extern Model *modelEO102;
 
 extern Model *modelFF110;
@@ -70,11 +70,11 @@ extern Model *modelOG202;
 extern Model *modelPG104;
 extern Model *modelPG112;
 
-//extern Model *modelPO101;
-//extern Model *modelPO102;
-//extern Model *modelPO204;
+extern Model *modelPO101;
+extern Model *modelPO102;
+extern Model *modelPO204;
 
-//extern Model *modelSN101;
+extern Model *modelSN101;
 
 //extern Model *modelSS112;
 //extern Model *modelSS208;
