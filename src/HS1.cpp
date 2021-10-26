@@ -46,12 +46,16 @@ struct HS_101 : Module {
 	HS_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_TIME, -10.0f, 6.0f, -4.0f, "Time base", "s", 2.0f);
-		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f, "Run");
+		configSwitch(PARAM_RUN, 0, 1, 1, "Run", { "Stopped", "Running" });
 		configParam(PARAM_X_PAN, 0.0f, 1.0f, 0.5f, "X Pan", "%", 0.0f, 100.0f);
 		configParam(PARAM_X_SCALE, 0.0f, +18.0f, 0.0f, "X Zoom", "x", 2.0f);
 		configParam(PARAM_Y_PAN, 0.0f, 1.0f, 0.5f, "Y Pan", "%", 0.0f, 100.0f);
 		configParam(PARAM_Y_SCALE, 0.0f, +20.0f, 0.0f, "Y Zoom", "x", 2.0f);
-		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
+		configSwitch(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors", { "Off", "On" });
+		configInput(INPUT_1, "Signal");
+		configInput(INPUT_TRIGGER, "Trigger");
+		configOutput(OUTPUT_TRIGGER, "Trigger");
+		configLight(LIGHT_STORING, "Storing");
 	}
 
 	~HS_101() {
@@ -153,7 +157,8 @@ struct HS_101 : Module {
 	
 namespace {
 
-	struct HS_DisplayLight : LightWidget {
+	struct HS_Display : OpaqueWidget {
+		ui::Tooltip *tooltip = NULL;
 		HS_101 *module;
 		PortWidget *port;
 		int minX, maxX;
@@ -161,20 +166,23 @@ namespace {
 		float minY, maxY;
 		int mipEntry = -1;
 
-		void draw(const DrawArgs &args) override {
-			if (!module) {
-				drawEasterEgg(args.vg);
-				return;
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				if (!module) {
+					drawEasterEgg(args.vg);
+					return;
+				}
+				if (!module->dataCaptured) {
+					return;
+				}
+				NVGcolor col = SUBLIGHTBLUETRANS;
+				if (module->params[HS_101::PARAM_COLORS].getValue()) {
+					col = APP->scene->rack->getTopCable(port)->color;
+					col.a = 1.0f;
+				}
+				drawTrace(args.vg, col, module->buffer, module->bufferCount);
 			}
-			if (!module->dataCaptured) {
-				return;
-			}
-			NVGcolor col = SUBLIGHTBLUETRANS;
-			if (module->params[HS_101::PARAM_COLORS].getValue()) {
-				col = APP->scene->rack->getTopCable(port)->color;
-				col.a = 1.0f;
-			}
-			drawTrace(args.vg, col, module->buffer, module->bufferCount);
+			Widget::drawLayer(args, layer);
 		}
 		void drawTrace(NVGcontext *vg, NVGcolor col, float *values, int bufferSize) {
 			
@@ -265,12 +273,6 @@ namespace {
 			nvgStrokeColor(vg, SUBLIGHTBLUETRANS);
 			nvgStroke(vg);
 		}
-	};
-
-	struct HS_Display : OpaqueWidget {
-		HS_DisplayLight *light;
-		ui::Tooltip *tooltip = NULL;
-
 		void setTooltip(ui::Tooltip *tooltip) {
 			if (this->tooltip) {
 				this->tooltip->requestDelete();
@@ -282,9 +284,9 @@ namespace {
 			}
 		}
 		void onEnter(const event::Enter& e) override {
-			if (light->module) {
+			if (module) {
 				std::string text;
-				text = light->module->dataCaptured?"":"No Data";
+				text = module->dataCaptured?"":"No Data";
 				ui::Tooltip *tooltip = new ui::Tooltip;
 				tooltip->text = text;
 				setTooltip(tooltip);
@@ -311,22 +313,22 @@ namespace {
 			return string::f("%6.3f", input);
 		}
 		void onHover(const event::Hover& e) override {
-			if (light->module) {
-				if (light->module->dataCaptured) {
+			if (module) {
+				if (module->dataCaptured) {
 					if (tooltip) {
-						float voltage = rescale(e.pos.y, box.size.y - 2, 2, light->minY, light->maxY);
-						int sample = rescale(e.pos.x, 0, box.size.x, light->originalMinX, light->originalMaxX);
-						float time = rescale(sample, 0, light->module->bufferCount, 0, light->module->time); 
-						int mipSample = rescale(e.pos.x, 0, box.size.x, light->minX, light->maxX);
+						float voltage = rescale(e.pos.y, box.size.y - 2, 2, minY, maxY);
+						int sample = rescale(e.pos.x, 0, box.size.x, originalMinX, originalMaxX);
+						float time = rescale(sample, 0, module->bufferCount, 0, module->time); 
+						int mipSample = rescale(e.pos.x, 0, box.size.x, minX, maxX);
 						
 						std::string text;
-						if (light->mipEntry == -1) {
-							float voltageAtSample = light->module->buffer[sample];
+						if (mipEntry == -1) {
+							float voltageAtSample = module->buffer[sample];
 							text = "Sampled Voltage: " + scale(voltageAtSample) + "V";
 						}
 						else {
-							float minVoltage = light->module->mipEntries[light->mipEntry][mipSample * 2];
-							float maxVoltage = light->module->mipEntries[light->mipEntry][mipSample * 2 + 1];
+							float minVoltage = module->mipEntries[mipEntry][mipSample * 2];
+							float maxVoltage = module->mipEntries[mipEntry][mipSample * 2 + 1];
 							text = "Signal Voltage: " + scale(minVoltage) + "V - " + scale(maxVoltage) + "V";
 						}
 						text = "Voltage: " + scale(voltage) + "V\n" +
@@ -348,44 +350,47 @@ namespace {
 		}
 	};
 
-	struct HS_Info : LightWidget {
+	struct HS_Info : Widget {
 		HS_101 *module;
 		HS_Display *display;
-		void draw(const DrawArgs &args) override {
-			nvgFontSize(args.vg, 12);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
-			if (!module) {
-				nvgFontSize(args.vg, 18);
-				nvgText(args.vg, 2, 12, "Submarine", NULL);
-				nvgText(args.vg, 2, 24, "High Resolution", NULL);
-				nvgText(args.vg, 2, 36, "Storage Scope", NULL);
-				return;
-			}
-			
-			if (module->running) {
-				int percentage = (100 * module->bufferIndex) / module->bufferCount;
-				nvgText(args.vg, 2, 12, string::f("Storing %d%%", percentage).c_str(), NULL);
-			}
-			else {
-				if (module->dataCaptured) {
-					nvgText(args.vg, 2, 12, "Stored", NULL);
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				nvgFontSize(args.vg, 12);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE);
+				if (!module) {
+					nvgFontSize(args.vg, 18);
+					nvgText(args.vg, 2, 12, "Submarine", NULL);
+					nvgText(args.vg, 2, 24, "High Resolution", NULL);
+					nvgText(args.vg, 2, 36, "Storage Scope", NULL);
+					return;
+				}
+				
+				if (module->running) {
+					int percentage = (100 * module->bufferIndex) / module->bufferCount;
+					nvgText(args.vg, 2, 12, string::f("Storing %d%%", percentage).c_str(), NULL);
 				}
 				else {
-					nvgText(args.vg, 2, 12, "No Data", NULL);
+					if (module->dataCaptured) {
+						nvgText(args.vg, 2, 12, "Stored", NULL);
+					}
+					else {
+						nvgText(args.vg, 2, 12, "No Data", NULL);
+					}
 				}
+				nvgText(args.vg, 2, 24, string::f("%.3fs", module->time).c_str(), NULL);
+				if (std::isfinite(module->minValue)) 
+					nvgText(args.vg, 2, 36, string::f("min %.3fV", module->minValue).c_str(), NULL);
+				nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE);
+				if (display->mipEntry > -1) {
+					nvgText(args.vg, box.size.x -2, 12, string::f("Mipped %dx", 4 << (2 * display->mipEntry)).c_str(), NULL);
+				}
+				nvgText(args.vg, box.size.x - 2, 24, string::f("%.3fMb", module->bufferSize / 1000000.0f).c_str(), NULL);
+				if (std::isfinite(module->maxValue))
+					nvgText(args.vg, box.size.x - 2, 36, string::f("max %.3fV", module->maxValue).c_str(), NULL);
 			}
-			nvgText(args.vg, 2, 24, string::f("%.3fs", module->time).c_str(), NULL);
-			if (std::isfinite(module->minValue)) 
-				nvgText(args.vg, 2, 36, string::f("min %.3fV", module->minValue).c_str(), NULL);
-			nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE);
-			if (display->light->mipEntry > -1) {
-				nvgText(args.vg, box.size.x -2, 12, string::f("Mipped %dx", 4 << (2 * display->light->mipEntry)).c_str(), NULL);
-			}
-			nvgText(args.vg, box.size.x - 2, 24, string::f("%.3fMb", module->bufferSize / 1000000.0f).c_str(), NULL);
-			if (std::isfinite(module->maxValue))
-				nvgText(args.vg, box.size.x - 2, 36, string::f("max %.3fV", module->maxValue).c_str(), NULL);
+			Widget::drawLayer(args, layer);
 		}
 	};
 
@@ -398,17 +403,11 @@ struct HS101 : SchemeModuleWidget {
 		this->box.size = Vec(450, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		HS_DisplayLight *light = new HS_DisplayLight();
-		light->module = module;
-		light->box.pos = Vec(2.5, 14);
-		light->box.size = Vec(445, 310);
-
 		HS_Display *display = new HS_Display();
-		display->light = light;
+		display->module = module;
 		display->box.pos = Vec(2.5, 14);
 		display->box.size = Vec(445, 310);
 		addChild(display);
-		addChild(light);
 
 		HS_Info *info = new HS_Info();
 		info->module = module;
@@ -419,7 +418,7 @@ struct HS101 : SchemeModuleWidget {
 
 		PortWidget *port = createInputCentered<SilverPort>(Vec(17, 341), module, HS_101::INPUT_1);
 		addInput(port);
-		light->port = port;
+		display->port = port;
 
 		addInput(createInputCentered<SilverPort>(Vec(47, 341), module, HS_101::INPUT_TRIGGER));
 		addOutput(createOutputCentered<SilverPort>(Vec(72, 341), module, HS_101::OUTPUT_TRIGGER));

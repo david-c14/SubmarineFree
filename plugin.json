@@ -119,6 +119,13 @@
 			"tags": ["DIGITAL", "NOISE", "MULTIPLE"]
 		},
 		{
+			"slug":"EO-102",
+			"name":"EO-102",
+			"description": "EO-102 Envelope Oscilloscope",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/EO.md",
+			"tags": ["VISUAL"]
+		},
+		{
 			"slug":"FF-110",
 			"name":"FF-110",
 			"description": "FF-110 10-Stage Flip-Flop Counter",
@@ -145,6 +152,13 @@
 			"description": "FF-212 Edge Triggered Flip-Flops",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/FF.md",
 			"tags": ["LOGIC", "MULTIPLE"]
+		},
+		{
+			"slug":"HS-101",
+			"name":"HS-101",
+			"description": "HS-101 Hi-Res Storage Oscilloscope",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/HS.md",
+			"tags": ["VISUAL"]
 		},
 		{
 			"slug":"LA-108",

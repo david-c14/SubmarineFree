@@ -38,14 +38,14 @@ extern Model *modelDN112;
 //extern Model *modelDO120;
 
 //extern Model *modelEN104;
-//extern Model *modelEO102;
+extern Model *modelEO102;
 
 extern Model *modelFF110;
 extern Model *modelFF120;
 extern Model *modelFF206;
 extern Model *modelFF212;
 
-//extern Model *modelHS101;
+extern Model *modelHS101;
 
 extern Model *modelLA108;
 

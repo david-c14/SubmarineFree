@@ -58,19 +58,22 @@ struct EO_102 : Module {
 	EO_102() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < 2; i++) {
-			configParam(PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f, string::f("Channel %c display mode", 'A' + (unsigned char)i));
+			configSwitch(PARAM_MODE_1 + i, 0.0f, 1.0f, 0.0f, string::f("Channel %c display mode", 'A' + (unsigned char)i), { "Signal", "Envelope" });
 			configParam(PARAM_OFFSET_1 + i, -10.0f, 10.0f, 0.0f, string::f("Channel %c offset", 'A' + (unsigned char)i));
 			configParam(PARAM_SCALE_1 + i, -5.0f, 5.0f, 0.0f, string::f("Channel %c scale", 'A' + (unsigned char)i));
+			configInput(INPUT_1 + i, string::f("Channel %c signal", 'A' + (unsigned char)i));
 		}
 		configParam(PARAM_TIME, -6.0f, -16.0f, -14.0f, "Time base");
 		configParam(PARAM_PRE, 0.0f, 1.0f * PRE_SIZE, 0.0f, "Pre-trigger buffer size");
 		configParam(PARAM_TRIGGER, -10.0f, 10.0f, 0.0f, "Trigger level");
-		configParam(PARAM_RUNMODE, 0.0f, 1.0f, 0.0f, "One-shot mode");
-		configParam(PARAM_RUN, 0.0f, 1.0f, 1.0f, "Run");
+		configSwitch(PARAM_RUNMODE, 0.0f, 1.0f, 0.0f, "One-shot mode", { "Continuous", "One-Shot" });
+		configSwitch(PARAM_RUN, 0.0f, 1.0f, 1.0f, "Run", { "Stopped", "Running" });
 		configParam(PARAM_INDEX_1, 0.0f, 1.0f, 0.0f, "Left index position");
 		configParam(PARAM_INDEX_2, 0.0f, 1.0f, 1.0f, "Right index position");
 		configParam(PARAM_INDEX_3, 0.0f, 1.0f, 0.2f, "Horizontal index position");
-		configParam(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors");
+		configSwitch(PARAM_COLORS, 0.0f, 1.0f, 0.0f, "Match cable colors", { "Off", "On" });
+		configInput(INPUT_EXT, "External Trigger");
+		configLight(LIGHT_TRIGGER, "Trigger");
 	}
 
 	void startFrame() {
@@ -180,7 +183,7 @@ struct EO_102 : Module {
 	
 namespace {
 
-	struct EO_Display : LightWidget {
+	struct EO_Display : Widget {
 		EO_102 *module;
 		PortWidget *ports[2];
 	
@@ -315,35 +318,38 @@ namespace {
 			nvgStroke(vg);
 		}
 	
-		void draw(const DrawArgs &args) override {
-			if (!module) {
-				drawEasterEgg(args.vg);
-				return;
-			}
-			NVGcolor col = SUBLIGHTBLUETRANS;
-			for (int i = 0; i < 2; i++) {
-				if (module->inputs[EO_102::INPUT_1 + i].isConnected()) {
-					if (module->params[EO_102::PARAM_COLORS].getValue()) {
-						col = APP->scene->rack->getTopCable(ports[i])->color;
-						col.a = 1.0f;
-					}
-					drawTrace(args.vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].getValue(), module->params[EO_102::PARAM_SCALE_1 + i].getValue(), col, module->traceMode[i]); 
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				if (!module) {
+					drawEasterEgg(args.vg);
+					return;
 				}
-				col = SUBLIGHTREDTRANS;
+				NVGcolor col = SUBLIGHTBLUETRANS;
+				for (int i = 0; i < 2; i++) {
+					if (module->inputs[EO_102::INPUT_1 + i].isConnected()) {
+						if (module->params[EO_102::PARAM_COLORS].getValue()) {
+							col = APP->scene->rack->getTopCable(ports[i])->color;
+							col.a = 1.0f;
+						}
+						drawTrace(args.vg, module->buffer[i], module->params[EO_102::PARAM_OFFSET_1 + i].getValue(), module->params[EO_102::PARAM_SCALE_1 + i].getValue(), col, module->traceMode[i]); 
+					}
+					col = SUBLIGHTREDTRANS;
+				}
+				drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
+				drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
+				drawIndexV(args.vg, clamp(module->params[EO_102::PARAM_INDEX_3].getValue(), 0.0f, 1.0f));
+				if (module->inputs[EO_102::INPUT_EXT].isConnected())
+					drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].getValue(), 0.0f, 1.0f);
+				else
+					drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].getValue(), module->params[EO_102::PARAM_OFFSET_1].getValue(), module->params[EO_102::PARAM_SCALE_1].getValue());
+				drawMask(args.vg, clamp(module->params[EO_102::PARAM_PRE].getValue(), 0.0f, 1.0f * PRE_SIZE) / BUFFER_SIZE);
+				drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
 			}
-			drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_1].getValue(), 0.0f, 1.0f));
-			drawIndex(args.vg, clamp(module->params[EO_102::PARAM_INDEX_2].getValue(), 0.0f, 1.0f));
-			drawIndexV(args.vg, clamp(module->params[EO_102::PARAM_INDEX_3].getValue(), 0.0f, 1.0f));
-			if (module->inputs[EO_102::INPUT_EXT].isConnected())
-				drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].getValue(), 0.0f, 1.0f);
-			else
-				drawTrigger(args.vg, module->params[EO_102::PARAM_TRIGGER].getValue(), module->params[EO_102::PARAM_OFFSET_1].getValue(), module->params[EO_102::PARAM_SCALE_1].getValue());
-			drawMask(args.vg, clamp(module->params[EO_102::PARAM_PRE].getValue(), 0.0f, 1.0f * PRE_SIZE) / BUFFER_SIZE);
-			drawPre(args.vg, 1.0f * module->preCount / BUFFER_SIZE);
+			Widget::drawLayer(args, layer);
 		}
 	};
 	
-	struct EO_Measure : LightWidget {
+	struct EO_Measure : Widget {
 		EO_102 *module;
 		char measureText[41] = "";
 		NVGcolor col;
@@ -351,13 +357,16 @@ namespace {
 		virtual void updateText() {
 		} 
 	
-		void draw(const DrawArgs &args) override {
-			updateText();
-			nvgFontSize(args.vg, 14);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, col);
-			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-			nvgText(args.vg, box.size.x / 2, 12, measureText, NULL);
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				updateText();
+				nvgFontSize(args.vg, 14);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, col);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, box.size.x / 2, 12, measureText, NULL);
+			}
+			Widget::drawLayer(args, layer);
 		}
 	};
 	
