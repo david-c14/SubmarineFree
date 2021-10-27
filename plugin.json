@@ -154,6 +154,34 @@
 			"tags": ["DIGITAL", "NOISE", "MULTIPLE"]
 		},
 		{
+			"slug":"DO-105",
+			"name":"DO-105",
+			"description": "DO-105 Digital Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
+			"slug":"DO-110",
+			"name":"DO-110",
+			"description": "DO-110 Digital Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
+			"slug":"DO-115",
+			"name":"DO-115",
+			"description": "DO-115 Digital Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
+			"slug":"DO-120",
+			"name":"DO-120",
+			"description": "DO-120 Digital Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/DO.md",
+			"tags": ["LOGIC", "MULTIPLE", "POLYPHONIC"]
+		},
+		{
 			"slug":"EN-104",
 			"name":"EN-104",
 			"description": "EN-104 Quad ADSR Enveloper Generator",

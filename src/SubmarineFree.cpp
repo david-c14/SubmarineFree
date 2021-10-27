@@ -21,10 +21,10 @@ void init(rack::Plugin *p) {
 	p->addModel(modelAO136);
 	p->addModel(modelBB120);
 	p->addModel(modelDN112);
-	//p->addModel(modelDO105);
-	//p->addModel(modelDO110);
-	//p->addModel(modelDO115);
-	//p->addModel(modelDO120);
+	p->addModel(modelDO105);
+	p->addModel(modelDO110);
+	p->addModel(modelDO115);
+	p->addModel(modelDO120);
 	p->addModel(modelEN104);
 	p->addModel(modelEO102);
 	p->addModel(modelFF110);

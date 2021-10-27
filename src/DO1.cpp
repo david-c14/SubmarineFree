@@ -394,7 +394,7 @@ namespace {
 		}
 		void draw(const DrawArgs &args) override {
 			if (module) {
-				unsigned int val = (unsigned int)APP->engine->getParam(module, index);
+				unsigned int val = (unsigned int)(getParamQuantity()->getValue());
 				if (val >= functions.size()) {
 					val = functions.size() - 1;
 				}
@@ -408,7 +408,7 @@ namespace {
 			if (module) {
 				if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
 					e.consume(this);
-					unsigned int val = (unsigned int)APP->engine->getParam(module, index);
+					unsigned int val = (unsigned int)(getParamQuantity()->getValue());
 					if (val >= functions.size()) {
 						val = functions.size() - 1;
 					}
@@ -516,6 +516,8 @@ struct DO1 : DS_Module {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int ix = 0; ix < x; ix++) {
 			configParam(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, "Connection" );
+			configInput(INPUT_1 + ix, string::f("Signal %d", ix + 1));
+			configOutput(OUTPUT_1 + ix, string::f("Signal %d", ix + 1));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			configParam(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate" );
@@ -569,6 +571,7 @@ template <unsigned int x, unsigned int y>
 struct DOWidget : SchemeModuleWidget {
 	ScrollWidget *collectionScrollWidget;
 	PLConnectorKnob *knobs[x + 4 * y];
+	PLGateKnob *gateKnobs[y];
 	PLBackground<x,y> *background;
 	DOWidget(DO1<x,y> *module) {
 		setModule(module);
@@ -595,13 +598,13 @@ struct DOWidget : SchemeModuleWidget {
 		collectionScrollWidget->box.size = Vec(box.size.x - 10, box.size.y - 110);
 		addChild(collectionScrollWidget);
 		for (unsigned int iy = 0; iy < y; iy++) {
-			PLGateKnob *knob = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
-			knob->module = module;
-			knob->index = DO1<x,y>::PARAM_GATE_1 + iy;
-			knob->getText = [=]()->std::string {
+			gateKnobs[iy] = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
+			gateKnobs[iy]->module = module;
+			gateKnobs[iy]->index = DO1<x,y>::PARAM_GATE_1 + iy;
+			gateKnobs[iy]->getText = [=]()->std::string {
 				return this->getGateText(iy);
 			};
-			collectionScrollWidget->container->addChild(knob);
+			collectionScrollWidget->container->addChild(gateKnobs[iy]);
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < 4; ix++) {
@@ -628,7 +631,7 @@ struct DOWidget : SchemeModuleWidget {
 	}
 
 	std::string getGateName(unsigned int index) {
-		unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_GATE_1 + index);
+		unsigned int val = (unsigned int)(gateKnobs[index]->getParamQuantity()->getValue());
 		if (val >= functions.size()) {
 			val = functions.size() - 1;
 		}
@@ -655,7 +658,7 @@ struct DOWidget : SchemeModuleWidget {
 		if (!module)
 			return std::string("Browser");
 		std::string connectorName = getConnectorNameText(index);
-		unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_1 + index);	
+		unsigned int val = (unsigned int)(knobs[index]->getParamQuantity()->getValue());
 		if (val > x + y + 1)
 			val = x + y + 1;
 		if (val == 0)
@@ -709,7 +712,7 @@ struct DOWidget : SchemeModuleWidget {
 				startX = (background->box.size.x / (x * 2)) * ((i - 4 * y) * 2 + 1);
 				startY = background->box.size.y - 5;
 			}
-			unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_1 + i);
+			unsigned int val = (unsigned int)(knobs[i]->getParamQuantity()->getValue());
 			if (val > (x + y + 1)) {
 				val = (x + y + 1);
 			}

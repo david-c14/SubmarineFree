@@ -32,10 +32,10 @@ extern Model *modelBP132;
 
 extern Model *modelDN112;
 
-//extern Model *modelDO105;
-//extern Model *modelDO110;
-//extern Model *modelDO115;
-//extern Model *modelDO120;
+extern Model *modelDO105;
+extern Model *modelDO110;
+extern Model *modelDO115;
+extern Model *modelDO120;
 
 extern Model *modelEN104;
 extern Model *modelEO102;
