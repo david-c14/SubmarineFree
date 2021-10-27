@@ -11,11 +11,11 @@ extern Model *modelAG104;
 extern Model *modelAG106;
 extern Model *modelAG202;
 
-//extern Model *modelAO106;
-//extern Model *modelAO112;
-//extern Model *modelAO118;
-//extern Model *modelAO124;
-//extern Model *modelAO136;
+extern Model *modelAO106;
+extern Model *modelAO112;
+extern Model *modelAO118;
+extern Model *modelAO124;
+extern Model *modelAO136;
 
 extern Model *modelBB120;
 

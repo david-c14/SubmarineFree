@@ -375,74 +375,51 @@ namespace {
 #undef F
 #undef LAM
 
-	struct AOKnob : Knob {
+	struct AOFuncDisplay : Knob {
 		Module *module;
 		int index;
-	};
-
-	struct AOFuncLight : LightWidget {
-		AOKnob *knob;
-		void draw(const DrawArgs &args) override;
-	};
-
-	struct AOFuncDisplay : AOKnob {
-		AOFuncLight *light;
 		AOFuncDisplay() {
 			box.size.x = 80;
 			box.size.y = 15;
 			snap = true;
 			smooth = false;
 			speed = 0.5f;
-			light = new AOFuncLight();
-			light->box.pos = Vec(0,0);
-			light->box.size = box.size;
-			light->knob = this;
-			addChild(light);
 		}
 		void onButton(const event::Button &e) override;
-	};
-
-	void AOFuncLight::draw(const DrawArgs &args) {
-		if (knob->module) {
-			nvgFontSize(args.vg, 16);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-			nvgText(args.vg, 41.5, 13, functions[APP->engine->getParam(knob->module, knob->index)].name.c_str(), NULL);
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if ((layer) == 1 && module) {
+				nvgFontSize(args.vg, 16);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 41.5, 13, functions[getParamQuantity()->getValue()].name.c_str(), NULL);
+			}
+			Widget::drawLayer(args, layer);
 		}
-	}
-
-	struct AOConstLight : LightWidget {
-		AOKnob *knob;
-		void draw(const DrawArgs &args) override;
 	};
 
-	struct AOConstDisplay : AOKnob {
-		AOConstLight *light;
+	struct AOConstDisplay : Knob {
+		Module *module;
+		int index;
 		AOConstDisplay() {
 			box.size.x = 80;
 			box.size.y = 15;
 			snap = true;
 			speed = 0.005;
-			light = new AOConstLight();
-			light->box.pos = Vec(0,0);
-			light->box.size = box.size;
-			light->knob = this;
-			addChild(light);
+		}
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if ((layer == 1) && module) {
+				char mtext[41];
+				sprintf(mtext, "C=%4.2f", ((int)(getParamQuantity()->getValue()))/100.0f);
+				nvgFontSize(args.vg, 16);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 41.5, 13, mtext, NULL);
+			}
+			Widget::drawLayer(args, layer);
 		}
 	};
-
-	void AOConstLight::draw(const DrawArgs &args) {
-		if (knob->module) {
-			char mtext[41];
-			sprintf(mtext, "C=%4.2f", ((int)APP->engine->getParam(knob->module, knob->index))/100.0f);
-			nvgFontSize(args.vg, 16);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-			nvgText(args.vg, 41.5, 13, mtext, NULL);
-		}
-	}
 
 } // end namespace
 
@@ -473,7 +450,14 @@ struct AO1 : Module {
 			for (unsigned int iy = 0; iy < y; iy++) {
 				configParam(PARAM_FUNC_1 + ix + iy * x, 0.0f, functions.size() - 1.0f, 0.0f, "Algorithm" );
 				configParam(PARAM_CONST_1 + ix + iy * x, -10000.0f, 10000.0f, 0.0f, "Constant", "", 0.f, 0.01f);
+				
 			}
+			configInput(INPUT_X_1 + ix, string::f("Signal X%d", ix + 1));
+			configOutput(OUTPUT_X_1 + ix, string::f("Signal X%d", ix + 1));		
+		}
+		for (unsigned int iy = 0; iy < y; iy++) {
+			configInput(INPUT_Y_1 + iy, string::f("Signal Y%d", iy + 1));
+			configOutput(OUTPUT_Y_1 + iy, string::f("Signal Y%d", iy + 1));		
 		}
 	}
 	void process(const ProcessArgs &args) override {
@@ -504,6 +488,7 @@ namespace {
 	struct AlgorithmMenu : MenuItem {
 		Module *module;
 		int index;
+		AOFuncDisplay *widget;
 		unsigned int algorithm;
 		void onAction(const event::Action &e) override;
 	};
@@ -511,6 +496,7 @@ namespace {
 	struct CategoryMenu : MenuItem {
 		Module *module;
 		int index;
+		AOFuncDisplay *widget;
 		unsigned int category;
 		Menu *createChildMenu() override {
 			Menu *menu = new Menu();
@@ -519,6 +505,7 @@ namespace {
 					AlgorithmMenu *am = new AlgorithmMenu();
 					am->module = module;
 					am->index = index;
+					am->widget = widget;
 					am->algorithm = i;
 					am->text = functions[i].name;
 					menu->addChild(am);
@@ -531,17 +518,19 @@ namespace {
 	struct FCopyMenu : MenuItem {
 		Module *module;
 		int index;
+		AOFuncDisplay *widget;
 		void onAction(const event::Action &e) override {
-			FunctorClipboard = APP->engine->getParam(module, index);
+			FunctorClipboard = widget->getParamQuantity()->getValue();
 		}
 	};
 	
 	struct FPasteMenu : MenuItem {
 		Module *module;
 		int index;
+		AOFuncDisplay *widget;
 		void onAction(const event::Action &e) override {
 			if (!std::isnan(FunctorClipboard))
-				APP->engine->setParam(module, index, FunctorClipboard);
+				widget->getParamQuantity()->setValue(FunctorClipboard);
 		}
 	};
 
@@ -553,12 +542,14 @@ namespace {
 				FCopyMenu *cm = new FCopyMenu();
 				cm->module = module;
 				cm->index = index;
+				cm->widget = this;
 				cm->text = "Copy";
 				menu->addChild(cm);
 				if (!std::isnan(FunctorClipboard)) {
 					FPasteMenu *pm = new FPasteMenu();
 					pm->module = module;
 					pm->index = index;
+					pm->widget = this;
 					pm->text = "Paste";
 					menu->addChild(pm);
 				}
@@ -567,6 +558,7 @@ namespace {
 				AlgorithmMenu *item = new AlgorithmMenu();
 				item->module = module;
 				item->index = index;
+				item->widget = this;
 				item->algorithm = 0;
 				item->text = categories[0];
 				menu->addChild(item);	
@@ -574,6 +566,7 @@ namespace {
 					CategoryMenu *cm = new CategoryMenu();
 					cm->module = module;
 					cm->index = index;
+					cm->widget = this;
 					cm->category = i;
 					cm->text = categories[i];
 					cm->rightText = SUBMENU;
@@ -586,7 +579,7 @@ namespace {
 	}
 	
 	void AlgorithmMenu::onAction(const event::Action &e) {
-		APP->engine->setParam(module, index, algorithm);
+		widget->getParamQuantity()->setValue(algorithm);
 	}
 	
 } // end namespace

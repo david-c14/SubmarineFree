@@ -35,6 +35,41 @@
 			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
 		},
 		{
+			"slug":"A0-106",
+			"name":"AO-106",
+			"description": "AO-106 Arithmetic Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AO.md",
+			"tags": ["UTILITY", "MULTIPLE"]
+		},
+		{
+			"slug":"A0-112",
+			"name":"AO-112",
+			"description": "AO-112 Arithmetic Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AO.md",
+			"tags": ["UTILITY", "MULTIPLE"]
+		},
+		{
+			"slug":"A0-118",
+			"name":"AO-118",
+			"description": "AO-118 Arithmetic Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AO.md",
+			"tags": ["UTILITY", "MULTIPLE"]
+		},
+		{
+			"slug":"A0-124",
+			"name":"AO-124",
+			"description": "AO-124 Arithmetic Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AO.md",
+			"tags": ["UTILITY", "MULTIPLE"]
+		},
+		{
+			"slug":"A0-136",
+			"name":"AO-136",
+			"description": "AO-136 Arithmetic Operators",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/AO.md",
+			"tags": ["UTILITY", "MULTIPLE"]
+		},
+		{
 			"slug":"BB-120",
 			"name":"BB-120",
 			"description": "BB-120 20-Stage Bucket Brigade Sample and Hold",
