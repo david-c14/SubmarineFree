@@ -54,7 +54,7 @@ extern Model *modelLD106;
 
 //extern Model *modelLT116;
 
-//extern Model *modelMZ909;
+extern Model *modelMZ909;
 
 extern Model *modelNG106;
 extern Model *modelNG112;
@@ -76,11 +76,11 @@ extern Model *modelPO204;
 
 extern Model *modelSN101;
 
-//extern Model *modelSS112;
-//extern Model *modelSS208;
-//extern Model *modelSS212;
-//extern Model *modelSS220;
-//extern Model *modelSS221;
+extern Model *modelSS112;
+extern Model *modelSS208;
+extern Model *modelSS212;
+extern Model *modelSS220;
+extern Model *modelSS221;
 
 extern Model *modelTD116;
 extern Model *modelTD202;

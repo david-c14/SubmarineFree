@@ -252,6 +252,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"MZ-909",
+			"name":"MZ-909",
+			"description": "MZ-909 Masterizer",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/MZ.md",
+			"tags": ["POLYPHONIC"]
+		},
+		{
 			"slug":"NG-106",
 			"name":"NG-106",
 			"description": "NG-106 NOT Gates",
@@ -348,6 +355,41 @@
 			"description": "SN-101 Smooth Noise Generator",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/SN.md",
 			"tags": ["OSCILLATOR", "NOISE"]
+		},
+		{
+			"slug":"SS-112",
+			"name":"SS-112",
+			"description": "SS-112 12 Input Sinks",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/SS.md",
+			"tags": ["UTILITY"]
+		},
+		{
+			"slug":"SS-208",
+			"name":"SS-208",
+			"description": "SS-208 8 Irrational Output Voltage Sources",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/SS.md",
+			"tags": ["UTILITY"]
+		},
+		{
+			"slug":"SS-212",
+			"name":"SS-212",
+			"description": "SS-212 12 Chromatic Output Voltage Sources",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/SS.md",
+			"tags": ["UTILITY"]
+		},
+		{
+			"slug":"SS-220",
+			"name":"SS-220",
+			"description": "SS-220 120 Chromatic Output Voltage Sources",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/SS.md",
+			"tags": ["UTILITY"]
+		},
+		{
+			"slug":"SS-221",
+			"name":"SS-221",
+			"description": "SS-221 21 Output Voltage Sources",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/SS.md",
+			"tags": ["UTILITY"]
 		},
 		{
 			"slug":"TD-116",

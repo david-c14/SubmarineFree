@@ -22,7 +22,10 @@ struct MZ_909: Module {
 	
 	MZ_909() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configParam(PARAM_ON, 1.0f, 2.0f, 1.0f, "On");
+		configSwitch(PARAM_ON, 1.0f, 2.0f, 1.0f, "Power", { "On", "More On" });
+		configInput(INPUT_1, "Signal");
+		configOutput(OUTPUT_1, "Mastererized Signal");
+
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -58,7 +61,7 @@ struct MZ909 : SchemeModuleWidget {
 		SchemeModuleWidget::step();
 		if (module) {
 			unsigned int count = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-			if (module->params[MZ_909::PARAM_ON].getValue() > 1.5f)
+			if (onButton->getParamQuantity()->getValue() > 1.5f)
 				count *= 2;
 			count %= 1000;
 			float lerp = ((float)count - 500.0f) / 500.0f;
