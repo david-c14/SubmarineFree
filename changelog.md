@@ -10,6 +10,7 @@
 - 25-Oct-2021 Port Text devices and Wiremanager
 - 26-Oct-2021 Port HS-101 and EO-102 to v2
 - 26-Oct-2021 Port EN-104 PO-101 PO-102 PO-202 and SN-101 to v2
+- 28-Oct-2021 Port WK-101 and WK-205 to v2  Deprecated Torpedo in WK devices and replace with extension modules
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual

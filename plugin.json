@@ -442,6 +442,20 @@
 			"tags": ["VISUAL"]
 		},
 		{
+			"slug":"WK-101",
+			"name":"WK-101",
+			"description": "WK-101 Das Wohltemperierte Klavier",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/WK.md",
+			"tags": ["QUANTIZER", "TUNER"]
+		},
+		{
+			"slug":"WK-205",
+			"name":"WK-205",
+			"description": "WK-205 Das Wohltemperierte Klavier Nano",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/WK.md",
+			"tags": ["QUANTIZER", "TUNER", "MULTIPLE"]
+		},
+		{
 			"slug":"WM-101",
 			"name":"WM-101",
 			"description":"WM-101 Wire Manager",

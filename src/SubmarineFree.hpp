@@ -95,8 +95,8 @@ extern Model *modelTF102;
 //extern Model *modelVM201;
 //extern Model *modelVM202;
 
-//extern Model *modelWK101;
-//extern Model *modelWK205;
+extern Model *modelWK101;
+extern Model *modelWK205;
 
 extern Model *modelWM101;
 extern Model *modelWM102;

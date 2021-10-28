@@ -114,7 +114,7 @@ namespace {
 					line.append(1,c);
 					strings[i].erase(0,1);
 					if (!std::isdigit(c) && (c != '/') && (c != '.')) {
-						WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+						WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 						return;
 					}
 					if (c == '.')
@@ -122,7 +122,7 @@ namespace {
 					if (c == '/' && !ratio)
 						ratio = line.size();
 					if (decimal && ratio) {
-						WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+						WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 						return;
 					}
 				}
@@ -131,13 +131,13 @@ namespace {
 						float d = std::stof(line, nullptr);
 						d -= (i-1) * 100.0;
 						if ((d < -50.0) || (d > 50.0)) {
-							WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+							WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 							return;
 						}
 						tuning.offsets[(i-1)%12] = d;
 					}
 					catch (std::exception &err) {
-						WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+						WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 						return;
 					}
 				}
@@ -149,20 +149,20 @@ namespace {
 							int inum = std::stoi(num,nullptr);
 							int idenom = std::stoi(denom, nullptr);
 							if (!idenom) {
-								WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+								WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 								return;
 							}
 							float r = (1.0f * inum / idenom);  
 							float d = 1200.0 * log2(r);
 							d -= (i-1) * 100.0;
 							if ((d < -50.0) || (d > 50.0)) {
-								WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+								WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 								return;
 							}
 							tuning.offsets[(i-1)%12] = d;
 						}
 						catch (std::exception &err) {
-							WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+							WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 							return;
 						}
 					}
@@ -172,13 +172,13 @@ namespace {
 							float d = 1200.0 * log2(inum);
 							d -= (i-1) * 100.0;
 							if ((d < -50.0) || (d > 50.0)) {
-								WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+								WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 								return;
 							}
 							tuning.offsets[(i-1)%12] = d;
 						}
 						catch (std::exception &err) {
-							WARN("SubmarineFree WK: Scala file format error in %s", string::filename(path).c_str());
+							WARN("SubmarineFree WK: Scala file format error in %s", system::getFilename(path).c_str());
 							return;
 						}
 					}
@@ -194,19 +194,13 @@ namespace {
 	}
 
 	void WK_Tunings::loadTuningsFromScala(Plugin *pluginInstance) {
-		std::list<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"));
+		std::vector<std::string> dirList = system::getEntries(asset::plugin(pluginInstance, "Scala"), 0);
 		for (auto entry : dirList) {
 			if (system::isDirectory(entry)) continue;
-			if (string::lowercase(string::filenameExtension(entry)).compare("scl")) continue;
+			if (string::lowercase(system::getExtension(entry)).compare(".scl")) continue;
 			loadScalaFile(entry);
 		}
 	}
-
-	struct WK101_InputPort : Torpedo::PatchInputPort {
-		WK_101 *wkModule;
-		WK101_InputPort(WK_101 *module, unsigned int portNum):PatchInputPort((Module *)module, portNum) { wkModule = module;};
-		void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
-	};
 
 } // end namespace
 
@@ -237,19 +231,22 @@ struct WK_101 : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		LIGHT_EXT,
 		NUM_LIGHTS
 	};
-	int toSend = 0;
 	unsigned int light = PARAM_1;
-	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, OUTPUT_TOR);
-	WK101_InputPort inPort = WK101_InputPort(this, INPUT_TOR);
+	float tunings[12];
 
 	WK_101() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int i = 0; i < NUM_PARAMS; i++) {
 			configParam(PARAM_1 + i, -50.0f, 50.0f, 0.0f, "Detune", " cents");
 		}
-		outPort.size(5);
+		configInput(INPUT_CV, "V/oct");
+		configInput(INPUT_TOR, "Deprecated");
+		configOutput(OUTPUT_CV, "Quantised V/oct");
+		configOutput(OUTPUT_TOR, "Deprecated");
+		configLight(LIGHT_EXT, "Extension module");
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -257,53 +254,30 @@ struct WK_101 : Module {
 		int note = (120 + quantized) % 12;
 		outputs[OUTPUT_CV].setVoltage((params[PARAM_1 + note].getValue() / 1200.0f) + (quantized / 12.0f));	
 		light = note;
-		if (toSend && !outPort.isBusy()) {
-			toSend = 0;
-			json_t *rootJ = json_array();
-			for (int i = 0; i < 12; i++)
-				json_array_append_new(rootJ, json_real(params[PARAM_1 + i].getValue()));
-			outPort.send(std::string(TOSTRING(SLUG)), std::string("WK"), rootJ);
+		for (unsigned int i = 0; i < 12; i++) {
+			tunings[i] = params[PARAM_1 + i].getValue();
 		}
-		outPort.process();
-		inPort.process();
+		lights[LIGHT_EXT].setBrightness(rightExpander.module && (rightExpander.module->model == modelWK205));
 	}
 };
 
 namespace {
 
-	void WK101_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
-		if (pluginName.compare(TOSTRING(SLUG))) return;
-		if (moduleName.compare("WK")) return;
-		float tunings[12];
-		int size = json_array_size(rootJ);
-		if (!size) return;
-		if (size > 12)
-			size = 12;
-		for (int i = 0; i < size; i++) {
-			json_t *j1 = json_array_get(rootJ, i);
-			if (j1)
-				tunings[i] = json_number_value(j1);
-		}
-		for (int i = 0; i < 12; i++)
-			wkModule->params[WK_101::PARAM_1 + i].setValue(tunings[i]);
-	}
-	
-	struct WK_Display : LightWidget {
-		WK_101 *module;
-		int index;
+	struct WK_Display : Widget {
+		LightKnob *knob;
 		char dspText[20];
 		
-		void draw(const DrawArgs &args) override {
-			if (!module) {
-				return;
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (knob && (layer == 1)) {
+				float val = knob->getParamQuantity()->getValue();
+				sprintf(dspText, "%+05.2f", val);
+				nvgFontSize(args.vg, 14);
+				nvgFontFaceId(args.vg, gScheme.font()->handle);
+				nvgFillColor(args.vg, SUBLIGHTBLUE);
+				nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
+				nvgText(args.vg, 30, 13, dspText, NULL);
 			}
-			float val = APP->engine->getParam(module, WK_101::PARAM_1 + index);
-			sprintf(dspText, "%+05.2f", val);
-			nvgFontSize(args.vg, 14);
-			nvgFontFaceId(args.vg, gScheme.font()->handle);
-			nvgFillColor(args.vg, SUBLIGHTBLUE);
-			nvgTextAlign(args.vg, NVG_ALIGN_CENTER);
-			nvgText(args.vg, 30, 13, dspText, NULL);
+			Widget::drawLayer(args, layer);
 		}
 	};
 	
@@ -316,53 +290,48 @@ namespace {
 			}
 			MedKnob::step();
 		}
-		void onChange(const event::Change &e) override {
-			MedKnob<LightKnob>::onChange(e);
-			
-			if (module) {
-				module->toSend = true;
-			}
-		}
 	};
 
 } // end namespace
 
 struct WK101 : SchemeModuleWidget {
+	WK_Param *knobs[12];
 	WK101(WK_101 *module) {
 		setModule(module);
 		this->box.size = Vec(150, 380);
 		addChild(new SchemePanel(this->box.size));
 
 		addInput(createInputCentered<SilverPort>(Vec(16.5,41.5), module, WK_101::INPUT_CV));
-		addOutput(createOutputCentered<SilverPort>(Vec(55.5,41.5), module, WK_101::OUTPUT_CV));
-		addInput(createInputCentered<BlackPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
-		addOutput(createOutputCentered<BlackPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_TOR));
+		addOutput(createOutputCentered<SilverPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_CV));
+		addInput(createInputCentered<DeprecatedPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
+		addOutput(createOutputCentered<DeprecatedPort>(Vec(55.5,41.5), module, WK_101::OUTPUT_TOR));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(147, 20), module, WK_101::LIGHT_EXT));
 
 		for (int i = 0; i < 5; i++)
 		{
+			knobs[i] = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i);
+			knobs[i]->module = module;
+			knobs[i]->index = i;
+			addParam(knobs[i]);
 			WK_Display *display = new WK_Display();
-			display->module = module;
-			display->index = i;
 			display->box.pos = Vec(45, 79 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			WK_Param *widget = createParamCentered<WK_Param>(Vec(23 + 104 * (i%2),89 + 21 * i), module, WK_101::PARAM_1 + i);
-			widget->module = module;
-			widget->index = i;
-			addParam(widget);
+			if (module)
+				display->knob = knobs[i];
 		}
 		for (int i = 5; i < 12; i++)
 		{
+			knobs[i] = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i);
+			knobs[i]->module = module;
+			knobs[i]->index = i;
+			addParam(knobs[i]);
 			WK_Display *display = new WK_Display();
-			display->module = module;
-			display->index = i;
 			display->box.pos = Vec(45, 100 + 21 * i);
 			display->box.size = Vec(60, 20);
 			addChild(display);
-			WK_Param *widget = createParamCentered<WK_Param>(Vec(127 - 104 * (i%2),110 + 21 * i), module, WK_101::PARAM_1 + i);
-			widget->module = module;
-			widget->index = i;
-			addParam(widget);
+			if (module)
+				display->knob = knobs[i];
 		}
 		WK_Tunings::loadTunings(pluginInstance);
 	}
@@ -522,12 +491,9 @@ struct WK101 : SchemeModuleWidget {
 		nvgRoundedRect(vg, 50, 332, 50, 17, 4);
 		nvgFill(vg);
 
-		drawText(vg, 36, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "V/OCT");
-		drawText(vg, 114, 25, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC");
-		drawText(vg, 16.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN");
-		drawText(vg, 55.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
-		drawText(vg, 94.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "IN");
-		drawText(vg, 133.5, 61, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
+		drawText(vg, 75, 41.5, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "V/OCT");
+		drawText(vg, 30, 41.5, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "IN");
+		drawText(vg, 120, 41.5, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE, 8, gScheme.getContrast(module), "OUT");
 	}
 };
 
@@ -540,9 +506,8 @@ void WK101::appendContextMenu(Menu *menu) {
 			EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>(tunings[i].name.c_str());
 			m->clickHandler = [=]() {
 				for (int j = 0; j < 12; j++) {
-					APP->engine->setParam(module, WK_101::PARAM_1 + j, tunings[i].offsets[j]);
+					knobs[j]->getParamQuantity()->setValue(tunings[i].offsets[j]);
 				}
-				module->toSend = true;
 			};
 			menu->addChild(m);
 		}
@@ -550,16 +515,6 @@ void WK101::appendContextMenu(Menu *menu) {
 }
 
 struct WK_205;
-
-namespace {
-
-	struct WK205_InputPort : Torpedo::PatchInputPort {
-		WK_205 *wkModule;
-		WK205_InputPort(WK_205 *module, unsigned int portNum):PatchInputPort((Module *)module, portNum) { wkModule = module;};
-		void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
-	};
-
-} // end namespace
 
 struct WK_205 : Module {
 	static const int deviceCount = 5;
@@ -584,13 +539,21 @@ struct WK_205 : Module {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		LIGHT_EXT_LEFT,
+		LIGHT_EXT_RIGHT,
 		NUM_LIGHTS
 	};
 	float tunings[12];
-	WK205_InputPort inPort = WK205_InputPort(this, INPUT_TOR);
 
 	WK_205() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (unsigned int i = 0; i < 5; i++) {
+			configInput(INPUT_CV_1 + i, string::f("Signal %d", i + 1));
+			configOutput(OUTPUT_CV_1 + i, string::f("Signal %d", i + 1));
+		}
+		configInput(INPUT_TOR, "Deprecated");
+		configLight(LIGHT_EXT_LEFT, "WK-101 Extension module");
+		configLight(LIGHT_EXT_RIGHT, "Extension module");
 	}
 	void process(const ProcessArgs &args) override;
 	json_t *dataToJson(void) override {
@@ -613,29 +576,31 @@ struct WK_205 : Module {
 };
 
 void WK_205::process(const ProcessArgs &args) {
+	bool light = false;
+	if (leftExpander.module) {
+		if (leftExpander.module->model == modelWK101) {
+			WK_101 *wk = dynamic_cast<WK_101 *>(leftExpander.module);
+			for (unsigned int i = 0; i < 12; i++) {
+				tunings[i] = wk->tunings[i];
+			}
+			light = true;
+		}
+		if (leftExpander.module->model == modelWK205) {
+			WK_205 *wk = dynamic_cast<WK_205 *>(leftExpander.module);
+			for (unsigned int i = 0; i < 12; i++) {
+				tunings[i] = wk->tunings[i];
+			}
+			light = true;
+		}
+	}
+	lights[LIGHT_EXT_LEFT].setBrightness(light);
+	lights[LIGHT_EXT_RIGHT].setBrightness(rightExpander.module && (rightExpander.module->model == modelWK205));
 	for (int i = 0; i < deviceCount; i++) {
 		int quantized = floor((12.0f * inputs[INPUT_CV_1 + i].getVoltage()) + 0.5f);
 		int note = (120 + quantized) % 12;
 		outputs[OUTPUT_CV_1 + i].setVoltage((tunings[note] / 1200.0f) + (quantized / 12.0f));	
 	}
-	inPort.process();
 }
-
-namespace {
-	void WK205_InputPort::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
-		if (pluginName.compare(TOSTRING(SLUG))) return;
-		if (moduleName.compare("WK")) return;
-		int size = json_array_size(rootJ);
-		if (!size) return;
-		if (size > 12)
-			size = 12;
-		for (int i = 0; i < size; i++) {
-			json_t *j1 = json_array_get(rootJ, i);
-			if (j1)
-				wkModule->tunings[i] = json_number_value(j1);
-		}
-	}
-} // end namespace
 
 struct WK205 : SchemeModuleWidget {
 	WK205(WK_205 *module) {
@@ -643,11 +608,13 @@ struct WK205 : SchemeModuleWidget {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		addInput(createInputCentered<BlackPort>(Vec(15,31.5), module, WK_205::INPUT_TOR));
+		addInput(createInputCentered<DeprecatedPort>(Vec(15,31.5), module, WK_205::INPUT_TOR));
 		for (int i = 0; i < WK_205::deviceCount; i++) {
 			addInput(createInputCentered<SilverPort>(Vec(15,75.5 + i * 60), module, WK_205::INPUT_CV_1 + i));
 			addOutput(createOutputCentered<SilverPort>(Vec(15,104.5 + i * 60), module, WK_205::OUTPUT_CV_1 + i));
 		}
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(3, 20), module, WK_205::LIGHT_EXT_LEFT));
+		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(27, 20), module, WK_205::LIGHT_EXT_RIGHT));
 
 		WK_Tunings::loadTunings(pluginInstance);
 	}
@@ -669,7 +636,6 @@ struct WK205 : SchemeModuleWidget {
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "WK-205");
-		drawText(vg, 15, 52, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC");
 		nvgStrokeColor(vg, gScheme.getContrast(module));
 		nvgStrokeWidth(vg, 1);
 		nvgLineCap(vg, NVG_ROUND);
