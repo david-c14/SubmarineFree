@@ -36,7 +36,9 @@ struct TD_202 : Module {
 	bool bgDirty = false;
 	std::string text = "";
 	TD_202() : Module() {
-		config(0, 0, 0, 0);
+		config(0, 0, 0, 2);
+		configLight(0, "Module Link");
+		configLight(1, "Module Link");
 	}
 	int reset = 0;
 	void onReset() override {
@@ -54,16 +56,22 @@ struct TD_202 : Module {
 		}
 	}
 	void process(const ProcessArgs &args) override {
+		bool left = false;
+		bool right = false;
 		if (leftExpander.module) {
 			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
 				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
+				left = true;
 			}
 		}
 		if (rightExpander.module) {
 			if ((rightExpander.module->model == modelTF101) || (rightExpander.module->model == modelTF102)) {
 				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
+				right = true;
 			}
 		}
+		lights[0].setBrightness(left);
+		lights[1].setBrightness(right);
 	}
 	json_t *dataToJson() override {
 		json_t *rootJ = json_object();
@@ -109,7 +117,7 @@ struct TD202 : SchemeModuleWidget {
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		MouseTransformWidget *tw = createWidget<MouseTransformWidget>(Vec(2, 15));
+		MouseTransformWidget *tw = createWidget<MouseTransformWidget>(Vec(2.5, 15));
 		tw->rotate(M_PI / 2.0f);
 		addChild(tw);
 
@@ -117,6 +125,9 @@ struct TD202 : SchemeModuleWidget {
 		textField->box.size = Vec(350, 30);
 		textField->changeHandler = [=]() { textChanged(); };
 		tw->addChild(textField);
+
+		addChild(createLightCentered<LeftLight>(Vec(3, 14), module, 0));
+		addChild(createLightCentered<RightLight>(Vec(27, 14), module, 1));
 	}
 
 	void step() override {

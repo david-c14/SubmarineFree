@@ -174,6 +174,8 @@ void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, 0, 0);
 		nvgLineTo(vg, box.size.x, 0);
+		nvgLineTo(vg, box.size.x -1, 1);
+		nvgLineTo(vg, 1, box.size.y - 1);
 		nvgLineTo(vg, 0, box.size.y);
 		nvgClosePath(vg);
 		nvgFillColor(vg, gScheme.getHighlight(module));
@@ -182,6 +184,8 @@ void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 		nvgMoveTo(vg, box.size.x, 0);
 		nvgLineTo(vg, box.size.x, box.size.y);
 		nvgLineTo(vg, 0, box.size.y);
+		nvgLineTo(vg, 1, box.size.y - 1);
+		nvgLineTo(vg, box.size.x - 1, 1);
 		nvgClosePath(vg);
 		nvgFillColor(vg, gScheme.getShadow(module));
 		nvgFill(vg);

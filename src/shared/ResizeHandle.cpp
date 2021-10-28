@@ -8,7 +8,7 @@
 #include "../SubmarineFree.hpp"
 
 ResizeHandle::ResizeHandle() {
-	box.size = Vec(8, 12);
+	box.size = Vec(8, 10);
 }
 
 void ResizeHandle::onDragStart(const event::DragStart& e) {

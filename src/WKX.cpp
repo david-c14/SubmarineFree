@@ -246,7 +246,7 @@ struct WK_101 : Module {
 		configInput(INPUT_TOR, "Deprecated");
 		configOutput(OUTPUT_CV, "Quantised V/oct");
 		configOutput(OUTPUT_TOR, "Deprecated");
-		configLight(LIGHT_EXT, "Extension module");
+		configLight(LIGHT_EXT, "Module Link");
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -305,7 +305,7 @@ struct WK101 : SchemeModuleWidget {
 		addOutput(createOutputCentered<SilverPort>(Vec(133.5,41.5), module, WK_101::OUTPUT_CV));
 		addInput(createInputCentered<DeprecatedPort>(Vec(94.5,41.5), module, WK_101::INPUT_TOR));
 		addOutput(createOutputCentered<DeprecatedPort>(Vec(55.5,41.5), module, WK_101::OUTPUT_TOR));
-		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(147, 20), module, WK_101::LIGHT_EXT));
+		addChild(createLightCentered<RightLight>(Vec(147, 25), module, WK_101::LIGHT_EXT));
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -552,8 +552,8 @@ struct WK_205 : Module {
 			configOutput(OUTPUT_CV_1 + i, string::f("Signal %d", i + 1));
 		}
 		configInput(INPUT_TOR, "Deprecated");
-		configLight(LIGHT_EXT_LEFT, "WK-101 Extension module");
-		configLight(LIGHT_EXT_RIGHT, "Extension module");
+		configLight(LIGHT_EXT_LEFT, "Module Link");
+		configLight(LIGHT_EXT_RIGHT, "Module Link");
 	}
 	void process(const ProcessArgs &args) override;
 	json_t *dataToJson(void) override {
@@ -613,8 +613,8 @@ struct WK205 : SchemeModuleWidget {
 			addInput(createInputCentered<SilverPort>(Vec(15,75.5 + i * 60), module, WK_205::INPUT_CV_1 + i));
 			addOutput(createOutputCentered<SilverPort>(Vec(15,104.5 + i * 60), module, WK_205::OUTPUT_CV_1 + i));
 		}
-		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(3, 20), module, WK_205::LIGHT_EXT_LEFT));
-		addChild(createLightCentered<TinyLight<BlueLight>>(Vec(27, 20), module, WK_205::LIGHT_EXT_RIGHT));
+		addChild(createLightCentered<LeftLight>(Vec(3, 25), module, WK_205::LIGHT_EXT_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(27, 25), module, WK_205::LIGHT_EXT_RIGHT));
 
 		WK_Tunings::loadTunings(pluginInstance);
 	}

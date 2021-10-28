@@ -4,7 +4,9 @@
 
 struct TD_316 : Module {
 	TD_316() : Module () {
-		config(0, 0, 0, 0);
+		config(0, 0, 0, 2);
+		configLight(0, "Module Link");
+		configLight(1, "Module Link");
 	}
 	void processExpander(float *message) {
 		if (!std::isnan(message[0])) {
@@ -21,16 +23,22 @@ struct TD_316 : Module {
 		}
 	}
 	void process(const ProcessArgs &args) override {
+		bool left = false;
+		bool right = false;
 		if (leftExpander.module) {
 			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
 				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
+				left = true;
 			}
 		}
 		if (rightExpander.module) {
 			if ((rightExpander.module->model == modelTF101) || (rightExpander.module->model == modelTF102)) {
 				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
+				right = true;
 			}
 		}
+		lights[0].setBrightness(left);
+		lights[1].setBrightness(right);
 	}
 	void onReset() override {
 		reset = 1;
@@ -112,6 +120,7 @@ namespace {
 struct TD316 : SchemeModuleWidget {
 	TD3Text *textField;
 	SchemePanel *schemePanel;
+	LightWidget *light;
 
 	TD316(TD_316 *module) {
 		setModule(module);
@@ -124,6 +133,10 @@ struct TD316 : SchemeModuleWidget {
 		textField->box.size = Vec(232, 344);
 		textField->multiline = true;
 		addChild(textField);
+		addChild(createLightCentered<LeftLight>(Vec(3, 14), module, 0));
+		light = createLightCentered<RightLight>(Vec(237, 14), module, 1);
+		addChild(light);
+
 	}
 
 	void step() override {
@@ -184,6 +197,7 @@ struct TD316 : SchemeModuleWidget {
 			TD_316 *td = dynamic_cast<TD_316 *>(module);
 			td->moduleSize = box.size.x;
 		}
+		light->box.pos.x = box.size.x - 5;
 	}
 };
 

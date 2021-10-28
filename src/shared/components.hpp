@@ -194,6 +194,21 @@ struct BlueRedLight : GrayModuleLightWidget {
 	}
 };
 
+struct ExtensionLight : BlueLight {
+	ExtensionLight();
+	virtual void getShape(const widget::Widget::DrawArgs& args) {}
+	void drawBackground(const widget::Widget::DrawArgs& args) override;
+	void drawLight(const widget::Widget::DrawArgs& args) override;
+};
+
+struct LeftLight : ExtensionLight {
+	void getShape(const widget::Widget::DrawArgs &args) override;
+};
+
+struct RightLight : ExtensionLight {
+	void getShape(const widget::Widget::DrawArgs &args) override;
+};
+
 //////////////////
 // Scheme
 //////////////////
