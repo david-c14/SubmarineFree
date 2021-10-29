@@ -133,8 +133,8 @@ struct TD316 : SchemeModuleWidget {
 		textField->box.size = Vec(232, 344);
 		textField->multiline = true;
 		addChild(textField);
-		addChild(createLightCentered<LeftLight>(Vec(3, 14), module, 0));
-		light = createLightCentered<RightLight>(Vec(237, 14), module, 1);
+		addChild(createLightCentered<RightLight>(Vec(3, 14), module, 0));
+		light = createLightCentered<LeftLight>(Vec(237, 14), module, 1);
 		addChild(light);
 
 	}

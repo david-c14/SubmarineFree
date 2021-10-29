@@ -394,7 +394,7 @@ struct TD510 : SchemeModuleWidget {
 		textItem->data->text = newText;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
@@ -424,7 +424,7 @@ struct TD510 : SchemeModuleWidget {
 		textItem->data->color = newColor;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
@@ -455,7 +455,7 @@ struct TD510 : SchemeModuleWidget {
 		textItem->data->alignment = newAlignment;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
@@ -488,7 +488,7 @@ struct TD510 : SchemeModuleWidget {
 			return;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 
 		APP->history->push(new EventWidgetAction(
@@ -523,7 +523,7 @@ struct TD510 : SchemeModuleWidget {
 		int newPosition = textItem->box.pos.x = textItem->data->position = clampPosition(textItem->data->position);
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 
 		APP->history->push(new EventWidgetAction(
@@ -555,7 +555,7 @@ struct TD510 : SchemeModuleWidget {
 		if (!module)
 			return;
 		textItem->data->flip = flip;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
@@ -644,7 +644,7 @@ struct TD510 : SchemeModuleWidget {
 		int flip = textItem->data->flip;
 		addText(text, color, position, alignment, fontSize, flip);
 		unsigned int id = textItems.size() - 1;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"TD-510 Duplicate Label",
 			[=]() {
@@ -702,7 +702,7 @@ struct TD510 : SchemeModuleWidget {
 		addText(newItem);
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		int id = index(newItem);
 		NVGcolor color = newItem->data->color;
 		std::string text = newItem->data->text;
@@ -729,7 +729,7 @@ struct TD510 : SchemeModuleWidget {
 	}
 
 	void removeTextWithHistory(TD5Text *oldItem) {
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(oldItem);
 		NVGcolor color = oldItem->data->color;
 		std::string text = oldItem->data->text;
@@ -757,7 +757,7 @@ struct TD510 : SchemeModuleWidget {
 		));
 	}
 
-	TD510 *getModuleWidgetById(int moduleId) {
+	TD510 *getModuleWidgetById(int64_t moduleId) {
 		for (Widget *widget : APP->scene->rack->getModuleContainer()->children) {
 			TD510 *mw = dynamic_cast<TD510 *>(widget);
 			if (mw) {

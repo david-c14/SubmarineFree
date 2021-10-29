@@ -252,6 +252,13 @@
 			"tags": ["LOGIC", "MULTIPLE"]
 		},
 		{
+			"slug":"LT-116",
+			"name":"LT-116",
+			"description": "LT-116 Linear Transformations",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/LT.md",
+			"tags": ["UTILITY", "POLYPHONIC"]
+		},
+		{
 			"slug":"MZ-909",
 			"name":"MZ-909",
 			"description": "MZ-909 Masterizer",

@@ -126,8 +126,8 @@ struct TD202 : SchemeModuleWidget {
 		textField->changeHandler = [=]() { textChanged(); };
 		tw->addChild(textField);
 
-		addChild(createLightCentered<LeftLight>(Vec(3, 14), module, 0));
-		addChild(createLightCentered<RightLight>(Vec(27, 14), module, 1));
+		addChild(createLightCentered<RightLight>(Vec(3, 14), module, 0));
+		addChild(createLightCentered<LeftLight>(Vec(27, 14), module, 1));
 	}
 
 	void step() override {

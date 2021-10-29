@@ -39,7 +39,7 @@ void SizeableModuleWidget::Minimize(bool minimize) {
 	box.size.x = minimize?15:fullSize;
 	ShiftOthers(box.size.x - oldSize);
 	Resize();
-	unsigned int id = module->id;
+	int64_t id = module->id;
 	float fs = fullSize; 
 	if (!stabilized)
 		return;

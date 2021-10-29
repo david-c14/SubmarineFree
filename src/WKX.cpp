@@ -613,7 +613,7 @@ struct WK205 : SchemeModuleWidget {
 			addInput(createInputCentered<SilverPort>(Vec(15,75.5 + i * 60), module, WK_205::INPUT_CV_1 + i));
 			addOutput(createOutputCentered<SilverPort>(Vec(15,104.5 + i * 60), module, WK_205::OUTPUT_CV_1 + i));
 		}
-		addChild(createLightCentered<LeftLight>(Vec(3, 25), module, WK_205::LIGHT_EXT_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(3, 25), module, WK_205::LIGHT_EXT_LEFT));
 		addChild(createLightCentered<RightLight>(Vec(27, 25), module, WK_205::LIGHT_EXT_RIGHT));
 
 		WK_Tunings::loadTunings(pluginInstance);

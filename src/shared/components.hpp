@@ -298,7 +298,6 @@ struct SchemeModuleWidget : app::ModuleWidget {
 	void drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt);
 	void drawBase(NVGcontext *vg, const char *txt);
 	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
-	virtual float* getBulkParam(int id) { return NULL; }
 };
 
 //////////////////

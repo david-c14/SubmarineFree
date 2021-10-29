@@ -10,27 +10,23 @@ namespace {
 	int clipboardColumn = -1;
 	const int bulkParamSize = sizeof(float) * 256;
 
-	template <class K>
-	K* createBulkParamCentered(math::Vec pos, float minValue, float maxValue, float defaultValue, std::string label = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
-		K* widget = new K();
-		widget->box.pos = pos.minus(widget->box.size.div(2));
-		widget->minValue = minValue;
-		widget->maxValue = maxValue;
-		widget->defaultValue = defaultValue;
-		widget->label = label;
-		widget->unit = unit;
-		widget->displayBase = displayBase;
-		widget->displayMultiplier = displayMultiplier;
-		widget->displayOffset = displayOffset;
-		return widget;
-	}
-	
+	struct LTKnob : LightKnob 
+	{
+		std::function<void(ui::Menu *)> contextMenuCallback;
+		void appendContextMenu(ui::Menu *menu) override {
+			ParamWidget::appendContextMenu(menu);
+			if (contextMenuCallback) {
+				contextMenuCallback(menu);
+			}
+		};
+	};
 }
 
 struct LT_116 : Module {
 	enum ParamIds {
 		PARAM_OUTPUT_CHANNELS,
-		NUM_PARAMS
+		PARAM_COEFF_1,
+		NUM_PARAMS = PARAM_COEFF_1 + 256
 	};
 	enum InputIds {
 		INPUT_1,
@@ -45,6 +41,7 @@ struct LT_116 : Module {
 	};
 
 	alignas(16) float bulkParams[256] = {.0f};
+	unsigned char tick = 0;
 
 	int numberOfInputs = 1;
 	int numberOfOutputs = 16;
@@ -52,20 +49,13 @@ struct LT_116 : Module {
 	LT_116() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_OUTPUT_CHANNELS, 1.0f, 16.0f, 16.0f, "Number of channels in output");
-	}
-
-	json_t *dataToJson() override {
-		json_t *rootJ = json_object();
-		json_t *arr = json_array();
-		for (unsigned int i = 0; i < 256; i++) {
-			if (std::isnan(bulkParams[i])) {
-				json_array_append_new(arr, json_real(0.0f));
-			} else {
-				json_array_append_new(arr, json_real(bulkParams[i]));
+		configInput(INPUT_1, "Signal");
+		configOutput(OUTPUT_1, "Signal");
+		for (unsigned int i = 0; i < 16; i++) {
+			for (unsigned int j = 0; j < 16; j++) {
+				configParam(PARAM_COEFF_1 + i * 16 + j, -100, +100, .0f, string::f("Coefficient [%d,%d]", j + 1, i + 1));
 			}
 		}
-		json_object_set_new(rootJ, "coefficients", arr);
-		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
@@ -77,13 +67,23 @@ struct LT_116 : Module {
 			for (int i = 0; i < size; i++) {
 				json_t *j1 = json_array_get(arr, i);
 				if (j1) {
-					bulkParams[i] = json_real_value(j1);
+					params[PARAM_COEFF_1 + i].setValue(json_real_value(j1));
 				}
 			}
+			gatherBulkParams();
+			tick = 1;
+		}
+	}
+	void gatherBulkParams() {
+		for (unsigned int i = 0; i < 256; i++) {
+			bulkParams[i] = params[PARAM_COEFF_1 + i].getValue();
 		}
 	}
 
 	void process(const ProcessArgs &args) override {
+		if (!tick++) {
+			gatherBulkParams();
+		}
 		numberOfInputs = inputs[INPUT_1].getChannels();
 		numberOfOutputs = params[PARAM_OUTPUT_CHANNELS].getValue();
 
@@ -119,26 +119,21 @@ struct LT_116 : Module {
 };
 
 struct LT116 : SchemeModuleWidget {
-	BulkLightKnob *knobs[256];
-	float *bulkParams;
+	LTKnob *knobs[256];
 	LT116(LT_116 *module) {
 		setModule(module);
-		if (module)
-			bulkParams = module->bulkParams;
 		this->box.size = Vec(300, 380);
 		addChild(new SchemePanel(this->box.size));
 
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
 				int index = i * 16 + j;
-				knobs[index] = createBulkParamCentered<TinyKnob<BulkLightKnob>>(Vec(15 + j * 18, 30 + i * 18), -INFINITY, +INFINITY, .0f, string::f("Coefficient [%d,%d]", j + 1, i + 1));
+				knobs[index] = createParamCentered<TinyKnob<LTKnob>>(Vec(15 + j * 18, 30 + i * 18), module, LT_116::PARAM_COEFF_1 + index);
+				
 				if (module) {
-					knobs[index]->value = &(bulkParams[index]);
 					knobs[index]->contextMenuCallback = [=](Menu *menu) {
 						this->appendOperationMenu(menu, i, j);
 					};
-					knobs[index]->module = module;
-					knobs[index]->paramId = index;
 				}
 				
 				addChild(knobs[index]);
@@ -147,15 +142,6 @@ struct LT116 : SchemeModuleWidget {
 		addInput(createInputCentered<SilverPort>(Vec(35, 330), module, LT_116::INPUT_1));
 		addOutput(createOutputCentered<SilverPort>(Vec(265, 330), module, LT_116::OUTPUT_1));
 		addParam(createParamCentered<SnapKnob<SmallKnob<LightKnob>>>(Vec(200, 330), module, LT_116::PARAM_OUTPUT_CHANNELS));
-	}
-	float *getBulkParam(int id) override {
-		if (id < 0)
-			return NULL;
-		if (id > 255)
-			return NULL;
-		if (module)
-			return bulkParams + id;	
-		return NULL;
 	}
 	void appendOperationMenu(Menu *menu, int row, int column) {
 		if (!module) {
@@ -342,25 +328,38 @@ struct LT116 : SchemeModuleWidget {
 		drawText(vg, 50, 330, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x93"); 
 		drawText(vg, 240, 330, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 16, gScheme.getContrast(module), "\xE2\x86\x92"); 
 	}
+	void getKnobs(float* values) {
+		for (unsigned int i = 0; i < 256; i++) {
+			values[i] = knobs[i]->getParamQuantity()->getValue();
+		}
+	}
+	void setKnobs(const float *values) {
+		for (unsigned int i = 0; i < 256; i++) {
+			knobs[i]->getParamQuantity()->setValue(values[i]);
+		}
+	}
 	void bulkChangeWithHistory(std::string label, std::function<void (float *params)> func) {
 		float oldValues[256];
 		float newValues[256];
+		float bulkParams[256];
+		getKnobs(bulkParams);
 		memcpy(oldValues, bulkParams, bulkParamSize);
 		func(bulkParams);
 		memcpy(newValues, bulkParams, bulkParamSize);
-		int moduleId = module->id;
+		setKnobs(newValues);
+		int64_t moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			label,
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					memcpy(mw->bulkParams, oldValues, bulkParamSize);
+					mw->setKnobs(oldValues);
 				}
 			},
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					memcpy(mw->bulkParams, newValues, bulkParamSize);
+					mw->setKnobs(newValues);
 				}
 			}
 		));	
@@ -368,6 +367,7 @@ struct LT116 : SchemeModuleWidget {
 	void bulkChangeWithHistory(std::string label, float *values) {
 		bulkChangeWithHistory(label, [=](float *params) {
 			memcpy(params, values, bulkParamSize);	
+			setKnobs(values);
 		});
 		
 	}
@@ -398,44 +398,47 @@ struct LT116 : SchemeModuleWidget {
 	}
 	void copy() {
 		clipboardUsed = true;
-		memcpy(clipboard, bulkParams, bulkParamSize);
+		getKnobs(clipboard);
 		clipboardRow = clipboardColumn = -1;
 	}
 	void copyRow(int row) {
 		clipboardUsed = true;
-		memcpy(clipboard, bulkParams, bulkParamSize);
+		getKnobs(clipboard);
 		clipboardRow = row;
 		clipboardColumn = -1;
 	}
 	void copyColumn(int column) {
 		clipboardUsed = true;
-		memcpy(clipboard, bulkParams, bulkParamSize);
+		getKnobs(clipboard);
 		clipboardRow = -1;
 		clipboardColumn = column;
 	}
 	void copyCell(int row, int column) {
 		clipboardUsed = true;
-		memcpy(clipboard, bulkParams, bulkParamSize);
+		getKnobs(clipboard);
 		clipboardRow = row;
 		clipboardColumn = column;
 	}
 	void pasteCell(int row, int column) {
+		float bulkParams[256];
+	        getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] = clipboard[clipboardColumn + 16 * clipboardRow];
 		float newValue = bulkParams[column + 16 * row];
-		int moduleId = module->id;
+		setKnobs(bulkParams);
+		int64_t moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"LT116 paste cell",
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = oldValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(oldValue);
 				}
 			},
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = newValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(newValue);
 				}
 			}
 		));	
@@ -480,22 +483,25 @@ struct LT116 : SchemeModuleWidget {
 		}
 	}
 	void pasteMultiplyCell(int row, int column) {
+		float bulkParams[256];
+	       	getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] *= clipboard[clipboardColumn + 16 * clipboardRow];
 		float newValue = bulkParams[column + 16 * row];
-		int moduleId = module->id;
+		setKnobs(bulkParams);
+		int64_t moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"LT116 paste multiply cell",
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = oldValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(oldValue);
 				}
 			},
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = newValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(newValue);
 				}
 			}
 		));	
@@ -549,22 +555,25 @@ struct LT116 : SchemeModuleWidget {
 		}
 	}
 	void pasteAddCell(int row, int column) {
+		float bulkParams[256];
+	       	getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] += clipboard[clipboardColumn + 16 * clipboardRow];
 		float newValue = bulkParams[column + 16 * row];
-		int moduleId = module->id;
+		setKnobs(bulkParams);
+		int64_t moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"LT116 paste add cell",
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = oldValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(oldValue);
 				}
 			},
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = newValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(newValue);
 				}
 			}
 		));	
@@ -618,22 +627,25 @@ struct LT116 : SchemeModuleWidget {
 		}
 	}
 	void pasteSubtractCell(int row, int column) {
+		float bulkParams[256];
+		getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] -= clipboard[clipboardColumn + 16 * clipboardRow];
 		float newValue = bulkParams[column + 16 * row];
-		int moduleId = module->id;
+		setKnobs(bulkParams);
+		int64_t moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"LT116 paste subtract cell",
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = oldValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(oldValue);
 				}
 			},
 			[=]() {
 				LT116 *mw = dynamic_cast<LT116 *>(APP->scene->rack->getModule(moduleId));	
 				if (mw) {
-					mw->bulkParams[column + 16 * row] = newValue;
+					mw->knobs[column + 16 * row]->getParamQuantity()->setValue(newValue);
 				}
 			}
 		));	
