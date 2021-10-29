@@ -13,6 +13,7 @@
 - 28-Oct-2021 Port WK-101 and WK-205 to v2  Deprecated Torpedo in WK devices and replace with extension modules
 - 28-Oct-2021 Add Module Link lights for expander modules
 - 29-Oct-2021 Port LT-116 to v2
+- 29-Oct-2021 Port XF-xxx to v2
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual

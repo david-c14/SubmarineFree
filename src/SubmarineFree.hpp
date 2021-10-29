@@ -101,12 +101,12 @@ extern Model *modelWK205;
 extern Model *modelWM101;
 extern Model *modelWM102;
 
-//extern Model *modelXF101;
-//extern Model *modelXF102;
-//extern Model *modelXF104;
-//extern Model *modelXF201;
-//extern Model *modelXF202;
-//extern Model *modelXF301;
+extern Model *modelXF101;
+extern Model *modelXF102;
+extern Model *modelXF104;
+extern Model *modelXF201;
+extern Model *modelXF202;
+extern Model *modelXF301;
 
 extern Model *modelXG104;
 extern Model *modelXG106;

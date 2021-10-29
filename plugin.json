@@ -477,6 +477,48 @@
 			"tags": ["BLANK", "UTILITY"]
 		},
 		{
+			"slug":"XF-101",
+			"name":"XF-101",
+			"description": "XF-101 Single Mono Cross Fader",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XF.md",
+			"tags": ["MIXER"]
+		},
+		{
+			"slug":"XF-102",
+			"name":"XF-102",
+			"description": "XF-102 Dual Mono Cross Fader",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XF.md",
+			"tags": ["MIXER", "DUAL"]
+		},
+		{
+			"slug":"XF-104",
+			"name":"XF-104",
+			"description": "XF-104 Quad Mono Cross Fader",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XF.md",
+			"tags": ["MIXER", "QUAD"]
+		},
+		{
+			"slug":"XF-201",
+			"name":"XF-201",
+			"description": "XF-201 Single Stereo Cross Fader",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XF.md",
+			"tags": ["MIXER"]
+		},
+		{
+			"slug":"XF-202",
+			"name":"XF-202",
+			"description": "XF-202 Dual Stereo Cross Fader",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XF.md",
+			"tags": ["MIXER", "DUAL"]
+		},
+		{
+			"slug":"XF-301",
+			"name":"XF-301",
+			"description": "XF-301 Small Form Factor Stereo Cross Fader",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XF.md",
+			"tags": ["MIXER"]
+		},
+		{
 			"slug":"XG-104",
 			"name":"XG-104",
 			"description": "XG-104 XOR Gates",
