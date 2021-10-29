@@ -90,27 +90,32 @@ namespace {
 		return rescale(x, 0.0f, 1.0f, min, max);
 	}
 
-	struct VM_LinearDisplay : LightWidget {
+	struct VM_LinearDisplay : Widget {
 		float value = 0.0f;
 	
-		void draw(const DrawArgs &args) override {
-			float zeroPoint = squareScale(0, box.size.y, 0);
-			float meter = squareScale(value, 0.0f, box.size.y);
-			
-			NVGpaint grad = nvgLinearGradient(args.vg, 0, zeroPoint - 10.0f, 0, zeroPoint + 10.0f, SUBLIGHTRED, nvgRGB(30,255,0));
-			nvgFillPaint(args.vg, grad);
-			
-			nvgBeginPath(args.vg);
-			nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter); 
-			nvgFill(args.vg);
-			Widget::draw(args);
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				float zeroPoint = squareScale(0, box.size.y, 0);
+				float meter = squareScale(value, 0.0f, box.size.y);
+				
+				NVGpaint grad = nvgLinearGradient(args.vg, 0, zeroPoint - 10.0f, 0, zeroPoint + 10.0f, SUBLIGHTRED, nvgRGB(30,255,0));
+				nvgFillPaint(args.vg, grad);
+				
+				nvgBeginPath(args.vg);
+				nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter); 
+				nvgFill(args.vg);
+			}
+			Widget::drawLayer(args, layer);
 		}
 	};
 
-	struct VM_NeedleCanvas : Widget {
-	
+	struct VM_NeedleDisplay : Widget {
+		float value = 0.0f;
+		VM_NeedleDisplay(float width, float height) : Widget() {
+			box.size = Vec(width, height);
+		}
 		void drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt) {
-			nvgFontFaceId(vg, gScheme.font(vg));
+			nvgFontFaceId(vg, gScheme.font()->handle);
 			nvgFontSize(vg, size * 90 / SVG_DPI);
 			nvgTextAlign(vg, align);
 			nvgFillColor(vg, col);
@@ -134,90 +139,86 @@ namespace {
 			nvgFillColor(args.vg, nvgRGB(255,255,255));
 			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
 			nvgFill(args.vg);
-
-			// Change from black to red scale
-			float zeroPoint = squareScale(0.0f, M_PI * 0.75, M_PI * 0.25);
-
-			// Red arc
-			nvgLineCap(args.vg, NVG_ROUND);
-			nvgStrokeColor(args.vg, SUBLIGHTRED);
-			nvgBeginPath(args.vg);
-			nvgArc(args.vg,
-				box.size.x * 0.5f,
-				box.size.y,
-				box.size.y * 0.9f,
-				-zeroPoint,
-				M_PI * -0.25f,
-				NVG_CW);
-			addTick(args, 1.0f);
-			addTick(args, 2.0f);
-			addTick(args, 3.0f);
-			nvgStroke(args.vg);
-
-			// Black arc
-			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
-			nvgBeginPath(args.vg);
-			nvgArc(args.vg,
-				box.size.x * 0.5f,
-				box.size.y,
-				box.size.y * 0.9f,
-				M_PI * -0.75f,
-				-zeroPoint,
-				NVG_CW);
-			addTick(args, 0.0f);
-			addTick(args, -1.0f);
-			addTick(args, -2.0f);
-			addTick(args, -3.0f);
-			addTick(args, -4.0f);
-			addTick(args, -5.0f);
-			addTick(args, -6.0f);
-			addTick(args, -7.0f);
-			addTick(args, -8.0f);
-			addTick(args, -9.0f);
-			addTick(args, -10.0f);
-			addTick(args, -20.0f);
-			nvgStroke(args.vg);
-
-			drawText(args.vg, box.size.x * 0.5, box.size.y * 0.7, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
-			drawText(args.vg, 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
-			drawText(args.vg, box.size.x - 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
-			drawText(args.vg, -27, nvgRGB(0,0,0), "20");
-			drawText(args.vg, -10, nvgRGB(0,0,0), "10");
-			drawText(args.vg, -7, nvgRGB(0,0,0), "7");
-			drawText(args.vg, -5, nvgRGB(0,0,0), "5");
-			drawText(args.vg, -3, nvgRGB(0,0,0), "3");
-			drawText(args.vg, -1, nvgRGB(0,0,0), "1");
-			drawText(args.vg, 0, nvgRGB(0,0,0), "0");
-			drawText(args.vg, 1, SUBLIGHTRED, "1");
-			drawText(args.vg, 2, SUBLIGHTRED, "2");
-			drawText(args.vg, 3.3, SUBLIGHTRED, "3");
-
 			Widget::draw(args);
+		}
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				// White backpanel
+				nvgBeginPath(args.vg);
+				NVGpaint grad = nvgRadialGradient(args.vg, box.size.x * 0.5f, box.size.y * 1.2f, box.size.y * 0.5f, box.size.y * 2, nvgRGBAf(1, 1, 1, 1), nvgRGBAf(1, 1, 1, 0));
+				nvgFillPaint(args.vg, grad);
+				nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+				nvgFill(args.vg);
+	
+				// Change from black to red scale
+				float zeroPoint = squareScale(0.0f, M_PI * 0.75, M_PI * 0.25);
+	
+				// Red arc
+				nvgLineCap(args.vg, NVG_ROUND);
+				nvgStrokeColor(args.vg, SUBLIGHTRED);
+				nvgBeginPath(args.vg);
+				nvgArc(args.vg,
+					box.size.x * 0.5f,
+					box.size.y,
+					box.size.y * 0.9f,
+					-zeroPoint,
+					M_PI * -0.25f,
+					NVG_CW);
+				addTick(args, 1.0f);
+				addTick(args, 2.0f);
+				addTick(args, 3.0f);
+				nvgStroke(args.vg);
+	
+				// Black arc
+				nvgStrokeColor(args.vg, nvgRGB(0,0,0));
+				nvgBeginPath(args.vg);
+				nvgArc(args.vg,
+					box.size.x * 0.5f,
+					box.size.y,
+					box.size.y * 0.9f,
+					M_PI * -0.75f,
+					-zeroPoint,
+					NVG_CW);
+				addTick(args, 0.0f);
+				addTick(args, -1.0f);
+				addTick(args, -2.0f);
+				addTick(args, -3.0f);
+				addTick(args, -4.0f);
+				addTick(args, -5.0f);
+				addTick(args, -6.0f);
+				addTick(args, -7.0f);
+				addTick(args, -8.0f);
+				addTick(args, -9.0f);
+				addTick(args, -10.0f);
+				addTick(args, -20.0f);
+				nvgStroke(args.vg);
+	
+				drawText(args.vg, box.size.x * 0.5, box.size.y * 0.7, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
+				drawText(args.vg, 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
+				drawText(args.vg, box.size.x - 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
+				drawText(args.vg, -27, nvgRGB(0,0,0), "20");
+				drawText(args.vg, -10, nvgRGB(0,0,0), "10");
+				drawText(args.vg, -7, nvgRGB(0,0,0), "7");
+				drawText(args.vg, -5, nvgRGB(0,0,0), "5");
+				drawText(args.vg, -3, nvgRGB(0,0,0), "3");
+				drawText(args.vg, -1, nvgRGB(0,0,0), "1");
+				drawText(args.vg, 0, nvgRGB(0,0,0), "0");
+				drawText(args.vg, 1, SUBLIGHTRED, "1");
+				drawText(args.vg, 2, SUBLIGHTRED, "2");
+				drawText(args.vg, 3.3, SUBLIGHTRED, "3");
+	
+				float meter = squareScale(value, M_PI * 0.75, M_PI * 0.25);
+				nvgStrokeColor(args.vg, nvgRGB(0,0,0));
+				nvgBeginPath(args.vg);
+				nvgMoveTo(args.vg, box.size.x * 0.5f, box.size.y);
+				nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.9f, box.size.y - sin(meter) * box.size.y * 0.9f);
+				nvgStrokeWidth(args.vg, 1);
+				nvgStroke(args.vg);
+			}
+			Widget::drawLayer(args, layer);
 		}
 	};
 
-	struct VM_NeedleDisplay : LightWidget {
-		float value = 0.0f;
-		FramebufferWidget *fb;
-		VM_NeedleDisplay(float width, float height) : LightWidget() {
-			box.size = Vec(width, height);
-			fb = new FramebufferWidget();
-			VM_NeedleCanvas *canvas = new VM_NeedleCanvas();
-			canvas->box.size = box.size;
-			fb->addChild(canvas);
-			addChild(fb);
-		}
-		void draw(const DrawArgs &args) override {
-			Widget::draw(args);
-			float meter = squareScale(value, M_PI * 0.75, M_PI * 0.25);
-			nvgStrokeColor(args.vg, nvgRGB(0,0,0));
-			nvgBeginPath(args.vg);
-			nvgMoveTo(args.vg, box.size.x * 0.5f, box.size.y);
-			nvgLineTo(args.vg, box.size.x * 0.5f + cos(meter) * box.size.y * 0.9f, box.size.y - sin(meter) * box.size.y * 0.9f);
-			nvgStrokeWidth(args.vg, 1);
-			nvgStroke(args.vg);
-		}
-	};
 }
 
 struct VM_Base : Module {
@@ -228,17 +229,17 @@ struct VM_Base : Module {
 		Module * module = this;
 		EventWidgetMenuItem *m = createMenuItem<EventWidgetMenuItem>("150\xe2\x84\xa6");
 		m->clickHandler = [=]() {
-			APP->engine->setParam(module, PARAM_LOAD, 150);
+			APP->engine->setParamValue(module, PARAM_LOAD, 150);
 		};
 		menu->addChild(m);
 		m = createMenuItem<EventWidgetMenuItem>("600\xe2\x84\xa6");
 		m->clickHandler = [=]() {
-			APP->engine->setParam(module, PARAM_LOAD, 600);
+			APP->engine->setParamValue(module, PARAM_LOAD, 600);
 		};
 		menu->addChild(m);
 		m = createMenuItem<EventWidgetMenuItem>("1000\xe2\x84\xa6");
 		m->clickHandler = [=]() {
-			APP->engine->setParam(module, PARAM_LOAD, 1000);
+			APP->engine->setParamValue(module, PARAM_LOAD, 1000);
 		};
 		menu->addChild(m);
 		return menu;
@@ -267,6 +268,9 @@ struct VM_ : VM_Base {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_LOAD, 50.0f, 20000.0f, 600.0f, "Load Resistor", "\xe2\x84\xa6");
 		configParam(PARAM_ATTENUATOR, -2.0f, 4.0f, 0.0f, "Attenuator", "x", 2.0f);
+		for(unsigned int i = 0; i < x; i++) {
+		//	configInput(INPUT_1 + x, string::f("Signal %d", x + 1));
+		}
 	}
 
 	Coefficients c { { APP->engine->getSampleTime() } };

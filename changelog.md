@@ -14,6 +14,7 @@
 - 28-Oct-2021 Add Module Link lights for expander modules
 - 29-Oct-2021 Port LT-116 to v2
 - 29-Oct-2021 Port XF-xxx to v2
+- 29-Oct-2021 Port VU meters to v2, including new backlights
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual

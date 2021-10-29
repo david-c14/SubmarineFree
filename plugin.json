@@ -449,6 +449,34 @@
 			"tags": ["VISUAL"]
 		},
 		{
+			"slug":"VM-101",
+			"name":"VM-101",
+			"description": "VM-101 VU-Meter",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/VM.md",
+			"tags": ["UTILITY", "VISUAL", "HARDWARE"]
+		},
+		{
+			"slug":"VM-102",
+			"name":"VM-102",
+			"description": "VM-102 2-Channel VU-Meter",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/VM.md",
+			"tags": ["UTILITY", "VISUAL", "DUAL", "POLYPHONIC", "HARDWARE"]
+		},
+		{
+			"slug":"VM-201",
+			"name":"VM-201",
+			"description": "VM-201 Vintage VU-Meter",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/VM.md",
+			"tags": ["UTILITY", "VISUAL", "HARDWARE"]
+		},
+		{
+			"slug":"VM-202",
+			"name":"VM-202",
+			"description": "VM-202 2-Channel Vintage VU-Meter",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/VM.md",
+			"tags": ["UTILITY", "VISUAL", "DUAL", "POLYPHONIC", "HARDWARE"]
+		},
+		{
 			"slug":"WK-101",
 			"name":"WK-101",
 			"description": "WK-101 Das Wohltemperierte Klavier",

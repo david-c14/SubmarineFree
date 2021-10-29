@@ -37,7 +37,7 @@ void LightKnob::draw(const DrawArgs &args) {
 			nvgBeginPath(args.vg);
 			nvgCircle(args.vg, radius, radius, radius);
 			nvgTranslate(args.vg, radius, radius);
-			nvgRotate(args.vg, M_PI / -15);
+			nvgRotate(args.vg, M_PI * 0.35f);
 			nvgScale(args.vg, 40, 1);
 			NVGpaint paint;
 			paint = nvgRadialGradient(args.vg, 0, 0, 0, radius * 0.2, nvgRGB(0x7a,0x7a,0x7a), nvgRGB(10,10,10));
