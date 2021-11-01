@@ -269,7 +269,7 @@ struct VM_ : VM_Base {
 		configParam(PARAM_LOAD, 50.0f, 20000.0f, 600.0f, "Load Resistor", "\xe2\x84\xa6");
 		configParam(PARAM_ATTENUATOR, -2.0f, 4.0f, 0.0f, "Attenuator", "x", 2.0f);
 		for(unsigned int i = 0; i < x; i++) {
-		//	configInput(INPUT_1 + x, string::f("Signal %d", x + 1));
+			configInput(INPUT_1 + i, string::f("Signal %d", i + 1));
 		}
 	}
 
