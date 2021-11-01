@@ -18,7 +18,24 @@ namespace {
 			if (contextMenuCallback) {
 				contextMenuCallback(menu);
 			}
-		};
+		}
+		void onDoubleClick(const DoubleClickEvent &e) override {
+			engine::ParamQuantity *pq = getParamQuantity(); 
+			if (pq && pq->resetEnabled) {
+				float oldValue = pq->getValue();
+				pq->reset();
+				float newValue = pq->getValue();
+				if (oldValue != newValue) {
+					history::ParamChange* h = new history::ParamChange();
+					h->name = "reset parameter";
+					h->moduleId = module->id;
+					h->paramId = paramId;
+					h->oldValue = oldValue;
+					h->newValue = newValue;
+					APP->history->push(h);
+				}
+			}
+		}
 	};
 }
 
@@ -53,9 +70,24 @@ struct LT_116 : Module {
 		configOutput(OUTPUT_1, "Signal");
 		for (unsigned int i = 0; i < 16; i++) {
 			for (unsigned int j = 0; j < 16; j++) {
-				configParam(PARAM_COEFF_1 + i * 16 + j, -100, +100, .0f, string::f("Coefficient [%d,%d]", j + 1, i + 1));
+				configParam(PARAM_COEFF_1 + i * 16 + j, -INFINITY, +INFINITY, .0f, string::f("Coefficient [%d,%d]", j + 1, i + 1));
 			}
 		}
+	}
+
+	json_t *dataToJson() override {
+		json_t *rootJ = json_object();
+		json_t *arr = json_array();
+		for (unsigned int i  = 0; i < 256; i++) {
+			float val = params[PARAM_COEFF_1 + i].getValue();
+			if (std::isnan(val)) {
+				json_array_append_new(arr, json_real(0.0f));
+			} else {
+				json_array_append_new(arr, json_real(val));
+			}
+		}
+		json_object_set_new(rootJ, "coefficients", arr);
+		return rootJ;
 	}
 
 	void dataFromJson(json_t *rootJ) override {
@@ -120,6 +152,7 @@ struct LT_116 : Module {
 
 struct LT116 : SchemeModuleWidget {
 	LTKnob *knobs[256];
+	alignas(16) float bulkParams[256];
 	LT116(LT_116 *module) {
 		setModule(module);
 		this->box.size = Vec(300, 380);
@@ -341,7 +374,6 @@ struct LT116 : SchemeModuleWidget {
 	void bulkChangeWithHistory(std::string label, std::function<void (float *params)> func) {
 		float oldValues[256];
 		float newValues[256];
-		float bulkParams[256];
 		getKnobs(bulkParams);
 		memcpy(oldValues, bulkParams, bulkParamSize);
 		func(bulkParams);
@@ -420,7 +452,6 @@ struct LT116 : SchemeModuleWidget {
 		clipboardColumn = column;
 	}
 	void pasteCell(int row, int column) {
-		float bulkParams[256];
 	        getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] = clipboard[clipboardColumn + 16 * clipboardRow];
@@ -483,7 +514,6 @@ struct LT116 : SchemeModuleWidget {
 		}
 	}
 	void pasteMultiplyCell(int row, int column) {
-		float bulkParams[256];
 	       	getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] *= clipboard[clipboardColumn + 16 * clipboardRow];
@@ -555,7 +585,6 @@ struct LT116 : SchemeModuleWidget {
 		}
 	}
 	void pasteAddCell(int row, int column) {
-		float bulkParams[256];
 	       	getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] += clipboard[clipboardColumn + 16 * clipboardRow];
@@ -627,7 +656,6 @@ struct LT116 : SchemeModuleWidget {
 		}
 	}
 	void pasteSubtractCell(int row, int column) {
-		float bulkParams[256];
 		getKnobs(bulkParams);
 		float oldValue = bulkParams[column + 16 * row];
 		bulkParams[column + 16 * row] -= clipboard[clipboardColumn + 16 * clipboardRow];
