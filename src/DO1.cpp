@@ -5,6 +5,7 @@
 namespace {
 
 	NVGcolor colors[26];
+	char labels[27] = "-1234+ABCDEFGHIJKLMNOPQRST";
 
 // Based on - Set of 20 Simple, Distinct Colors
 // Thanks to Sacha Trubetskoy
@@ -83,11 +84,19 @@ namespace {
 
 	typedef uint16_t status_t;
 
-	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color) {
+	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color, char label) {
+		static char lbl[2] = {0,0};
+		lbl[0] = label;
 		nvgFillColor(vg, color);
 		nvgBeginPath(vg);
 		nvgCircle(vg, x, y, 4);
 		nvgFill(vg);
+		nvgFontFaceId(vg, gScheme.font()->handle);
+		nvgFontSize(vg, 7 * 90 / SVG_DPI);
+		float bright = color.r * 0.212655 + color.g * 0.715158 + color.b * 0.072187;
+		nvgFillColor(vg, (bright > 0.5f)?nvgRGB(0,0,0):nvgRGB(255,255,255));
+		nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+		nvgText(vg, x, y, lbl, NULL);
 	}
 
 	inline void drawOutput(NVGcontext *vg, float leftPos) {
@@ -401,7 +410,7 @@ namespace {
 				functions[val].draw(args, box.size);
 				unsigned int i = box.pos.y / 80;
 				i += 6;
-				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, colors[i]);
+				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, colors[i], labels[i]);
 			}
 		}
 		void onButton(const event::Button &e) override {
@@ -459,9 +468,6 @@ namespace {
 			nvgBeginPath(args.vg);
 			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
 			nvgFill(args.vg);
-			for (unsigned int ix = 0; ix < x + 2; ix++) {
-				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, colors[ix]);
-			}
 			nvgStrokeWidth(args.vg, 2);
 			for (unsigned int ix = 0; ix < x; ix++) {
 				nvgStrokeColor(args.vg, colors[ix + 1]);
@@ -469,6 +475,9 @@ namespace {
 				nvgMoveTo(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 3), 5);
 				nvgLineTo(args.vg, 15 + ix * 30 - box.pos.x, 30 - box.pos.y);
 				nvgStroke(args.vg);
+			}
+			for (unsigned int ix = 0; ix < x + 2; ix++) {
+				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, colors[ix], labels[ix]);
 			}
 			Widget::draw(args);
 		}
@@ -520,7 +529,7 @@ struct DO1 : DS_Module {
 			configOutput(OUTPUT_1 + ix, string::f("Signal %d", ix + 1));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			configParam(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate" );
+			configSwitch(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate", { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17" } );
 			configParam(PARAM_CONNECTOR_1 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
 			configParam(PARAM_CONNECTOR_2 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
 			configParam(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
@@ -587,9 +596,9 @@ struct DOWidget : SchemeModuleWidget {
 		for (unsigned int ix = 0; ix < x; ix++) {
 			knobs[ix + 4 * y] = createParamCentered<PLConnectorKnob>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
 			knobs[ix + 4 * y]->module = module;
-			knobs[ix + 4 * y]->getText = [=]()->std::string {
-				return this->getConnectorText(ix + 4 * y);
-			};
+			//knobs[ix + 4 * y]->getText = [=]()->std::string {
+			//	return this->getConnectorText(ix + 4 * y);
+			//}//;
 			knobs[ix + 4 * y]->speed = 20.0f / (2 + x + 4 * y);
 			background->addChild(knobs[ix + 4 * y]);
 			pos = pos + posDiff;
@@ -601,18 +610,18 @@ struct DOWidget : SchemeModuleWidget {
 			gateKnobs[iy] = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
 			gateKnobs[iy]->module = module;
 			gateKnobs[iy]->index = DO1<x,y>::PARAM_GATE_1 + iy;
-			gateKnobs[iy]->getText = [=]()->std::string {
-				return this->getGateText(iy);
-			};
+		//	gateKnobs[iy]->getText = [=]()->std::string {
+		//		return this->getGateText(iy);
+		//	};
 			collectionScrollWidget->container->addChild(gateKnobs[iy]);
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < 4; ix++) {
 				knobs[4 * iy + ix] = createParamCentered<PLConnectorKnob>(Vec(5, (iy + 1) * 80.0f + ix * 14.0f - 21.0f), module, DO1<x, y>::PARAM_CONNECTOR_1 + iy * 4 + ix);
 				knobs[4 * iy + ix]->module = module;
-				knobs[4 * iy + ix]->getText = [=]()->std::string {
-					return this->getConnectorText(4 * iy + ix);
-				};
+		//		knobs[4 * iy + ix]->getText = [=]()->std::string {
+		//			return this->getConnectorText(4 * iy + ix);
+		//		};
 				knobs[4 * iy + ix]->speed = 20.0f / (4 * iy + x + 2);
 				collectionScrollWidget->container->addChild(knobs[4 * iy + ix]);	
 			}
@@ -670,19 +679,21 @@ struct DOWidget : SchemeModuleWidget {
 		return connectorName + string::f("Gate %d: ", val - x -1) + getGateName(val - x - 2);
 	}
 
-	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade) {
-		drawConnector(args.vg, sx, sy, color);
+	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade, char label) {
 		color.a = fade;
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, sx, sy);
 		nvgLineTo(args.vg, dx, dy);
-		nvgLineCap(args.vg, NVG_ROUND);
+		nvgLineCap(args.vg, NVG_BUTT);
 		nvgStrokeColor(args.vg, nvgRGBAf(color.r / 2.0f, color.g / 2.0f, color.b / 2.0f, fade));
 		nvgStrokeWidth(args.vg, 3);
 		nvgStroke(args.vg);
 		nvgStrokeColor(args.vg, color);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
+		color.a = 1;
+		drawConnector(args.vg, sx, sy, color, label);
+		drawConnector(args.vg, dx, dy, color, label);
 	}
 	void drawConnectors(const DrawArgs &args) {
 		if (!module)
@@ -731,7 +742,7 @@ struct DOWidget : SchemeModuleWidget {
 			nvgScissor(args.vg, args.clipBox.pos.x, scissorTop, args.clipBox.size.x, scissorBottom);
 			NVGcolor color = colors[val];
 			float fade = val?knobs[i]->fade:0.0f;
-			drawWire(args, startX, startY, destX, destY, color, fade);
+			drawWire(args, startX, startY, destX, destY, color, fade, labels[val]);
 			nvgResetScissor(args.vg);
 		}
 	}

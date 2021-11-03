@@ -480,7 +480,7 @@ struct SubTooltip : ui::Tooltip {
 
 struct TooltipKnob : Knob
 {
-	std::function<std::string()> getText;
-	void onEnter(const event::Enter &e) override;
-	void onLeave(const event::Leave &e) override;
+//	std::function<std::string()> getText;
+//	void onEnter(const event::Enter &e) override;
+//	void onLeave(const event::Leave &e) override;
 };

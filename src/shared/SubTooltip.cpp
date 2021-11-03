@@ -7,7 +7,7 @@ void SubTooltip::step() {
 	//Tooltip::step();
 }
 
-void TooltipKnob::onEnter(const event::Enter &e) {
+//void TooltipKnob::onEnter(const event::Enter &e) {
 //	if (settings::tooltips && !tooltip) {
 //		SubTooltip *stt = new SubTooltip();
 //		tooltip = stt;
@@ -20,13 +20,13 @@ void TooltipKnob::onEnter(const event::Enter &e) {
 //		};
 //		APP->scene->addChild(tooltip);
 //	}	
-}
+//}
 
-void TooltipKnob::onLeave(const event::Leave &e) {
+//void TooltipKnob::onLeave(const event::Leave &e) {
 //	if (tooltip) {
 //		APP->scene->removeChild(tooltip);
 //		delete tooltip;
 //		tooltip = NULL;
 //	}
-}
+//}
 

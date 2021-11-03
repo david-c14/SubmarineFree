@@ -1,7 +1,6 @@
 //SubTag W16 AM WP
 
 #include "SubmarineFree.hpp"
-#include "shared/torpedo.hpp"
 
 struct TD_116;
 
