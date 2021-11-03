@@ -426,6 +426,7 @@ namespace {
 	struct PLGateKnob : Knob {
 		Module *module;
 		int index;
+		std::function<void(int index, unsigned int val)> rightClickHandler;
 		PLGateKnob() {
 			box.size.x = 86;
 			box.size.y = 60;
@@ -452,12 +453,9 @@ namespace {
 					if (val >= functions.size()) {
 						val = functions.size() - 1;
 					}
-					Menu *menu = createMenu();
-					MenuLabel *menuLabel = new MenuLabel();
-					menuLabel->text = functions[val].name;
-					menu->addChild(menuLabel);
-					menu->addChild(new MenuSeparator());
-					menu->addChild(new PLTruthTable(functions[val].truthTable));
+					if (rightClickHandler) {
+						rightClickHandler(index, val);
+					}
 					return;
 				}
 			}
@@ -637,9 +635,6 @@ struct DOWidget : SchemeModuleWidget {
 		for (unsigned int ix = 0; ix < x; ix++) {
 			knobs[ix + 4 * y] = createParamCentered<PLConnectorKnob>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
 			knobs[ix + 4 * y]->module = module;
-			//knobs[ix + 4 * y]->getText = [=]()->std::string {
-			//	return this->getConnectorText(ix + 4 * y);
-			//}//;
 			knobs[ix + 4 * y]->speed = 20.0f / (2 + x + 4 * y);
 			background->addChild(knobs[ix + 4 * y]);
 			pos = pos + posDiff;
@@ -651,18 +646,85 @@ struct DOWidget : SchemeModuleWidget {
 			gateKnobs[iy] = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
 			gateKnobs[iy]->module = module;
 			gateKnobs[iy]->index = DO1<x,y>::PARAM_GATE_1 + iy;
-		//	gateKnobs[iy]->getText = [=]()->std::string {
-		//		return this->getGateText(iy);
-		//	};
+			gateKnobs[iy]->rightClickHandler = [=](int index, unsigned int val) {	
+				this->appendGateRightClickMenu(index, val);
+				/*
+					Menu *menu = createMenu();
+					MenuLabel *menuTitle = new MenuLabel();
+					menuTitle->text = string::f("Gate %c", labels[index + 6]);
+					menu->addChild(menuTitle);
+
+					MenuLabel *menuLabel = new MenuLabel();
+					menuLabel->text = functions[val].name;
+					menu->addChild(menuLabel);
+					menu->addChild(new MenuSeparator());
+
+					unsigned int cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4]->getParamQuantity()->getValue();
+					if (cval > ((unsigned int)index + 5)) {
+						cval = index + 5;
+					}							
+					MenuLabel *menu1 = new MenuLabel();
+					menu1->text = string::f("Input 1 from %s", connectorLabels[cval].c_str());
+					menu->addChild(menu1);
+
+					cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 1]->getParamQuantity()->getValue();
+					if (cval > ((unsigned int)index + 5)) {
+						cval = index + 5;
+					}							
+					MenuLabel *menu2 = new MenuLabel();
+					menu2->text = string::f("Input 2 from %s", connectorLabels[cval].c_str());
+					menu->addChild(menu2);
+					
+					cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 2]->getParamQuantity()->getValue();
+					if (cval > ((unsigned int)index + 5)) {
+						cval = index + 5;
+					}							
+					MenuLabel *menu3 = new MenuLabel();
+					menu3->text = string::f("Input 3 from %s", connectorLabels[cval].c_str());
+					menu->addChild(menu3);
+					
+					cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 3]->getParamQuantity()->getValue();
+					if (cval > ((unsigned int)index + 5)) {
+						cval = index + 5;
+					}							
+					MenuLabel *menu4 = new MenuLabel();
+					menu4->text = string::f("Input 4 from %s", connectorLabels[cval].c_str());
+					menu->addChild(menu4);
+
+					for (unsigned int i = index * 4 + 1; i < y * 4; i++) {
+						cval = knobs[i]->getParamQuantity()->getValue();
+						if (cval == (unsigned int)index + 6) {
+							MenuLabel *menuOut = new MenuLabel();
+							menuOut->text = string::f("Output to Gate %c Input %d", labels[6 + (i / 4)], (i % 4) + 1);
+							menu->addChild(menuOut);
+						}
+					}
+					
+					for (unsigned int i = 0; i < 4; i++) {
+						cval = knobs[y * 4 + i]->getParamQuantity()->getValue();
+						if (cval == (unsigned int)index + 6) {
+							MenuLabel *menuOut = new MenuLabel();
+							menuOut->text = string::f("Output to Device Output %d", i + 1);
+							menu->addChild(menuOut);
+						}
+					}
+
+					EventWidgetMenuItem *tt = createMenuItem<EventWidgetMenuItem>("Truth Table");
+					tt->rightText = SUBMENU;
+					tt->childMenuHandler = [=]() {
+						Menu *menu = new Menu();
+						menu->addChild(new PLTruthTable(functions[val].truthTable));
+						return menu;
+					};
+					menu->addChild(tt);
+					*/
+			};
 			collectionScrollWidget->container->addChild(gateKnobs[iy]);
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < 4; ix++) {
 				knobs[4 * iy + ix] = createParamCentered<PLConnectorKnob>(Vec(5, (iy + 1) * 80.0f + ix * 14.0f - 21.0f), module, DO1<x, y>::PARAM_CONNECTOR_1 + iy * 4 + ix);
 				knobs[4 * iy + ix]->module = module;
-		//		knobs[4 * iy + ix]->getText = [=]()->std::string {
-		//			return this->getConnectorText(4 * iy + ix);
-		//		};
 				knobs[4 * iy + ix]->speed = 20.0f / (4 * iy + x + 2);
 				collectionScrollWidget->container->addChild(knobs[4 * iy + ix]);	
 			}
@@ -678,6 +740,98 @@ struct DOWidget : SchemeModuleWidget {
 			addInput(createInputCentered<BluePort>(Vec(15 + ix * 30, 30), module, DO1<x,y>::INPUT_1 + ix));
 			addOutput(createOutputCentered<BluePort>(Vec(15 + ix * 30, 350), module, DO1<x,y>::OUTPUT_1 + ix));
 		}
+	}
+
+	void appendGateRightClickMenu(unsigned int index, unsigned int val) {
+		Menu *menu = createMenu();
+		MenuLabel *menuTitle = new MenuLabel();
+		menuTitle->text = string::f("Gate %c", labels[index + 6]);
+		menu->addChild(menuTitle);
+
+		MenuLabel *menuLabel = new MenuLabel();
+		menuLabel->text = functions[val].name;
+		menu->addChild(menuLabel);
+		menu->addChild(new MenuSeparator());
+
+		EventWidgetMenuItem *io = createMenuItem<EventWidgetMenuItem>("Inputs / Outputs");
+		io->rightText = SUBMENU;
+		io->childMenuHandler = [=]() {
+			return this->appendGateIOMenu(index);
+		};
+		menu->addChild(io);
+
+		EventWidgetMenuItem *tt = createMenuItem<EventWidgetMenuItem>("Truth Table");
+		tt->rightText = SUBMENU;
+		tt->childMenuHandler = [=]() {
+			Menu *menu = new Menu();
+			menu->addChild(new PLTruthTable(functions[val].truthTable));
+			return menu;
+		};
+		menu->addChild(tt);
+	}
+
+	rack::ui::Menu *appendGateIOMenu(unsigned int index) {
+		Menu *menu = new Menu();
+		unsigned int cval;
+		bool foundOutput = false;
+
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu1 = new MenuLabel();
+		menu1->text = string::f("Input 1 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu1);
+
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 1]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu2 = new MenuLabel();
+		menu2->text = string::f("Input 2 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu2);
+					
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 2]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu3 = new MenuLabel();
+		menu3->text = string::f("Input 3 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu3);
+					
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 3]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu4 = new MenuLabel();
+		menu4->text = string::f("Input 4 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu4);
+
+		for (unsigned int i = index * 4 + 1; i < y * 4; i++) {
+			cval = knobs[i]->getParamQuantity()->getValue();
+			if (cval == (unsigned int)index + 6) {
+				if (!foundOutput)
+					menu->addChild(new MenuSeparator());
+				MenuLabel *menuOut = new MenuLabel();
+				menuOut->text = string::f("Output to Gate %c Input %d", labels[6 + (i / 4)], (i % 4) + 1);
+				menu->addChild(menuOut);
+				foundOutput = true;
+			}
+		}
+					
+		for (unsigned int i = 0; i < 4; i++) {
+			cval = knobs[y * 4 + i]->getParamQuantity()->getValue();
+			if (cval == (unsigned int)index + 6) {
+				if (!foundOutput)
+					menu->addChild(new MenuSeparator());
+				MenuLabel *menuOut = new MenuLabel();
+				menuOut->text = string::f("Output to Device Output %d", i + 1);
+				menu->addChild(menuOut);
+				foundOutput = true;
+			}
+		}
+
+		return menu;
 	}
 
 	std::string getGateName(unsigned int index) {
