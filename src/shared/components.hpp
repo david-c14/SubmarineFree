@@ -478,9 +478,3 @@ struct SubTooltip : ui::Tooltip {
 	void step() override; 
 };
 
-struct TooltipKnob : Knob
-{
-//	std::function<std::string()> getText;
-//	void onEnter(const event::Enter &e) override;
-//	void onLeave(const event::Leave &e) override;
-};

@@ -315,6 +315,37 @@ namespace {
 #undef DN
 #undef LAMBDA_HEADER
 
+	std::vector<std::string> connectorLabels {
+		"-ve Rail",
+		"Device Input 1",
+		"Device Input 2",
+		"Device Input 3",
+		"Device Input 4",
+		"+ve Rail",
+		"Gate A Output",
+		"Gate B Output",
+		"Gate C Output",
+		"Gate D Output",
+		"Gate E Output",
+		"Gate F Output",
+		"Gate G Output",
+		"Gate H Output",
+		"Gate I Output",
+		"Gate J Output",
+		"Gate K Output",
+		"Gate L Output",
+		"Gate M Output",
+		"Gate N Output",
+		"Gate O Output",
+		"Gate P Output",
+		"Gate Q Output",
+		"Gate R Output",
+		"Gate S Output",
+		"Gate T Output"
+	};
+
+	std::vector<std::string> gateLabels;
+
 	struct PLConnectorRenderer : TransparentWidget {
 		std::function<void (const Widget::DrawArgs &)> drawLambda;
 		void draw(const DrawArgs &args) override {
@@ -392,7 +423,7 @@ namespace {
 		}
 	};
 
-	struct PLGateKnob : TooltipKnob {
+	struct PLGateKnob : Knob {
 		Module *module;
 		int index;
 		PLGateKnob() {
@@ -434,7 +465,7 @@ namespace {
 		}
 	};
 
-	struct PLConnectorKnob : TooltipKnob {
+	struct PLConnectorKnob : Knob {
 		Module *module;
 		float fade = 0.1f;
 		PLConnectorKnob() {
@@ -482,6 +513,15 @@ namespace {
 			Widget::draw(args);
 		}
 	};
+
+	std::vector<std::string> getGateLabels() {
+		if (gateLabels.size() == 0) {
+			for (unsigned int i = 0; i < functions.size(); i++ ) {
+				gateLabels.push_back(functions[i].name);
+			}
+		}
+		return gateLabels;
+	}
 }
 
 template <unsigned int x, unsigned int y>
@@ -522,18 +562,19 @@ struct DO1 : DS_Module {
 	status_t statuses[NUM_STATUS] = { 0 };
 
 	DO1() {
+		std::vector<std::string> gLabels = getGateLabels();
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int ix = 0; ix < x; ix++) {
-			configParam(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, "Connection" );
+			configSwitch(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, string::f("Device Output %d", ix + 1), connectorLabels );
 			configInput(INPUT_1 + ix, string::f("Signal %d", ix + 1));
 			configOutput(OUTPUT_1 + ix, string::f("Signal %d", ix + 1));
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			configSwitch(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate", { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17" } );
-			configParam(PARAM_CONNECTOR_1 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_2 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_4 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
+			configSwitch(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate", gLabels );
+			configSwitch(PARAM_CONNECTOR_1 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 1", labels[iy + 6]), connectorLabels);
+			configSwitch(PARAM_CONNECTOR_2 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 2", labels[iy + 6]), connectorLabels);
+			configSwitch(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 3", labels[iy + 6]), connectorLabels);
+			configSwitch(PARAM_CONNECTOR_4 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 4", labels[iy + 6]), connectorLabels);
 		}
 		statuses[STATUS_ALL_ZEROES] = 0;
 		statuses[STATUS_ALL_ONES] = ~statuses[STATUS_ALL_ZEROES];
