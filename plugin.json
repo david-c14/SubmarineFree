@@ -402,7 +402,6 @@
 			"slug":"TD-116",
 			"name":"TD-116",
 			"hidden":true,
-			"description": "TD-116 Text Display",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
 			"tags": ["VISUAL"]
 		},
@@ -447,6 +446,13 @@
 			"description": "TF-102 Text Display Format Control",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TF.md",
 			"tags": ["VISUAL"]
+		},
+		{
+			"slug":"TM-105",
+			"name":"Obsolete",
+			"hidden":true,
+			"description": "This was Torpedo Merge TM-105",
+			"tags": ["BLANK"]
 		},
 		{
 			"slug":"VM-101",
@@ -566,6 +572,13 @@
 			"description": "XG-202 4-Input Polyphonic XOR Gates",
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/XG.md",
 			"tags": ["LOGIC", "DUAL", "POLYPHONIC"]
+		},
+		{
+			"slug":"XX-219",
+			"name":"Obsolete",
+			"hidden":true,
+			"description": "This was Secret Santa 2019",
+			"tags": ["BLANK"]
 		}
 	]
 }

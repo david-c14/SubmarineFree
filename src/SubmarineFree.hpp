@@ -89,6 +89,7 @@ extern Model *modelTD410;
 extern Model *modelTD510;
 extern Model *modelTF101;
 extern Model *modelTF102;
+extern Model *modelTM105;
 
 extern Model *modelVM101;
 extern Model *modelVM102;
@@ -112,7 +113,7 @@ extern Model *modelXG104;
 extern Model *modelXG106;
 extern Model *modelXG202;
 
-//extern Model *modelXX219;
+extern Model *modelXX219;
 
 #include "shared/components.hpp"
 
