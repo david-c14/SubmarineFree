@@ -648,76 +648,6 @@ struct DOWidget : SchemeModuleWidget {
 			gateKnobs[iy]->index = DO1<x,y>::PARAM_GATE_1 + iy;
 			gateKnobs[iy]->rightClickHandler = [=](int index, unsigned int val) {	
 				this->appendGateRightClickMenu(index, val);
-				/*
-					Menu *menu = createMenu();
-					MenuLabel *menuTitle = new MenuLabel();
-					menuTitle->text = string::f("Gate %c", labels[index + 6]);
-					menu->addChild(menuTitle);
-
-					MenuLabel *menuLabel = new MenuLabel();
-					menuLabel->text = functions[val].name;
-					menu->addChild(menuLabel);
-					menu->addChild(new MenuSeparator());
-
-					unsigned int cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4]->getParamQuantity()->getValue();
-					if (cval > ((unsigned int)index + 5)) {
-						cval = index + 5;
-					}							
-					MenuLabel *menu1 = new MenuLabel();
-					menu1->text = string::f("Input 1 from %s", connectorLabels[cval].c_str());
-					menu->addChild(menu1);
-
-					cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 1]->getParamQuantity()->getValue();
-					if (cval > ((unsigned int)index + 5)) {
-						cval = index + 5;
-					}							
-					MenuLabel *menu2 = new MenuLabel();
-					menu2->text = string::f("Input 2 from %s", connectorLabels[cval].c_str());
-					menu->addChild(menu2);
-					
-					cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 2]->getParamQuantity()->getValue();
-					if (cval > ((unsigned int)index + 5)) {
-						cval = index + 5;
-					}							
-					MenuLabel *menu3 = new MenuLabel();
-					menu3->text = string::f("Input 3 from %s", connectorLabels[cval].c_str());
-					menu->addChild(menu3);
-					
-					cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 3]->getParamQuantity()->getValue();
-					if (cval > ((unsigned int)index + 5)) {
-						cval = index + 5;
-					}							
-					MenuLabel *menu4 = new MenuLabel();
-					menu4->text = string::f("Input 4 from %s", connectorLabels[cval].c_str());
-					menu->addChild(menu4);
-
-					for (unsigned int i = index * 4 + 1; i < y * 4; i++) {
-						cval = knobs[i]->getParamQuantity()->getValue();
-						if (cval == (unsigned int)index + 6) {
-							MenuLabel *menuOut = new MenuLabel();
-							menuOut->text = string::f("Output to Gate %c Input %d", labels[6 + (i / 4)], (i % 4) + 1);
-							menu->addChild(menuOut);
-						}
-					}
-					
-					for (unsigned int i = 0; i < 4; i++) {
-						cval = knobs[y * 4 + i]->getParamQuantity()->getValue();
-						if (cval == (unsigned int)index + 6) {
-							MenuLabel *menuOut = new MenuLabel();
-							menuOut->text = string::f("Output to Device Output %d", i + 1);
-							menu->addChild(menuOut);
-						}
-					}
-
-					EventWidgetMenuItem *tt = createMenuItem<EventWidgetMenuItem>("Truth Table");
-					tt->rightText = SUBMENU;
-					tt->childMenuHandler = [=]() {
-						Menu *menu = new Menu();
-						menu->addChild(new PLTruthTable(functions[val].truthTable));
-						return menu;
-					};
-					menu->addChild(tt);
-					*/
 			};
 			collectionScrollWidget->container->addChild(gateKnobs[iy]);
 		}
@@ -768,6 +698,23 @@ struct DOWidget : SchemeModuleWidget {
 			return menu;
 		};
 		menu->addChild(tt);
+
+		menu->addChild(new MenuSeparator());
+		
+		if (val == 0) {
+			EventWidgetMenuItem *moveUp = createMenuItem<EventWidgetMenuItem>("Delete and Shuffle Up");
+			moveUp->clickHandler = [=]() {
+				this->MoveItemsUp(index);
+			};
+			menu->addChild(moveUp);
+		}
+		else {
+			EventWidgetMenuItem *moveDown = createMenuItem<EventWidgetMenuItem>("Shuffle Down");
+			moveDown->clickHandler = [=]() {
+				this->MoveItemsDown(index);
+			};
+			menu->addChild(moveDown);
+		}
 	}
 
 	rack::ui::Menu *appendGateIOMenu(unsigned int index) {
@@ -832,6 +779,84 @@ struct DOWidget : SchemeModuleWidget {
 		}
 
 		return menu;
+	}
+	void MoveItemsUp(unsigned int index) {
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = "Shuffle Up";
+		MoveItemUp(index, complex);
+		APP->history->push(complex);
+	}
+	void MoveItemUp(unsigned int index, history::ComplexAction *complex) {
+		if (index == y - 1) {
+			complex->push(shuffleChange(gateKnobs[index]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 0]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 1]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 2]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 3]->getParamQuantity(), 0));
+			return;
+		}
+		complex->push(shuffleChange(gateKnobs[index]->getParamQuantity(), gateKnobs[index + 1]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 0]->getParamQuantity(), knobs[index * 4 + 4]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 1]->getParamQuantity(), knobs[index * 4 + 5]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 2]->getParamQuantity(), knobs[index * 4 + 6]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 3]->getParamQuantity(), knobs[index * 4 + 7]->getParamQuantity()->getValue()));
+		for (unsigned int i = index * 4 + 4; i < (y * 4 + 4); i++) {
+			ParamQuantity *pq = knobs[i]->getParamQuantity();
+			if (pq->getValue() == index + 7) {
+				complex->push(shuffleChange(pq, index + 6));	
+			}
+		}
+		MoveItemUp(index + 1, complex);
+	}
+	void MoveItemsDown(unsigned int index) {
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = "Shuffle Down";
+		if (MoveItemDown(index, complex)) {
+			complex->push(shuffleChange(gateKnobs[index]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 0]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 1]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 2]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 3]->getParamQuantity(), 0));
+			APP->history->push(complex);
+		}
+
+	}
+	bool MoveItemDown(unsigned int index, history::ComplexAction *complex) {
+		if (index >= y)
+			return false;
+		unsigned int val = gateKnobs[index]->getParamQuantity()->getValue();
+		if (val == 0) {
+			return true;
+		}
+		if (!MoveItemDown(index + 1, complex)) {
+			return false;
+		}
+		complex->push(shuffleChange(gateKnobs[index + 1]->getParamQuantity(), val));
+		complex->push(shuffleChange(knobs[index * 4 + 4]->getParamQuantity(), knobs[index * 4 + 0]->getParamQuantity()->getValue())); 
+		complex->push(shuffleChange(knobs[index * 4 + 5]->getParamQuantity(), knobs[index * 4 + 1]->getParamQuantity()->getValue())); 
+		complex->push(shuffleChange(knobs[index * 4 + 6]->getParamQuantity(), knobs[index * 4 + 2]->getParamQuantity()->getValue())); 
+		complex->push(shuffleChange(knobs[index * 4 + 7]->getParamQuantity(), knobs[index * 4 + 3]->getParamQuantity()->getValue())); 
+
+		for (unsigned int i = index * 4; i < (y * 4 + 4); i++) {
+			ParamQuantity *pq = knobs[i]->getParamQuantity();
+			if (pq->getValue() == index + 6) {
+				complex->push(shuffleChange(pq, index + 7));
+			}
+		}
+		return true;
+	}
+
+	history::ParamChange *shuffleChange(ParamQuantity *pq, float newValue) {
+		float oldValue = pq->getValue();
+		pq->setValue(newValue);
+		newValue = pq->getValue();
+		history::ParamChange *h = new history::ParamChange();
+		h->name = "change parameter";
+		h->moduleId = module->id;
+		h->paramId = pq->paramId;
+		h->oldValue = oldValue;
+		h->newValue = newValue;
+		return h;
 	}
 
 	std::string getGateName(unsigned int index) {
