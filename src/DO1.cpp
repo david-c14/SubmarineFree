@@ -6,6 +6,38 @@ namespace {
 
 	NVGcolor colors[26];
 	char labels[27] = "-1234+ABCDEFGHIJKLMNOPQRST";
+	std::vector<std::string> connectorLabels {
+		"-ve Rail",
+		"Device Input 1",
+		"Device Input 2",
+		"Device Input 3",
+		"Device Input 4",
+		"+ve Rail",
+		"Gate A Output",
+		"Gate B Output",
+		"Gate C Output",
+		"Gate D Output",
+		"Gate E Output",
+		"Gate F Output",
+		"Gate G Output",
+		"Gate H Output",
+		"Gate I Output",
+		"Gate J Output",
+		"Gate K Output",
+		"Gate L Output",
+		"Gate M Output",
+		"Gate N Output",
+		"Gate O Output",
+		"Gate P Output",
+		"Gate Q Output",
+		"Gate R Output",
+		"Gate S Output",
+		"Gate T Output"
+	};
+
+	std::vector<std::string> gateLabels;
+	unsigned int copyBuffer[107] = { 0 };	// 20 gates, 20 * 4 connectors, 4 output connectors, 3 additional bytes of size information
+	unsigned int pasteBuffer[107];   	// Working space if the copy needs to be compacted before pasting
 
 // Based on - Set of 20 Simple, Distinct Colors
 // Thanks to Sacha Trubetskoy
@@ -314,37 +346,6 @@ namespace {
 #undef UP
 #undef DN
 #undef LAMBDA_HEADER
-
-	std::vector<std::string> connectorLabels {
-		"-ve Rail",
-		"Device Input 1",
-		"Device Input 2",
-		"Device Input 3",
-		"Device Input 4",
-		"+ve Rail",
-		"Gate A Output",
-		"Gate B Output",
-		"Gate C Output",
-		"Gate D Output",
-		"Gate E Output",
-		"Gate F Output",
-		"Gate G Output",
-		"Gate H Output",
-		"Gate I Output",
-		"Gate J Output",
-		"Gate K Output",
-		"Gate L Output",
-		"Gate M Output",
-		"Gate N Output",
-		"Gate O Output",
-		"Gate P Output",
-		"Gate Q Output",
-		"Gate R Output",
-		"Gate S Output",
-		"Gate T Output"
-	};
-
-	std::vector<std::string> gateLabels;
 
 	struct PLConnectorRenderer : TransparentWidget {
 		std::function<void (const Widget::DrawArgs &)> drawLambda;
@@ -859,6 +860,119 @@ struct DOWidget : SchemeModuleWidget {
 		return h;
 	}
 
+	void copyToBuffer() {
+		unsigned int gateCount = 0; // Number of gates actually used.
+		unsigned int usedCount = 0; // Highest numbered gate in use.
+		copyBuffer[0] = y;
+		for (unsigned int i = 0; i < y; i++) {
+			copyBuffer[i * 5 + 3] = gateKnobs[i]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 4] = knobs[i * 4 + 0]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 5] = knobs[i * 4 + 1]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 6] = knobs[i * 4 + 2]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 7] = knobs[i * 4 + 3]->getParamQuantity()->getValue();
+			if (copyBuffer[i * 5 + 3] != 0) {
+				gateCount++;
+				usedCount = i + 1;
+			}
+		}
+		copyBuffer[103] = knobs[y * 4 + 0]->getParamQuantity()->getValue();
+		copyBuffer[104] = knobs[y * 4 + 1]->getParamQuantity()->getValue();
+		copyBuffer[105] = knobs[y * 4 + 2]->getParamQuantity()->getValue();
+		copyBuffer[106] = knobs[y * 4 + 3]->getParamQuantity()->getValue();
+		copyBuffer[1] = usedCount;
+		copyBuffer[2] = gateCount;
+	}
+
+	void pasteFromBuffer() {
+		unsigned int deviceSize = copyBuffer[0];
+		unsigned int usedCount = copyBuffer[1];
+		unsigned int gateCount = copyBuffer[2];
+		if (!deviceSize) 
+			return;
+		if (gateCount > y)
+			return;
+		if (usedCount > y) {
+			compactBuffer();
+			pasteFromBuffer(pasteBuffer);
+		}
+		else {
+			pasteFromBuffer(copyBuffer);
+		}
+	}
+
+	void compactBuffer() {
+		for (unsigned int i = 0; i < 107; i++) {
+			pasteBuffer[i] = copyBuffer[i];
+		}
+		int shuffleDistance = 0;
+		for (unsigned int i = 0; i < 20; i++) {
+			if (pasteBuffer[i * 5 + 3] == 0) {
+				shuffleDistance++;
+				continue;
+			}
+			if (shuffleDistance == 0) {
+				continue;
+			}
+			unsigned int o = i - shuffleDistance;
+			pasteBuffer[o * 5 + 3] = pasteBuffer[i * 5 + 3];
+			pasteBuffer[o * 5 + 4] = pasteBuffer[i * 5 + 4];
+			pasteBuffer[o * 5 + 5] = pasteBuffer[i * 5 + 5];
+			pasteBuffer[o * 5 + 6] = pasteBuffer[i * 5 + 6];
+			pasteBuffer[o * 5 + 7] = pasteBuffer[i * 5 + 7];
+			for(unsigned int j = 0; j < 20; j++) {
+				if (pasteBuffer[j * 5 + 4] == (i + 6))
+					pasteBuffer[j * 5 + 4] -= shuffleDistance;
+				if (pasteBuffer[j * 5 + 5] == (i + 6))
+					pasteBuffer[j * 5 + 5] -= shuffleDistance;
+				if (pasteBuffer[j * 5 + 6] == (i + 6))
+					pasteBuffer[j * 5 + 6] -= shuffleDistance;
+				if (pasteBuffer[j * 5 + 7] == (i + 6))
+					pasteBuffer[j * 5 + 7] -= shuffleDistance;
+			}
+			if (pasteBuffer[103] == (i + 6))
+				pasteBuffer[103] -= shuffleDistance;
+			if (pasteBuffer[104] == (i + 6))
+				pasteBuffer[104] -= shuffleDistance;
+			if (pasteBuffer[105] == (i + 6))
+				pasteBuffer[105] -= shuffleDistance;
+			if (pasteBuffer[106] == (i + 6))
+				pasteBuffer[106] -= shuffleDistance;
+			pasteBuffer[i * 5 + 3] = 0;
+			pasteBuffer[i * 5 + 4] = 0;
+			pasteBuffer[i * 5 + 5] = 0;
+			pasteBuffer[i * 5 + 6] = 0;
+			pasteBuffer[i * 5 + 7] = 0;
+		}
+		pasteBuffer[1] = pasteBuffer[2];
+	}
+
+	void pasteFromBuffer(unsigned int * buffer) {
+		unsigned int usedCount = buffer[1];
+		if (usedCount > y)
+			return;
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = "Paste";
+		for (unsigned int i = 0; i < usedCount; i++) {
+			complex->push(shuffleChange(gateKnobs[i]->getParamQuantity(), buffer[i * 5 + 3]));
+			complex->push(shuffleChange(knobs[i * 4 + 0]->getParamQuantity(), buffer[i * 5 + 4]));
+			complex->push(shuffleChange(knobs[i * 4 + 1]->getParamQuantity(), buffer[i * 5 + 5]));
+			complex->push(shuffleChange(knobs[i * 4 + 2]->getParamQuantity(), buffer[i * 5 + 6]));
+			complex->push(shuffleChange(knobs[i * 4 + 3]->getParamQuantity(), buffer[i * 5 + 7]));
+		}
+		for (unsigned int i = usedCount; i < y; i++) {
+			complex->push(shuffleChange(gateKnobs[i]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 0]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 1]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 2]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 3]->getParamQuantity(), 0));
+		}
+ 		complex->push(shuffleChange(knobs[y * 4 + 0]->getParamQuantity(), buffer[103]));
+		complex->push(shuffleChange(knobs[y * 4 + 1]->getParamQuantity(), buffer[104]));
+		complex->push(shuffleChange(knobs[y * 4 + 2]->getParamQuantity(), buffer[105]));
+		complex->push(shuffleChange(knobs[y * 4 + 3]->getParamQuantity(), buffer[106]));
+		APP->history->push(complex);
+	}
+
 	std::string getGateName(unsigned int index) {
 		unsigned int val = (unsigned int)(gateKnobs[index]->getParamQuantity()->getValue());
 		if (val >= functions.size()) {
@@ -972,6 +1086,26 @@ struct DOWidget : SchemeModuleWidget {
 		drawBase(vg, workingSpace);
 	}
 	void appendContextMenu(Menu *menu) override {
+		menu->addChild(new MenuSeparator());
+		EventWidgetMenuItem *copy = createMenuItem<EventWidgetMenuItem>("Copy");
+		copy->clickHandler = [=]() {
+			this->copyToBuffer();
+		};
+		menu->addChild(copy);
+		if (copyBuffer[0] != 0) {
+			if (copyBuffer[2] <= y) {
+				EventWidgetMenuItem *paste = createMenuItem<EventWidgetMenuItem>("Paste");
+				paste->clickHandler = [=]() {
+					this->pasteFromBuffer();
+				};
+				menu->addChild(paste);
+			} 
+			else {
+				MenuLabel *paste = new MenuLabel();
+				paste->text = "Paste (device is too small)";
+				menu->addChild(paste);
+			}
+		}
 		SchemeModuleWidget::appendContextMenu(menu);
 		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
 		if (dsMod) {

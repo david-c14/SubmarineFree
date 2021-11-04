@@ -15,6 +15,7 @@
 - 29-Oct-2021 Port LT-116 to v2
 - 29-Oct-2021 Port XF-xxx to v2
 - 29-Oct-2021 Port VU meters to v2, including new backlights
+- 03-Nov-2021 Make DO-1xx devices more usable, improve connection labelling, add shuffle and copy/paste
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual

@@ -34,7 +34,7 @@ the routing of the device.  But you can connect a cable directly between the dev
 
 ## Truth Tables
 
-If you right click on a gate, a truth table will be displayed to help you understand the connections to and from the gate.
+If you right click on a gate, the menu will offer a truth table which can help you understand the connections to and from the gate.
 
 ## Signal Range
 
@@ -49,3 +49,18 @@ An input not connected will generate 0V on all polyphonic channels. The meaning 
 All 4 outputs will have a number of channels which is the maximum number of channels presented at the inputs. 
 An input with a single channel will present that voltage across all the channels being processed. 
 An input with more than one channel, but fewer than the number of channels being processed will present 0V on the excess channels.
+
+## Shuffle
+
+Empty (not connected) gate slots can be deleted using the right-click menu on the gate. This will cause any gates below that to be shuffled up the device, including all the related connections.
+
+Gates which are not empty can be shuffled down if you need to make additional space to insert a gate. All related connections will be automatically adjusted at the same time.
+
+## Copying to another device
+
+The right click menu on the device as a whole (not on an individual gate) offers copy and paste options which will allow you to copy and paste even between DO-1xx devices of different sizes.
+
+When copying to a smaller device, empty (not connected) gate slots may be deleted to help the circuit fit into the destination device, all connections will be correctly adjusted to suit. Note that deleting empty slots will only happen if it is necessary.
+The circuit in the source device will not be affected.
+
+
