@@ -1,0 +1,15 @@
+on:
+  push:
+    branches:
+    - v2
+name: V2
+env:
+  RACK_SDK_VERSION: 2.git.219bbaf1-lin
+jobs:
+  buildLinux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build Linux
+      uses: ./.github/actions/build_linux
