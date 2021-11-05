@@ -6,8 +6,22 @@
 namespace {
 
 	static float FunctorClipboard = NAN;
+	float deviceClipboard[73] = { 0 };
 
 	typedef float (*func_t)(float, float, float);
+
+	history::ParamChange *changeWithUndo(ParamQuantity *pq, float newValue) {
+		float oldValue = pq->getValue();
+		pq->setValue(newValue);
+		newValue = pq->getValue();
+		history::ParamChange *h = new history::ParamChange();
+		h->name = "paste function";
+		h->moduleId = pq->module->id;
+		h->paramId = pq->paramId;
+		h->oldValue = oldValue;
+		h->newValue = newValue;
+		return h;
+	}
 
 	struct Functor {
 		unsigned int category;
@@ -565,7 +579,7 @@ namespace {
 		AOFuncDisplay *widget;
 		void onAction(const event::Action &e) override {
 			if (!std::isnan(FunctorClipboard))
-				widget->getParamQuantity()->setValue(FunctorClipboard);
+				APP->history->push(changeWithUndo(widget->getParamQuantity(), FunctorClipboard));
 		}
 	};
 
@@ -621,6 +635,8 @@ namespace {
 
 template <unsigned int x, unsigned int y>
 struct AOWidget : SchemeModuleWidget {
+	AOFuncDisplay *funcDisplay[x * y];
+	AOConstDisplay *constDisplay[x * y];
 	AOWidget(AO1<x,y> *module) {
 		setModule(module);
 		this->box.size = Vec(y * 90 + 75, 380);
@@ -639,10 +655,12 @@ struct AOWidget : SchemeModuleWidget {
 				fd->module = module;
 				fd->index = AO1<x,y>::PARAM_FUNC_1 + ix + iy * x;
 				addParam(fd);
+				funcDisplay[iy * x + ix] = fd;
 				AOConstDisplay *cd = createParam<AOConstDisplay>(Vec(42.5 + 90 * iy, 78 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x);
 				cd->module = module;
 				cd->index = AO1<x,y>::PARAM_CONST_1 + ix + iy * x;
 				addParam(cd);
+				constDisplay[iy * x + ix] = cd;
 			}
 		}
 	}
@@ -699,6 +717,62 @@ struct AOWidget : SchemeModuleWidget {
 			}
 		}
 		nvgFill(vg);
+	}
+	void appendContextMenu(Menu *menu) override {
+		menu->addChild(new MenuSeparator());
+		EventWidgetMenuItem *cm = createMenuItem<EventWidgetMenuItem>("Copy");
+		cm->clickHandler = [=]() {
+			this->copy();
+		};
+		menu->addChild(cm);
+		if (deviceClipboard[0]) {
+			if (deviceClipboard[0] <= y) {
+				EventWidgetMenuItem *pm = createMenuItem<EventWidgetMenuItem>("Paste");
+				pm->clickHandler = [=]() {
+					this->paste();
+				};
+				menu->addChild(pm);
+			}
+			else {
+				MenuLabel *pm = new MenuLabel();
+				pm->text = "Paste (device too small)";
+				menu->addChild(pm);
+			}
+		}
+	}
+	void copy() {
+		unsigned int usedCount = 0;
+		for (unsigned int iy = 0; iy < y; iy++) {
+			for (unsigned int ix = 0; ix < x; ix++) {
+				deviceClipboard[iy * x + ix + 1] = funcDisplay[iy * x + ix]->getParamQuantity()->getValue();
+				deviceClipboard[iy * x + ix + 37] = constDisplay[iy * x + ix]->getParamQuantity()->getValue();
+				if (deviceClipboard[iy * x + ix + 1]) {
+					usedCount = iy + 1;
+				}
+			}
+		}
+		deviceClipboard[0] = usedCount;
+	}
+	void paste() {
+		unsigned int usedCount = deviceClipboard[0];
+		if (usedCount > y) 
+			return;
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = "paste from device";
+		for (unsigned int iy = 0; iy < usedCount; iy++) {
+			for (unsigned int ix = 0; ix < x; ix++) {
+				complex->push(changeWithUndo(funcDisplay[iy * x + ix]->getParamQuantity(), deviceClipboard[iy * x + ix + 1]));
+				complex->push(changeWithUndo(constDisplay[iy * x + ix]->getParamQuantity(), deviceClipboard[iy * x + ix + 37]));
+			}
+		}	
+		for (unsigned int iy = usedCount; iy < y; iy++) {
+			for (unsigned int ix = 0; ix < x; ix++) {
+				complex->push(changeWithUndo(funcDisplay[iy * x + ix]->getParamQuantity(), 0));
+				complex->push(changeWithUndo(constDisplay[iy * x + ix]->getParamQuantity(), 0));
+			}
+		}	
+		APP->history->push(complex);
+
 	}
 };
 
