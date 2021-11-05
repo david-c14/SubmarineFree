@@ -4,12 +4,12 @@ on:
     - v2
 name: V2
 env:
-  RACK_SDK_VERSION: 2.git.219bbaf1-win
+  RACK_SDK_VERSION: 2.git.219bbaf1-mac
 jobs:
-  buildWin:
-    name: Build Windows
+  buildOSX:
+    name: Build OSX
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Build Windows
-      uses: ./.github/actions/build_win
+    - name: Build OSX
+      uses: ./.github/actions/build_osx
