@@ -538,6 +538,15 @@ struct TD410 : SchemeModuleWidget {
 		nvgBeginPath(vg);
 		nvgRect(vg, 4, 15, box.size.x - 8, box.size.y - 30);
 		nvgFill(vg);
+		if (!module) {
+			std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+			nvgFontFaceId(vg, font->handle);
+			nvgFontSize(vg, 25);
+			nvgFillColor(vg, SUBLIGHTBLUE);
+			nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+			nvgText(vg, box.size.x / 2, box.size.y / 2, "Submarine", NULL);
+			nvgText(vg, box.size.x / 2, box.size.y / 2 + 30, "TD-410", NULL);
+		}
 	}
 
 	void removeText(TD4Text *text) {

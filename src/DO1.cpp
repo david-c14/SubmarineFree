@@ -445,6 +445,12 @@ namespace {
 				i += 6;
 				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, colors[i], labels[i]);
 			}
+			else if (index == 1) {
+				scheme::drawLogoPath(args.vg, 0, 0, 4, 0);
+				nvgStrokeColor(args.vg, SUBLIGHTBLUE);
+				nvgStrokeWidth(args.vg, 3);
+				nvgStroke(args.vg);
+			}
 		}
 		void onButton(const event::Button &e) override {
 			if (module) {

@@ -134,6 +134,7 @@ struct TD202 : SchemeModuleWidget {
 		SchemeModuleWidget::step();
 		TD_202 *tdModule = dynamic_cast<TD_202 *>(module);
 		if (!tdModule) {
+			textField->text = "Submarine TD-202";
 			return;
 		}
 		if (tdModule->reset) {

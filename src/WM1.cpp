@@ -2511,6 +2511,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (!module) {
 			drawBase(vg, "WM-102");
+			drawEasterEgg(vg);
 			return;
 		}
 		WM_102 *wm = dynamic_cast<WM_102 *>(module);
@@ -2522,6 +2523,25 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		nvgSave(vg);
 		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
 		drawBillboardBase(vg, renderBox, wm->colors, wm->labels, draw3d);
+		nvgRestore(vg);
+	}
+	void drawEasterEgg(NVGcontext *vg) {
+		Rect renderBox;
+	       	renderBox.pos = Vec(0, 15);
+		renderBox.size = Vec(box.size.x, box.size.y - 30);
+		nvgSave(vg);
+		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
+		std::vector<NVGcolor> colors;
+		colors.push_back(color::fromHexString("#c91847"));
+		colors.push_back(color::fromHexString("#0986ad"));
+		colors.push_back(color::fromHexString("#c9b70e"));
+		colors.push_back(color::fromHexString("#0c8e15"));
+		std::vector<std::string> labels;
+		labels.push_back("");
+		labels.push_back("Submarine");
+		labels.push_back("WM-102");
+		labels.push_back("");
+		drawBillboardBase(vg, renderBox, colors, labels, true);
 		nvgRestore(vg);
 	}
 	void appendContextMenu(Menu *menu) override {

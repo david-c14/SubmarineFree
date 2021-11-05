@@ -142,6 +142,8 @@ struct TD316 : SchemeModuleWidget {
 	void step() override {
 		TD_316 *tdModule = dynamic_cast<TD_316 *>(module);
 		if (!tdModule) {
+			textField->text = "\n\n\n\n:Submarine TD-316:";
+			textField->fontSize = 24;
 			return;
 		}
 		if (tdModule->moduleSizeDirty) {
