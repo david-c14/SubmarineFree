@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-    - v2x
+    - v2
 name: V2
 env:
   RACK_SDK_VERSION: 2.git.219bbaf1-mac
