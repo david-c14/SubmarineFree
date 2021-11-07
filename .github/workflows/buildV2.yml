@@ -12,4 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: install tools
-      run: brew install git wget cmake autoconf automake libtool jq python zstd
+      run: brew install automake
+    - name: get Rack-SDK
+      run: curl -L https://vcvrack.com/downloads/Rack-SDK-${RACK_SDK_VERSION}.zip -o rack-sdk.zip
+    - name: unzip SDK
+      run: unzip -o rack-sdk.zip
+    - name: clean up SDK
+      run: rm rack-sdk.zip
