@@ -18,7 +18,7 @@ ASSET_PATH=$(ls dist/*.vcvplugin)
 
 curl -i \
     --header "Authorization: token ${GITHUB_TOKEN}" \
-    --header "Content-Type: application/zip" \
+    --header "Content-Type: application/zstd" \
     --request POST \
     --data-binary @"${ASSET_PATH}" \
     ${UPLOAD_URL%"{?name,label\}"}?name=${ASSET_PATH#"dist/"}
