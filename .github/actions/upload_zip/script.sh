@@ -14,7 +14,7 @@ curl -o release.json \
 
 UPLOAD_URL=$(jq -r .upload_url release.json)
 
-ASSET_PATH=$(ls dist/*.vcvrack)
+ASSET_PATH=$(ls dist/*.vcvplugin)
 
 curl -i \
     --header "Authorization: token ${GITHUB_TOKEN}" \
