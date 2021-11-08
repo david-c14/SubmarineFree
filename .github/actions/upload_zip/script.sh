@@ -6,8 +6,7 @@ GITHUB_API_URL=https://api.github.com
 
 GITHUB_TOKEN=$1
 
-pwd
-ls -al
+ls -al dist
 
 # Get release url
 curl -o release.json \
@@ -16,16 +15,17 @@ curl -o release.json \
     ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/${GITHUB_REF#"refs/"}
 
 UPLOAD_URL=$(jq -r .upload_url release.json)
-
+UPLOAD_URL=${UPLOAD_URL/\{\?name,label\}/}
 echo ${UPLOAD_URL}
 
 ASSET_PATH=$(ls dist/*.vcvplugin)
+echo ${ASSET_PATH}
 
 echo curl -i \
     --header "Authorization: token ${GITHUB_TOKEN}" \
     --header "Content-Type: application/zstd" \
     --request POST \
     --data-binary @"${ASSET_PATH}" \
-    ${UPLOAD_URL/\{\?name,label\}/}?name=${ASSET_PATH#"dist/"}
+    ${UPLOAD_URL}?name=${ASSET_PATH#"dist/"}
 
 
