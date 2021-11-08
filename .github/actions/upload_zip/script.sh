@@ -14,6 +14,8 @@ curl -o release.json \
 
 UPLOAD_URL=$(jq -r .upload_url release.json)
 
+echo ${UPLOAD_URL}
+
 ASSET_PATH=$(ls dist/*.vcvplugin)
 
 echo curl -i \
