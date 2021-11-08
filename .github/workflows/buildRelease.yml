@@ -46,4 +46,4 @@ jobs:
     - name: make
       run: make dist
     - name: upload zip
-      run: sh ./.github/actions/upload_zip/script.sh ${{ secrets.GITHUB_TOKEN }}
+      run: sh ./.github/actions/upload_plugin_mac/script.sh ${{ secrets.GITHUB_TOKEN }}
