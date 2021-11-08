@@ -17,3 +17,4 @@ rm rack-sdk.zip
 
 make clean
 make dist
+chmod 644 dist/*.vcvplugin
