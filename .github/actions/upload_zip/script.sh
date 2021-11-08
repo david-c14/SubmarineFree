@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -eu
 
@@ -14,11 +14,16 @@ curl -o release.json \
 
 UPLOAD_URL=$(jq -r .upload_url release.json)
 
-echo ${UPLOAD_URL}
-
 ASSET_PATH=$(ls dist/*.vcvplugin)
 
 echo curl -i \
+    --header "Authorization: token ${GITHUB_TOKEN}" \
+    --header "Content-Type: application/zstd" \
+    --request POST \
+    --data-binary @"${ASSET_PATH}" \
+    ${UPLOAD_URL%"{?name,label\}"}?name=${ASSET_PATH#"dist/"}
+
+curl -i \
     --header "Authorization: token ${GITHUB_TOKEN}" \
     --header "Content-Type: application/zstd" \
     --request POST \
