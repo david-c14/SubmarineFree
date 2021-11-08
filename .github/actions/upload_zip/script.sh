@@ -16,7 +16,7 @@ UPLOAD_URL=$(jq -r .upload_url release.json)
 
 ASSET_PATH=$(ls dist/*.vcvplugin)
 
-curl -i \
+echo curl -i \
     --header "Authorization: token ${GITHUB_TOKEN}" \
     --header "Content-Type: application/zstd" \
     --request POST \
