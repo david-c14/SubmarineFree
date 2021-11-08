@@ -13,7 +13,7 @@ curl -o release.json \
     ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/${GITHUB_REF#"refs/"}
 
 UPLOAD_URL=$(jq -r .upload_url release.json)
-read -t 5 -p "I am going to wait for 5 seconds only ..."
+sleep 5
 ls -al dist
 ls -al
 ASSET_PATH=$(ls dist/*.vcvplugin)
