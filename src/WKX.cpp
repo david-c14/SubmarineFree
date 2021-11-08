@@ -246,6 +246,7 @@ struct WK_101 : Module {
 		configOutput(OUTPUT_CV, "Quantised V/oct");
 		configOutput(OUTPUT_TOR, "Deprecated");
 		configLight(LIGHT_EXT, "Module Link");
+		configBypass(INPUT_CV, OUTPUT_CV);
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -549,6 +550,7 @@ struct WK_205 : Module {
 		for (unsigned int i = 0; i < 5; i++) {
 			configInput(INPUT_CV_1 + i, string::f("Signal %d", i + 1));
 			configOutput(OUTPUT_CV_1 + i, string::f("Signal %d", i + 1));
+			configBypass(INPUT_CV_1 + i, OUTPUT_CV_1 + i);
 		}
 		configInput(INPUT_TOR, "Deprecated");
 		configLight(LIGHT_EXT_LEFT, "Module Link");

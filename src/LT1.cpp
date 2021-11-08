@@ -73,6 +73,7 @@ struct LT_116 : Module {
 				configParam(PARAM_COEFF_1 + i * 16 + j, -INFINITY, +INFINITY, .0f, string::f("Coefficient [%d,%d]", j + 1, i + 1));
 			}
 		}
+		configBypass(INPUT_1, OUTPUT_1);
 	}
 
 	json_t *dataToJson() override {

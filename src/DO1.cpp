@@ -573,6 +573,7 @@ struct DO1 : DS_Module {
 			configSwitch(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, string::f("Device Output %d", ix + 1), connectorLabels );
 			configInput(INPUT_1 + ix, string::f("Signal %d", ix + 1));
 			configOutput(OUTPUT_1 + ix, string::f("Signal %d", ix + 1));
+			configBypass(INPUT_1 + ix, OUTPUT_1 + ix);
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			configSwitch(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate", gLabels );
