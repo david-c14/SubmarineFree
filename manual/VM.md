@@ -33,3 +33,8 @@ The VM-102 and VM-202 meters will accept a two-channel polyphonic input. The VM-
 ## Compact option
 
 The VM-101 and VM-102 are small form factor meters with OLED strip displays.
+
+## Expansion
+
+All of the VM-1xx and VM-2xx series meters can be chained together as expander modules to provide polyphonic metering capabilities. Additional channels to input to the meter, will be passed to another meter on the right if that expansion meter has no inputs of its own.
+Load and attenuator settings are copied from the device on the left to the device on the right. The meters models themselves and inter-compatible and can be mixed and matched.

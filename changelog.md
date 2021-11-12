@@ -18,6 +18,7 @@
 - 03-Nov-2021 Make DO-1xx devices more usable, improve connection labelling, add shuffle and copy/paste
 - 05-Nov-2021 Add visuals to TD-xxx, DO-1xx and WM-102 devices in the module browser
 - 05-Nov-2021 Add Device copy/paste and undo to AO-1xx devices
+- 12-Nov-2021 Add expansion capabilities to VM-1xx and VM-2xx devices
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual

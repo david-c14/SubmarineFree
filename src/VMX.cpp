@@ -36,6 +36,8 @@ namespace {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
+		LIGHT_LINK_LEFT,
+		LIGHT_LINK_RIGHT,
 		NUM_LIGHTS
 	};
 	const double zeta = 0.81272; 
@@ -222,6 +224,11 @@ namespace {
 }
 
 struct VM_Base : Module {
+	unsigned int meterCount;
+	unsigned int inputCount = 0;
+	float load = 150;
+	float attenuation = 0;
+	float data[16];
 	VM_Base() : Module() { }
 	
 	Menu * addLoadMenu() {
@@ -255,6 +262,66 @@ struct VM_Base : Module {
 		};
 		menu->addChild(m);
 	}
+
+	void getLinkedData() {
+		bool left = false;
+		bool right = false;
+
+		VM_Base *searchMod = this;
+		unsigned int dataOffset = 0;
+		for (unsigned int i = inputCount; i < meterCount; i++) {
+			data[i] = 0;
+		}
+		if (!inputCount) { // no inputs of our own, look to the left
+			bool found = false;
+			while (!found) {
+				if (searchMod->leftExpander.module) {
+					if ((searchMod->leftExpander.module->model == modelVM101) ||
+						(searchMod->leftExpander.module->model == modelVM102) ||
+				   		(searchMod->leftExpander.module->model == modelVM201) ||
+						(searchMod->leftExpander.module->model == modelVM202)) {
+						searchMod = reinterpret_cast<VM_Base *>(searchMod->leftExpander.module);		
+						dataOffset += searchMod->meterCount;
+						if (dataOffset >= 16)
+							break;
+						if (searchMod->inputCount) {
+							for(unsigned int i = 0; i < meterCount; i++) {
+								if (dataOffset >= searchMod->inputCount)
+									break;
+								data[i] = searchMod->data[dataOffset++];
+								left = true;
+							}
+							load = searchMod->load;
+							attenuation = searchMod->attenuation;
+							break;
+						}
+						continue;
+					}
+				}
+				break;
+			}
+		}
+		else {
+			dataOffset = inputCount;
+		}
+		if (dataOffset < searchMod->inputCount && rightExpander.module) {
+			if ((rightExpander.module->model == modelVM101) ||
+				(rightExpander.module->model == modelVM102) ||
+			   	(rightExpander.module->model == modelVM201) ||
+				(rightExpander.module->model == modelVM202)) {
+				searchMod = reinterpret_cast<VM_Base *>(rightExpander.module);
+				if (!searchMod->inputCount)
+					right = true;
+			}
+		}
+		if (load != params[PARAM_LOAD].getValue()) 
+			params[PARAM_LOAD].setValue(load);
+		if (attenuation != params[PARAM_ATTENUATOR].getValue())
+			params[PARAM_ATTENUATOR].setValue(attenuation);
+
+		lights[LIGHT_LINK_LEFT].setBrightness(left);
+		lights[LIGHT_LINK_RIGHT].setBrightness(right);
+	}
 };
 
 template <int x>
@@ -265,12 +332,15 @@ struct VM_ : VM_Base {
 	};
 
 	VM_() : VM_Base() { 
+		meterCount = x;
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(PARAM_LOAD, 50.0f, 20000.0f, 600.0f, "Load Resistor", "\xe2\x84\xa6");
 		configParam(PARAM_ATTENUATOR, -2.0f, 4.0f, 0.0f, "Attenuator", "x", 2.0f);
 		for(unsigned int i = 0; i < x; i++) {
 			configInput(INPUT_1 + i, string::f("Signal %d", i + 1));
 		}
+		configLight(LIGHT_LINK_LEFT, "Module Link");
+		configLight(LIGHT_LINK_RIGHT, "Module Link");
 	}
 
 	Coefficients c { { APP->engine->getSampleTime() } };
@@ -279,8 +349,8 @@ struct VM_ : VM_Base {
 		c.Recalculate(APP->engine->getSampleTime());
 	}
 	double calculate(double y_0) {
-		double vRef = 1 / std::sqrt(params[PARAM_LOAD].getValue() * 0.001);
-		double atten = params[PARAM_ATTENUATOR].getValue() * 6.0f;
+		double vRef = 1 / std::sqrt(load * 0.001);
+		double atten = attenuation * 6.0f;
 		double sample = 20 * std::log10(y_0 * vRef) - atten;
 		if (std::isnan(sample)) {
 			sample = -20.0f;
@@ -297,20 +367,36 @@ struct VM_xx1 : VM_<1> {
 	Samples samples;
 
 	void process(const ProcessArgs &args) override {
-		samples.process(&c, inputs[INPUT_1].getVoltage(0));
+		inputs[INPUT_1].readVoltages(data);
+		inputCount = inputs[INPUT_1].getChannels();
+		load = params[PARAM_LOAD].getValue();
+		attenuation = params[PARAM_ATTENUATOR].getValue();
+
+		getLinkedData();
+
+		samples.process(&c, data[0]);
 	}
 };
 
 struct VM_102 : VM_<1> {
 
-	VM_102() : VM_<1>() { }
+	VM_102() : VM_<1>() { 
+		meterCount = 2;
+	}
 
 	Samples samples_1;
 	Samples samples_2;
 	
 	void process(const ProcessArgs &args) override {
-		samples_1.process(&c, inputs[INPUT_1].getVoltage(0));
-		samples_2.process(&c, inputs[INPUT_1].getVoltage(1));
+		inputs[INPUT_1].readVoltages(data);
+		inputCount = inputs[INPUT_1].getChannels();
+		load = params[PARAM_LOAD].getValue();
+		attenuation = params[PARAM_ATTENUATOR].getValue();
+
+		getLinkedData();
+
+		samples_1.process(&c, data[0]);
+		samples_2.process(&c, data[1]);
 	}
 };
 
@@ -322,13 +408,22 @@ struct VM_202 : VM_<2> {
 	Samples samples_2;
 
 	void process(const ProcessArgs &args) override {
-		samples_1.process(&c, inputs[INPUT_1].getVoltage(0));
+		inputs[INPUT_1].readVoltages(data);
+		inputCount = inputs[INPUT_1].getChannels();
+		load = params[PARAM_LOAD].getValue();
+		attenuation = params[PARAM_ATTENUATOR].getValue();
+		if (!inputs[INPUT_1].isConnected()) {
+			data[0] = 0;
+		}
 		if (inputs[INPUT_1 + 1].isConnected()) {
-			samples_2.process(&c, inputs[INPUT_1 + 1].getVoltage(0));
+			inputCount = 2;
+			data[1] = inputs[INPUT_1 + 1].getVoltage(0);
 		}
-		else {
-			samples_2.process(&c, inputs[INPUT_1].getVoltage(1));
-		}
+
+		getLinkedData();
+
+		samples_1.process(&c, data[0]);
+		samples_2.process(&c, data[1]);
 	}
 };
 
@@ -360,6 +455,8 @@ struct VM101 : VMxxx {
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_xx1::INPUT_1));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, PARAM_ATTENUATOR));
+		addChild(createLightCentered<RightLight>(Vec(3, 332), module, LIGHT_LINK_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(27, 332), module, LIGHT_LINK_RIGHT));
 	}
 	void addTick(NVGcontext *vg, float point) {
 		float tick = displayPos + squareScale(point, displayHeight, 0.0f);
@@ -435,6 +532,8 @@ struct VM102 : VMxxx {
 
 		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_102::INPUT_1));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, PARAM_ATTENUATOR));
+		addChild(createLightCentered<RightLight>(Vec(3, 332), module, LIGHT_LINK_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(27, 332), module, LIGHT_LINK_RIGHT));
 	}
 	void addTick(NVGcontext *vg, float point) {
 		float tick = displayPos + squareScale(point, displayHeight, 0.0f);
@@ -501,12 +600,14 @@ struct VM201 : VMxxx {
 		display->box.pos = Vec(10, 20);
 		addChild(display);
 
-		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_xx1::INPUT_1));
+		addInput(createInputCentered<SilverPort>(Vec(35,330), module, VM_xx1::INPUT_1));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, PARAM_ATTENUATOR));
+		addChild(createLightCentered<RightLight>(Vec(3, 332), module, LIGHT_LINK_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(147, 332), module, LIGHT_LINK_RIGHT));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-201");
-		drawText(vg, 20, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
+		drawText(vg, 35, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
 		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR");
 	}
 	void step() override {
@@ -534,13 +635,15 @@ struct VM202 : VMxxx {
 		display2->box.pos = Vec(10, 120);
 		addChild(display2);
 
-		addInput(createInputCentered<SilverPort>(Vec(20,330), module, VM_202::INPUT_1));
-		addInput(createInputCentered<RedPort>(Vec(55,330), module, VM_202::INPUT_1 + 1));
+		addInput(createInputCentered<SilverPort>(Vec(35,330), module, VM_202::INPUT_1));
+		addInput(createInputCentered<RedPort>(Vec(70,330), module, VM_202::INPUT_1 + 1));
 		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(115, 330), module, PARAM_ATTENUATOR));
+		addChild(createLightCentered<RightLight>(Vec(3, 332), module, LIGHT_LINK_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(147, 332), module, LIGHT_LINK_RIGHT));
 	}
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "VM-202");
-		drawText(vg, 37.5f, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
+		drawText(vg, 52.5f, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
 		drawText(vg, 115, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR");
 	}
 	void step() override {
