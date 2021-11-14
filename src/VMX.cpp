@@ -278,6 +278,7 @@ struct VM_Base : Module {
 				if (searchMod->leftExpander.module) {
 					if ((searchMod->leftExpander.module->model == modelVM101) ||
 						(searchMod->leftExpander.module->model == modelVM102) ||
+						(searchMod->leftExpander.module->model == modelVM104) ||
 				   		(searchMod->leftExpander.module->model == modelVM201) ||
 						(searchMod->leftExpander.module->model == modelVM202)) {
 						searchMod = reinterpret_cast<VM_Base *>(searchMod->leftExpander.module);		
@@ -307,6 +308,7 @@ struct VM_Base : Module {
 		if (dataOffset < searchMod->inputCount && rightExpander.module) {
 			if ((rightExpander.module->model == modelVM101) ||
 				(rightExpander.module->model == modelVM102) ||
+				(rightExpander.module->model == modelVM104) ||
 			   	(rightExpander.module->model == modelVM201) ||
 				(rightExpander.module->model == modelVM202)) {
 				searchMod = reinterpret_cast<VM_Base *>(rightExpander.module);
@@ -397,6 +399,32 @@ struct VM_102 : VM_<1> {
 
 		samples_1.process(&c, data[0]);
 		samples_2.process(&c, data[1]);
+	}
+};
+
+struct VM_104 : VM_<1> {
+
+	VM_104() : VM_<1>() { 
+		meterCount = 4;
+	}
+
+	Samples samples_1;
+	Samples samples_2;
+	Samples samples_3;
+	Samples samples_4;
+	
+	void process(const ProcessArgs &args) override {
+		inputs[INPUT_1].readVoltages(data);
+		inputCount = inputs[INPUT_1].getChannels();
+		load = params[PARAM_LOAD].getValue();
+		attenuation = params[PARAM_ATTENUATOR].getValue();
+
+		getLinkedData();
+
+		samples_1.process(&c, data[0]);
+		samples_2.process(&c, data[1]);
+		samples_3.process(&c, data[2]);
+		samples_4.process(&c, data[3]);
 	}
 };
 
@@ -589,6 +617,85 @@ struct VM102 : VMxxx {
 	}
 };
 
+struct VM104 : VMxxx {
+	const float displayHeight = 276.0f;
+	const float displayPos = 19.5f;
+	VM_LinearDisplay *display1;
+	VM_LinearDisplay *display2;
+	VM_LinearDisplay *display3;
+	VM_LinearDisplay *display4;
+	VM104(VM_104 *module) : VMxxx() {
+		setModule(module);
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
+
+		display1 = new VM_LinearDisplay();
+		display1->box.pos = Vec(2, displayPos);
+		display1->box.size = Vec(6, displayHeight);
+		addChild(display1);
+
+		display2 = new VM_LinearDisplay();
+		display2->box.pos = Vec(9, displayPos);
+		display2->box.size = Vec(6, displayHeight);
+		addChild(display2);
+
+		display3 = new VM_LinearDisplay();
+		display3->box.pos = Vec(16, displayPos);
+		display3->box.size = Vec(6, displayHeight);
+		addChild(display3);
+
+		display4 = new VM_LinearDisplay();
+		display4->box.pos = Vec(23, displayPos);
+		display4->box.size = Vec(6, displayHeight);
+		addChild(display4);
+
+		addInput(createInputCentered<SilverPort>(Vec(15,350), module, VM_102::INPUT_1));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(15, 315), module, PARAM_ATTENUATOR));
+		addChild(createLightCentered<RightLight>(Vec(3, 332), module, LIGHT_LINK_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(27, 332), module, LIGHT_LINK_RIGHT));
+	}
+	void addTick(NVGcontext *vg, float point) {
+		float tick = displayPos + squareScale(point, displayHeight, 0.0f);
+		nvgMoveTo(vg, 2, tick);
+		nvgLineTo(vg, 28, tick);
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "VM-104");
+		nvgStrokeWidth(vg, 1);
+		nvgBeginPath(vg);
+		nvgStrokeColor(vg, SUBLIGHTRED);
+		addTick(vg, 1);
+		addTick(vg, 2);
+		addTick(vg, 3);
+		nvgStroke(vg);
+		nvgBeginPath(vg);
+		nvgStrokeColor(vg, gScheme.getContrast(module));
+		addTick(vg, 0);
+		addTick(vg, -1);
+		addTick(vg, -2);
+		addTick(vg, -3);
+		addTick(vg, -4);
+		addTick(vg, -5);
+		addTick(vg, -6);
+		addTick(vg, -7);
+		addTick(vg, -8);
+		addTick(vg, -9);
+		addTick(vg, -10);
+		addTick(vg, -20);
+		nvgStroke(vg);
+	}
+	void step() override {
+		if (module) {
+			VM_104 *vmModule = dynamic_cast<VM_104 *>(module);
+			display1->value = vmModule->calculate(vmModule->samples_1.y_0);
+			display2->value = vmModule->calculate(vmModule->samples_2.y_0);
+			display3->value = vmModule->calculate(vmModule->samples_3.y_0);
+			display4->value = vmModule->calculate(vmModule->samples_4.y_0);
+		}	
+		SchemeModuleWidget::step();
+	}
+};
+
 struct VM201 : VMxxx {
 	VM_NeedleDisplay *display;
 	VM201(VM_xx1 *module) : VMxxx() {
@@ -658,5 +765,6 @@ struct VM202 : VMxxx {
 
 Model *modelVM101 = createModel<VM_xx1, VM101>("VM-101");
 Model *modelVM102 = createModel<VM_102, VM102>("VM-102");
+Model *modelVM104 = createModel<VM_104, VM104>("VM-104");
 Model *modelVM201 = createModel<VM_xx1, VM201>("VM-201");
 Model *modelVM202 = createModel<VM_202, VM202>("VM-202");

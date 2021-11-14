@@ -93,6 +93,7 @@ extern Model *modelTM105;
 
 extern Model *modelVM101;
 extern Model *modelVM102;
+extern Model *modelVM104;
 extern Model *modelVM201;
 extern Model *modelVM202;
 
