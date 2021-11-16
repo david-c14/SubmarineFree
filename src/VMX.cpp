@@ -12,7 +12,7 @@ a₀⋅y₀ = b₀⋅x₀ + b₁⋅x₋₁ + b₂⋅x₋₂ - a₁⋅y₋₁ - a
 ωn = 13.5119  (undamped natural frequency)
 
 a₀ = 4 + 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
-a₁ = -8 + 2⋅ωn²⋅Td
+a₁ = -8 + 2⋅ωn²⋅Td²
 a₂ = 4 - 4⋅ζ⋅ωn⋅Td + ωn²⋅Td²
 b₀ = ωn²⋅Td²
 b₁ = 2⋅ωn²⋅Td²
