@@ -767,7 +767,10 @@ struct LT116 : SchemeModuleWidget {
 	}
 	void normaliseAll() {
 		bulkChangeWithHistory("LT116 normalise all columns", [=](float *params) {
-			__m128 a1, a2, a3, a4 = _mm_setzero_ps();
+			__m128 a1 = _mm_setzero_ps();
+			__m128 a2 = _mm_setzero_ps();
+			__m128 a3 = _mm_setzero_ps();
+			__m128 a4 = _mm_setzero_ps();
 			for (int i = 0; i < 256; i += 16) {
 				__m128 s = _mm_load_ps(params + i);
 				a1 = _mm_add_ps(a1, s);

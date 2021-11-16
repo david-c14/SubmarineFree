@@ -1,4 +1,3 @@
-#include <settings.hpp>
 #include "../SubmarineFree.hpp"
 
 json_t *SizeableModule::dataToJson() {

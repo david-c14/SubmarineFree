@@ -1,6 +1,4 @@
 //SubTag W10 WP AM
-#include <settings.hpp>
-#include <system.hpp>
 #include <osdialog.h>
 #include "SubmarineFree.hpp"
 
@@ -1184,8 +1182,8 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 				lastCable = NULL;
 			highlightIsDirty = true;		
 		}
-		if (wirePanel->visible && APP->scene->rack->incompleteCable) {
-			colorCable(APP->scene->rack->incompleteCable,NULL);
+		if (wirePanel->visible && APP->scene->rack->getIncompleteCable()) {
+			colorCable(APP->scene->rack->getIncompleteCable(),NULL);
 		}
 		highlightWires();
 		SizeableModuleWidget::step();

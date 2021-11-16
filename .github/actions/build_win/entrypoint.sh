@@ -11,7 +11,7 @@ export STRIP=x86_64-w64-mingw32-strip
 
 git submodule update --init --recursive
 
-curl -L https://vcvrack.com/downloads/Rack-SDK-${RACK_SDK_VERSION}.zip -o rack-sdk.zip
+curl -L https://vcvrack.com/downloads/Rack-SDK-${RACK_SDK_VERSION}-win.zip -o rack-sdk.zip
 unzip -o rack-sdk.zip
 rm rack-sdk.zip
 

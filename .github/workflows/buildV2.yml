@@ -4,22 +4,16 @@ on:
     - v2q
 name: V2
 env:
-  RACK_SDK_VERSION: 2.git.219bbaf1-mac
+  RACK_SDK_VERSION: 2.git.588342d7
   RACK_DIR: ${GITHUB_WORKSPACE}/Rack-SDK
   RACK_USER_DIR: ${GITHUB_WORKSPACE}
 jobs:
-  buildOSX:
-    name: Build OSX
-    runs-on: macos-10.15
+  buildLinux:
+    name: Build Linux
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: install tools
-      run: brew install automake
-    - name: get Rack-SDK
-      run: curl -L https://vcvrack.com/downloads/Rack-SDK-${RACK_SDK_VERSION}.zip -o rack-sdk.zip
-    - name: unzip SDK
-      run: unzip -o rack-sdk.zip
-    - name: clean up SDK
-      run: rm rack-sdk.zip
-    - name: make
-      run: make dist
+    - name: Build Linux
+      uses: ./.github/actions/build_linux
+    - name: upload zip
+      run: sh ./.github/actions/upload_plugin_lin/script.sh ${{ secrets.GITHUB_TOKEN }}

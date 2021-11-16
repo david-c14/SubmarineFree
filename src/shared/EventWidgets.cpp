@@ -1,4 +1,3 @@
-#include <settings.hpp>
 #include "../SubmarineFree.hpp"
 
 void EventWidgetAction::undo() {
