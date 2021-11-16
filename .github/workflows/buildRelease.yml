@@ -39,7 +39,7 @@ jobs:
     - name: clean up SDK
       run: rm rack-sdk.zip
     - name: update submodules
-      run: git submodules update --init --recursive
+      run: git submodule update --init --recursive
     - name: make
       run: make dist
     - name: upload zip
