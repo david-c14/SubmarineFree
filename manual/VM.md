@@ -28,7 +28,7 @@ For a sinusoidal bipolar wave with a peak of 5V, the RMS is approximately 3.5V. 
 
 ## Inputs
 
-The VM-102 and VM-202 meters will accept a two-channel polyphonic input. The VM-202 has two inputs, and if the second input is connected, the lower meter will display measure the second input. When only the first input is connected, the lower meter is connected to the second channel of the first (polyphonic) input.
+The VM-102 and VM-202 meters will accept a two-channel polyphonic input. The VM-104 and VM-204 will accept a four-channel polyphonic input. The VM-202 has two inputs, and if the second input is connected, the lower meter will display measure the second input. When only the first input is connected, the lower meter is connected to the second channel of the first (polyphonic) input.
 
 ## Compact option
 

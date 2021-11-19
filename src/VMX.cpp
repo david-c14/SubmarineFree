@@ -126,7 +126,7 @@ namespace {
 		void drawText(NVGcontext *vg, float point, NVGcolor col, const char *txt) {
 			float tick = squareScale(point, M_PI * 0.75, M_PI * 0.25);
 			drawText(vg, box.size.x * 0.5 + cos(tick) * box.size.y * 0.75f, box.size.y - sin(tick) * box.size.y * 0.77f,
-				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 8, col, txt);
+				NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, box.size.y * 0.08889, col, txt);
 		}
 
 		void addTick(const DrawArgs &args, float point) {
@@ -196,8 +196,8 @@ namespace {
 				nvgStroke(args.vg);
 	
 				drawText(args.vg, box.size.x * 0.5, box.size.y * 0.7, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 12, nvgRGB(0,0,0), "VU");
-				drawText(args.vg, 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
-				drawText(args.vg, box.size.x - 10, 20, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
+				drawText(args.vg, 10, box.size.y * 0.222, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, nvgRGB(0,0,0), "-");
+				drawText(args.vg, box.size.x - 10, box.size.y * 0.222, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE, 10, SUBLIGHTRED, "+");
 				drawText(args.vg, -27, nvgRGB(0,0,0), "20");
 				drawText(args.vg, -10, nvgRGB(0,0,0), "10");
 				drawText(args.vg, -7, nvgRGB(0,0,0), "7");
@@ -280,7 +280,8 @@ struct VM_Base : Module {
 						(searchMod->leftExpander.module->model == modelVM102) ||
 						(searchMod->leftExpander.module->model == modelVM104) ||
 				   		(searchMod->leftExpander.module->model == modelVM201) ||
-						(searchMod->leftExpander.module->model == modelVM202)) {
+				   		(searchMod->leftExpander.module->model == modelVM202) ||
+						(searchMod->leftExpander.module->model == modelVM204)) {
 						searchMod = reinterpret_cast<VM_Base *>(searchMod->leftExpander.module);		
 						dataOffset += searchMod->meterCount;
 						if (dataOffset >= 16)
@@ -303,14 +304,15 @@ struct VM_Base : Module {
 			}
 		}
 		else {
-			dataOffset = inputCount;
+			dataOffset = meterCount;
 		}
 		if (dataOffset < searchMod->inputCount && rightExpander.module) {
 			if ((rightExpander.module->model == modelVM101) ||
 				(rightExpander.module->model == modelVM102) ||
 				(rightExpander.module->model == modelVM104) ||
 			   	(rightExpander.module->model == modelVM201) ||
-				(rightExpander.module->model == modelVM202)) {
+			   	(rightExpander.module->model == modelVM202) ||
+				(rightExpander.module->model == modelVM204)) {
 				searchMod = reinterpret_cast<VM_Base *>(rightExpander.module);
 				if (!searchMod->inputCount)
 					right = true;
@@ -402,9 +404,9 @@ struct VM_102 : VM_<1> {
 	}
 };
 
-struct VM_104 : VM_<1> {
+struct VM_xx4 : VM_<1> {
 
-	VM_104() : VM_<1>() { 
+	VM_xx4() : VM_<1>() { 
 		meterCount = 4;
 	}
 
@@ -624,7 +626,7 @@ struct VM104 : VMxxx {
 	VM_LinearDisplay *display2;
 	VM_LinearDisplay *display3;
 	VM_LinearDisplay *display4;
-	VM104(VM_104 *module) : VMxxx() {
+	VM104(VM_xx4 *module) : VMxxx() {
 		setModule(module);
 		this->box.size = Vec(30, 380);
 		addChild(new SchemePanel(this->box.size));
@@ -686,7 +688,7 @@ struct VM104 : VMxxx {
 	}
 	void step() override {
 		if (module) {
-			VM_104 *vmModule = dynamic_cast<VM_104 *>(module);
+			VM_xx4 *vmModule = dynamic_cast<VM_xx4 *>(module);
 			display1->value = vmModule->calculate(vmModule->samples_1.y_0);
 			display2->value = vmModule->calculate(vmModule->samples_2.y_0);
 			display3->value = vmModule->calculate(vmModule->samples_3.y_0);
@@ -763,8 +765,57 @@ struct VM202 : VMxxx {
 	}
 };
 
+struct VM204 : VMxxx {
+	VM_NeedleDisplay *display1;
+	VM_NeedleDisplay *display2;
+	VM_NeedleDisplay *display3;
+	VM_NeedleDisplay *display4;
+	VM204(VM_xx4 *module) : VMxxx() {
+		setModule(module);
+		this->box.size = Vec(120, 380);
+		addChild(new SchemePanel(this->box.size));
+
+		display1 = new VM_NeedleDisplay(100, 70);
+		display1->box.pos = Vec(10, 15);
+		addChild(display1);
+
+		display2 = new VM_NeedleDisplay(100, 70);
+		display2->box.pos = Vec(10, 90);
+		addChild(display2);
+
+		display3 = new VM_NeedleDisplay(100, 70);
+		display3->box.pos = Vec(10, 165);
+		addChild(display3);
+
+		display4 = new VM_NeedleDisplay(100, 70);
+		display4->box.pos = Vec(10, 240);
+		addChild(display4);
+
+		addInput(createInputCentered<SilverPort>(Vec(35,330), module, VM_xx4::INPUT_1));
+		addParam(createParamCentered<SmallKnob<LightKnob>>(Vec(85, 330), module, PARAM_ATTENUATOR));
+		addChild(createLightCentered<RightLight>(Vec(3, 332), module, LIGHT_LINK_LEFT));
+		addChild(createLightCentered<RightLight>(Vec(117, 332), module, LIGHT_LINK_RIGHT));
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "VM-204");
+		drawText(vg, 35, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "INPUT");
+		drawText(vg, 85, 355, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "ATTENUATOR");
+	}
+	void step() override {
+		if (module) {
+			VM_xx4 *vmModule = dynamic_cast<VM_xx4 *>(module);
+			display1->value = vmModule->calculate(vmModule->samples_1.y_0);
+			display2->value = vmModule->calculate(vmModule->samples_2.y_0);
+			display3->value = vmModule->calculate(vmModule->samples_3.y_0);
+			display4->value = vmModule->calculate(vmModule->samples_4.y_0);
+		}	
+		SchemeModuleWidget::step();
+	}
+};
+
 Model *modelVM101 = createModel<VM_xx1, VM101>("VM-101");
 Model *modelVM102 = createModel<VM_102, VM102>("VM-102");
-Model *modelVM104 = createModel<VM_104, VM104>("VM-104");
+Model *modelVM104 = createModel<VM_xx4, VM104>("VM-104");
 Model *modelVM201 = createModel<VM_xx1, VM201>("VM-201");
 Model *modelVM202 = createModel<VM_202, VM202>("VM-202");
+Model *modelVM204 = createModel<VM_xx4, VM204>("VM-204");

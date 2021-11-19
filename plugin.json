@@ -556,6 +556,14 @@
 			"tags": ["UTILITY", "VISUAL", "DUAL", "POLYPHONIC", "HARDWARE"]
 		},
 		{
+			"slug":"VM-204",
+			"name":"VM-204",
+			"description": "VM-204 4-Channel Vintage VU-Meter",
+			"keywords": "Quad Four Meter VU RMS Peak Vintage Needle",
+			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/VM.md",
+			"tags": ["UTILITY", "VISUAL", "QUAD", "POLYPHONIC", "HARDWARE"]
+		},
+		{
 			"slug":"WK-101",
 			"name":"WK-101",
 			"description": "WK-101 Das Wohltemperierte Klavier",
