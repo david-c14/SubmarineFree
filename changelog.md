@@ -22,6 +22,7 @@
 - 14-Nov-2021 Use keywords to make library searching more effective
 - 14-Nov-2021 Add VM-104 Quad digital VU-meter
 - 19-Nov-2021 Add VM-204 Quad vintage VU-meter
+- 22-Nov-2021 Fix rendering bug in VM-1xx devices
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual

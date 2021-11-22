@@ -97,15 +97,17 @@ namespace {
 	
 		void drawLayer(const DrawArgs &args, int layer) override {
 			if (layer == 1) {
-				float zeroPoint = squareScale(0, box.size.y, 0);
 				float meter = squareScale(value, 0.0f, box.size.y);
 				
-				NVGpaint grad = nvgLinearGradient(args.vg, 0, zeroPoint - 10.0f, 0, zeroPoint + 10.0f, SUBLIGHTRED, nvgRGB(30,255,0));
-				nvgFillPaint(args.vg, grad);
-				
-				nvgBeginPath(args.vg);
-				nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter); 
-				nvgFill(args.vg);
+				if (meter) {
+					float zeroPoint = squareScale(0, box.size.y, 0);
+					NVGpaint grad = nvgLinearGradient(args.vg, 0, zeroPoint - 10.0f, 0, zeroPoint + 10.0f, SUBLIGHTRED, nvgRGB(30,255,0));
+					nvgFillPaint(args.vg, grad);
+					
+					nvgBeginPath(args.vg);
+					nvgRect(args.vg, 0, box.size.y - meter, box.size.x, meter); 
+					nvgFill(args.vg);
+				}
 			}
 			Widget::drawLayer(args, layer);
 		}
