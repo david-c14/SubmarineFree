@@ -4,7 +4,7 @@ on:
     - v2q
 name: V2
 env:
-  RACK_SDK_VERSION: 2.git.588342d7
+  RACK_SDK_VERSION: 2.beta.1
   RACK_DIR: ${GITHUB_WORKSPACE}/Rack-SDK
   RACK_USER_DIR: ${GITHUB_WORKSPACE}
 jobs:
