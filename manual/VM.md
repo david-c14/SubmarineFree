@@ -36,7 +36,7 @@ The VM-102 and VM-202 meters will accept a two-channel polyphonic input. The VM-
 
 ## Compact option
 
-The VM-101 and VM-102 are small form factor meters with OLED strip displays.
+The VM-101, VM-102 and VM-104 are small form factor meters with OLED strip displays.
 
 ## Expansion
 
