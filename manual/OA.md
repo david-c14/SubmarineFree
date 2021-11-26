@@ -1,9 +1,9 @@
 # Logical Operational Amplifiers
 ### [Part of the Digital Suite](DS.md)
 #### OA-103 OP-Amps
-![View of the Op-Amps](OA-103.m.png "Operation Amplifiers")
+![View of the Op-Amps](OA-103.png "Operation Amplifiers")
 #### OA-105 OP-Amps
-![View of the Op-Amps](OA-105.m.png "Operation Amplifiers")
+![View of the Op-Amps](OA-105.png "Operation Amplifiers")
 
 ## Basic Operation
 

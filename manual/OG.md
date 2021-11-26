@@ -1,11 +1,11 @@
 # Logical OR Gates
 ### [Part of the Digital Suite](DS.md)
 #### OG-104 OR Gates
-![View of the OR Gates](OG-104.m.png "OR Gates")
+![View of the OR Gates](OG-104.png "OR Gates")
 #### OG-106 OR Gates
-![View of the OR Gates](OG-106.m.png "OR Gates")
+![View of the OR Gates](OG-106.png "OR Gates")
 #### OG-202 OR Gates
-![View of the OR Gates](OG-202.m.png "OR Gates")
+![View of the OR Gates](OG-202.png "OR Gates")
 
 ## Basic Operation
 

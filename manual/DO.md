@@ -1,13 +1,13 @@
 # Digital Operators
 ### [Part of the Digital Suite](DS.md)
 #### DO-105 5 Gate Digital Operators
-![View of the Digital Operators](DO-105.m.png "Digital Operators")
+![View of the Digital Operators](DO-105.png "Digital Operators")
 #### DO-110 10 Gate Digital Operators
-![View of the Digital Operators](DO-110.m.png "Digital Operators")
+![View of the Digital Operators](DO-110.png "Digital Operators")
 #### DO-115 15 Gate Digital Operators
-![View of the Digital Operators](DO-115.m.png "Digital Operators")
+![View of the Digital Operators](DO-115.png "Digital Operators")
 #### DO-120 20 Gate Digital Operators
-![View of the Digital Operators](DO-120.m.png "Digital Operators")
+![View of the Digital Operators](DO-120.png "Digital Operators")
 
 ## Basic Operation
 

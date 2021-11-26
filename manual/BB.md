@@ -3,7 +3,7 @@
 #### BB-120 20-Stage Bucket Brigade Sample and Hold
 
 
-![View of the Sample and Hold Latches](BB-120.m.png "Sample and Hold Latches")
+![View of the Sample and Hold Latches](BB-120.png "Sample and Hold Latches")
 
 ## Basic Operation
 

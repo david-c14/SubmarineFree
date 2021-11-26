@@ -1,12 +1,16 @@
 # VU Meter
 #### VM-101 Compact VU Meter
-![View of the Dual Vintage VU Meter](VM-101.m.png "VU Meter")
+![View of the Digital VU Meter](VM-101.png "VU Meter")
 #### VM-102 Compact Dual VU Meter
-![View of the Dual Vintage VU Meter](VM-102.m.png "VU Meter")
+![View of the Dual Digital VU Meter](VM-102.png "VU Meter")
+#### VM-104 Compact Quad VU Meter
+![View of the Quad Digital VU Meter](VM-104.png "VU Meter")
 #### VM-201 Vintage VU Meter
-![View of the Dual Vintage VU Meter](VM-201.m.png "VU Meter")
+![View of the Vintage VU Meter](VM-201.png "VU Meter")
 #### VM-202 Dual Vintage VU Meter
-![View of the Dual Vintage VU Meter](VM-202.m.png "VU Meter")
+![View of the Dual Vintage VU Meter](VM-202.png "VU Meter")
+#### VM-204 Quad Vintage VU Meter
+![View of the Quad Vintage VU Meter](VM-204.png "VU Meter")
 
 ## Basic Operation
 

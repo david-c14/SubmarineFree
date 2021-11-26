@@ -3,7 +3,7 @@
 #### DN-112 Digital Noise Source
 
 
-![View of the Digital Noise Source](DN-112.m.png "Digital Noise Source")
+![View of the Digital Noise Source](DN-112.png "Digital Noise Source")
 
 ## Basic Operation
 

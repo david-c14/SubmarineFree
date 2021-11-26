@@ -1,8 +1,8 @@
 # Text Display Formatter
 #### TF-101 Text Display Formatter
-![View of the Text Display Formatter](TF-101.m.png "Text Display Formatter")
+![View of the Text Display Formatter](TF-101.png "Text Display Formatter")
 #### TF-102 Text Display Formatter
-![View of the Text Dispaly Formatter](TF-102.m.png "Text Display Formatter")
+![View of the Text Dispaly Formatter](TF-102.png "Text Display Formatter")
 
 ## Basic Operation
 

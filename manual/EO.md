@@ -1,7 +1,7 @@
 # Envelope Oscilloscope
 #### EO-102 2-Channel Envelope Oscilloscope
 
-![View of the Envelope Oscilloscope](EO-102.m.png "Envelope Oscilloscope")
+![View of the Envelope Oscilloscope](EO-102.png "Envelope Oscilloscope")
 
 ## Basic Operation
 
