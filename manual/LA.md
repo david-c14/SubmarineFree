@@ -4,10 +4,16 @@
 
 ![View of the Logic Analyser](LA-108.png "Logic Analyser")
 
+#### LA-216 Dual-Channel Polyphonic Logic Analyser
+
+![View of the Logic Analyser](LA-216.png "Logic Analyser")
+
 ## Basic Operation
 
 The logic analyser takes 8 input signals which it will trace out on the scope screen. It is designed to take digital signals, but it will happily accept analog signals which will be clamped to the configured range.
 It has one additional input (EXT.TR) which is not traced, but which can be used as a trigger.
+
+The polyphonic analyser has 2 inputs (plus an external trigger) and will output up to 16 traces for each.
 
 ## Trigger
 
