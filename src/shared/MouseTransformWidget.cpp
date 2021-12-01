@@ -57,6 +57,17 @@ void MouseTransformWidget::draw(const DrawArgs &args) {
 	Widget::draw(txCtx);
 };
 
+void MouseTransformWidget::drawLayer(const DrawArgs &args, int layer) {
+	DrawArgs txCtx = args;
+	if (hasInverse) {
+		nvgTransformPoint(&txCtx.clipBox.pos.x, &txCtx.clipBox.pos.y, inverse, txCtx.clipBox.pos.x, txCtx.clipBox.pos.y);
+	}
+	
+	// No need to save the state because that is done in the parent
+	nvgTransform(txCtx.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
+	Widget::drawLayer(txCtx, layer);
+};
+
 void MouseTransformWidget::onButton(const event::Button &e) {
 	event::Button e2 = e;
 	if (hasInverse) {

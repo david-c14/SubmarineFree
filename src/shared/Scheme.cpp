@@ -81,19 +81,8 @@ void Scheme::setColors() {
 }
 
 std::shared_ptr<Font> Scheme::font() {
-	if (!_fontLoaded) {
-		_fontLoaded = true;
-		_font = APP->window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));	
-	}
+	std::shared_ptr<Font> _font = APP->window->loadFont(asset::system("res/fonts/DejaVuSans.ttf"));	
 	return _font;
-}
-
-int Scheme::font(NVGcontext *vg) {
-	int ret = nvgFindFont(vg, "subDejaVu");
-	if (ret != -1) {
-		return ret;
-	}
-	return nvgCreateFont(vg, "subDejaVu", asset::system("res/fonts/DejaVuSans.ttf").c_str());
 }
 
 Scheme gScheme;
@@ -151,10 +140,13 @@ void SchemePanel::resize(ModuleWidget *mw, Rect newBox) {
 	canvas->box.size = newBox.size;
 	rightHandle->box.pos.x = newBox.size.x - 10;
 	mw->setSize(newBox.size);
+	if (resizeHandler) 
+		resizeHandler();
 	dirty = true;
 }
 
 void SchemeCanvasWidget::draw(const DrawArgs &args) {
+
 	SchemeModuleWidget *smw = dynamic_cast<SchemeModuleWidget *>(parent->parent);
 	nvgSave(args.vg);
 	smw->render(args.vg, this);
@@ -182,6 +174,8 @@ void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, 0, 0);
 		nvgLineTo(vg, box.size.x, 0);
+		nvgLineTo(vg, box.size.x -1, 1);
+		nvgLineTo(vg, 1, box.size.y - 1);
 		nvgLineTo(vg, 0, box.size.y);
 		nvgClosePath(vg);
 		nvgFillColor(vg, gScheme.getHighlight(module));
@@ -190,6 +184,8 @@ void SchemeModuleWidget::drawBackground(NVGcontext *vg) {
 		nvgMoveTo(vg, box.size.x, 0);
 		nvgLineTo(vg, box.size.x, box.size.y);
 		nvgLineTo(vg, 0, box.size.y);
+		nvgLineTo(vg, 1, box.size.y - 1);
+		nvgLineTo(vg, box.size.x - 1, 1);
 		nvgClosePath(vg);
 		nvgFillColor(vg, gScheme.getShadow(module));
 		nvgFill(vg);
@@ -270,7 +266,7 @@ void SchemeModuleWidget::drawLogo(NVGcontext *vg, float left, float top, float s
 }
 
 void SchemeModuleWidget::drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt) {
-	nvgFontFaceId(vg, gScheme.font(vg));
+	nvgFontFaceId(vg, gScheme.font()->handle);
 	nvgFontSize(vg, size * 90 / SVG_DPI);
 	nvgTextAlign(vg, align);
 	nvgFillColor(vg, col);

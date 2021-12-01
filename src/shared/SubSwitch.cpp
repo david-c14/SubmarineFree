@@ -12,10 +12,10 @@ void SubSwitch2::draw(const DrawArgs &args) {
 	float value = 0.0f;
 	float minValue = 0.0f;
 	float maxValue = 1.0f;
-	if (paramQuantity) {
-		value = paramQuantity->getValue();
-		minValue = paramQuantity->getMinValue();
-		maxValue = paramQuantity->getMaxValue();
+	if (getParamQuantity()) {
+		value = getParamQuantity()->getValue();
+		minValue = getParamQuantity()->getMinValue();
+		maxValue = getParamQuantity()->getMaxValue();
 	}
 
 	float cx = 7.0f + (box.size.x - 14.0f) * value / (maxValue - minValue);

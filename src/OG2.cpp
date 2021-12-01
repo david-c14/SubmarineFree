@@ -28,6 +28,16 @@ struct OG_2 : DS_Module {
 
 	OG_2() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configInput(INPUT_A_1, "Signal 1A");
+		configInput(INPUT_A_2, "Signal 2A");
+		configInput(INPUT_B_1, "Signal 1B");
+		configInput(INPUT_B_2, "Signal 2B");
+		configInput(INPUT_C_1, "Signal 1C");
+		configInput(INPUT_C_2, "Signal 2C");
+		configInput(INPUT_D_1, "Signal 1D");
+		configInput(INPUT_D_2, "Signal 2D");
+		configOutput(OUTPUT_1, "Signal 1");
+		configOutput(OUTPUT_2, "Signal 2");
 	}
 
 	void process(const ProcessArgs &args) override {

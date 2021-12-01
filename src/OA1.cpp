@@ -24,6 +24,13 @@ struct OA_1 : DS_Module {
 
 	OA_1() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		configInput(INPUT_REF_HI, "Reference Signal 1");
+		configInput(INPUT_REF_LO, "Reference Signal 2");
+		for (int i = 0; i < x; i++) {
+			configInput(INPUT_A_1 + i, "Signal " + std::to_string(i + 1) + "A");
+			configInput(INPUT_B_1 + i, "Signal " + std::to_string(i + 1) + "B");
+			configOutput(OUTPUT_1 + i, "Signal " + std::to_string(i + 1));
+		}
 	}
 
 	void process(const ProcessArgs &args) override {

@@ -1,7 +1,7 @@
 # Linear Transformations
 #### LT-116 Linear Transformations
 
-![View of the Linear Transformations](LT-116.m.png "Linear Transformations")
+![View of the Linear Transformations](LT-116.png "Linear Transformations")
 
 ## Basic Operation
 

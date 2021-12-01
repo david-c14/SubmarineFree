@@ -1,26 +1,14 @@
 //SubTag W16 AM WP
 
 #include "SubmarineFree.hpp"
-#include "window.hpp"
-#include "shared/torpedo.hpp"
 
 struct TD_116;
 
-namespace {
-	struct TDInput : Torpedo::PatchInputPort {
-		TD_116 *tdModule;
-		TDInput(TD_116 *module, unsigned int portNum) : Torpedo::PatchInputPort((Module *)module, portNum) { tdModule = module; }
-		void received(std::string pluginName, std::string moduleName, json_t *rootJ) override;
-		NVGcolor decodeColor(std::string colorStr);
-	};
-} // end namespace
-
 struct TD_116 : Module {
-	TDInput inPort = TDInput(this, 0);
-	Torpedo::PatchOutputPort outPort = Torpedo::PatchOutputPort(this, 0);
 	TD_116() : Module () {
 		config(0, 1, 1, 0);
-		outPort.size(1);
+		configInput(0, "Deprecated");
+		configOutput(0, "Deprecated");
 	}
 	void processExpander(float *message) {
 		if (!std::isnan(message[0])) {
@@ -53,18 +41,10 @@ struct TD_116 : Module {
 				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
 			}
 		}
-		inPort.process();
-		outPort.process();
 	}
 	void sendText(std::string textValue) {
 		text = textValue;
-		
-		json_t *rootJ = json_object();;
 
-		// text
-		json_object_set_new(rootJ, "text", json_string(text.c_str()));
-
-		outPort.send("SubmarineFree", "TDNotesText", rootJ); 
 	}
 	void onReset() override {
 		reset = 1;
@@ -142,40 +122,6 @@ namespace {
 		}
 	};
 
-	NVGcolor TDInput::decodeColor(std::string colorStr) {
-		int r = (colorStr[0] - 'A') * 16 + (colorStr[1] - 'A');
-		int g = (colorStr[2] - 'A') * 16 + (colorStr[3] - 'A');
-		int b = (colorStr[4] - 'A') * 16 + (colorStr[5] - 'A');
-		return nvgRGB(r, g, b);
-	}
-	
-	void TDInput::received(std::string pluginName, std::string moduleName, json_t *rootJ) {
-		if (pluginName.compare("SubmarineFree")) return;
-		if (!moduleName.compare("TDNotesText")) { 
-			json_t *text = json_object_get(rootJ, "text");
-			if (text) {
-				tdModule->text.assign(json_string_value(text));
-				tdModule->isDirty = true;
-			}
-		}
-		else if (!moduleName.compare("TDNotesColor")) {
-			json_t *size = json_object_get(rootJ, "size");
-			if (size) {
-				tdModule->fontSize = json_number_value(size);
-				tdModule->isDirtyC = true;
-			}	
-			json_t *fg = json_object_get(rootJ, "fg");
-			if (fg) {
-				tdModule->fg = decodeColor(std::string(json_string_value(fg)));
-				tdModule->isDirtyC = true;
-			}
-			json_t *bg = json_object_get(rootJ, "bg");
-			if (bg) {
-				tdModule->bg = decodeColor(std::string(json_string_value(bg)));
-				tdModule->isDirtyC = true;
-			}
-		}	
-	}
 } // end namespace
 	
 struct TD116 : SchemeModuleWidget {
@@ -186,40 +132,14 @@ struct TD116 : SchemeModuleWidget {
 		this->box.size = Vec(240, 380);
 		addChild(new SchemePanel(this->box.size));
 
-		addInput(createInputCentered<BlackPort>(Vec(16.5,31.5), module, 0));
-		addOutput(createOutputCentered<BlackPort>(Vec(223.5,31.5), module, 0));	
+		addInput(createInputCentered<DeprecatedPort>(Vec(16.5,31.5), module, 0));
+		addOutput(createOutputCentered<DeprecatedPort>(Vec(223.5,31.5), module, 0));	
 
 		textField = createWidget<TD1Text>(mm2px(Vec(3.39962, 15.8373)));
 		textField->box.size = mm2px(Vec(74.480, 102.753));
 		textField->multiline = true;
 		textField->tdModule = module;
 		addChild(textField);
-	}
-
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-		TD_116 *tdModule = dynamic_cast<TD_116 *>(module);
-		if (tdModule) {
-			textField->text = tdModule->text;
-			textField->fontSize = tdModule->fontSize;
-			textField->color = tdModule->fg;
-			textField->bgColor = tdModule->bg;
-		}
-
-		json_t *textJ = json_object_get(rootJ, "text");
-		if (textJ)
-			textField->text = json_string_value(textJ);
-		json_t *sizeJ = json_object_get(rootJ, "size");
-		if (sizeJ)
-			textField->fontSize = json_number_value(sizeJ);
-		json_t *fgJ = json_object_get(rootJ, "fg");
-		if (fgJ) {
-			textField->color = color::fromHexString(json_string_value(fgJ));
-		}
-		json_t *bgJ = json_object_get(rootJ, "bg");
-		if (bgJ) {
-			textField->bgColor = color::fromHexString(json_string_value(bgJ));
-		}
 	}
 
 	void step() override {
@@ -253,13 +173,11 @@ struct TD116 : SchemeModuleWidget {
 
 	void appendContextMenu(Menu *menu) override {
 		SchemeModuleWidget::appendContextMenu(menu);
-		textField->appendContextMenu(menu);
+	textField->appendContextMenu(menu);
 	}
 
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		drawBase(vg, "TD-116");
-		drawText(vg, 30, 36, NVG_ALIGN_LEFT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC IN");
-		drawText(vg, 210, 36, NVG_ALIGN_RIGHT | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "SYNC OUT");
 	}
 };
 

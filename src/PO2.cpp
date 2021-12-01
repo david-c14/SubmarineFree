@@ -56,6 +56,10 @@ struct PO_204 : Module {
 			configParam(PARAM_WAVE_1 + i, 0.0f, 10.0f, 5.0f, string::f("Operator #%d wave shape", i + 1));
 			configParam(PARAM_PHASE_1 + i, -1.0f, +1.0f, 0.0f, string::f("Operator #%d phase shift", i + 1), "\xc2\xb0", 0.f, 360.f);
 			configParam(PARAM_MULT_1 + i, 1.0f, 16.0f, 1.0f, string::f("Operator #%d frequency multiplier", i + 1));
+			configInput(INPUT_WAVE_1 + i, string::f("Operator #%d wave shape", i + 1));
+			configInput(INPUT_PHASE_1 + i, string::f("Operator #%d phase shift", i + 1));
+			configInput(INPUT_MULT_1 + i, string::f("Operator #%d frequency multiplier", i + 1));
+			configOutput(OUTPUT_1 + i, string::f("Signal #%d", i + 1));
 		}
 	}
 	void process(const ProcessArgs &args) override;

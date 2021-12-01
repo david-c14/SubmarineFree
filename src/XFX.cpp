@@ -104,8 +104,8 @@ namespace {
 		int cv;
 		int link;
 		void step() override {
-			if (paramQuantity) {
-				Module *module = paramQuantity->module;
+			if (module) {
+				//Module *module = paramQuantity->module;
 				if (link) {
 					setEnabled(!module->inputs[cv].isConnected() && (module->params[link].getValue() < 0.5f));
 				}
@@ -209,9 +209,16 @@ struct XF_101 : XF {
 	};
 
 	XF_101() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		configParam(PARAM_CV_1, 0.0f, 1.0f, 0.0f, "CV is bipolar");
-		configParam(PARAM_MODE_1, 0.0f, 2.0f, 0.0f, "Fade profile");
+		configSwitch(PARAM_CV_1, 0.0f, 1.0f, 0.0f, "CV Mode", { "Unipolar", "Bipolar" });
+		configSwitch(PARAM_MODE_1, 0.0f, 2.0f, 0.0f, "Fade Profile", { "Linear", "Logarithmic", "Automatic" });
 		configParam(PARAM_FADE_1, 0.0f, 10.0f, 5.0f, "A/B blend", "%", 0.f, 10.f );
+		configInput(INPUT_A_1, "Signal A");
+		configInput(INPUT_B_1, "Signal B");
+		configInput(INPUT_CV_1, "CV");
+		configOutput(OUTPUT_1, "Signal");
+		configLight(LIGHT_LIN_1, "Linear");
+		configLight(LIGHT_LOG_1, "Logarithmic");
+		configLight(LIGHT_AUTO_1, "Auto / Inverted");
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -304,10 +311,10 @@ struct XF_102 : XF {
 	XF_Controls controls[(int)(deviceCount * 1.5f)];
 
 	XF_102() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		configParam(PARAM_LINK_1, 0.0f, 1.0f, 0.0f, "Link faders");
+		configSwitch(PARAM_LINK_1, 0.0f, 1.0f, 0.0f, "Link Faders", { "Unlinked", "Linked" });
 		for (int i = 0; i < deviceCount; i++) {
-			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, string::f("Fader %d CV is bipolar", i + 1));
-			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, string::f("Fader %d Fade profile", i + 1));
+			configSwitch(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, "CV Mode", { "Unipolar", "Bipolar" });
+			configSwitch(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, "Fade Profile", { "Linear", "Logarithmic", "Automatic" });
 			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f, string::f("Fader %d A/B blend", i + 1), "%", 0.f, 10.f);
 			controls[i].a = INPUT_A_1 + i;
 			controls[i].ar = 0;
@@ -341,6 +348,20 @@ struct XF_102 : XF {
 			controls[i + deviceCount].light3 = LIGHT_AUTO_1 + x * 2;
 			controls[i + deviceCount].correlator = &correlators[x];
 		}
+		configInput(INPUT_A_1, "Signal A 1");
+		configInput(INPUT_A_2, "Signal A 2");
+		configInput(INPUT_B_1, "Signal B 1");
+		configInput(INPUT_B_2, "Signal B 2");
+		configInput(INPUT_CV_1, "CV 1");
+		configInput(INPUT_CV_2, "CV 2");
+		configOutput(OUTPUT_1, "Signal 1");
+		configOutput(OUTPUT_2, "Signal 2");
+		configLight(LIGHT_LIN_1, "Linear");
+		configLight(LIGHT_LIN_2, "Linear");
+		configLight(LIGHT_LOG_1, "Logarithmic");
+		configLight(LIGHT_LOG_2, "Logarithmic");
+		configLight(LIGHT_AUTO_1, "Auto / Inverted");
+		configLight(LIGHT_AUTO_2, "Auto / Inverted");
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -455,11 +476,11 @@ struct XF_104 : XF {
 	XF_Controls controls[(int)(deviceCount * 1.5f)];
 
 	XF_104() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
-		configParam(PARAM_LINK_1, 0.0f, 1.0f, 0.0f, "Link faders 1 & 2");
-		configParam(PARAM_LINK_2, 0.0f, 1.0f, 0.0f, "Link faders 3 & 4");
+		configSwitch(PARAM_LINK_1, 0.0f, 1.0f, 0.0f, "Link Faders 1 & 2", { "Not Linked", "Linked" });
+		configSwitch(PARAM_LINK_2, 0.0f, 1.0f, 0.0f, "Link Faders 3 & 4", { "Not Linked", "Linked" });
 		for (int i = 0; i < deviceCount; i++) {
-			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, string::f("Fader %d CV is bipolar", i + 1));
-			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, string::f("Fader %d Fade profile", i + 1));
+			configSwitch(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, "CV Mode", { "Unipolar", "Bipolar" });
+			configSwitch(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, "Fade Profile", { "Linear", "Logarithmic", "Automatic" });
 			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f, string::f("Fader %d A/B blend", i + 1), "%", 0.f, 10.f);
 			controls[i].a = INPUT_A_1 + i;
 			controls[i].ar = 0;
@@ -493,6 +514,34 @@ struct XF_104 : XF {
 			controls[i + deviceCount].light3 = LIGHT_AUTO_1 + x * 2;
 			controls[i + deviceCount].correlator = &correlators[x];
 		}
+		configInput(INPUT_A_1, "Signal A 1");
+		configInput(INPUT_A_2, "Signal A 2");
+		configInput(INPUT_A_3, "Signal A 3");
+		configInput(INPUT_A_4, "Signal A 4");
+		configInput(INPUT_B_1, "Signal B 1");
+		configInput(INPUT_B_2, "Signal B 2");
+		configInput(INPUT_B_3, "Signal B 3");
+		configInput(INPUT_B_4, "Signal B 4");
+		configInput(INPUT_CV_1, "CV 1");
+		configInput(INPUT_CV_2, "CV 2");
+		configInput(INPUT_CV_3, "CV 3");
+		configInput(INPUT_CV_4, "CV 4");
+		configOutput(OUTPUT_1, "Signal 1");
+		configOutput(OUTPUT_2, "Signal 2");
+		configOutput(OUTPUT_3, "Signal 3");
+		configOutput(OUTPUT_4, "Signal 4");
+		configLight(LIGHT_LIN_1, "Linear");
+		configLight(LIGHT_LIN_2, "Linear");
+		configLight(LIGHT_LIN_3, "Linear");
+		configLight(LIGHT_LIN_4, "Linear");
+		configLight(LIGHT_LOG_1, "Logarithmic");
+		configLight(LIGHT_LOG_2, "Logarithmic");
+		configLight(LIGHT_LOG_3, "Logarithmic");
+		configLight(LIGHT_LOG_4, "Logarithmic");
+		configLight(LIGHT_AUTO_1, "Auto / Inverted");
+		configLight(LIGHT_AUTO_2, "Auto / Inverted");
+		configLight(LIGHT_AUTO_3, "Auto / Inverted");
+		configLight(LIGHT_AUTO_4, "Auto / Inverted");
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -638,8 +687,8 @@ struct XF_201 : XF {
 
 	XF_201() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		for (int i = 0; i < deviceCount; i++) {
-			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, string::f("Fader %d CV is bipolar", i + 1));
-			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, string::f("Fader %d Fade profile", i + 1));
+			configSwitch(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, "CV Mode", { "Unipolar", "Bipolar" });
+			configSwitch(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, "Fade Profile", { "Linear", "Logarithmic", "Automatic" });
 			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f, string::f("Fader %d A/B blend", i + 1), "%", 0.f, 10.f);
 			controls[i].a = INPUT_A_1 + i;
 			controls[i].ar = INPUT_AR_1 + i;
@@ -656,6 +705,16 @@ struct XF_201 : XF {
 			controls[i].light3 = LIGHT_AUTO_1 + i * 2;
 			controls[i].correlator = &correlators[i];
 		}
+		configInput(INPUT_A_1, "Signal A Left");
+		configInput(INPUT_AR_1, "Signal A Right");
+		configInput(INPUT_B_1, "Signal B Left");
+		configInput(INPUT_BR_1, "Signal B Right");
+		configInput(INPUT_CV_1, "CV");
+		configOutput(OUTPUT_1, "Signal Left");
+		configOutput(OUTPUTR_1, "Signal Right");
+		configLight(LIGHT_LIN_1, "Linear");
+		configLight(LIGHT_LOG_1, "Logarithmic");
+		configLight(LIGHT_AUTO_1, "Auto / Inverted");
 	}
 
 	void process(const ProcessArgs &args) override {
@@ -817,8 +876,8 @@ struct XF_202 : XF {
 
 	XF_202() : XF(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 		for (int i = 0; i < deviceCount; i++) {
-			configParam(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, string::f("Fader %d CV is bipolar", i + 1));
-			configParam(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, string::f("Fader %d Fade profile", i + 1));
+			configSwitch(PARAM_CV_1 + i, 0.0f, 1.0f, 0.0f, "CV Mode", { "Unipolar", "Bipolar" });
+			configSwitch(PARAM_MODE_1 + i, 0.0f, 2.0f, 0.0f, "Fade Profile", { "Linear", "Logarithmic", "Automatic" });
 			configParam(PARAM_FADE_1 + i, 0.0f, 10.0f, 5.0f, string::f("Fader %d A/B blend", i + 1), "%", 0.f, 10.f);
 			controls[i].a = INPUT_A_1 + i;
 			controls[i].ar = INPUT_AR_1 + i;
@@ -835,6 +894,26 @@ struct XF_202 : XF {
 			controls[i].light3 = LIGHT_AUTO_1 + i * 2;
 			controls[i].correlator = &correlators[i];
 		}
+		configInput(INPUT_A_1, "Signal A 1 Left");
+		configInput(INPUT_AR_1, "Signal A 1 Right");
+		configInput(INPUT_B_1, "Signal B 1 Left");
+		configInput(INPUT_BR_1, "Signal B 1 Right");
+		configInput(INPUT_CV_1, "CV 1");
+		configOutput(OUTPUT_1, "Signal 1 Left");
+		configOutput(OUTPUTR_1, "Signal 1 Right");
+		configLight(LIGHT_LIN_1, "Linear");
+		configLight(LIGHT_LOG_1, "Logarithmic");
+		configLight(LIGHT_AUTO_1, "Auto / Inverted");
+		configInput(INPUT_A_2, "Signal A 1 Left");
+		configInput(INPUT_AR_2, "Signal A 1 Right");
+		configInput(INPUT_B_2, "Signal B 1 Left");
+		configInput(INPUT_BR_2, "Signal B 1 Right");
+		configInput(INPUT_CV_2, "CV 1");
+		configOutput(OUTPUT_2, "Signal 1 Left");
+		configOutput(OUTPUTR_2, "Signal 1 Right");
+		configLight(LIGHT_LIN_2, "Linear");
+		configLight(LIGHT_LOG_2, "Logarithmic");
+		configLight(LIGHT_AUTO_2, "Auto / Inverted");
 	}
 
 	void process(const ProcessArgs &args) override {

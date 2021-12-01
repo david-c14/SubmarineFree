@@ -1,6 +1,4 @@
 //SubTag W10 WP AM
-#include <settings.hpp>
-#include <system.hpp>
 #include <osdialog.h>
 #include "SubmarineFree.hpp"
 
@@ -627,7 +625,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	ModuleWidget *lastHover = NULL;
 	bool highlightIsDirty = true;
 
-	int cableCount = 0;
+	int64_t cableCount = 0;
 	Widget *lastCable = NULL;
 	unsigned int newColorIndex = 0;
 
@@ -675,7 +673,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		backPanel = new BackPanel();
 		backPanel->box.pos = Vec(10, 15);
-		backPanel->box.size = Vec(box.size.x - 20, box.size.y - 30);
+		backPanel->box.size = Vec(130, box.size.y - 30);
 		addChild(backPanel);
 		scrollWidget = new ScrollWidget();
 		scrollWidget->box.pos = Vec(0, 21);
@@ -719,7 +717,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		deleteLabel = new EventWidgetLabel();
 		deleteLabel->box.pos = Vec(15, 195);
-		deleteLabel->box.size = Vec(box.size.x - 40, 19);
+		deleteLabel->box.size = Vec(110, 19);
 		deleteConfirmPanel->addChild(deleteLabel);
 		
 		deleteOkButton = new EventWidgetButton();
@@ -755,7 +753,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		billboardPanel = new BillboardPanel();
 		billboardPanel->box.pos = Vec(0, 15);
-		billboardPanel->box.size = Vec(box.size.x, box.size.y - 30);
+		billboardPanel->box.size = Vec(150, box.size.y - 30);
 		billboardPanel->visible = false;
 		billboardPanel->drawHandler = [=](const DrawArgs &args) { 
 			this->drawBillboard(args);
@@ -789,7 +787,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		varyCheck = new EventWidgetCheckBox();
 		varyCheck->label = "Variation";
 		varyCheck->box.pos = Vec(10, 5);
-		varyCheck->box.size = Vec(box.size.x - 40, 19);
+		varyCheck->box.size = Vec(110, 19);
 		varyCheck->changeHandler = [=]() { this->varyCheckChanged(); };
 		settingsPanel->addChild(varyCheck);
 
@@ -813,7 +811,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		varyH = new EventWidgetSlider();
 		varyH->box.pos = Vec(20, 25);
-		varyH->box.size = Vec(box.size.x - 50, 19);
+		varyH->box.size = Vec(100, 19);
 		varyH->value = 0.1f;
 		varyH->textHandler = [](float value) -> std::string {
 			return string::f("%.4g%s", value * 360.0, "\xC2\xB0");
@@ -841,7 +839,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	
 		varyS = new EventWidgetSlider();
 		varyS->box.pos = Vec(20, 45);
-		varyS->box.size = Vec(box.size.x - 50, 19);
+		varyS->box.size = Vec(100, 19);
 		varyS->value = 0.1f;
 		varyS->textHandler = percentageTextHandler;
 		varyS->label = "Saturation";
@@ -867,7 +865,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	
 		varyL = new EventWidgetSlider();
 		varyL->box.pos = Vec(20, 65);
-		varyL->box.size = Vec(box.size.x - 50, 19);
+		varyL->box.size = Vec(100, 19);
 		varyL->value = 0.1f;
 		varyL->textHandler = percentageTextHandler;
 		varyL->label = "Lightness";
@@ -894,13 +892,13 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		EventWidgetLabel *highlightLabel = new EventWidgetLabel();
 		highlightLabel->label = "Highlighting";
 		highlightLabel->box.pos = Vec(10, 105);
-		highlightLabel->box.size = Vec(box.size.x - 40, 19);
+		highlightLabel->box.size = Vec(110, 19);
 		settingsPanel->addChild(highlightLabel);
 
 		highlightOff = new EventWidgetRadioButton();
 		highlightOff->label = "Off";
 		highlightOff->box.pos = Vec(10, 125);
-		highlightOff->box.size = Vec(box.size.x - 40, 19);
+		highlightOff->box.size = Vec(110, 19);
 		highlightOff->selected = true;
 		highlightOff->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_OFF);
@@ -911,7 +909,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		highlightLow = new EventWidgetRadioButton();
 		highlightLow->label = "When hovering";
 		highlightLow->box.pos = Vec(10, 145);
-		highlightLow->box.size = Vec(box.size.x - 40, 19);
+		highlightLow->box.size = Vec(110, 19);
 		highlightLow->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_LOW);
 			this->saveSettings();
@@ -921,7 +919,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		highlightOn = new EventWidgetRadioButton();
 		highlightOn->label = "Always On";
 		highlightOn->box.pos = Vec(10, 165);
-		highlightOn->box.size = Vec(box.size.x - 40, 19);
+		highlightOn->box.size = Vec(110, 19);
 		highlightOn->changeHandler = [=]() {
 			this->highlightChanged(HIGHLIGHT_ON);
 			this->saveSettings();
@@ -930,7 +928,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		highlightSlider = new EventWidgetSlider();
 		highlightSlider->box.pos = Vec(10, 185);
-		highlightSlider->box.size = Vec(box.size.x - 40, 21);
+		highlightSlider->box.size = Vec(110, 21);
 		highlightSlider->value = 0.1f;
 		highlightSlider->textHandler = percentageTextHandler;
 		highlightSlider->label = "Opacity";
@@ -959,14 +957,14 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		redoCheck = new EventWidgetCheckBox();
 		redoCheck->label = "Redo colors?";
 		redoCheck->box.pos = Vec(10, 220);
-		redoCheck->box.size = Vec(box.size.x - 40, 19);
+		redoCheck->box.size = Vec(110, 19);
 		redoCheck->changeHandler = [=]() { this->redoCheckChanged(); };
 		settingsPanel->addChild(redoCheck);
 
 		billboard3d = new EventWidgetCheckBox();
 		billboard3d->label = "3D billboard?";
 		billboard3d->box.pos = Vec(10, 255);
-		billboard3d->box.size = Vec(box.size.x - 40, 19);
+		billboard3d->box.size = Vec(110, 19);
 		billboard3d->selected = 1;
 		billboard3d->changeHandler = [=]() { this->billboard3dChanged(); };
 		settingsPanel->addChild(billboard3d);
@@ -1005,11 +1003,23 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		blockingButton->clickHandler = [=]() { this->takeMasterSlot(); };
 		blockingPanel->addChild(blockingButton);
 
-		if (!module)
+		if (module) {
+			setInitialSize(module);
+		}
+		else {
 			loadSettings();
+		}
 	}
 	~WM101() {
 		this->_delete();
+	}
+	void setInitialSize(SizeableModule *module) {
+		if (module->loadedSize == 0)
+			return;
+		if (module->loadedSize == module->size)
+			return;
+		module->size = module->loadedSize;
+		Minimize(module->size < 16.0f);
 	}
 	void onHoverKey(const event::HoverKey &e) override {
 		ModuleWidget::onHoverKey(e);
@@ -1128,9 +1138,10 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		if (!module) {
 			return;
 		}
+	
 		if (!stabilized) {
 			stabilized = true;
-			cableCount = APP->scene->rack->cableContainer->children.size();
+			cableCount = APP->scene->rack->getCableContainer()->children.size();
 		}
 		if (masterWireManager != this) {
 			if (masterWireManager) {
@@ -1142,11 +1153,12 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 			}
 			takeMasterSlot();
 		}
-		int newSize = APP->scene->rack->cableContainer->children.size();
+		int64_t newSize = APP->scene->rack->getCableContainer()->children.size();
+		
 		if (newSize < cableCount) {
 			cableCount = newSize;
 			if (cableCount) 
-				lastCable = APP->scene->rack->cableContainer->children.back();
+				lastCable = APP->scene->rack->getCableContainer()->children.back();
 			else
 				lastCable = NULL;
 		}
@@ -1158,20 +1170,20 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 				APP->history->push(complex);
 				cableCount = 0;
 			}
-			std::list<Widget *>::reverse_iterator iterator = APP->scene->rack->cableContainer->children.rbegin();
-			for (int i = 0; i < newSize - cableCount; i++) {
+			std::list<Widget *>::reverse_iterator iterator = APP->scene->rack->getCableContainer()->children.rbegin();
+			for (int64_t i = 0; i < newSize - cableCount; i++) {
 				colorCable(*iterator, complex);
 				++iterator;
 			}
 			cableCount = newSize;
 			if (cableCount)
-				lastCable = APP->scene->rack->cableContainer->children.back();
+				lastCable = APP->scene->rack->getCableContainer()->children.back();
 			else
 				lastCable = NULL;
 			highlightIsDirty = true;		
 		}
-		if (wirePanel->visible && APP->scene->rack->incompleteCable) {
-			colorCable(APP->scene->rack->incompleteCable,NULL);
+		if (wirePanel->visible && APP->scene->rack->getIncompleteCable()) {
+			colorCable(APP->scene->rack->getIncompleteCable(),NULL);
 		}
 		highlightWires();
 		SizeableModuleWidget::step();
@@ -1191,7 +1203,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		}
 		if (highlightIsDirty) {
 			highlightIsDirty = false;
-			for (Widget *widget : APP->scene->rack->cableContainer->children) {
+			for (Widget *widget : APP->scene->rack->getCableContainer()->children) {
 				CableWidget *cable = dynamic_cast<CableWidget *>(widget);
 				if (focusedModuleWidget) {
 					if (!cable->outputPort || !cable->inputPort) {
@@ -1219,7 +1231,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 	}
 	void colorCable(Widget *widget, history::ComplexAction *complex) {
 		CableWidget *cable = dynamic_cast<CableWidget *>(widget);
-		if (cable->cable->id > -1 && !complex && redoCheck->selected && !wirePanel->visible)
+		if (cable->cable && cable->cable->id > -1 && !complex && redoCheck->selected && !wirePanel->visible)
 			return;
 		NVGcolor oldColor = cable->color;
 		if (wirePanel->visible) {
@@ -1235,7 +1247,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		if (!complex)
 			return;
 		NVGcolor newColor = cable->color;
-		int id = cable->cable->id;
+		int64_t id = cable->cable->id;
 		complex->push(
 			new EventWidgetAction("Color Cable",
 				[id, oldColor](){
@@ -1503,7 +1515,6 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		}
 		
 		addColor(nvgRGB(0xff, 0xae, 0xc9), "", false);
-		addColor(nvgRGB(0xb7, 0x00, 0xb5), "", false);
 		addColor(nvgRGB(0x80, 0x80, 0x80), "", false);
 		addColor(nvgRGB(0xff, 0xff, 0xff), "", false);
 		addColor(nvgRGB(0x10, 0x0f, 0x12), "", false);
@@ -1816,7 +1827,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 		Menu *menu = createMenu();
 		if (forcePosition) {
 			// put the name field under the mouse
-			menu->box.pos = APP->window->mousePos.minus(Vec(100, 12));
+			menu->box.pos = APP->scene->rack->getMousePos().minus(Vec(100, 12));
 		}
 		EventParamField *paramField = new EventParamField();
 		paramField->box.size.x = 100;
@@ -1976,7 +1987,7 @@ struct WM101 : SizeableModuleWidget, WM_Base {
 
 		// Append .vcv extension if no extension was given.
 		std::string pathStr = pathC;
-		if (string::filenameExtension(string::filename(pathStr)) == "") {
+		if (system::getExtension(system::getFilename(pathStr)) == "") {
 			pathStr += ".wmCollection";
 		}
 
@@ -2498,6 +2509,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
 		if (!module) {
 			drawBase(vg, "WM-102");
+			drawEasterEgg(vg);
 			return;
 		}
 		WM_102 *wm = dynamic_cast<WM_102 *>(module);
@@ -2509,6 +2521,25 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		nvgSave(vg);
 		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
 		drawBillboardBase(vg, renderBox, wm->colors, wm->labels, draw3d);
+		nvgRestore(vg);
+	}
+	void drawEasterEgg(NVGcontext *vg) {
+		Rect renderBox;
+	       	renderBox.pos = Vec(0, 15);
+		renderBox.size = Vec(box.size.x, box.size.y - 30);
+		nvgSave(vg);
+		nvgTranslate(vg, renderBox.pos.x, renderBox.pos.y);
+		std::vector<NVGcolor> colors;
+		colors.push_back(color::fromHexString("#c91847"));
+		colors.push_back(color::fromHexString("#0986ad"));
+		colors.push_back(color::fromHexString("#c9b70e"));
+		colors.push_back(color::fromHexString("#0c8e15"));
+		std::vector<std::string> labels;
+		labels.push_back("");
+		labels.push_back("Submarine");
+		labels.push_back("WM-102");
+		labels.push_back("");
+		drawBillboardBase(vg, renderBox, colors, labels, true);
 		nvgRestore(vg);
 	}
 	void appendContextMenu(Menu *menu) override {
@@ -2590,6 +2621,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 		btn->labels = labels;
 		return btn;
 	}
+	/*
 	void fromJson(json_t *rootJ) override {
 		ModuleWidget::fromJson(rootJ);
 		if (!module) 
@@ -2614,6 +2646,7 @@ struct WM102 : SchemeModuleWidget, WM_Base {
 			module->params[WM_102::PARAM_LOCKED].setValue(clamp((int)json_number_value(v1), 0, 1));
 		}
 	}
+	*/
 };
 
 Model *modelWM101 = createModel<SizeableModule, WM101>("WM-101");

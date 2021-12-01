@@ -6,6 +6,9 @@ struct SS_112 : Module {
 	static constexpr int deviceCount = 12;
 	SS_112() : Module() {
 		config(0, deviceCount, 0, 0);
+		for (unsigned int i = 0; i < deviceCount; i++) {
+			configInput(i, "Signal Sink");
+		}
 	}
 };
 
@@ -37,6 +40,14 @@ struct SS_208 : Module {
 		values[5] = powf(3.0f, 0.5f);
 		values[6] = powf(5.0f, 0.5f);
 		values[7] = powf(7.0f, 0.5f);
+		configOutput(0, "\xcf\x80 V");
+		configOutput(1, "\xcf\x84 V");
+		configOutput(2, "\xe2\x84\xaf V");
+		configOutput(3, "\xe2\x88\x9a\xc2\xbd V");
+		configOutput(4, "\xe2\x88\x9a" "2 V");
+		configOutput(5, "\xe2\x88\x9a" "3 V");
+		configOutput(6, "\xe2\x88\x9a" "5 V");
+		configOutput(7, "\xe2\x88\x9a" "7 V");
 	}
 	void process(const ProcessArgs &args) override {
 		outputs[0].setVoltage(values[0]);
@@ -78,6 +89,7 @@ struct SS_212 : Module {
 	void setValues() {
 		for (int i = 0; i < deviceCount; i++) {
 			outputs[i].setVoltage(v + 1.0f * i / 12.0f);
+			configOutput(i, string::f("%f V", v + 1.0f * i / 12.0f));
 		}
 	}
 
@@ -156,6 +168,9 @@ struct SS_221 : Module {
 	static constexpr int deviceCount = 21;
 	SS_221() : Module() {
 		config(0, 0, deviceCount, 0);
+		for (int i = 0; i < deviceCount; i++) {
+			configOutput(i, string::f("%d V", 10 - i));
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		for (int i = 0; i < deviceCount; i++) {
@@ -204,6 +219,9 @@ struct SS_220 : Module {
 	static constexpr int deviceSetCount = 10;
 	SS_220() : Module() {
 		config(0, 0, deviceCount * deviceSetCount, 0);
+		for (unsigned int i = 0; i < deviceCount * deviceSetCount; i++) {
+			configOutput(i, string::f("%f V", 5.0f - i / 12.0f));
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		for (int j = 0; j < deviceSetCount; j++) {
