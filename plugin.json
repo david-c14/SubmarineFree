@@ -11,7 +11,7 @@
 	"donateUrl": "https://www.paypal.me/SubmarineFree",
         "pluginUrl": "https://vcvrack.submarine.org.uk",
 	"changelogUrl": "https://github.com/david-c14/SubmarineFree/blob/main/changelog.md",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"modules": [
 		{
 			"slug":"AG-104",
@@ -464,6 +464,7 @@
 		{
 			"slug":"TD-116",
 			"name":"TD-116",
+			"hidden":true,
 			"deprecated":true,
 			"manualUrl": "https://github.com/david-c14/SubmarineFree/blob/main/manual/TD.md",
 			"tags": ["VISUAL"]
@@ -519,6 +520,7 @@
 		{
 			"slug":"TM-105",
 			"name":"Obsolete",
+			"hidden":true,
 			"deprecated":true,
 			"description": "This was Torpedo Merge TM-105",
 			"tags": ["BLANK"]
@@ -678,6 +680,7 @@
 		{
 			"slug":"XX-219",
 			"name":"Obsolete",
+			"hidden":true,
 			"deprecated":true,
 			"description": "This was Secret Santa 2019",
 			"tags": ["BLANK"]

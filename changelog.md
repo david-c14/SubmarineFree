@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.1
+- 30-Nov-2021 Add LA-216 Polyphonic Logic Analyser
+
 ## v2.0.0
 - 11-Oct-2021 Port shared components to v2
 - 11-Oct-2021 Port Blanking plates to v2
@@ -23,7 +26,6 @@
 - 14-Nov-2021 Add VM-104 Quad digital VU-meter
 - 19-Nov-2021 Add VM-204 Quad vintage VU-meter
 - 22-Nov-2021 Fix rendering bug in VM-1xx devices
-- 30-Nov-2021 Add LA-216 Polyphonic Logic Analyser
 
 ## v1.1.10
 - 10-Dec-2020 Update images in manual
