@@ -19,6 +19,16 @@
 // Ports
 //////////////////
 
+struct DeprecatedPort : PortWidget {
+	DeprecatedPort() {
+		box.size.x = 0;
+		box.size.y = 0;
+	}
+	void draw(const DrawArgs &args) override {
+		Widget::draw(args);
+	}
+};
+
 struct SilverPort : PortWidget {
 	NVGcolor col = nvgRGB(0xf0, 0xf0, 0xf0);
 	SilverPort() {
@@ -36,9 +46,9 @@ struct BluePort : SilverPort {
 	BluePort() { col = SUBLIGHTBLUE; }
 };
 
-struct BlackPort : SilverPort {
-	BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
-};
+//struct BlackPort : SilverPort {
+	//BlackPort() { col = nvgRGB(0x40, 0x40, 0x40); }
+//};
 
 //////////////////
 // Switches
@@ -83,172 +93,37 @@ struct SubSwitchHorz : k {
 // Buttons
 //////////////////
 
-struct LightButtonLight;
-
 struct LightButton : app::Switch {
 	NVGcolor color = SUBLIGHTBLUE;
-	LightButtonLight *light;
 	LightButton(); 
 	void draw(const DrawArgs &args) override;
-};
-
-struct LightButtonLight : LightWidget {
-	LightButton *button;
-	void draw(const DrawArgs &args) override;
-};
-
-//////////////////
-// BulkParams
-//////////////////
-
-struct BulkParamWidget : widget::OpaqueWidget {
-	Module *module;
-	int paramId;
-	float *value = NULL;
-	float minValue = .0f;
-	float maxValue = 1.0f;
-	float defaultValue = .0f;
-	ui::Tooltip* tooltip = NULL;
-	std::string description;
-	std::string label;
-	std::string unit;
-	/** Set to 0 for linear, positive for exponential, negative for logarithmic. */
-	float displayBase = 0.f;
-	float displayMultiplier = 1.f;
-	float displayOffset = 0.f;
-
-	void onButton(const event::Button& e) override;
-	void onDoubleClick(const event::DoubleClick& e) override;
-	void onEnter(const event::Enter& e) override;
-	void onLeave(const event::Leave& e) override;
-
-	/** For legacy patch loading */
-	void fromJson(json_t* rootJ);
-	void createContextMenu();
-	void resetAction();
-	virtual void reset() {}
-	virtual void randomize() {}
-
-	std::function<void(ui::Menu *)> contextMenuCallback;
-
-	std::string getString();
-	float getDisplayValue();
-	void setDisplayValue(float displayValue);
-	std::string getDisplayValueString();
-	void setDisplayValueString(std::string s);
-	
-	static void setBulkParamValue(int thisModuleId, int thisParamId, float thisValue);
-};
-
-struct BulkParamTooltip : ui::Tooltip {
-	BulkParamWidget* bulkParamWidget;
-
-	void step() override;
+	void drawLayer(const DrawArgs &args, int layer) override;
+	void drawLight(const DrawArgs &args, bool enabled);
+	void drawHalo(const DrawArgs &args);
 };
 
 //////////////////
 // Knobs
 //////////////////
 
-struct BulkKnob : BulkParamWidget {
-	/** Multiplier for mouse movement to adjust knob value */
-	float speed = 1.0;
-	float oldValue = .0f;
-	bool smooth = true;
-	/** Enable snapping at integer values */
-	bool snap = false;
-	float snapValue = NAN;
-	/** Drag horizontally instead of vertically */
-	bool horizontal = false;
 
-	void onHover(const event::Hover& e) override;
-	void onButton(const event::Button& e) override;
-	void onDragStart(const event::DragStart& e) override;
-	void onDragEnd(const event::DragEnd& e) override;
-	void onDragMove(const event::DragMove& e) override;
-	void reset() override;
-	void randomize() override;
-};
-
-struct LightKnobLight;
-
-struct BaseLightKnob
-{
+struct LightKnob : Knob {
 	/** Angles in radians */
 	float minAngle = -0.83*M_PI;
 	float maxAngle = 0.83*M_PI;
 	/** Radii in standard units */
 	float radius = 19.0;
 	int enabled = 1;
-	LightKnobLight *light;
 	NVGcolor color = SUBLIGHTBLUE;
-	virtual void doDraw(const rack::widget::Widget::DrawArgs &args);
 	void setEnabled(int val);
 	void setRadius(int r);
-	virtual float getBLKValue() { return 0.0f; } 
-	virtual float getBLKMinValue() { return -1.0f; }
-	virtual float getBLKMaxValue() { return 1.0f; }
-};
-
-struct LightKnobLight : LightWidget {
-	BaseLightKnob *knob;
-	void draw(const DrawArgs &args) override;
-};
-
-struct LightKnob : BaseLightKnob, Knob {
 	LightKnob() {
 		smooth = false;
-		light = new LightKnobLight();
-		light->box.pos = Vec(0,0);
-		light->box.size = Vec(radius * 2, radius * 2);
-		light->knob = this;
-		addChild(light);
 	}
-	float getBLKValue() override {
-		if (paramQuantity)
-			return paramQuantity->getValue();
-		return BaseLightKnob::getBLKValue();
-	}
-	float getBLKMinValue() override {
-		if (paramQuantity)
-			return paramQuantity->getMinValue();
-		return BaseLightKnob::getBLKMinValue();
-	}
-	float getBLKMaxValue() override {
-		if (paramQuantity)
-			return paramQuantity->getMaxValue();
-		return BaseLightKnob::getBLKMaxValue();
-	}
-	void draw(const DrawArgs &args) override {
-		doDraw(args);
-		Knob::draw(args);
-	}
-};
-
-struct BulkLightKnob : BaseLightKnob, BulkKnob {
-	BulkLightKnob() {
-		smooth = false;
-		light = new LightKnobLight();
-		light->box.pos = Vec(0,0);
-		light->box.size = Vec(radius * 2, radius * 2);
-		light->knob = this;
-		addChild(light);
-	}
-	float getBLKValue() override {
-		if (value)
-			return *value;
-		return BaseLightKnob::getBLKValue();
-	}
-	float getBLKMinValue() override {
-		return minValue;
-	}
-	float getBLKMaxValue() override {
-		return maxValue;
-	}
-	void draw(const DrawArgs &args) override {
-		doDraw(args);
-		BulkKnob::draw(args);
-	}
+	void draw(const DrawArgs &args) override;
+	void drawLayer(const DrawArgs &args, int layer) override;
+	void drawLight(const DrawArgs &args);
+	void drawHalo(const DrawArgs &args);
 };
 
 template <class K>
@@ -319,6 +194,21 @@ struct BlueRedLight : GrayModuleLightWidget {
 	}
 };
 
+struct ExtensionLight : BlueLight {
+	ExtensionLight();
+	virtual void getShape(const widget::Widget::DrawArgs& args) {}
+	void drawBackground(const widget::Widget::DrawArgs& args) override;
+	void drawLight(const widget::Widget::DrawArgs& args) override;
+};
+
+struct LeftLight : ExtensionLight {
+	void getShape(const widget::Widget::DrawArgs &args) override;
+};
+
+struct RightLight : ExtensionLight {
+	void getShape(const widget::Widget::DrawArgs &args) override;
+};
+
 //////////////////
 // Scheme
 //////////////////
@@ -333,11 +223,8 @@ struct Scheme {
 	void setColors();
 	void save();
 	std::shared_ptr<Font> font();
-	int font(NVGcontext *vg);
 	bool isFlat = false;
 	int scheme = Blue;
-	std::shared_ptr<Font> _font = NULL;
-	bool _fontLoaded = false;
 	NVGcolor getBackground(Module *module) { return module?background:_background; }
 	NVGcolor getAlternative(Module *module) { return module?alternative:_alternative; }
 	NVGcolor getContrast(Module *module) { return module?contrast:_contrast; }
@@ -392,6 +279,7 @@ struct SchemePanel : FramebufferWidget {
 	void step() override;
 	void resize(Rect newBox, Rect oldBox);
 	void resize(ModuleWidget *mw, Rect newBox);
+	std::function<void()> resizeHandler;
 };
 
 struct SchemeCanvasWidget : Widget {
@@ -410,7 +298,6 @@ struct SchemeModuleWidget : app::ModuleWidget {
 	void drawText(NVGcontext *vg, float x, float y, int align, float size, NVGcolor col, const char *txt);
 	void drawBase(NVGcontext *vg, const char *txt);
 	virtual void render(NVGcontext *vg, SchemeCanvasWidget *canvas);
-	virtual float* getBulkParam(int id) { return NULL; }
 };
 
 //////////////////
@@ -427,11 +314,14 @@ struct SubText : LedDisplayTextField {
 	}
 	int getTextPosition(Vec mousePos) override; 
 	void draw(const DrawArgs &args) override;
+	void drawLayer(const DrawArgs &args, int layer) override;
+	void onChange(const ChangeEvent &e) override;
 	void appendContextMenu(Menu *menu);
 	MenuItem *createForegroundMenuItem(std::string label, NVGcolor color);
 	MenuItem *createBackgroundMenuItem(std::string label, NVGcolor color);
 	virtual void foregroundMenu(Menu *menu);
 	virtual void backgroundMenu(Menu *menu);
+	std::function<void()> changeHandler;
 };
 
 //////////////////
@@ -450,6 +340,7 @@ struct MouseTransformWidget:Widget {
 	void rotate(float angle);
 	void scale(Vec s);
 	void draw(const DrawArgs &args) override;
+	void drawLayer(const DrawArgs &args, int layer) override;
 	void onButton(const event::Button &e) override;
 	void onHover(const event::Hover &e) override;
 	void onHoverKey(const event::HoverKey &e) override;
@@ -554,6 +445,7 @@ struct EventParamField : ui::TextField {
 
 struct SizeableModule : Module {
 	float size = 0;
+	float loadedSize = 0;
 	json_t *dataToJson() override;
 	void dataFromJson(json_t *rootJ) override;
 };
@@ -567,7 +459,7 @@ struct SizeableModuleWidget : SchemeModuleWidget {
 	void Resize();
 	void Minimize(bool minimize);
 	void ShiftOthers(float delta);
-	void fromJson(json_t *rootJ) override;
+//	void dataFromJson(json_t *rootJ) override;
 	virtual void onResized();
 };
 
@@ -586,9 +478,3 @@ struct SubTooltip : ui::Tooltip {
 	void step() override; 
 };
 
-struct TooltipKnob : Knob
-{
-	std::function<std::string()> getText;
-	void onEnter(const event::Enter &e) override;
-	void onLeave(const event::Leave &e) override;
-};

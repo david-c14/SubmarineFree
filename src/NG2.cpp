@@ -20,6 +20,10 @@ struct NG_2 : DS_Module {
 
 	NG_2() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < 6; i++) {
+			configInput(INPUT_1 + i, "Signal " + std::to_string(i + 1));
+			configOutput(OUTPUT_1 + i, "Signal " + std::to_string(i + 1));
+		}
 	}
 	void process(const ProcessArgs &args) override {
 		for (int i = 0; i < 6; i++) {

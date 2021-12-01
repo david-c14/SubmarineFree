@@ -5,6 +5,39 @@
 namespace {
 
 	NVGcolor colors[26];
+	char labels[27] = "-1234+ABCDEFGHIJKLMNOPQRST";
+	std::vector<std::string> connectorLabels {
+		"-ve Rail",
+		"Device Input 1",
+		"Device Input 2",
+		"Device Input 3",
+		"Device Input 4",
+		"+ve Rail",
+		"Gate A Output",
+		"Gate B Output",
+		"Gate C Output",
+		"Gate D Output",
+		"Gate E Output",
+		"Gate F Output",
+		"Gate G Output",
+		"Gate H Output",
+		"Gate I Output",
+		"Gate J Output",
+		"Gate K Output",
+		"Gate L Output",
+		"Gate M Output",
+		"Gate N Output",
+		"Gate O Output",
+		"Gate P Output",
+		"Gate Q Output",
+		"Gate R Output",
+		"Gate S Output",
+		"Gate T Output"
+	};
+
+	std::vector<std::string> gateLabels;
+	unsigned int copyBuffer[107] = { 0 };	// 20 gates, 20 * 4 connectors, 4 output connectors, 3 additional bytes of size information
+	unsigned int pasteBuffer[107];   	// Working space if the copy needs to be compacted before pasting
 
 // Based on - Set of 20 Simple, Distinct Colors
 // Thanks to Sacha Trubetskoy
@@ -83,11 +116,19 @@ namespace {
 
 	typedef uint16_t status_t;
 
-	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color) {
+	void drawConnector(NVGcontext *vg, float x, float y, NVGcolor color, char label) {
+		static char lbl[2] = {0,0};
+		lbl[0] = label;
 		nvgFillColor(vg, color);
 		nvgBeginPath(vg);
 		nvgCircle(vg, x, y, 4);
 		nvgFill(vg);
+		nvgFontFaceId(vg, gScheme.font()->handle);
+		nvgFontSize(vg, 7 * 90 / SVG_DPI);
+		float bright = color.r * 0.212655 + color.g * 0.715158 + color.b * 0.072187;
+		nvgFillColor(vg, (bright > 0.5f)?nvgRGB(0,0,0):nvgRGB(255,255,255));
+		nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+		nvgText(vg, x, y, lbl, NULL);
 	}
 
 	inline void drawOutput(NVGcontext *vg, float leftPos) {
@@ -383,9 +424,10 @@ namespace {
 		}
 	};
 
-	struct PLGateKnob : TooltipKnob {
+	struct PLGateKnob : Knob {
 		Module *module;
 		int index;
+		std::function<void(int index, unsigned int val)> rightClickHandler;
 		PLGateKnob() {
 			box.size.x = 86;
 			box.size.y = 60;
@@ -394,30 +436,33 @@ namespace {
 		}
 		void draw(const DrawArgs &args) override {
 			if (module) {
-				unsigned int val = (unsigned int)APP->engine->getParam(module, index);
+				unsigned int val = (unsigned int)(getParamQuantity()->getValue());
 				if (val >= functions.size()) {
 					val = functions.size() - 1;
 				}
 				functions[val].draw(args, box.size);
 				unsigned int i = box.pos.y / 80;
 				i += 6;
-				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, colors[i]);
+				drawConnector(args.vg, box.size.x - 5, box.size.y / 2.0f, colors[i], labels[i]);
+			}
+			else if (index == 1) {
+				scheme::drawLogoPath(args.vg, 0, 0, 4, 0);
+				nvgStrokeColor(args.vg, SUBLIGHTBLUE);
+				nvgStrokeWidth(args.vg, 3);
+				nvgStroke(args.vg);
 			}
 		}
 		void onButton(const event::Button &e) override {
 			if (module) {
 				if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
 					e.consume(this);
-					unsigned int val = (unsigned int)APP->engine->getParam(module, index);
+					unsigned int val = (unsigned int)(getParamQuantity()->getValue());
 					if (val >= functions.size()) {
 						val = functions.size() - 1;
 					}
-					Menu *menu = createMenu();
-					MenuLabel *menuLabel = new MenuLabel();
-					menuLabel->text = functions[val].name;
-					menu->addChild(menuLabel);
-					menu->addChild(new MenuSeparator());
-					menu->addChild(new PLTruthTable(functions[val].truthTable));
+					if (rightClickHandler) {
+						rightClickHandler(index, val);
+					}
 					return;
 				}
 			}
@@ -425,7 +470,7 @@ namespace {
 		}
 	};
 
-	struct PLConnectorKnob : TooltipKnob {
+	struct PLConnectorKnob : Knob {
 		Module *module;
 		float fade = 0.1f;
 		PLConnectorKnob() {
@@ -459,9 +504,6 @@ namespace {
 			nvgBeginPath(args.vg);
 			nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
 			nvgFill(args.vg);
-			for (unsigned int ix = 0; ix < x + 2; ix++) {
-				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, colors[ix]);
-			}
 			nvgStrokeWidth(args.vg, 2);
 			for (unsigned int ix = 0; ix < x; ix++) {
 				nvgStrokeColor(args.vg, colors[ix + 1]);
@@ -470,9 +512,21 @@ namespace {
 				nvgLineTo(args.vg, 15 + ix * 30 - box.pos.x, 30 - box.pos.y);
 				nvgStroke(args.vg);
 			}
+			for (unsigned int ix = 0; ix < x + 2; ix++) {
+				drawConnector(args.vg, box.size.x / (x * 2 + 4.0f) * (ix * 2 + 1), 5, colors[ix], labels[ix]);
+			}
 			Widget::draw(args);
 		}
 	};
+
+	std::vector<std::string> getGateLabels() {
+		if (gateLabels.size() == 0) {
+			for (unsigned int i = 0; i < functions.size(); i++ ) {
+				gateLabels.push_back(functions[i].name);
+			}
+		}
+		return gateLabels;
+	}
 }
 
 template <unsigned int x, unsigned int y>
@@ -513,16 +567,20 @@ struct DO1 : DS_Module {
 	status_t statuses[NUM_STATUS] = { 0 };
 
 	DO1() {
+		std::vector<std::string> gLabels = getGateLabels();
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (unsigned int ix = 0; ix < x; ix++) {
-			configParam(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, "Connection" );
+			configSwitch(PARAM_CONNECTOR_OUT_1 + ix, 0.0f, x + y + 1, 0.0f, string::f("Device Output %d", ix + 1), connectorLabels );
+			configInput(INPUT_1 + ix, string::f("Signal %d", ix + 1));
+			configOutput(OUTPUT_1 + ix, string::f("Signal %d", ix + 1));
+			configBypass(INPUT_1 + ix, OUTPUT_1 + ix);
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
-			configParam(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate" );
-			configParam(PARAM_CONNECTOR_1 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_2 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
-			configParam(PARAM_CONNECTOR_4 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, "Connection");
+			configSwitch(PARAM_GATE_1 + iy, 0.0f, functions.size() - 1.0f, 0.0f, "Gate", gLabels );
+			configSwitch(PARAM_CONNECTOR_1 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 1", labels[iy + 6]), connectorLabels);
+			configSwitch(PARAM_CONNECTOR_2 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 2", labels[iy + 6]), connectorLabels);
+			configSwitch(PARAM_CONNECTOR_3 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 3", labels[iy + 6]), connectorLabels);
+			configSwitch(PARAM_CONNECTOR_4 + 4 * iy, 0.0f, 1 + x + iy, 0.0f, string::f("Gate %c Input 4", labels[iy + 6]), connectorLabels);
 		}
 		statuses[STATUS_ALL_ZEROES] = 0;
 		statuses[STATUS_ALL_ONES] = ~statuses[STATUS_ALL_ZEROES];
@@ -569,6 +627,7 @@ template <unsigned int x, unsigned int y>
 struct DOWidget : SchemeModuleWidget {
 	ScrollWidget *collectionScrollWidget;
 	PLConnectorKnob *knobs[x + 4 * y];
+	PLGateKnob *gateKnobs[y];
 	PLBackground<x,y> *background;
 	DOWidget(DO1<x,y> *module) {
 		setModule(module);
@@ -584,9 +643,6 @@ struct DOWidget : SchemeModuleWidget {
 		for (unsigned int ix = 0; ix < x; ix++) {
 			knobs[ix + 4 * y] = createParamCentered<PLConnectorKnob>(Vec(pos, background->box.size.y - 5), module, DO1<x, y>::PARAM_CONNECTOR_OUT_1 + ix);
 			knobs[ix + 4 * y]->module = module;
-			knobs[ix + 4 * y]->getText = [=]()->std::string {
-				return this->getConnectorText(ix + 4 * y);
-			};
 			knobs[ix + 4 * y]->speed = 20.0f / (2 + x + 4 * y);
 			background->addChild(knobs[ix + 4 * y]);
 			pos = pos + posDiff;
@@ -595,21 +651,18 @@ struct DOWidget : SchemeModuleWidget {
 		collectionScrollWidget->box.size = Vec(box.size.x - 10, box.size.y - 110);
 		addChild(collectionScrollWidget);
 		for (unsigned int iy = 0; iy < y; iy++) {
-			PLGateKnob *knob = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
-			knob->module = module;
-			knob->index = DO1<x,y>::PARAM_GATE_1 + iy;
-			knob->getText = [=]()->std::string {
-				return this->getGateText(iy);
+			gateKnobs[iy] = createParamCentered<PLGateKnob>(Vec(53, 80 * (iy + 1)), module, DO1<x,y>::PARAM_GATE_1 + iy);
+			gateKnobs[iy]->module = module;
+			gateKnobs[iy]->index = DO1<x,y>::PARAM_GATE_1 + iy;
+			gateKnobs[iy]->rightClickHandler = [=](int index, unsigned int val) {	
+				this->appendGateRightClickMenu(index, val);
 			};
-			collectionScrollWidget->container->addChild(knob);
+			collectionScrollWidget->container->addChild(gateKnobs[iy]);
 		}
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < 4; ix++) {
 				knobs[4 * iy + ix] = createParamCentered<PLConnectorKnob>(Vec(5, (iy + 1) * 80.0f + ix * 14.0f - 21.0f), module, DO1<x, y>::PARAM_CONNECTOR_1 + iy * 4 + ix);
 				knobs[4 * iy + ix]->module = module;
-				knobs[4 * iy + ix]->getText = [=]()->std::string {
-					return this->getConnectorText(4 * iy + ix);
-				};
 				knobs[4 * iy + ix]->speed = 20.0f / (4 * iy + x + 2);
 				collectionScrollWidget->container->addChild(knobs[4 * iy + ix]);	
 			}
@@ -627,8 +680,308 @@ struct DOWidget : SchemeModuleWidget {
 		}
 	}
 
+	void appendGateRightClickMenu(unsigned int index, unsigned int val) {
+		Menu *menu = createMenu();
+		MenuLabel *menuTitle = new MenuLabel();
+		menuTitle->text = string::f("Gate %c", labels[index + 6]);
+		menu->addChild(menuTitle);
+
+		MenuLabel *menuLabel = new MenuLabel();
+		menuLabel->text = functions[val].name;
+		menu->addChild(menuLabel);
+		menu->addChild(new MenuSeparator());
+
+		EventWidgetMenuItem *io = createMenuItem<EventWidgetMenuItem>("Inputs / Outputs");
+		io->rightText = SUBMENU;
+		io->childMenuHandler = [=]() {
+			return this->appendGateIOMenu(index);
+		};
+		menu->addChild(io);
+
+		EventWidgetMenuItem *tt = createMenuItem<EventWidgetMenuItem>("Truth Table");
+		tt->rightText = SUBMENU;
+		tt->childMenuHandler = [=]() {
+			Menu *menu = new Menu();
+			menu->addChild(new PLTruthTable(functions[val].truthTable));
+			return menu;
+		};
+		menu->addChild(tt);
+
+		menu->addChild(new MenuSeparator());
+		
+		if (val == 0) {
+			EventWidgetMenuItem *moveUp = createMenuItem<EventWidgetMenuItem>("Delete and Shuffle Up");
+			moveUp->clickHandler = [=]() {
+				this->MoveItemsUp(index);
+			};
+			menu->addChild(moveUp);
+		}
+		else {
+			EventWidgetMenuItem *moveDown = createMenuItem<EventWidgetMenuItem>("Shuffle Down");
+			moveDown->clickHandler = [=]() {
+				this->MoveItemsDown(index);
+			};
+			menu->addChild(moveDown);
+		}
+	}
+
+	rack::ui::Menu *appendGateIOMenu(unsigned int index) {
+		Menu *menu = new Menu();
+		unsigned int cval;
+		bool foundOutput = false;
+
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu1 = new MenuLabel();
+		menu1->text = string::f("Input 1 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu1);
+
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 1]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu2 = new MenuLabel();
+		menu2->text = string::f("Input 2 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu2);
+					
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 2]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu3 = new MenuLabel();
+		menu3->text = string::f("Input 3 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu3);
+					
+		cval = knobs[(index - DO1<x,y>::PARAM_GATE_1) * 4 + 3]->getParamQuantity()->getValue();
+		if (cval > ((unsigned int)index + 5)) {
+			cval = index + 5;
+		}							
+		MenuLabel *menu4 = new MenuLabel();
+		menu4->text = string::f("Input 4 from %s", connectorLabels[cval].c_str());
+		menu->addChild(menu4);
+
+		for (unsigned int i = index * 4 + 1; i < y * 4; i++) {
+			cval = knobs[i]->getParamQuantity()->getValue();
+			if (cval == (unsigned int)index + 6) {
+				if (!foundOutput)
+					menu->addChild(new MenuSeparator());
+				MenuLabel *menuOut = new MenuLabel();
+				menuOut->text = string::f("Output to Gate %c Input %d", labels[6 + (i / 4)], (i % 4) + 1);
+				menu->addChild(menuOut);
+				foundOutput = true;
+			}
+		}
+					
+		for (unsigned int i = 0; i < 4; i++) {
+			cval = knobs[y * 4 + i]->getParamQuantity()->getValue();
+			if (cval == (unsigned int)index + 6) {
+				if (!foundOutput)
+					menu->addChild(new MenuSeparator());
+				MenuLabel *menuOut = new MenuLabel();
+				menuOut->text = string::f("Output to Device Output %d", i + 1);
+				menu->addChild(menuOut);
+				foundOutput = true;
+			}
+		}
+
+		return menu;
+	}
+	void MoveItemsUp(unsigned int index) {
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = "Shuffle Up";
+		MoveItemUp(index, complex);
+		APP->history->push(complex);
+	}
+	void MoveItemUp(unsigned int index, history::ComplexAction *complex) {
+		if (index == y - 1) {
+			complex->push(shuffleChange(gateKnobs[index]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 0]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 1]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 2]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 3]->getParamQuantity(), 0));
+			return;
+		}
+		complex->push(shuffleChange(gateKnobs[index]->getParamQuantity(), gateKnobs[index + 1]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 0]->getParamQuantity(), knobs[index * 4 + 4]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 1]->getParamQuantity(), knobs[index * 4 + 5]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 2]->getParamQuantity(), knobs[index * 4 + 6]->getParamQuantity()->getValue()));
+		complex->push(shuffleChange(knobs[index * 4 + 3]->getParamQuantity(), knobs[index * 4 + 7]->getParamQuantity()->getValue()));
+		for (unsigned int i = index * 4 + 4; i < (y * 4 + 4); i++) {
+			ParamQuantity *pq = knobs[i]->getParamQuantity();
+			if (pq->getValue() == index + 7) {
+				complex->push(shuffleChange(pq, index + 6));	
+			}
+		}
+		MoveItemUp(index + 1, complex);
+	}
+	void MoveItemsDown(unsigned int index) {
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = "Shuffle Down";
+		if (MoveItemDown(index, complex)) {
+			complex->push(shuffleChange(gateKnobs[index]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 0]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 1]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 2]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[index * 4 + 3]->getParamQuantity(), 0));
+			APP->history->push(complex);
+		}
+
+	}
+	bool MoveItemDown(unsigned int index, history::ComplexAction *complex) {
+		if (index >= y)
+			return false;
+		unsigned int val = gateKnobs[index]->getParamQuantity()->getValue();
+		if (val == 0) {
+			return true;
+		}
+		if (!MoveItemDown(index + 1, complex)) {
+			return false;
+		}
+		complex->push(shuffleChange(gateKnobs[index + 1]->getParamQuantity(), val));
+		complex->push(shuffleChange(knobs[index * 4 + 4]->getParamQuantity(), knobs[index * 4 + 0]->getParamQuantity()->getValue())); 
+		complex->push(shuffleChange(knobs[index * 4 + 5]->getParamQuantity(), knobs[index * 4 + 1]->getParamQuantity()->getValue())); 
+		complex->push(shuffleChange(knobs[index * 4 + 6]->getParamQuantity(), knobs[index * 4 + 2]->getParamQuantity()->getValue())); 
+		complex->push(shuffleChange(knobs[index * 4 + 7]->getParamQuantity(), knobs[index * 4 + 3]->getParamQuantity()->getValue())); 
+
+		for (unsigned int i = index * 4; i < (y * 4 + 4); i++) {
+			ParamQuantity *pq = knobs[i]->getParamQuantity();
+			if (pq->getValue() == index + 6) {
+				complex->push(shuffleChange(pq, index + 7));
+			}
+		}
+		return true;
+	}
+
+	history::ParamChange *shuffleChange(ParamQuantity *pq, float newValue) {
+		float oldValue = pq->getValue();
+		pq->setValue(newValue);
+		newValue = pq->getValue();
+		history::ParamChange *h = new history::ParamChange();
+		h->name = "change parameter";
+		h->moduleId = module->id;
+		h->paramId = pq->paramId;
+		h->oldValue = oldValue;
+		h->newValue = newValue;
+		return h;
+	}
+
+	void copyToBuffer() {
+		unsigned int gateCount = 0; // Number of gates actually used.
+		unsigned int usedCount = 0; // Highest numbered gate in use.
+		copyBuffer[0] = y;
+		for (unsigned int i = 0; i < y; i++) {
+			copyBuffer[i * 5 + 3] = gateKnobs[i]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 4] = knobs[i * 4 + 0]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 5] = knobs[i * 4 + 1]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 6] = knobs[i * 4 + 2]->getParamQuantity()->getValue();
+			copyBuffer[i * 5 + 7] = knobs[i * 4 + 3]->getParamQuantity()->getValue();
+			if (copyBuffer[i * 5 + 3] != 0) {
+				gateCount++;
+				usedCount = i + 1;
+			}
+		}
+		copyBuffer[103] = knobs[y * 4 + 0]->getParamQuantity()->getValue();
+		copyBuffer[104] = knobs[y * 4 + 1]->getParamQuantity()->getValue();
+		copyBuffer[105] = knobs[y * 4 + 2]->getParamQuantity()->getValue();
+		copyBuffer[106] = knobs[y * 4 + 3]->getParamQuantity()->getValue();
+		copyBuffer[1] = usedCount;
+		copyBuffer[2] = gateCount;
+	}
+
+	void pasteFromBuffer() {
+		unsigned int deviceSize = copyBuffer[0];
+		unsigned int usedCount = copyBuffer[1];
+		unsigned int gateCount = copyBuffer[2];
+		if (!deviceSize) 
+			return;
+		if (gateCount > y)
+			return;
+		if (usedCount > y) {
+			compactBuffer();
+			pasteFromBuffer(pasteBuffer);
+		}
+		else {
+			pasteFromBuffer(copyBuffer);
+		}
+	}
+
+	void compactBuffer() {
+		for (unsigned int i = 0; i < 107; i++) {
+			pasteBuffer[i] = copyBuffer[i];
+		}
+		int shuffleDistance = 0;
+		for (unsigned int i = 0; i < 20; i++) {
+			if (pasteBuffer[i * 5 + 3] == 0) {
+				shuffleDistance++;
+				continue;
+			}
+			if (shuffleDistance == 0) {
+				continue;
+			}
+			unsigned int o = i - shuffleDistance;
+			pasteBuffer[o * 5 + 3] = pasteBuffer[i * 5 + 3];
+			pasteBuffer[o * 5 + 4] = pasteBuffer[i * 5 + 4];
+			pasteBuffer[o * 5 + 5] = pasteBuffer[i * 5 + 5];
+			pasteBuffer[o * 5 + 6] = pasteBuffer[i * 5 + 6];
+			pasteBuffer[o * 5 + 7] = pasteBuffer[i * 5 + 7];
+			for(unsigned int j = 0; j < 20; j++) {
+				if (pasteBuffer[j * 5 + 4] == (i + 6))
+					pasteBuffer[j * 5 + 4] -= shuffleDistance;
+				if (pasteBuffer[j * 5 + 5] == (i + 6))
+					pasteBuffer[j * 5 + 5] -= shuffleDistance;
+				if (pasteBuffer[j * 5 + 6] == (i + 6))
+					pasteBuffer[j * 5 + 6] -= shuffleDistance;
+				if (pasteBuffer[j * 5 + 7] == (i + 6))
+					pasteBuffer[j * 5 + 7] -= shuffleDistance;
+			}
+			if (pasteBuffer[103] == (i + 6))
+				pasteBuffer[103] -= shuffleDistance;
+			if (pasteBuffer[104] == (i + 6))
+				pasteBuffer[104] -= shuffleDistance;
+			if (pasteBuffer[105] == (i + 6))
+				pasteBuffer[105] -= shuffleDistance;
+			if (pasteBuffer[106] == (i + 6))
+				pasteBuffer[106] -= shuffleDistance;
+			pasteBuffer[i * 5 + 3] = 0;
+			pasteBuffer[i * 5 + 4] = 0;
+			pasteBuffer[i * 5 + 5] = 0;
+			pasteBuffer[i * 5 + 6] = 0;
+			pasteBuffer[i * 5 + 7] = 0;
+		}
+		pasteBuffer[1] = pasteBuffer[2];
+	}
+
+	void pasteFromBuffer(unsigned int * buffer) {
+		unsigned int usedCount = buffer[1];
+		if (usedCount > y)
+			return;
+		history::ComplexAction *complex = new history::ComplexAction();
+		complex->name = "Paste";
+		for (unsigned int i = 0; i < usedCount; i++) {
+			complex->push(shuffleChange(gateKnobs[i]->getParamQuantity(), buffer[i * 5 + 3]));
+			complex->push(shuffleChange(knobs[i * 4 + 0]->getParamQuantity(), buffer[i * 5 + 4]));
+			complex->push(shuffleChange(knobs[i * 4 + 1]->getParamQuantity(), buffer[i * 5 + 5]));
+			complex->push(shuffleChange(knobs[i * 4 + 2]->getParamQuantity(), buffer[i * 5 + 6]));
+			complex->push(shuffleChange(knobs[i * 4 + 3]->getParamQuantity(), buffer[i * 5 + 7]));
+		}
+		for (unsigned int i = usedCount; i < y; i++) {
+			complex->push(shuffleChange(gateKnobs[i]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 0]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 1]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 2]->getParamQuantity(), 0));
+			complex->push(shuffleChange(knobs[i * 4 + 3]->getParamQuantity(), 0));
+		}
+ 		complex->push(shuffleChange(knobs[y * 4 + 0]->getParamQuantity(), buffer[103]));
+		complex->push(shuffleChange(knobs[y * 4 + 1]->getParamQuantity(), buffer[104]));
+		complex->push(shuffleChange(knobs[y * 4 + 2]->getParamQuantity(), buffer[105]));
+		complex->push(shuffleChange(knobs[y * 4 + 3]->getParamQuantity(), buffer[106]));
+		APP->history->push(complex);
+	}
+
 	std::string getGateName(unsigned int index) {
-		unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_GATE_1 + index);
+		unsigned int val = (unsigned int)(gateKnobs[index]->getParamQuantity()->getValue());
 		if (val >= functions.size()) {
 			val = functions.size() - 1;
 		}
@@ -655,7 +1008,7 @@ struct DOWidget : SchemeModuleWidget {
 		if (!module)
 			return std::string("Browser");
 		std::string connectorName = getConnectorNameText(index);
-		unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_1 + index);	
+		unsigned int val = (unsigned int)(knobs[index]->getParamQuantity()->getValue());
 		if (val > x + y + 1)
 			val = x + y + 1;
 		if (val == 0)
@@ -667,19 +1020,21 @@ struct DOWidget : SchemeModuleWidget {
 		return connectorName + string::f("Gate %d: ", val - x -1) + getGateName(val - x - 2);
 	}
 
-	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade) {
-		drawConnector(args.vg, sx, sy, color);
+	void drawWire(const DrawArgs &args, float sx, float sy, float dx, float dy, NVGcolor color, float fade, char label) {
 		color.a = fade;
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, sx, sy);
 		nvgLineTo(args.vg, dx, dy);
-		nvgLineCap(args.vg, NVG_ROUND);
+		nvgLineCap(args.vg, NVG_BUTT);
 		nvgStrokeColor(args.vg, nvgRGBAf(color.r / 2.0f, color.g / 2.0f, color.b / 2.0f, fade));
 		nvgStrokeWidth(args.vg, 3);
 		nvgStroke(args.vg);
 		nvgStrokeColor(args.vg, color);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
+		color.a = 1;
+		drawConnector(args.vg, sx, sy, color, label);
+		drawConnector(args.vg, dx, dy, color, label);
 	}
 	void drawConnectors(const DrawArgs &args) {
 		if (!module)
@@ -709,7 +1064,7 @@ struct DOWidget : SchemeModuleWidget {
 				startX = (background->box.size.x / (x * 2)) * ((i - 4 * y) * 2 + 1);
 				startY = background->box.size.y - 5;
 			}
-			unsigned int val = (unsigned int)APP->engine->getParam(module, DO1<x,y>::PARAM_CONNECTOR_1 + i);
+			unsigned int val = (unsigned int)(knobs[i]->getParamQuantity()->getValue());
 			if (val > (x + y + 1)) {
 				val = (x + y + 1);
 			}
@@ -728,7 +1083,7 @@ struct DOWidget : SchemeModuleWidget {
 			nvgScissor(args.vg, args.clipBox.pos.x, scissorTop, args.clipBox.size.x, scissorBottom);
 			NVGcolor color = colors[val];
 			float fade = val?knobs[i]->fade:0.0f;
-			drawWire(args, startX, startY, destX, destY, color, fade);
+			drawWire(args, startX, startY, destX, destY, color, fade, labels[val]);
 			nvgResetScissor(args.vg);
 		}
 	}
@@ -738,6 +1093,26 @@ struct DOWidget : SchemeModuleWidget {
 		drawBase(vg, workingSpace);
 	}
 	void appendContextMenu(Menu *menu) override {
+		menu->addChild(new MenuSeparator());
+		EventWidgetMenuItem *copy = createMenuItem<EventWidgetMenuItem>("Copy");
+		copy->clickHandler = [=]() {
+			this->copyToBuffer();
+		};
+		menu->addChild(copy);
+		if (copyBuffer[0] != 0) {
+			if (copyBuffer[2] <= y) {
+				EventWidgetMenuItem *paste = createMenuItem<EventWidgetMenuItem>("Paste");
+				paste->clickHandler = [=]() {
+					this->pasteFromBuffer();
+				};
+				menu->addChild(paste);
+			} 
+			else {
+				MenuLabel *paste = new MenuLabel();
+				paste->text = "Paste (device is too small)";
+				menu->addChild(paste);
+			}
+		}
 		SchemeModuleWidget::appendContextMenu(menu);
 		DS_Module *dsMod = dynamic_cast<DS_Module *>(module);
 		if (dsMod) {

@@ -11,11 +11,6 @@
 LightButton::LightButton() {
 	box.size.x = 16.0f;
 	box.size.y = 16.0f;
-	light = new LightButtonLight();
-	light->box.pos = Vec(0,0);
-	light->box.size = box.size;
-	light->button = this;
-	addChild(light);
 }
 
 void LightButton::draw(const DrawArgs &args) {
@@ -45,21 +40,37 @@ void LightButton::draw(const DrawArgs &args) {
 		nvgFill(args.vg);
 		nvgStroke(args.vg);
 	}
+	float value = 0.0f;
+	if (getParamQuantity()) {
+		value = getParamQuantity()->getValue();
+	}
+	if (value < 0.5f) {
+		drawLight(args, false);
+	}
 
 	nvgRestore(args.vg);
 	Widget::draw(args);
 }
 
-void LightButtonLight::draw(const DrawArgs &args) {
-	float value = 0.0f;
-	if (button->paramQuantity) {
-		value = button->paramQuantity->getValue();
+void LightButton::drawLayer(const DrawArgs &args, int layer) {
+	if (layer == 1) {
+		float value = 0.0f;
+		if (getParamQuantity()) {
+			value = getParamQuantity()->getValue();
+		}
+		if (value > 0.5f) {
+			drawLight(args, true);
+			drawHalo(args);
+		}
+
 	}
+	Widget::drawLayer(args, layer);
+}
 
+void LightButton::drawLight(const DrawArgs &args, bool enabled) {
 	Rect lightbox = Rect(Vec(box.size.x / 4.0f, box.size.y / 4.0f), Vec(box.size.x / 2.0f, box.size.y / 4.0f));	
-	NVGcolor lcol = (value > 0.5f)?button->color:nvgRGB(0x4a,0x4a,0x4a);
+	NVGcolor lcol = (enabled)?color:nvgRGB(0x4a,0x4a,0x4a);
 
-	nvgSave(args.vg);
 	// Light
 	{
 		nvgBeginPath(args.vg);
@@ -75,21 +86,33 @@ void LightButtonLight::draw(const DrawArgs &args) {
 		}
 		nvgFill(args.vg);
 	}
+}
 
+void LightButton::drawHalo(const DrawArgs &args) {
 	// Halo
-	if (!gScheme.isFlat) {
-		float lradius = mm2px(0.544);
-		float oradius = lradius + 15.0;
-		nvgBeginPath(args.vg);
-		nvgRect(args.vg, box.size.x / 2.0 - oradius, box.size.y * 0.375f - oradius, 2 * oradius, 2 * oradius);
-		NVGpaint paint;
-		NVGcolor icol = color::mult(lcol, 0.08);
-		NVGcolor ocol = nvgRGB(0, 0, 0);
-		paint = nvgRadialGradient(args.vg, box.size.x / 2.0, box.size.y * 0.375f, lradius, oradius, icol, ocol);
-		nvgFillPaint(args.vg, paint);
-		nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
-		nvgFill(args.vg);	
-	}
-	nvgRestore(args.vg);
+	// Don't draw halo if rendering in a framebuffer, e.g. screenshots or Module Browser
+	if (args.fb)
+		return;
 
+	const float halo = settings::haloBrightness;
+	if (halo == 0.f)
+		return;
+
+	// If light is off, rendering the halo gives no effect.
+	if (color.r == 0.f && color.g == 0.f && color.b == 0.f)
+		return;
+
+	nvgSave(args.vg);
+	float lradius = mm2px(0.544);
+	float oradius = lradius + 15.0;
+	nvgBeginPath(args.vg);
+	nvgRect(args.vg, box.size.x / 2.0 - oradius, box.size.y * 0.375f - oradius, 2 * oradius, 2 * oradius);
+	NVGpaint paint;
+	NVGcolor icol = color::mult(color, halo);
+	NVGcolor ocol = nvgRGB(0, 0, 0);
+	paint = nvgRadialGradient(args.vg, box.size.x / 2.0, box.size.y * 0.375f, lradius, oradius, icol, ocol);
+	nvgFillPaint(args.vg, paint);
+	nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
+	nvgFill(args.vg);	
+	nvgRestore(args.vg);
 }

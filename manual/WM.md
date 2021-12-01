@@ -1,8 +1,8 @@
 # Wire Manager
 #### WM-101 Wire Manager
-![View of the Wire Manager](WM-101.m.png "Wire Manager")
+![View of the Wire Manager](WM-101.png "Wire Manager")
 #### WM-102 Wire Manager Billboard
-![View of the Wire Manager](WM-102.m.png "Wire Manager")
+![View of the Wire Manager](WM-102.png "Wire Manager")
 
 The wire manager offers the ability to choose more colors for the patch cables that you use in your patches. It also has highlighting options 
 which some users may find useful in tracing wires around the patch.

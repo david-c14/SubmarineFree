@@ -1,11 +1,11 @@
 # Logical NOT Gates
 ### [Part of the Digital Suite](DS.md)
 #### NG-106 NOT Gates
-![View of the NOT Gates](NG-106.m.png "NOT Gates")
+![View of the NOT Gates](NG-106.png "NOT Gates")
 #### NG-112 NOT Gates
-![View of the NOT Gates](NG-112.m.png "NOT Gates")
+![View of the NOT Gates](NG-112.png "NOT Gates")
 #### NG-206 NOT Gates
-![View of the NOT Gates](NG-206.m.png "NOT Gates")
+![View of the NOT Gates](NG-206.png "NOT Gates")
 
 ## Basic Operation
 

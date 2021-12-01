@@ -1,7 +1,6 @@
 //SubTag W10 WP AM
 
 #include "SubmarineFree.hpp"
-#include "window.hpp"
 
 namespace {
 
@@ -15,7 +14,6 @@ namespace {
 
 	struct TD4Text : OpaqueWidget {
 		TD4Data *data = NULL;
-		std::shared_ptr<Font> font;
 		std::function<void ()> addMenuHandler;
 		std::function<void (int oldPostion, int newPosition)> posHandler;
 		int oldPosition = 0;
@@ -24,28 +22,31 @@ namespace {
 				delete data;
 		}
 		TD4Text(float width) {
-			font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
 			this->box.size = Vec(width - 8.0f, 20);
 		}
-		void draw(const DrawArgs &args) override {
-			nvgFontFaceId(args.vg, font->handle);
-			nvgFontSize(args.vg, data->fontSize);
-			nvgFillColor(args.vg, data->color);
-			nvgSave(args.vg);
-			nvgScissor(args.vg, args.clipBox.pos.x, args.clipBox.pos.y, args.clipBox.size.x, args.clipBox.size.y);	
-			if (data->alignment & NVG_ALIGN_LEFT) {
-				nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, 0, box.size.y / 2, data->text.c_str(), NULL);
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if (layer == 1) {
+				std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+				nvgFontFaceId(args.vg, font->handle);
+				nvgFontSize(args.vg, data->fontSize);
+				nvgFillColor(args.vg, data->color);
+				nvgSave(args.vg);
+				nvgScissor(args.vg, args.clipBox.pos.x, args.clipBox.pos.y, args.clipBox.size.x, args.clipBox.size.y);	
+				if (data->alignment & NVG_ALIGN_LEFT) {
+					nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+					nvgText(args.vg, 0, box.size.y / 2, data->text.c_str(), NULL);
+				}
+				else if (data->alignment & NVG_ALIGN_RIGHT) {
+					nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
+					nvgText(args.vg, box.size.x, box.size.y / 2, data->text.c_str(), NULL);
+				}
+				else {
+					nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+					nvgText(args.vg, box.size.x / 2, box.size.y / 2, data->text.c_str(), NULL);
+				}
+				nvgRestore(args.vg);
 			}
-			else if (data->alignment & NVG_ALIGN_RIGHT) {
-				nvgTextAlign(args.vg, NVG_ALIGN_RIGHT | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.x, box.size.y / 2, data->text.c_str(), NULL);
-			}
-			else {
-				nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-				nvgText(args.vg, box.size.x / 2, box.size.y / 2, data->text.c_str(), NULL);
-			}
-			nvgRestore(args.vg);
+			Widget::drawLayer(args, layer);
 		}
 		void onButton(const event::Button &e) override {
 			if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
@@ -110,8 +111,9 @@ struct TD_410 : Module {
 	}
 	void dataFromJson(json_t *rootJ) override {
 		json_t *sizeJ = json_object_get(rootJ, "width");
-		if (sizeJ)
+		if (sizeJ) {
 			moduleSize = clamp(json_number_value(sizeJ), 75.0f, 300.0f);
+		}
 		json_t *a1 = json_object_get(rootJ, "items");
 		if (a1) {
 			int asize = json_array_size(a1);
@@ -140,11 +142,13 @@ struct TD_410 : Module {
 						item->fontSize = json_number_value(fSize);
 					}
 					dataItems.push_back(item);
+					lblDirty = true;
 				}
 			}
 		}
 	}
 	float moduleSize = 150.0f;
+	bool lblDirty = false;
 };
 
 struct TD410 : SchemeModuleWidget {
@@ -153,59 +157,10 @@ struct TD410 : SchemeModuleWidget {
 
 	TD410(TD_410 *module) {
 		setModule(module);
-		this->box.size = Vec(150, 380);
+		this->box.size = Vec(module ? (module->moduleSize) : 150, 380);
 		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
+		schemePanel->resizeHandler = [=]() { onResized(); };
 		addChild(schemePanel);
-	}
-
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-		TD_410 *tdModule = dynamic_cast<TD_410 *>(module);
-		if (!tdModule) return;
-		
-		for(TD4Data *data : tdModule->dataItems) {
-			TD4Text *item = new TD4Text(box.size.x);
-			item->data = data;
-			item->box.pos = Vec(4, 18);
-			addClickHandler(item);
-			item->box.size.y = data->fontSize = clampFontSize(data->fontSize);
-			item->box.pos.y = data->position = clampPosition(data->position);
-			addText(item);
-		}
-		json_t *a1 = json_object_get(rootJ, "items");
-		if (a1) {
-			int asize = json_array_size(a1);
-			for (int j = 0; j < asize; j++) {
-				json_t *i = json_array_get(a1, j);
-				if (i) {
-					TD4Data *data = new TD4Data;
-					tdModule->dataItems.push_back(data);
-					TD4Text *item = new TD4Text(box.size.x);
-					item->data = data;
-					item->box.pos = Vec(4, 18);
-					addClickHandler(item);
-					json_t *text = json_object_get(i, "text");
-					if (text) {
-						data->text = json_string_value(text);
-					}
-					json_t *color = json_object_get(i, "color");
-					if (color) {
-						data->color = color::fromHexString(json_string_value(color));
-					}
-					json_t *pos = json_object_get(i, "position");
-					if (pos) {
-						item->box.pos.y = data->position = clampPosition(json_number_value(pos));
-					}
-					json_t *align = json_object_get(i, "alignment");
-					if (align) {
-						data->alignment = json_number_value(align);
-					}
-					addText(item);
-				}
-			}
-		}
-		box.size.x = tdModule->moduleSize;
-		schemePanel->resize(this, box);
 	}
 
 	int clampPosition(int input) {
@@ -411,7 +366,7 @@ struct TD410 : SchemeModuleWidget {
 		textItem->data->text = newText;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
@@ -441,7 +396,7 @@ struct TD410 : SchemeModuleWidget {
 		textItem->data->color = newColor;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
@@ -472,7 +427,7 @@ struct TD410 : SchemeModuleWidget {
 		textItem->data->alignment = newAlignment;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 		
 		APP->history->push(new EventWidgetAction(
@@ -505,7 +460,7 @@ struct TD410 : SchemeModuleWidget {
 			return;
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 
 		APP->history->push(new EventWidgetAction(
@@ -540,7 +495,7 @@ struct TD410 : SchemeModuleWidget {
 		int newPosition = textItem->box.pos.y = textItem->data->position = clampPosition(textItem->data->position);
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(textItem);
 
 		APP->history->push(new EventWidgetAction(
@@ -583,6 +538,15 @@ struct TD410 : SchemeModuleWidget {
 		nvgBeginPath(vg);
 		nvgRect(vg, 4, 15, box.size.x - 8, box.size.y - 30);
 		nvgFill(vg);
+		if (!module) {
+			std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+			nvgFontFaceId(vg, font->handle);
+			nvgFontSize(vg, 25);
+			nvgFillColor(vg, SUBLIGHTBLUE);
+			nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+			nvgText(vg, box.size.x / 2, box.size.y / 2, "Submarine", NULL);
+			nvgText(vg, box.size.x / 2, box.size.y / 2 + 30, "TD-410", NULL);
+		}
 	}
 
 	void removeText(TD4Text *text) {
@@ -627,7 +591,7 @@ struct TD410 : SchemeModuleWidget {
 		int alignment = textItem->data->alignment;
 		addText(text, color, position, alignment, fontSize);
 		unsigned int id = textItems.size() - 1;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		APP->history->push(new EventWidgetAction(
 			"TD-410 Duplicate Label",
 			[=]() {
@@ -685,7 +649,7 @@ struct TD410 : SchemeModuleWidget {
 		addText(newItem);
 		if (!module)
 			return;
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		int id = index(newItem);
 		NVGcolor color = newItem->data->color;
 		std::string text = newItem->data->text;
@@ -711,7 +675,7 @@ struct TD410 : SchemeModuleWidget {
 	}
 
 	void removeTextWithHistory(TD4Text *oldItem) {
-		int moduleId = module->id;
+		int64_t moduleId = module->id;
 		unsigned int id = index(oldItem);
 		NVGcolor color = oldItem->data->color;
 		std::string text = oldItem->data->text;
@@ -738,8 +702,8 @@ struct TD410 : SchemeModuleWidget {
 		));
 	}
 
-	TD410 *getModuleWidgetById(int moduleId) {
-		for (Widget *widget : APP->scene->rack->moduleContainer->children) {
+	TD410 *getModuleWidgetById(int64_t moduleId) {
+		for (Widget *widget : APP->scene->rack->getModuleContainer()->children) {
 			TD410 *mw = dynamic_cast<TD410 *>(widget);
 			if (mw) {
 				if (mw->module) {
@@ -750,6 +714,26 @@ struct TD410 : SchemeModuleWidget {
 			}
 		}
 		return NULL;
+	}
+
+	void step() override {
+		TD_410 *tdm = dynamic_cast<TD_410 *>(module);
+		if (!tdm)
+			return;
+		if (tdm->lblDirty) {
+
+			for (TD4Data *data : tdm->dataItems) {
+				TD4Text *item = new TD4Text(box.size.x);
+				item->data = data;
+				item->box.pos = Vec(4, 18);
+				addClickHandler(item);
+				item->box.size.y = data->fontSize = clampFontSize(data->fontSize);
+				item->box.pos.y = data->position = clampPosition(data->position);
+				addText(item);
+			}
+			tdm->lblDirty = false;
+		}
+
 	}
 
 	void onResize(const event::Resize &e) override {

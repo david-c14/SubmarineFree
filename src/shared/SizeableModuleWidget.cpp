@@ -1,4 +1,3 @@
-#include <settings.hpp>
 #include "../SubmarineFree.hpp"
 
 json_t *SizeableModule::dataToJson() {
@@ -9,16 +8,17 @@ json_t *SizeableModule::dataToJson() {
 
 void SizeableModule::dataFromJson(json_t *rootJ) {
 	json_t *widthJ = json_object_get(rootJ, "width");
-	if (widthJ)
-		size = json_number_value(widthJ);
+	if (widthJ) {
+		loadedSize = json_number_value(widthJ);
+	}
 }
 
 SizeableModuleWidget::SizeableModuleWidget(SizeableModule *sm, float size) {
 	sizeableModule = sm;
+	fullSize = size;
 	if (sm) {
 		sm->size = size;
 	}
-	fullSize = size;
 	this->box.size = Vec(size, 380);
 	panel = new SchemePanel(this->box.size);
 	addChild(panel);
@@ -38,7 +38,7 @@ void SizeableModuleWidget::Minimize(bool minimize) {
 	box.size.x = minimize?15:fullSize;
 	ShiftOthers(box.size.x - oldSize);
 	Resize();
-	unsigned int id = module->id;
+	int64_t id = module->id;
 	float fs = fullSize; 
 	if (!stabilized)
 		return;
@@ -68,7 +68,7 @@ void SizeableModuleWidget::ShiftOthers(float delta) {
 		return;
 	if (delta == 0.0f)
 		return;
-	for (Widget *w : APP->scene->rack->moduleContainer->children) {
+	for (Widget *w : APP->scene->rack->getModuleContainer()->children) {
 		if (this == w)
 			continue;
 		if (this->box.pos.x > w->box.pos.x) 
@@ -78,7 +78,7 @@ void SizeableModuleWidget::ShiftOthers(float delta) {
 		w->box.pos.x += delta;
 	}
 }
-
+/*
 void SizeableModuleWidget::fromJson(json_t *rootJ) {
 	ModuleWidget::fromJson(rootJ);
 	if (!sizeableModule)
@@ -89,6 +89,7 @@ void SizeableModuleWidget::fromJson(json_t *rootJ) {
 	Minimize(sizeableModule->size < 16.0f);
 	APP->scene->rack->requestModulePos(this, box.pos);
 }
+*/
 
 void SizeableModuleWidget::onResized() {
 }

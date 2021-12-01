@@ -1,25 +1,21 @@
 # Das Wohltemperierte Klavier - Unequal Temperament Quantizer
 #### WK-101 Das Wohltemperierte Klavier
-![View of the Das Wohltemperierte Klavier](WK-101.m.png "Das Wohltemperierte Klavier")
+![View of the Das Wohltemperierte Klavier](WK-101.png "Das Wohltemperierte Klavier")
 
 ## Basic Operation
 
-The WK-101 takes a note CV and quantizes it to a 12-ET chromatic scale. It then adjusts the quantized signal up or down by up to 50 cents according to which pitch it has been quantized to. The each of the 12 pitches can have a different adjustment specified by using the control knobs. The cent adjustment is displayed to the side of each knob.
+The WK-101 takes a note CV and quantizes it to a 12-ET chromatic scale. It then adjusts the quantized signal up or down by up to 50 cents according to which pitch it has been quantized to. Each of the 12 pitches can have a different adjustment specified by using the control knobs. The cent adjustment is displayed to the side of each knob.
 
-The currently recognized pitch is indicated by a small blue led in the centre of the 12 adjustment knobs.
+The currently recognized pitch is indicated by the index light in the adjustment knob turning red.
 
 The context menu offers presets which you can configure. See below for more details
 
 #### WK-205 Das Wohltemperierte Klavier Nano
-![View of the Das Wohltemperierte Klavier nano](WK-205.m.png "Das Wohltemperierte Klavier nano")
+![View of the Das Wohltemperierte Klavier nano](WK-205.png "Das Wohltemperierte Klavier nano")
 
 ## Basic Operation
 
-The WK-205 has 5 input and output pairs. It takes each note CV input, quantizes it to a 12-ET chromatic scale, and then adjusts the quantized signal up or down by up to 50 cents. There are no control knobs on the WK-205 so the adjustment settings must be selected either from presets on the context menu, or by synching the device from a WK-101.
-
-## Synch Ports
-
-The WK-101 can output its settings to another WK-101 or to a WK-205. Connect a patch lead from the Sync-out port on the master device to the Sync-in port on the slave devige. Settings are automatically transmitted whenever they change on the master device.
+The WK-205 has 5 input and output pairs. It takes each note CV input, quantizes it to a 12-ET chromatic scale, and then adjusts the quantized signal up or down by up to 50 cents. There are no control knobs on the WK-205 so the adjustment settings must be selected either from presets on the context menu, or by synching the device from a WK-101 as an extension module. Place the WK-205 to the immediate right of a WK-101 or another WK-205.
 
 ## Presets
 

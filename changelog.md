@@ -1,5 +1,32 @@
 # Changelog
 
+## v2.0.1
+- 30-Nov-2021 Add LA-216 Polyphonic Logic Analyser
+
+## v2.0.0
+- 11-Oct-2021 Port shared components to v2
+- 11-Oct-2021 Port Blanking plates to v2
+- 14-Oct-2021 Port LA-108 to v2
+- 15-Oct-2021 Port AG-xxx OG-xxx NG-xxx XG-xxx LD-xxx and PG-xxx to v2
+- 15-Oct-2021 Persist DS suite voltage range between devices. When voltage is changed, new devices use the same option
+- 15-Oct-2021 Port BB-xxx DN-xxx FF-xxx OA-xxx to v2
+- 25-Oct-2021 Port Text devices and Wiremanager
+- 26-Oct-2021 Port HS-101 and EO-102 to v2
+- 26-Oct-2021 Port EN-104 PO-101 PO-102 PO-202 and SN-101 to v2
+- 28-Oct-2021 Port WK-101 and WK-205 to v2  Deprecated Torpedo in WK devices and replace with extension modules
+- 28-Oct-2021 Add Module Link lights for expander modules
+- 29-Oct-2021 Port LT-116 to v2
+- 29-Oct-2021 Port XF-xxx to v2
+- 29-Oct-2021 Port VU meters to v2, including new backlights
+- 03-Nov-2021 Make DO-1xx devices more usable, improve connection labelling, add shuffle and copy/paste
+- 05-Nov-2021 Add visuals to TD-xxx, DO-1xx and WM-102 devices in the module browser
+- 05-Nov-2021 Add Device copy/paste and undo to AO-1xx devices
+- 12-Nov-2021 Add expansion capabilities to VM-1xx and VM-2xx devices
+- 14-Nov-2021 Use keywords to make library searching more effective
+- 14-Nov-2021 Add VM-104 Quad digital VU-meter
+- 19-Nov-2021 Add VM-204 Quad vintage VU-meter
+- 22-Nov-2021 Fix rendering bug in VM-1xx devices
+
 ## v1.1.10
 - 10-Dec-2020 Update images in manual
 - 26-Nov-2020 Add exponential response to VM-needle

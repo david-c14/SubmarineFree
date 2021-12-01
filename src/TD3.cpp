@@ -1,11 +1,12 @@
 //SubTag W16 WP AM
 
 #include "SubmarineFree.hpp"
-#include "window.hpp"
 
 struct TD_316 : Module {
 	TD_316() : Module () {
-		config(0, 0, 0, 0);
+		config(0, 0, 0, 2);
+		configLight(0, "Module Link");
+		configLight(1, "Module Link");
 	}
 	void processExpander(float *message) {
 		if (!std::isnan(message[0])) {
@@ -22,16 +23,22 @@ struct TD_316 : Module {
 		}
 	}
 	void process(const ProcessArgs &args) override {
+		bool left = false;
+		bool right = false;
 		if (leftExpander.module) {
 			if ((leftExpander.module->model == modelTF101) || (leftExpander.module->model == modelTF102)) {
 				processExpander((float *)(leftExpander.module->rightExpander.consumerMessage));
+				left = true;
 			}
 		}
 		if (rightExpander.module) {
 			if ((rightExpander.module->model == modelTF101) || (rightExpander.module->model == modelTF102)) {
 				processExpander((float *)(rightExpander.module->leftExpander.consumerMessage));
+				right = true;
 			}
 		}
+		lights[0].setBrightness(left);
+		lights[1].setBrightness(right);
 	}
 	void onReset() override {
 		reset = 1;
@@ -50,22 +57,27 @@ struct TD_316 : Module {
 		json_t *widthJ = json_object_get(rootJ, "width");
 		if (widthJ) {
 			moduleSize = clamp(json_number_value(widthJ), 75.0f, 300.0f);
+			moduleSizeDirty = true;
 		}
 		json_t *textJ = json_object_get(rootJ, "text");
 		if (textJ) {
 			text = json_string_value(textJ);
+			textDirty = true;
 		}
 		json_t *sizeJ = json_object_get(rootJ, "size");
 		if (sizeJ) {
 			fontSize = json_number_value(sizeJ);
+			fontSizeDirty = true;
 		}
 		json_t *fgJ = json_object_get(rootJ, "fg");
 		if (fgJ) {
 			fg = color::fromHexString(json_string_value(fgJ));
+			fgDirty = true;
 		}
 		json_t *bgJ = json_object_get(rootJ, "bg");
 		if (bgJ) {
 			bg = color::fromHexString(json_string_value(bgJ));
+			bgDirty = true;
 		}
 		
 	}
@@ -77,6 +89,7 @@ struct TD_316 : Module {
 	bool bgDirty = false;
 	bool fontSizeDirty = false;
 	bool textDirty = false;
+	bool moduleSizeDirty = false;
 	float moduleSize = 240.0;
 	std::string text;
 };
@@ -107,52 +120,40 @@ namespace {
 struct TD316 : SchemeModuleWidget {
 	TD3Text *textField;
 	SchemePanel *schemePanel;
+	LightWidget *light;
 
 	TD316(TD_316 *module) {
 		setModule(module);
 		this->box.size = Vec(240, 380);
 		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
+		schemePanel->resizeHandler = [=]() { onResized(); }; 
 		addChild(schemePanel);
 
 		textField = createWidget<TD3Text>(Vec(4, 18));
 		textField->box.size = Vec(232, 344);
 		textField->multiline = true;
 		addChild(textField);
-	}
+		addChild(createLightCentered<RightLight>(Vec(3, 14), module, 0));
+		light = createLightCentered<LeftLight>(Vec(237, 14), module, 1);
+		addChild(light);
 
-	void fromJson(json_t *rootJ) override {
-		ModuleWidget::fromJson(rootJ);
-		TD_316 *td = dynamic_cast<TD_316 *>(module);
-		if (td) {
-			textField->text = td->text;
-			textField->fontSize = td->fontSize;
-			textField->color = td->fg;
-			textField->bgColor = td->bg;
-			box.size.x = td->moduleSize;
-			schemePanel->resize(this, box);
-		}
-
-		json_t *textJ = json_object_get(rootJ, "text");
-		if (textJ)
-			textField->text = json_string_value(textJ);
-		json_t *sizeJ = json_object_get(rootJ, "size");
-		if (sizeJ)
-			textField->fontSize = json_number_value(sizeJ);
-		json_t *fgJ = json_object_get(rootJ, "fg");
-		if (fgJ) {
-			textField->color = color::fromHexString(json_string_value(fgJ));
-		}
-		json_t *bgJ = json_object_get(rootJ, "bg");
-		if (bgJ) {
-			textField->bgColor = color::fromHexString(json_string_value(bgJ));
-		}
-		
 	}
 
 	void step() override {
 		TD_316 *tdModule = dynamic_cast<TD_316 *>(module);
 		if (!tdModule) {
+			textField->text = "\n\n\n\n:Submarine TD-316:";
+			textField->fontSize = 24;
 			return;
+		}
+		if (tdModule->moduleSizeDirty) {
+			box.size.x = tdModule->moduleSize;
+			schemePanel->resize(this, box);
+			tdModule->moduleSizeDirty = false;
+		}
+		if (tdModule->textDirty) {
+			textField->text = tdModule->text;
+			tdModule->textDirty = false;
 		}
 		if (tdModule->fontSizeDirty) {
 			textField->fontSize = tdModule->fontSize;
@@ -198,6 +199,7 @@ struct TD316 : SchemeModuleWidget {
 			TD_316 *td = dynamic_cast<TD_316 *>(module);
 			td->moduleSize = box.size.x;
 		}
+		light->box.pos.x = box.size.x - 5;
 	}
 };
 

@@ -1,11 +1,11 @@
 # Logical XOR Gates
 ### [Part of the Digital Suite](DS.md)
 #### XG-104 XOR Gates
-![View of the XOR Gates](XG-104.m.png "XOR Gates")
+![View of the XOR Gates](XG-104.png "XOR Gates")
 #### XG-106 XOR Gates
-![View of the XOR Gates](XG-106.m.png "XOR Gates")
+![View of the XOR Gates](XG-106.png "XOR Gates")
 #### XG-202 XOR Gates
-![View of the XOR Gates](XG-202.m.png "XOR Gates")
+![View of the XOR Gates](XG-202.png "XOR Gates")
 
 ## Basic Operation
 

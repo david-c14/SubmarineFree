@@ -74,9 +74,6 @@ Formattable Text Display
 # [TF](TF.md)
 Text Format Controller
 
-# [TM](TM.md)
-Torpedo Message Merge
-
 # [VM](VM.md)
 ANSI C16.5-1942 VU Meter
 

@@ -1,16 +1,16 @@
 # Equal Power Cross-Fader
 #### XF-101 Single Monophonic Cross-Fader
-![View of the Cross-Fader modules](XF-101.m.png "Cross-Fader Range")
+![View of the Cross-Fader modules](XF-101.png "Cross-Fader Range")
 #### XF-102 Dual Monophonic Cross-Fader with LINK option
-![View of the Cross-Fader modules](XF-102.m.png "Cross-Fader Range")
+![View of the Cross-Fader modules](XF-102.png "Cross-Fader Range")
 #### XF-104 Quad Monophonic Cross-Fader with LINK option
-![View of the Cross-Fader modules](XF-104.m.png "Cross-Fader Range")
+![View of the Cross-Fader modules](XF-104.png "Cross-Fader Range")
 #### XF-201 Single Stereophonic Cross-Fader
-![View of the Cross-Fader modules](XF-201.m.png "Cross-Fader Range")
+![View of the Cross-Fader modules](XF-201.png "Cross-Fader Range")
 #### XF-202 Dual Stereophonic Cross-Fader
-![View of the Cross-Fader modules](XF-202.m.png "Cross-Fader Range")
+![View of the Cross-Fader modules](XF-202.png "Cross-Fader Range")
 #### XF-301 Small Form Factor Stereophonic Cross-Fader
-![View of the Cross-Fader modules](XF-301.m.png "Cross-Fader Range")
+![View of the Cross-Fader modules](XF-301.png "Cross-Fader Range")
 
 ## Basic Operation
 

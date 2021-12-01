@@ -6,8 +6,6 @@
 
 template <int x>
 struct FF_2 : DS_Module {
-	int doResetFlag = 0;
-	int doRandomFlag = 0;
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -28,10 +26,12 @@ struct FF_2 : DS_Module {
 
 	FF_2() : DS_Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		for (int i = 0; i < x; i++) {
+			configInput(INPUT_1 + i, "Clock " + std::to_string(i + 1));
+			configOutput(OUTPUT_1 + i, "Cascaded Signal " + std::to_string(i + 1));
+		}
 	}
 	void process(const ProcessArgs &args) override {
-		if (doResetFlag) doReset();
-		if (doRandomFlag) doRandomize();
 		for (int i = 0; i < x; i++) {
 			if (inputs[INPUT_1 + i].isConnected()) {
 				if (schmittTrigger[i].redge(this, inputs[INPUT_1 + i].getVoltage()))
@@ -46,8 +46,7 @@ struct FF_2 : DS_Module {
 			outputs[OUTPUT_1 + i].setVoltage(state[i]?voltage1:voltage0);
 		}
 	}
-	void doRandomize() {
-		doRandomFlag = 0;
+	void onRandomize() override {
 		std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
 		std::uniform_int_distribution<int> distribution(0,1);
 		for (int i = 0; i < x; i++) {
@@ -56,30 +55,11 @@ struct FF_2 : DS_Module {
 			outputs[OUTPUT_1 + i].setVoltage(state[i]?voltage1:voltage0);
 		}
 	}
-	void doReset() {
-		doResetFlag = 0;
+	void onReset() override {
 		for (int i = 0; i < x; i++) {
 			state[i] = 0;
 			if (!inputs[INPUT_1 + i].isConnected()) schmittTrigger[i].reset();
 			outputs[OUTPUT_1 + i].setVoltage(voltage0);
-		}
-	}
-	void onRandomize() override {
-		if (APP->engine->isPaused()) {
-			doRandomize();
-		}
-		else {
-			doResetFlag = 0;
-			doRandomFlag = 1;
-		}
-	}
-	void onReset() override {
-		if (APP->engine->isPaused()) {
-			doReset();
-		}
-		else {
-			doRandomFlag = 0;
-			doResetFlag = 1;
 		}
 	}
 };

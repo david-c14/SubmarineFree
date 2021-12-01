@@ -6,7 +6,7 @@
 	X	X	X	X	ZE
 	,
 	[](const Widget::DrawArgs &args, Vec size) {
-		nvgFontFaceId(args.vg, gScheme.font(args.vg));
+		nvgFontFaceId(args.vg, gScheme.font()->handle);
 		nvgFontSize(args.vg, 10 * 90 / SVG_DPI);
 		nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 		nvgFillColor(args.vg, SUBLIGHTBLUE);

@@ -16,7 +16,7 @@
 		drawOutput(args.vg, 60);
 		nvgStrokeWidth(args.vg, 2);
 		nvgStroke(args.vg);
-		nvgFontFaceId(args.vg, gScheme.font(args.vg));
+		nvgFontFaceId(args.vg, gScheme.font()->handle);
 		nvgFontSize(args.vg, 8 * 90 / SVG_DPI);
 		nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
 		nvgFillColor(args.vg, SUBLIGHTBLUE);

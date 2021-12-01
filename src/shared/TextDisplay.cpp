@@ -1,37 +1,47 @@
 #include "../SubmarineFree.hpp"
-#include "window.hpp"
+#include "window/Window.hpp"
 
 int SubText::getTextPosition(Vec mousePos) {
-    bndSetFont(font->handle);
-    int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
-      box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-      -1, fontSize, text.c_str(), mousePos.x, mousePos.y);
-    bndSetFont(APP->window->uiFont->handle);
-    return textPos;
+	std::shared_ptr<window::Font> font = APP->window->loadFont("res/fonts/ShareTechMono-Regular.ttf");
+	if (font && font->handle >= 0) {
+    		bndSetFont(font->handle);
+		int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
+	      		box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
+	      		-1, fontSize, text.c_str(), mousePos.x, mousePos.y);
+	    	bndSetFont(APP->window->uiFont->handle);
+	    	return textPos;
+	}
+	return 0;
 }
 
 void SubText::draw(const DrawArgs &args) {
-	nvgScissor(args.vg, 0, 0, box.size.x, box.size.y);
 	//Background
 	nvgBeginPath(args.vg);
 	nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
 	nvgFillColor(args.vg, bgColor);
 	nvgFill(args.vg);
+}
 
-	//Text
-	if (font->handle >= 0) {
-		bndSetFont(font->handle);
-		
-		NVGcolor highlightColor = color;
-		highlightColor.a = 0.5;
-		int begin = std::min(cursor, selection);
-		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
-		bndIconLabelCaret(args.vg, textOffset.x, textOffset.y,
-			box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
-			-1, color, fontSize, text.c_str(), highlightColor, begin, end);
+void SubText::drawLayer(const DrawArgs &args, int layer) {
+	if (layer == 1) {
+		//Text
+		nvgScissor(args.vg, 0, 0, box.size.x, box.size.y);
+		std::shared_ptr<Font> font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+		if (font && font->handle >= 0) {
+			bndSetFont(font->handle);
+			
+			NVGcolor highlightColor = color;
+			highlightColor.a = 0.5;
+			int begin = std::min(cursor, selection);
+			int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
+			bndIconLabelCaret(args.vg, textOffset.x, textOffset.y,
+				box.size.x - 2*textOffset.x, box.size.y - 2*textOffset.y,
+				-1, color, fontSize, text.c_str(), highlightColor, begin, end);
+    			bndSetFont(APP->window->uiFont->handle);
+		}
+		nvgResetScissor(args.vg);
 	}
-	nvgResetScissor(args.vg);
-	bndSetFont(APP->window->uiFont->handle);
+	Widget::drawLayer(args, layer);
 }
 
 void SubText::appendContextMenu(Menu *menu) {
@@ -148,5 +158,12 @@ void SubText::backgroundMenu(Menu *menu) {
 	menu->addChild(createBackgroundMenuItem("None", nvgRGBA(0, 0, 0, 0)));
 	menu->addChild(createBackgroundMenuItem("Black", nvgRGB(0, 0, 0)));
 	menu->addChild(createBackgroundMenuItem("White", nvgRGB(0xff, 0xff, 0xff)));
+}
+
+void SubText::onChange(const ChangeEvent &e) {
+	if (changeHandler) {
+		changeHandler();
+	}
+	LedDisplayTextField::onChange(e);
 }
 		

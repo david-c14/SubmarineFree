@@ -33,6 +33,7 @@ void init(rack::Plugin *p) {
 	p->addModel(modelFF212);
 	p->addModel(modelHS101);
 	p->addModel(modelLA108);
+	p->addModel(modelLA216);
 	p->addModel(modelLD103);
 	p->addModel(modelLD106);
 	p->addModel(modelLT116);
@@ -70,8 +71,10 @@ void init(rack::Plugin *p) {
 
 	p->addModel(modelVM101);
 	p->addModel(modelVM102);
+	p->addModel(modelVM104);
 	p->addModel(modelVM201);
 	p->addModel(modelVM202);
+	p->addModel(modelVM204);
 
 	p->addModel(modelWK101);
 	p->addModel(modelWK205);
