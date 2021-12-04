@@ -784,6 +784,7 @@ struct TD510 : SchemeModuleWidget {
 	}
 
 	void step() override {
+		SchemeModuleWidget::step();
 		TD_510 *tdm = dynamic_cast<TD_510 *>(module);
 		if (!tdm)
 			return;
