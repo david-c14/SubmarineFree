@@ -2,24 +2,22 @@
 
 #apt-get install -y markdown
 
-for p in *.md gates/*.md
-do
-	sed 's/\.md/\.html/g' ${p} | markdown > ${p%md}body
-	cat prefix ${p%md}body suffix > ${p%md}html
-done
-
 git clone https://github.com/david-c14/Submarine.git
 
-rm Submarine/Free/Manual/*
+rm Submarine/Free/Manual/*.html
+rm Submarine/Free/Manual/*.png
 rm Submarine/Free/Manual/gates/*
 
-cp * Submarine/Free/Manual
+for p in *.md
+do
+	sed 's/\.md/\.html/g' ${p} | markdown > ${p%md}body
+	cat Submarine/Free/Manual/prefix ${p%md}body Submarine/Free/Manual/suffix > Submarine/Free/Manual/${p%md}html
+done
+
+cp *.png Submarine/Free/Manual
 cp gates/* Submarine/Free/Manual/gates
 
-rm Submarine/Free/Manual/*.md
-rm Submarine/Free/Manual/*.body
-rm Submarine/Free/Manual/gates/*.md
-rm Submarine/Free/Manual/gates/*.body
+rm *.body
 
 cd Submarine
 git add *
