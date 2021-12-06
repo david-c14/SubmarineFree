@@ -86,15 +86,20 @@ struct SS208 : SchemeModuleWidget {
 struct SS_212 : Module {
 	static constexpr int deviceCount = 12;
 	int v = 0;
+	void setLabels() {
+		for (int i = 0; i < deviceCount; i++) {
+			configOutput(i, string::f("%f V", v + 1.0f * i / 12.0f));
+		}
+	}
 	void setValues() {
 		for (int i = 0; i < deviceCount; i++) {
 			outputs[i].setVoltage(v + 1.0f * i / 12.0f);
-			configOutput(i, string::f("%f V", v + 1.0f * i / 12.0f));
 		}
 	}
 
 	SS_212() : Module() {
 		config(0, 0, deviceCount, 0);
+		setLabels();
 	}
 	void process(const ProcessArgs &args) override {
 		setValues();
@@ -111,6 +116,7 @@ struct SS_212 : Module {
 		if (intJ)
 			v = json_integer_value(intJ);
 		setValues();
+		setLabels();
 	}
 };
 
@@ -141,6 +147,7 @@ struct SS212 : SchemeModuleWidget {
 					menuItem->clickHandler = [=]() {
 						ss_212->v = i;
 						ss_212->setValues();
+						ss_212->setLabels();
 					};
 					menu->addChild(menuItem);
 				}
