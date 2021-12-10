@@ -5,7 +5,7 @@ name: Release
 env:
   RACK_DIR: ${GITHUB_WORKSPACE}/Rack-SDK
   RACK_USER_DIR: ${GITHUB_WORKSPACE}
-  RACK_SDK_VERSION: 2.0.0
+  RACK_SDK_VERSION: 2.0.3
 jobs:
   buildLinux:
     name: Build Linux
