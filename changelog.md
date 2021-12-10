@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.0.2
+- 06-Dec-2021 Fix bug #175 High CPU usage in SS-212
+- 04-Dec-2021 Minor fixes in manual
+- 04-Dec-2021 Fix bug #172 Visuals not updating on TD-410 and TD-510 in a timely manner
+
 ## v2.0.1
 - 30-Nov-2021 Add LA-216 Polyphonic Logic Analyser
 
