@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.3
+- 13-Dec-2021 Fix unitialized variable in XF-301
+
 ## v2.0.2
 - 06-Dec-2021 Fix bug #175 High CPU usage in SS-212
 - 04-Dec-2021 Minor fixes in manual

@@ -101,8 +101,8 @@ namespace {
 	}; 
 
 	struct XF_LightKnob : LargeKnob<NarrowKnob<LightKnob>> {
-		int cv;
-		int link;
+		int cv = 0;
+		int link = 0;
 		void step() override {
 			if (module) {
 				//Module *module = paramQuantity->module;
@@ -797,6 +797,7 @@ struct XF301 : SchemeModuleWidget {
 
 		fader = createParamCentered<SmallKnob<XF_LightKnob>>(Vec(15, 105), module, XF_201::PARAM_FADE_1);
 		fader->cv = XF_201::INPUT_CV_1;
+		fader->link = 0;
 		addParam(fader);
 
 		addInput(createInputCentered<SilverPort>(Vec(15,155), module, XF_201::INPUT_B_1));
