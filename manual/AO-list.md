@@ -257,3 +257,22 @@
 <tr><td> if C>Y&#x21a3;Y/X </td><td> (c > y) ? y : x </td><td> Y if C is greater than Y otherwise X </td></tr>
 <tr><td> if C<Y&#x21a3;Y/X </td><td> (c < y) ? y : x </td><td> Y if C is less than Y otherwise X </td></tr>
 </table>
+
+## Rounding
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> if X>0&#x21a3;Y/C </td><td> (x > 0) ? y : c </td><td> Y if X is greater than 0 otherwise C </td></tr>
+<tr><td>&#x230a;X+C&#x230b;</td><td> floor(x + c) </td><td>Round down x and c</td></tr>
+<tr><td>&#x230a;Y+C&#x230b;</td><td> floor(y + c) </td><td>Round down y and c</td></tr>
+<tr><td>&#x230a;X+Y+C&#x230b;</td><td> floor(x + y + c) </td><td>Round down x and y and c</td></tr>
+<tr><td>&#x230a;CX&#x230b;</td><td> floor(x * c) </td><td>Round down x by c</td></tr>
+<tr><td>&#x230a;CY&#x230b;</td><td> floor(y * c) </td><td>Round down x by c</td></tr>
+<tr><td>&#x230a;CXY&#x230b;</td><td> floor(x * y * c) </td><td>Round down x by y by c</td></tr>
+<tr><td>&#x2308;X+C&#x2309;</td><td> ceil(x + c) </td><td>Round up x and c</td></tr>
+<tr><td>&#x2308;Y+C&#x2309;</td><td> ceil(y + c) </td><td>Round up y and c</td></tr>
+<tr><td>&#x2308;X+Y+C&#x2309;</td><td> ceil(x + y + c) </td><td>Round up x and y and c</td></tr>
+<tr><td>&#x2308;CX&#x2309;</td><td> ceil(x * c) </td><td>Round up x by c</td></tr>
+<tr><td>&#x2308;CY&#x2309;</td><td> ceil(y * c) </td><td>Round up x by c</td></tr>
+<tr><td>&#x2308;CXY&#x2309;</td><td> ceil(x * y * c) </td><td>Round up x by y by c</td></tr>
+</table>
