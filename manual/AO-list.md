@@ -1,230 +1,277 @@
 # AO-1xx Algorithms
 
 ## Arithmetical
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| | | Pass-through. X passes across unchanged, Y passes down unchanged |
-| C | c | The value of the selected constant C |
-| X+C | x + c | X added to C |
-| Y+C | y + c | Y added to C|
-| X+Y+C | x + y + c | X and Y added to C |
-| C-X | c - x | X subtracted from C |
-| C-Y | c - y | Y subtracted from C |
-| X-(Y+C) | x - ( y + c ) | Y added to C then all subtracted from X |
-| (X+C)-Y | ( x + c ) - y | Y subtracted from X and C |
-| Y-(X+C) | y - ( x + c ) | X added to C then all subtracted from Y |
-| (Y+C)-X | ( y + c ) - x | X subtracted from Y and C |
-| (X&#x2a2f;Y)+C | ( x * y ) + c | X times Y added to C |
-| (X+C)&#x2a2f;Y | ( x + c ) * y | X and C multiplied by Y |
-| X&#x2a2f;(Y+C) | x * ( y + c ) | Y and C multiplied by X |
-| X&#x2a2f;C | x * c | X times C |
-| Y&#x2a2f;C | y * c | Y times C |
-| X&#x2a2f;Y&#x2a2f;C | x * y * c | X times Y times C|
-| &#x3c0;&#x2a2f;(X+C) | M_PI * ( x + c ) | X and C multiplied by pi |
-| &#x3c0;&#x2a2f;(Y+C) | M_PI * ( y + c ) | Y and C multiplied by pi |
-| &#x3c4;&#x2a2f;(X+C) | 2 * M_PI * ( x + c ) | X and C multiplied by tau |
-| &#x3c4;&#x2a2f;(Y+C) | 2 * M_PI * ( y + c ) | Y and C multiplied by tau |
-| X&#xf7;C | x / c | X divided by C |
-| C&#xf7;X | c / x | C divided by X |
-| Y&#xf7;C | y / c | Y divided by C |
-| C&#xf7;Y | c / y | C divided by Y |
-| C+(X&#xf7;Y) | c + ( x / y ) | C added to X divided by Y |
-| C+(Y&#xf7;X) | c + ( y / x ) | C added to Y divided by X |
-| X+(Y&#xf7;C) | x + ( y / c ) | X added to Y divided by C |
-| X+(C&#xf7;Y) | x + ( c / y ) | X added to C divided by Y |
-| Y+(X&#xf7;C) | y + ( x / c ) | Y added to X divided by C |
-| Y+(C&#xf7;X) | y + ( c / x ) | Y added to C divided by X |
-| (X+C)&#xf7;Y | ( x + c ) / y | X and C divided by Y |
-| X&#xf7;(Y+C) | x / ( y + c ) | X divided by Y and C |
-| (Y+C)&#xf7;X | ( y + c ) / x | Y and C divided by X |
-| Y&#xf7;(X+C) | y / ( x + c ) | Y divided by X and C |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> </td><td> </td><td> Pass-through. X passes across unchanged, Y passes down unchanged </td></tr>
+<tr><td> C </td><td> c </td><td> The value of the selected constant C </td></tr>
+<tr><td> X+C </td><td> x + c </td><td> X added to C </td></tr>
+<tr><td> Y+C </td><td> y + c </td><td> Y added to C</td></tr>
+<tr><td> X+Y+C </td><td> x + y + c </td><td> X and Y added to C </td></tr>
+<tr><td> C-X </td><td> c - x </td><td> X subtracted from C </td></tr>
+<tr><td> C-Y </td><td> c - y </td><td> Y subtracted from C </td></tr>
+<tr><td> X-(Y+C) </td><td> x - ( y + c ) </td><td> Y added to C then all subtracted from X </td></tr>
+<tr><td> (X+C)-Y </td><td> ( x + c ) - y </td><td> Y subtracted from X and C </td></tr>
+<tr><td> Y-(X+C) </td><td> y - ( x + c ) </td><td> X added to C then all subtracted from Y </td></tr>
+<tr><td> (Y+C)-X </td><td> ( y + c ) - x </td><td> X subtracted from Y and C </td></tr>
+<tr><td> (X&#x2a2f;Y)+C </td><td> ( x * y ) + c </td><td> X times Y added to C </td></tr>
+<tr><td> (X+C)&#x2a2f;Y </td><td> ( x + c ) * y </td><td> X and C multiplied by Y </td></tr>
+<tr><td> X&#x2a2f;(Y+C) </td><td> x * ( y + c ) </td><td> Y and C multiplied by X </td></tr>
+<tr><td> X&#x2a2f;C </td><td> x * c </td><td> X times C </td></tr>
+<tr><td> Y&#x2a2f;C </td><td> y * c </td><td> Y times C </td></tr>
+<tr><td> X&#x2a2f;Y&#x2a2f;C </td><td> x * y * c </td><td> X times Y times C</td></tr>
+<tr><td> &#x3c0;&#x2a2f;(X+C) </td><td> M_PI * ( x + c ) </td><td> X and C multiplied by pi </td></tr>
+<tr><td> &#x3c0;&#x2a2f;(Y+C) </td><td> M_PI * ( y + c ) </td><td> Y and C multiplied by pi </td></tr>
+<tr><td> &#x3c4;&#x2a2f;(X+C) </td><td> 2 * M_PI * ( x + c ) </td><td> X and C multiplied by tau </td></tr>
+<tr><td> &#x3c4;&#x2a2f;(Y+C) </td><td> 2 * M_PI * ( y + c ) </td><td> Y and C multiplied by tau </td></tr>
+<tr><td> X&#xf7;C </td><td> x / c </td><td> X divided by C </td></tr>
+<tr><td> C&#xf7;X </td><td> c / x </td><td> C divided by X </td></tr>
+<tr><td> Y&#xf7;C </td><td> y / c </td><td> Y divided by C </td></tr>
+<tr><td> C&#xf7;Y </td><td> c / y </td><td> C divided by Y </td></tr>
+<tr><td> C+(X&#xf7;Y) </td><td> c + ( x / y ) </td><td> C added to X divided by Y </td></tr>
+<tr><td> C+(Y&#xf7;X) </td><td> c + ( y / x ) </td><td> C added to Y divided by X </td></tr>
+<tr><td> X+(Y&#xf7;C) </td><td> x + ( y / c ) </td><td> X added to Y divided by C </td></tr>
+<tr><td> X+(C&#xf7;Y) </td><td> x + ( c / y ) </td><td> X added to C divided by Y </td></tr>
+<tr><td> Y+(X&#xf7;C) </td><td> y + ( x / c ) </td><td> Y added to X divided by C </td></tr>
+<tr><td> Y+(C&#xf7;X) </td><td> y + ( c / x ) </td><td> Y added to C divided by X </td></tr>
+<tr><td> (X+C)&#xf7;Y </td><td> ( x + c ) / y </td><td> X and C divided by Y </td></tr>
+<tr><td> X&#xf7;(Y+C) </td><td> x / ( y + c ) </td><td> X divided by Y and C </td></tr>
+<tr><td> (Y+C)&#xf7;X </td><td> ( y + c ) / x </td><td> Y and C divided by X </td></tr>
+<tr><td> Y&#xf7;(X+C) </td><td> y / ( x + c ) </td><td> Y divided by X and C </td></tr>
+</table>
+
 ## Modular
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| (X+C)%Y | fmodf( x + c , y ) | The remainder of X and C divided by Y |
-| (Y+C)%X | fmodf( y + c , x ) | The remainder of Y and C divided by X |
-| X%(Y+C) | fmodf( x , y + c ) | The remainder of X divided by Y and C |
-| Y%(X+C) | fmodf( y , x + c) | The remainder of Y divided by X and C |
-| X%C | fmodf( x , c ) | The remainder of X divided by C |
-| Y%C | fmodf( y , c ) | The remainder of Y divided by C |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> (X+C)%Y </td><td> fmodf( x + c , y ) </td><td> The remainder of X and C divided by Y </td></tr>
+<tr><td> (Y+C)%X </td><td> fmodf( y + c , x ) </td><td> The remainder of Y and C divided by X </td></tr>
+<tr><td> X%(Y+C) </td><td> fmodf( x , y + c ) </td><td> The remainder of X divided by Y and C </td></tr>
+<tr><td> Y%(X+C) </td><td> fmodf( y , x + c) </td><td> The remainder of Y divided by X and C </td></tr>
+<tr><td> X%C </td><td> fmodf( x , c ) </td><td> The remainder of X divided by C </td></tr>
+<tr><td> Y%C </td><td> fmodf( y , c ) </td><td> The remainder of Y divided by C </td></tr>
+</table>
+
 ## Quadratic
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| X&#xb2;+C | x * x + c | X squared added to C |
-| Y&#xb2;+C | y * y + c | Y squared added to C |
-| (X+C)&#xb2; | ( x + c ) * ( x + c ) | X and C squared |
-| (Y+C)&#xb2; | ( y + c ) * ( y + c ) | Y and C squared |
-| X&#xb2;+Y+C | x * x + y + c | X squared added to Y and C |
-| Y&#xb2;+X+C | y * y + x + c | Y squared added to X and C |
-| X&#xb2;+CY | x * x + c * y | X squared added to Y multiplied by C |
-| Y&#xb2;+CX | y * y + c * x | Y squared added to X multiplied by C |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> X&#xb2;+C </td><td> x * x + c </td><td> X squared added to C </td></tr>
+<tr><td> Y&#xb2;+C </td><td> y * y + c </td><td> Y squared added to C </td></tr>
+<tr><td> (X+C)&#xb2; </td><td> ( x + c ) * ( x + c ) </td><td> X and C squared </td></tr>
+<tr><td> (Y+C)&#xb2; </td><td> ( y + c ) * ( y + c ) </td><td> Y and C squared </td></tr>
+<tr><td> X&#xb2;+Y+C </td><td> x * x + y + c </td><td> X squared added to Y and C </td></tr>
+<tr><td> Y&#xb2;+X+C </td><td> y * y + x + c </td><td> Y squared added to X and C </td></tr>
+<tr><td> X&#xb2;+CY </td><td> x * x + c * y </td><td> X squared added to Y multiplied by C </td></tr>
+<tr><td> Y&#xb2;+CX </td><td> y * y + c * x </td><td> Y squared added to X multiplied by C </td></tr>
+</table>
+
 ## Powers
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| &#x221a;(X+C) | sqrt( x + c ) | The square root of X and C |
-| &#x221a;(Y+C) | sqrt( y + c ) | The square root of Y and C |
-| C&#x2e3; | powf( c , x ) | C raised to the power of X |
-| C&#x2b8; | powf( c , y ) | C raised to the power of Y |
-| C&#x2e3;&#x207a;&#x2b8; | powf( c , x + y ) | C raised to the power of X and Y |
-| C&#x2e3;&#x2b8; | powf( c , x * y ) | C raised to the power of X multiplied by Y |
-| X&#x1D9c; | powf( x , c ) | X raised to the power of C |
-| Y&#x1D9c; | powf( y , c ) | Y raised to the power of C |
-| X&#x2b8;&#x207a;&#x1D9c; | powf( x , y + c ) | X raised to the power of Y and C |
-| Y&#x2e3;&#x207a;&#x1D9c; | powf( y , x + c ) | Y raised to the power of X and C |
-| X&#x1D9c;&#x2b8; | powf( x , c * y ) | X raised to the power of Y multiplied by C |
-| Y&#x1D9c;&#x2e3; | powf( y , c * x ) | Y raised to the power of X multiplied by C |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> &#x221a;(X+C) </td><td> sqrt( x + c ) </td><td> The square root of X and C </td></tr>
+<tr><td> &#x221a;(Y+C) </td><td> sqrt( y + c ) </td><td> The square root of Y and C </td></tr>
+<tr><td> C&#x2e3; </td><td> powf( c , x ) </td><td> C raised to the power of X </td></tr>
+<tr><td> C&#x2b8; </td><td> powf( c , y ) </td><td> C raised to the power of Y </td></tr>
+<tr><td> C&#x2e3;&#x207a;&#x2b8; </td><td> powf( c , x + y ) </td><td> C raised to the power of X and Y </td></tr>
+<tr><td> C&#x2e3;&#x2b8; </td><td> powf( c , x * y ) </td><td> C raised to the power of X multiplied by Y </td></tr>
+<tr><td> X&#x1D9c; </td><td> powf( x , c ) </td><td> X raised to the power of C </td></tr>
+<tr><td> Y&#x1D9c; </td><td> powf( y , c ) </td><td> Y raised to the power of C </td></tr>
+<tr><td> X&#x2b8;&#x207a;&#x1D9c; </td><td> powf( x , y + c ) </td><td> X raised to the power of Y and C </td></tr>
+<tr><td> Y&#x2e3;&#x207a;&#x1D9c; </td><td> powf( y , x + c ) </td><td> Y raised to the power of X and C </td></tr>
+<tr><td> X&#x1D9c;&#x2b8; </td><td> powf( x , c * y ) </td><td> X raised to the power of Y multiplied by C </td></tr>
+<tr><td> Y&#x1D9c;&#x2e3; </td><td> powf( y , c * x ) </td><td> Y raised to the power of X multiplied by C </td></tr>
+</table>
+
 ## Positive values only
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| &#124;X+C&#124; | abs( x + c ) | X Added to C with any minus sign removed |
-| &#124;Y+C&#124; | abs( y + c ) | Y added to C with any minus sign removed |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> &#124;X+C&#124; </td><td> abs( x + c ) </td><td> X Added to C with any minus sign removed </td></tr>
+<tr><td> &#124;Y+C&#124; </td><td> abs( y + c ) </td><td> Y added to C with any minus sign removed </td></tr>
+</table>
+
 ## Maximum and Minimum
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| min(X+C,Y) | min( x + c, y ) | The smaller of X Added to C, or Y |
-| min(X,C) | min( x, c ) | The smaller of X or C |
-| min(Y,C) | min( y, c ) | The smaller of Y or C |
-| max(X+C,Y) | max( x + c, y ) | The larger of X added to C, or Y |
-| max(X,C) | max( x, c ) | The larger of X or C |
-| max(Y,C) | max( y, c ) | The larger of Y or C |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> min(X+C,Y) </td><td> min( x + c, y ) </td><td> The smaller of X Added to C, or Y </td></tr>
+<tr><td> min(X,C) </td><td> min( x, c ) </td><td> The smaller of X or C </td></tr>
+<tr><td> min(Y,C) </td><td> min( y, c ) </td><td> The smaller of Y or C </td></tr>
+<tr><td> max(X+C,Y) </td><td> max( x + c, y ) </td><td> The larger of X added to C, or Y </td></tr>
+<tr><td> max(X,C) </td><td> max( x, c ) </td><td> The larger of X or C </td></tr>
+<tr><td> max(Y,C) </td><td> max( y, c ) </td><td> The larger of Y or C </td></tr>
+</table>
+
 ## Trigonometric
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| sin(X+C) | sin( x + c ) | The sine of X and C |
-| sin(Y+C) | sin( y + c ) | The sine of Y and C |
-| sin(X+Y) | sin( x + y ) | The sine of X and Y |
-| sin(CX) | sin( c * x ) | The sine of X mulitplied by C |
-| sin(CY) | sin( c * y ) | The sine of Y multiplied by C |
-| sin(XY) | sin( x * y ) | The sine of X multiplied by Y |
-| cos(X+C) | cos( x + c ) | The cosine of X and C |
-| cos(Y+C) | cos( y + c ) ||
-| cos(X+Y) | cos( x + y ) ||
-| cos(CX) | cos( c * x ) ||
-| cos(CY) | cos( c * y ) ||
-| cos(XY) | cos( x * y ) ||
-| tan(X+C) | tan( x + c ) | The tangent of X and C |
-| tan(Y+C) | tan( y + c ) ||
-| tan(X+Y) | tan( x + y ) ||
-| tan(CX) | tan( c * x ) ||
-| tan(CY) | tan( c * y ) ||
-| tan(XY) | tan( x * y ) ||
-| asin(X+C) | asin( x + c ) | The arcsine of X and C |
-| asin(Y+C) | asin( y + c ) ||
-| asin(X+Y) | asin( x + y ) ||
-| asin(CX) | asin( c * x ) ||
-| asin(CY) | asin( c * y ) ||
-| asin(XY) | asin( x * y ) ||
-| acos(X+C) | acos( x + c ) | The arcosine of X and C |
-| acos(Y+C) | acos( y + c ) ||
-| acos(X+Y) | acos( x + y ) ||
-| acos(CX) | acos( c * x ) ||
-| acos(CY) | acos( c * y ) ||
-| acos(XY) | acos( x * y ) ||
-| atan(X+C) | atan( x + c ) | The arctangent of X and C |
-| atan(Y+C) | atan( y + c ) ||
-| atan(X+Y) | atan( x + y ) ||
-| atan(CX) | atan( c * x ) ||
-| atan(CY) | atan( c * y ) ||
-| atan(XY) | atan( x * y ) ||
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> sin(X+C) </td><td> sin( x + c ) </td><td> The sine of X and C </td></tr>
+<tr><td> sin(Y+C) </td><td> sin( y + c ) </td><td> The sine of Y and C </td></tr>
+<tr><td> sin(X+Y) </td><td> sin( x + y ) </td><td> The sine of X and Y </td></tr>
+<tr><td> sin(CX) </td><td> sin( c * x ) </td><td> The sine of X mulitplied by C </td></tr>
+<tr><td> sin(CY) </td><td> sin( c * y ) </td><td> The sine of Y multiplied by C </td></tr>
+<tr><td> sin(XY) </td><td> sin( x * y ) </td><td> The sine of X multiplied by Y </td></tr>
+<tr><td> cos(X+C) </td><td> cos( x + c ) </td><td> The cosine of X and C </td></tr>
+<tr><td> cos(Y+C) </td><td> cos( y + c ) </td><td></td></tr>
+<tr><td> cos(X+Y) </td><td> cos( x + y ) </td><td></td></tr>
+<tr><td> cos(CX) </td><td> cos( c * x ) </td><td></td></tr>
+<tr><td> cos(CY) </td><td> cos( c * y ) </td><td></td></tr>
+<tr><td> cos(XY) </td><td> cos( x * y ) </td><td></td></tr>
+<tr><td> tan(X+C) </td><td> tan( x + c ) </td><td> The tangent of X and C </td></tr>
+<tr><td> tan(Y+C) </td><td> tan( y + c ) </td><td></td></tr>
+<tr><td> tan(X+Y) </td><td> tan( x + y ) </td><td></td></tr>
+<tr><td> tan(CX) </td><td> tan( c * x ) </td><td></td></tr>
+<tr><td> tan(CY) </td><td> tan( c * y ) </td><td></td></tr>
+<tr><td> tan(XY) </td><td> tan( x * y ) </td><td></td></tr>
+<tr><td> asin(X+C) </td><td> asin( x + c ) </td><td> The arcsine of X and C </td></tr>
+<tr><td> asin(Y+C) </td><td> asin( y + c ) </td><td></td></tr>
+<tr><td> asin(X+Y) </td><td> asin( x + y ) </td><td></td></tr>
+<tr><td> asin(CX) </td><td> asin( c * x ) </td><td></td></tr>
+<tr><td> asin(CY) </td><td> asin( c * y ) </td><td></td></tr>
+<tr><td> asin(XY) </td><td> asin( x * y ) </td><td></td></tr>
+<tr><td> acos(X+C) </td><td> acos( x + c ) </td><td> The arcosine of X and C </td></tr>
+<tr><td> acos(Y+C) </td><td> acos( y + c ) </td><td></td></tr>
+<tr><td> acos(X+Y) </td><td> acos( x + y ) </td><td></td></tr>
+<tr><td> acos(CX) </td><td> acos( c * x ) </td><td></td></tr>
+<tr><td> acos(CY) </td><td> acos( c * y ) </td><td></td></tr>
+<tr><td> acos(XY) </td><td> acos( x * y ) </td><td></td></tr>
+<tr><td> atan(X+C) </td><td> atan( x + c ) </td><td> The arctangent of X and C </td></tr>
+<tr><td> atan(Y+C) </td><td> atan( y + c ) </td><td></td></tr>
+<tr><td> atan(X+Y) </td><td> atan( x + y ) </td><td></td></tr>
+<tr><td> atan(CX) </td><td> atan( c * x ) </td><td></td></tr>
+<tr><td> atan(CY) </td><td> atan( c * y ) </td><td></td></tr>
+<tr><td> atan(XY) </td><td> atan( x * y ) </td><td></td></tr>
+</table>
+
 ## Logarithmic
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| log(X+C) | log( x + c ) | The natural logarithm of X and C |
-| log(Y+C) | log( y + c ) | The natural logarithm of Y and C |
-| log&#x2082;(X+C) | log2( x + c ) | The base-2 logarithm of X and C |
-| log&#x2082;(Y+C) | log2( y + c ) | The base-2 logarithm of Y and C |
-| log&#x2081;&#x2080;(X+C) | log10( x + c ) | The base-10 logarithm of X and C |
-| log&#x2081;&#x2080;(Y+C) | log10( y + c ) | The base-10 logarithm of Y and C |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> log(X+C) </td><td> log( x + c ) </td><td> The natural logarithm of X and C </td></tr>
+<tr><td> log(Y+C) </td><td> log( y + c ) </td><td> The natural logarithm of Y and C </td></tr>
+<tr><td> log&#x2082;(X+C) </td><td> log2( x + c ) </td><td> The base-2 logarithm of X and C </td></tr>
+<tr><td> log&#x2082;(Y+C) </td><td> log2( y + c ) </td><td> The base-2 logarithm of Y and C </td></tr>
+<tr><td> log&#x2081;&#x2080;(X+C) </td><td> log10( x + c ) </td><td> The base-10 logarithm of X and C </td></tr>
+<tr><td> log&#x2081;&#x2080;(Y+C) </td><td> log10( y + c ) </td><td> The base-10 logarithm of Y and C </td></tr>
+</table>
+
 ## Exponential
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| &#x212f;&#x2e3;&#x207a;&#x1D9c; | exp( x + c ) | e raised to the power of X and C |
-| &#x212f;&#x2b8;&#x207a;&#x1D9c; | exp( y + c ) | e raised to the power of Y and C |
-| &#x212f;&#x1D9c;&#x2e3; | exp( c * x ) | e raised to the power of X multiplied by C |
-| &#x212f;&#x1D9c;&#x2b8; | exp( c * y ) | e raised to the power of Y multiplied by C |
-| 2&#x2e3;&#x207a;&#x1D9c; | powf( 2, x + c ) | 2 raised to the power of X and C |
-| 2&#x2b8;&#x207a;&#x1D9c; | powf( 2, y + c ) | 2 raised to the power of Y and C |
-| 2&#x1D9c;&#x2e3; | powf( 2, c * x ) | 2 raised to the power of X multiplied by C |
-| 2&#x1D9c;&#x2b8; | powf( 2, c * y ) | 2 raised to the power of Y multiplied by C |
-| 10&#x2e3;&#x207a;&#x1D9c; | powf( 10, x + c ) | 10 raised to the power of X and C |
-| 10&#x2b8;&#x207a;&#x1D9c; | powf( 10, y + c ) | 10 raised to the power of Y and C |
-| 10&#x1D9c;&#x2e3; | powf( 10, c * x ) | 10 raised to the power of X multiplied by C |
-| 10&#x1D9c;&#x2b8; | powf( 10, c * y ) | 10 raised to the power of Y multiplied by C |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> &#x212f;&#x2e3;&#x207a;&#x1D9c; </td><td> exp( x + c ) </td><td> e raised to the power of X and C </td></tr>
+<tr><td> &#x212f;&#x2b8;&#x207a;&#x1D9c; </td><td> exp( y + c ) </td><td> e raised to the power of Y and C </td></tr>
+<tr><td> &#x212f;&#x1D9c;&#x2e3; </td><td> exp( c * x ) </td><td> e raised to the power of X multiplied by C </td></tr>
+<tr><td> &#x212f;&#x1D9c;&#x2b8; </td><td> exp( c * y ) </td><td> e raised to the power of Y multiplied by C </td></tr>
+<tr><td> 2&#x2e3;&#x207a;&#x1D9c; </td><td> powf( 2, x + c ) </td><td> 2 raised to the power of X and C </td></tr>
+<tr><td> 2&#x2b8;&#x207a;&#x1D9c; </td><td> powf( 2, y + c ) </td><td> 2 raised to the power of Y and C </td></tr>
+<tr><td> 2&#x1D9c;&#x2e3; </td><td> powf( 2, c * x ) </td><td> 2 raised to the power of X multiplied by C </td></tr>
+<tr><td> 2&#x1D9c;&#x2b8; </td><td> powf( 2, c * y ) </td><td> 2 raised to the power of Y multiplied by C </td></tr>
+<tr><td> 10&#x2e3;&#x207a;&#x1D9c; </td><td> powf( 10, x + c ) </td><td> 10 raised to the power of X and C </td></tr>
+<tr><td> 10&#x2b8;&#x207a;&#x1D9c; </td><td> powf( 10, y + c ) </td><td> 10 raised to the power of Y and C </td></tr>
+<tr><td> 10&#x1D9c;&#x2e3; </td><td> powf( 10, c * x ) </td><td> 10 raised to the power of X multiplied by C </td></tr>
+<tr><td> 10&#x1D9c;&#x2b8; </td><td> powf( 10, c * y ) </td><td> 10 raised to the power of Y multiplied by C </td></tr>
+</table>
+
 ## Conditional
-| Display                  | Code               | Description          |
-| ------------------------ | ------------------ | -------------------- |
-| if X>0&#x21a3;Y/C | (x > 0) ? y : c | Y if X is greater than 0 otherwise C |
-| if X<0&#x21a3;Y/C | (x < 0) ? y : c | Y if X is less than 0 otherwise C |
-| if X=0&#x21a3;Y/C | (x == 0) ? y : c | Y if X is 0 otherwise C |
-| if X>0&#x21a3;C/Y | (x > 0) ? c : y | C if X is greater than 0 otherwise Y |
-| if X<0&#x21a3;C/Y | (x < 0) ? c : y | C if X is less that 0 otherwise Y |
-| if X=0&#x21a3;C/Y | (x == 0) ? c : y | C if X is 0 otherwise Y |
-| if X>0&#x21a3;1/0 | (x > 0) ? 1 : 0 | 1 if X is greater than 0 otherwise 0 |
-| if X<0&#x21a3;1/0 | (x < 0) ? 1 : 0 ||
-| if X=0&#x21a3;1/0 | (x == 0) ? 1 : 0 ||
-| if X>0&#x21a3;X/C | (x > 0) ? x : c | X if X is greater than 0 otherwise C |
-| if X<0&#x21a3;X/C | (x < 0) ? x : c ||
-| if X=0&#x21a3;X/C | (x == 0) ? x : c ||
-| if X>0&#x21a3;C/X | (x > 0) ? c : x | C if X is greater than 0 otherwise X |
-| if X<0&#x21a3;C/X | (x < 0) ? c : x ||
-| if X=0&#x21a3;C/X | (x == 0) ? c : x ||
-| if Y>0&#x21a3;X/C | (y > 0) ? x : c | X if Y is greater than 0 otherwise C |
-| if Y<0&#x21a3;X/C | (y < 0) ? x : c ||
-| if Y=0&#x21a3;X/C | (y == 0) ? x : c ||
-| if Y>0&#x21a3;C/X | (y > 0) ? c : x | C if Y is greater than 0 otherwise X |
-| if Y<0&#x21a3;C/X | (y < 0) ? c : x ||
-| if Y=0&#x21a3;C/X | (y == 0) ? c : x ||
-| if Y>0&#x21a3;1/0 | (y > 0) ? 1 : 0 ||
-| if Y<0&#x21a3;1/0 | (y < 0) ? 1 : 0 ||
-| if Y=0&#x21a3;1/0 | (y == 0) ? 1 : 0 ||
-| if Y>0&#x21a3;Y/C | (y > 0) ? y : c ||
-| if Y<0&#x21a3;Y/C | (y < 0) ? y : c ||
-| if Y=0&#x21a3;Y/C | (y == 0) ? y : c ||
-| if Y>0&#x21a3;C/Y | (y > 0) ? c : y ||
-| if Y<0&#x21a3;C/Y | (y < 0) ? c : y ||
-| if Y=0&#x21a3;C/Y | (y == 0) ? c : y ||
-| if X>Y&#x21a3;C/0 | (x > y) ? c : 0 | C if X is greater than Y otherwise 0 |
-| if X<Y&#x21a3;C/0 | (x < y) ? c : 0 ||
-| if X=Y&#x21a3;C/0 | (x == y) ? c : 0 ||
-| if Y>X&#x21a3;C/0 | (y > x) ? c : 0 ||
-| if Y<X&#x21a3;C/0 | (y < x) ? c : 0 ||
-| if X>Y&#x21a3;X/0 | (x > y) ? x : 0 | X if X is greater than Y otherwise 0 |
-| if X<Y&#x21a3;X/0 | (x < y) ? x : 0 ||
-| if X=Y&#x21a3;X/0 | (x == y) ? x : 0 ||
-| if Y>X&#x21a3;X/0 | (y > x) ? x : 0 ||
-| if Y<X&#x21a3;X/0 | (y < x) ? x : 0 ||
-| if X>Y&#x21a3;Y/0 | (x > y) ? y : 0 ||
-| if X<Y&#x21a3;Y/0 | (x < y) ? y : 0 ||
-| if X=Y&#x21a3;Y/0 | (x == y) ? y : 0 ||
-| if Y>X&#x21a3;Y/0 | (y > x) ? y : 0 ||
-| if Y<X&#x21a3;Y/0 | (y < x) ? y : 0 ||
-| if X>C&#x21a3;Y/0 | (x > c) ? y : 0 ||
-| if X<C&#x21a3;Y/0 | (x < c) ? y : 0 ||
-| if X=C&#x21a3;Y/0 | (x == c) ? y : 0 ||
-| if C>X&#x21a3;Y/0 | (c > x) ? y : 0 ||
-| if C<X&#x21a3;Y/0 | (c < x) ? y : 0 ||
-| if X>C&#x21a3;X/0 | (x > c) ? x : 0 ||
-| if X<C&#x21a3;X/0 | (x < c) ? x : 0 ||
-| if X=C&#x21a3;X/0 | (x == c) ? x : 0 ||
-| if C>X&#x21a3;X/0 | (c > x) ? x : 0 ||
-| if C<X&#x21a3;X/0 | (c < x) ? x : 0 ||
-| if X>C&#x21a3;X/Y | (x > c) ? x : y ||
-| if X<C&#x21a3;X/Y | (x < c) ? x : y ||
-| if X=C&#x21a3;X/Y | (x == c) ? x : y ||
-| if C>X&#x21a3;X/Y | (c > x) ? x : y ||
-| if C<X&#x21a3;X/Y | (c < x) ? x : y ||
-| if Y>C&#x21a3;X/0 | (y > c) ? x : 0 ||
-| if Y<C&#x21a3;X/0 | (y < c) ? x : 0 ||
-| if Y=C&#x21a3;X/0 | (y == c) ? x : 0 ||
-| if C>Y&#x21a3;X/0 | (c > y) ? x : 0 ||
-| if C<Y&#x21a3;X/0 | (c < y) ? x : 0 ||
-| if Y>C&#x21a3;Y/0 | (y > c) ? y : 0 ||
-| if Y<C&#x21a3;Y/0 | (y < c) ? y : 0 ||
-| if Y=C&#x21a3;Y/0 | (y == c) ? y : 0 ||
-| if C>Y&#x21a3;Y/0 | (c > y) ? y : 0 ||
-| if C<Y&#x21a3;Y/0 | (c < y) ? y : 0 ||
-| if Y>C&#x21a3;Y/X | (y > c) ? y : x | Y if Y is greater than C otherwise X |
-| if Y<C&#x21a3;Y/X | (y < c) ? y : x | Y if Y is less than C otherwise X |
-| if Y=C&#x21a3;Y/X | (y == c) ? y : x | Y if Y is C otherwise X |
-| if C>Y&#x21a3;Y/X | (c > y) ? y : x | Y if C is greater than Y otherwise X |
-| if C<Y&#x21a3;Y/X | (c < y) ? y : x | Y if C is less than Y otherwise X |
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td> if X>0&#x21a3;Y/C </td><td> (x > 0) ? y : c </td><td> Y if X is greater than 0 otherwise C </td></tr>
+<tr><td> if X<0&#x21a3;Y/C </td><td> (x < 0) ? y : c </td><td> Y if X is less than 0 otherwise C </td></tr>
+<tr><td> if X=0&#x21a3;Y/C </td><td> (x == 0) ? y : c </td><td> Y if X is 0 otherwise C </td></tr>
+<tr><td> if X>0&#x21a3;C/Y </td><td> (x > 0) ? c : y </td><td> C if X is greater than 0 otherwise Y </td></tr>
+<tr><td> if X<0&#x21a3;C/Y </td><td> (x < 0) ? c : y </td><td> C if X is less that 0 otherwise Y </td></tr>
+<tr><td> if X=0&#x21a3;C/Y </td><td> (x == 0) ? c : y </td><td> C if X is 0 otherwise Y </td></tr>
+<tr><td> if X>0&#x21a3;1/0 </td><td> (x > 0) ? 1 : 0 </td><td> 1 if X is greater than 0 otherwise 0 </td></tr>
+<tr><td> if X<0&#x21a3;1/0 </td><td> (x < 0) ? 1 : 0 </td><td></td></tr>
+<tr><td> if X=0&#x21a3;1/0 </td><td> (x == 0) ? 1 : 0 </td><td></td></tr>
+<tr><td> if X>0&#x21a3;X/C </td><td> (x > 0) ? x : c </td><td> X if X is greater than 0 otherwise C </td></tr>
+<tr><td> if X<0&#x21a3;X/C </td><td> (x < 0) ? x : c </td><td></td></tr>
+<tr><td> if X=0&#x21a3;X/C </td><td> (x == 0) ? x : c </td><td></td></tr>
+<tr><td> if X>0&#x21a3;C/X </td><td> (x > 0) ? c : x </td><td> C if X is greater than 0 otherwise X </td></tr>
+<tr><td> if X<0&#x21a3;C/X </td><td> (x < 0) ? c : x </td><td></td></tr>
+<tr><td> if X=0&#x21a3;C/X </td><td> (x == 0) ? c : x </td><td></td></tr>
+<tr><td> if Y>0&#x21a3;X/C </td><td> (y > 0) ? x : c </td><td> X if Y is greater than 0 otherwise C </td></tr>
+<tr><td> if Y<0&#x21a3;X/C </td><td> (y < 0) ? x : c </td><td></td></tr>
+<tr><td> if Y=0&#x21a3;X/C </td><td> (y == 0) ? x : c </td><td></td></tr>
+<tr><td> if Y>0&#x21a3;C/X </td><td> (y > 0) ? c : x </td><td> C if Y is greater than 0 otherwise X </td></tr>
+<tr><td> if Y<0&#x21a3;C/X </td><td> (y < 0) ? c : x </td><td></td></tr>
+<tr><td> if Y=0&#x21a3;C/X </td><td> (y == 0) ? c : x </td><td></td></tr>
+<tr><td> if Y>0&#x21a3;1/0 </td><td> (y > 0) ? 1 : 0 </td><td></td></tr>
+<tr><td> if Y<0&#x21a3;1/0 </td><td> (y < 0) ? 1 : 0 </td><td></td></tr>
+<tr><td> if Y=0&#x21a3;1/0 </td><td> (y == 0) ? 1 : 0 </td><td></td></tr>
+<tr><td> if Y>0&#x21a3;Y/C </td><td> (y > 0) ? y : c </td><td></td></tr>
+<tr><td> if Y<0&#x21a3;Y/C </td><td> (y < 0) ? y : c </td><td></td></tr>
+<tr><td> if Y=0&#x21a3;Y/C </td><td> (y == 0) ? y : c </td><td></td></tr>
+<tr><td> if Y>0&#x21a3;C/Y </td><td> (y > 0) ? c : y </td><td></td></tr>
+<tr><td> if Y<0&#x21a3;C/Y </td><td> (y < 0) ? c : y </td><td></td></tr>
+<tr><td> if Y=0&#x21a3;C/Y </td><td> (y == 0) ? c : y </td><td></td></tr>
+<tr><td> if X>Y&#x21a3;C/0 </td><td> (x > y) ? c : 0 </td><td> C if X is greater than Y otherwise 0 </td></tr>
+<tr><td> if X<Y&#x21a3;C/0 </td><td> (x < y) ? c : 0 </td><td></td></tr>
+<tr><td> if X=Y&#x21a3;C/0 </td><td> (x == y) ? c : 0 </td><td></td></tr>
+<tr><td> if Y>X&#x21a3;C/0 </td><td> (y > x) ? c : 0 </td><td></td></tr>
+<tr><td> if Y<X&#x21a3;C/0 </td><td> (y < x) ? c : 0 </td><td></td></tr>
+<tr><td> if X>Y&#x21a3;X/0 </td><td> (x > y) ? x : 0 </td><td> X if X is greater than Y otherwise 0 </td></tr>
+<tr><td> if X<Y&#x21a3;X/0 </td><td> (x < y) ? x : 0 </td><td></td></tr>
+<tr><td> if X=Y&#x21a3;X/0 </td><td> (x == y) ? x : 0 </td><td></td></tr>
+<tr><td> if Y>X&#x21a3;X/0 </td><td> (y > x) ? x : 0 </td><td></td></tr>
+<tr><td> if Y<X&#x21a3;X/0 </td><td> (y < x) ? x : 0 </td><td></td></tr>
+<tr><td> if X>Y&#x21a3;Y/0 </td><td> (x > y) ? y : 0 </td><td></td></tr>
+<tr><td> if X<Y&#x21a3;Y/0 </td><td> (x < y) ? y : 0 </td><td></td></tr>
+<tr><td> if X=Y&#x21a3;Y/0 </td><td> (x == y) ? y : 0 </td><td></td></tr>
+<tr><td> if Y>X&#x21a3;Y/0 </td><td> (y > x) ? y : 0 </td><td></td></tr>
+<tr><td> if Y<X&#x21a3;Y/0 </td><td> (y < x) ? y : 0 </td><td></td></tr>
+<tr><td> if X>C&#x21a3;Y/0 </td><td> (x > c) ? y : 0 </td><td></td></tr>
+<tr><td> if X<C&#x21a3;Y/0 </td><td> (x < c) ? y : 0 </td><td></td></tr>
+<tr><td> if X=C&#x21a3;Y/0 </td><td> (x == c) ? y : 0 </td><td></td></tr>
+<tr><td> if C>X&#x21a3;Y/0 </td><td> (c > x) ? y : 0 </td><td></td></tr>
+<tr><td> if C<X&#x21a3;Y/0 </td><td> (c < x) ? y : 0 </td><td></td></tr>
+<tr><td> if X>C&#x21a3;X/0 </td><td> (x > c) ? x : 0 </td><td></td></tr>
+<tr><td> if X<C&#x21a3;X/0 </td><td> (x < c) ? x : 0 </td><td></td></tr>
+<tr><td> if X=C&#x21a3;X/0 </td><td> (x == c) ? x : 0 </td><td></td></tr>
+<tr><td> if C>X&#x21a3;X/0 </td><td> (c > x) ? x : 0 </td><td></td></tr>
+<tr><td> if C<X&#x21a3;X/0 </td><td> (c < x) ? x : 0 </td><td></td></tr>
+<tr><td> if X>C&#x21a3;X/Y </td><td> (x > c) ? x : y </td><td></td></tr>
+<tr><td> if X<C&#x21a3;X/Y </td><td> (x < c) ? x : y </td><td></td></tr>
+<tr><td> if X=C&#x21a3;X/Y </td><td> (x == c) ? x : y </td><td></td></tr>
+<tr><td> if C>X&#x21a3;X/Y </td><td> (c > x) ? x : y </td><td></td></tr>
+<tr><td> if C<X&#x21a3;X/Y </td><td> (c < x) ? x : y </td><td></td></tr>
+<tr><td> if Y>C&#x21a3;X/0 </td><td> (y > c) ? x : 0 </td><td></td></tr>
+<tr><td> if Y<C&#x21a3;X/0 </td><td> (y < c) ? x : 0 </td><td></td></tr>
+<tr><td> if Y=C&#x21a3;X/0 </td><td> (y == c) ? x : 0 </td><td></td></tr>
+<tr><td> if C>Y&#x21a3;X/0 </td><td> (c > y) ? x : 0 </td><td></td></tr>
+<tr><td> if C<Y&#x21a3;X/0 </td><td> (c < y) ? x : 0 </td><td></td></tr>
+<tr><td> if Y>C&#x21a3;Y/0 </td><td> (y > c) ? y : 0 </td><td></td></tr>
+<tr><td> if Y<C&#x21a3;Y/0 </td><td> (y < c) ? y : 0 </td><td></td></tr>
+<tr><td> if Y=C&#x21a3;Y/0 </td><td> (y == c) ? y : 0 </td><td></td></tr>
+<tr><td> if C>Y&#x21a3;Y/0 </td><td> (c > y) ? y : 0 </td><td></td></tr>
+<tr><td> if C<Y&#x21a3;Y/0 </td><td> (c < y) ? y : 0 </td><td></td></tr>
+<tr><td> if Y>C&#x21a3;Y/X </td><td> (y > c) ? y : x </td><td> Y if Y is greater than C otherwise X </td></tr>
+<tr><td> if Y<C&#x21a3;Y/X </td><td> (y < c) ? y : x </td><td> Y if Y is less than C otherwise X </td></tr>
+<tr><td> if Y=C&#x21a3;Y/X </td><td> (y == c) ? y : x </td><td> Y if Y is C otherwise X </td></tr>
+<tr><td> if C>Y&#x21a3;Y/X </td><td> (c > y) ? y : x </td><td> Y if C is greater than Y otherwise X </td></tr>
+<tr><td> if C<Y&#x21a3;Y/X </td><td> (c < y) ? y : x </td><td> Y if C is less than Y otherwise X </td></tr>
+</table>
+
+## Rounding
+
+<table>
+<thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
+<tr><td>&#x230a;X+C&#x230b;</td><td> floor(x + c) </td><td>Round down x and c</td></tr>
+<tr><td>&#x230a;Y+C&#x230b;</td><td> floor(y + c) </td><td>Round down y and c</td></tr>
+<tr><td>&#x230a;X+Y+C&#x230b;</td><td> floor(x + y + c) </td><td>Round down x and y and c</td></tr>
+<tr><td>&#x230a;CX&#x230b;</td><td> floor(x * c) </td><td>Round down x by c</td></tr>
+<tr><td>&#x230a;CY&#x230b;</td><td> floor(y * c) </td><td>Round down x by c</td></tr>
+<tr><td>&#x230a;CXY&#x230b;</td><td> floor(x * y * c) </td><td>Round down x by y by c</td></tr>
+<tr><td>&#x2308;X+C&#x2309;</td><td> ceil(x + c) </td><td>Round up x and c</td></tr>
+<tr><td>&#x2308;Y+C&#x2309;</td><td> ceil(y + c) </td><td>Round up y and c</td></tr>
+<tr><td>&#x2308;X+Y+C&#x2309;</td><td> ceil(x + y + c) </td><td>Round up x and y and c</td></tr>
+<tr><td>&#x2308;CX&#x2309;</td><td> ceil(x * c) </td><td>Round up x by c</td></tr>
+<tr><td>&#x2308;CY&#x2309;</td><td> ceil(y * c) </td><td>Round up x by c</td></tr>
+<tr><td>&#x2308;CXY&#x2309;</td><td> ceil(x * y * c) </td><td>Round up x by y by c</td></tr>
+</table>
