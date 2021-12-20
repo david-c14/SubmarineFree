@@ -262,7 +262,6 @@
 
 <table>
 <thead><th> Display                  </th><th> Code               </th><th> Description          </th></thead>
-<tr><td> if X>0&#x21a3;Y/C </td><td> (x > 0) ? y : c </td><td> Y if X is greater than 0 otherwise C </td></tr>
 <tr><td>&#x230a;X+C&#x230b;</td><td> floor(x + c) </td><td>Round down x and c</td></tr>
 <tr><td>&#x230a;Y+C&#x230b;</td><td> floor(y + c) </td><td>Round down y and c</td></tr>
 <tr><td>&#x230a;X+Y+C&#x230b;</td><td> floor(x + y + c) </td><td>Round down x and y and c</td></tr>
