@@ -1,6 +1,7 @@
 # Changelog
 
 ## v2.0.4
+- 22-Dec-2021 Add AO-101 module
 - 20-Dec-2021 Fix bug #186 missing algorithms is AO-1xx manual
 - 18-Dec-2021 Fix bug #185 html tables in manual
 

@@ -413,8 +413,7 @@ namespace {
 #undef RF
 
 	struct AOFuncDisplay : Knob {
-		Module *module;
-		int index;
+		int index = 0;
 		AOFuncDisplay() {
 			box.size.x = 80;
 			box.size.y = 15;
@@ -436,8 +435,7 @@ namespace {
 	};
 
 	struct AOConstDisplay : Knob {
-		Module *module;
-		int index;
+		int index = 0;
 		AOConstDisplay() {
 			box.size.x = 80;
 			box.size.y = 15;
@@ -455,6 +453,48 @@ namespace {
 				nvgText(args.vg, 41.5, 13, mtext, NULL);
 			}
 			Widget::drawLayer(args, layer);
+		}
+	};
+
+	struct AOFuncDisplayR : AOFuncDisplay {
+		AOFuncDisplayR() {
+			box.size.x = 16;
+			box.size.y = 80;
+			snap = true;
+			smooth = false;
+			speed = 0.5f;
+		}
+		void onHover(const HoverEvent &e) override {
+			ParamWidget::onHover(e);
+		}
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if ((layer) == 1 && module) {
+				nvgTranslate(args.vg, 0, box.size.y);
+				nvgRotate(args.vg, M_PI / -2);
+			}
+			AOFuncDisplay::drawLayer(args, layer);
+		}
+	};
+
+	struct AOConstDisplayR : AOConstDisplay {
+		AOConstDisplayR() {
+			box.size.x = 16;
+			box.size.y = 80;
+			snap = true;
+			speed = 0.005;
+		}
+		void onHover(const HoverEvent &e) override {
+			ParamWidget::onHover(e);
+		}
+		void onButton(const ButtonEvent &e) override {
+			ParamWidget::onButton(e);
+		}
+		void drawLayer(const DrawArgs &args, int layer) override {
+			if ((layer == 1) && module) {
+				nvgTranslate(args.vg, 0, box.size.y);
+				nvgRotate(args.vg, M_PI / -2);
+			}
+			AOConstDisplay::drawLayer(args, layer);
 		}
 	};
 
@@ -490,7 +530,7 @@ struct AO1 : Module {
 	};
 	enum LightIds {
 		NUM_LIGHTS
-};
+	};
 
 	AO1() : Module() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -529,6 +569,52 @@ struct AO1 : Module {
 		for (unsigned int ix = 0; ix < x; ix++) {
 			outputs[OUTPUT_X_1 + ix].setVoltage(std::isfinite(vx[ix])?vx[ix]:0.0f);
 		}
+	}
+};
+
+struct AO101 : Module {
+	enum ParamIds {
+		PARAM_FUNC,
+		PARAM_CONST,
+		NUM_PARAMS
+	};
+	enum InputIds {
+		INPUT_X,
+		INPUT_Y,
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		OUTPUT,
+		NUM_OUTPUTS
+	};
+	enum LightIds {
+		NUM_LIGHTS
+	};
+
+	AO101() : Module() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		
+		std::vector<std::string> descriptions = AOGetDescriptions();
+		configSwitch(PARAM_FUNC, 0.0f, functions.size() - 1.0f, 0.0f, "Algorithm", descriptions);
+		configParam(PARAM_CONST, -10000.0f, 10000.0f, 0.0f, "Constant", "", 0.f, 0.01f);
+		configInput(INPUT_X, "Signal X");
+		configInput(INPUT_Y, "Signal Y");
+		configOutput(OUTPUT, "Signal");
+		
+	};
+	void process(const ProcessArgs &args) override {
+		
+		float x = inputs[INPUT_X].getVoltageSum();
+		float y = inputs[INPUT_Y].getVoltageSum();
+		unsigned int f = params[PARAM_FUNC].getValue();
+		if (f >= functions.size()) {
+			f = functions.size() - 1;
+		}
+		if (f > 0) {
+			x = functions[f].func(x, y, ((int)params[PARAM_CONST].getValue())/100.0f);
+		}
+		outputs[OUTPUT].setVoltage(std::isfinite(x)?x:0.0f);
+		
 	}
 };
 
@@ -652,12 +738,10 @@ struct AOWidget : SchemeModuleWidget {
 		for (unsigned int iy = 0; iy < y; iy++) {
 			for (unsigned int ix = 0; ix < x; ix++) {
 				AOFuncDisplay *fd = createParam<AOFuncDisplay>(Vec(42.5 + 90 * iy, 59 + 46 * ix), module, AO1<x,y>::PARAM_FUNC_1 + ix + iy * x);
-				fd->module = module;
 				fd->index = AO1<x,y>::PARAM_FUNC_1 + ix + iy * x;
 				addParam(fd);
 				funcDisplay[iy * x + ix] = fd;
 				AOConstDisplay *cd = createParam<AOConstDisplay>(Vec(42.5 + 90 * iy, 78 + 46 * ix), module, AO1<x,y>::PARAM_CONST_1 + ix + iy * x);
-				cd->module = module;
 				cd->index = AO1<x,y>::PARAM_CONST_1 + ix + iy * x;
 				addParam(cd);
 				constDisplay[iy * x + ix] = cd;
@@ -776,6 +860,39 @@ struct AOWidget : SchemeModuleWidget {
 	}
 };
 
+struct AO_101 : SchemeModuleWidget {
+	AO_101(AO101 *module) {
+		setModule(module);
+		this->box.size = Vec(30, 380);
+		addChild(new SchemePanel(this->box.size));
+		
+		addInput(createInputCentered<SilverPort>(Vec(15, 45), module, AO101::INPUT_X));
+		addInput(createInputCentered<SilverPort>(Vec(15, 90), module, AO101::INPUT_Y));
+		addOutput(createOutputCentered<SilverPort>(Vec(15, 320), module, AO101::OUTPUT));
+		AOFuncDisplayR *fd = createParam<AOFuncDisplayR>(Vec(7, 125), module, AO101::PARAM_FUNC);
+		fd->index = AO101::PARAM_FUNC;
+		addParam(fd);
+
+		AOConstDisplayR *cd = createParam<AOConstDisplayR>(Vec(7, 215), module, AO101::PARAM_CONST);
+		cd->index = AO101::PARAM_CONST;
+		addParam(cd);
+		
+	}
+	void render(NVGcontext *vg, SchemeCanvasWidget *canvas) override {
+		drawBase(vg, "AO-101");
+		drawText(vg, 15, 68, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "X");
+		drawText(vg, 15, 113, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "Y");
+		drawText(vg, 15, 343, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE, 8, gScheme.getContrast(module), "OUT");
+		nvgFillColor(vg, nvgRGB(0,0,0));
+		nvgBeginPath(vg);
+		nvgRect(vg, 7, 125, 16, 80);
+		nvgRect(vg, 7, 215, 16, 80);
+		nvgFill(vg);
+		
+	}
+};
+
+Model *modelAO101 = createModel<AO101, AO_101>("A0-101");
 Model *modelAO106 = createModel<AO1<6,1>, AOWidget<6,1>>("A0-106");
 Model *modelAO112 = createModel<AO1<6,2>, AOWidget<6,2>>("A0-112");
 Model *modelAO118 = createModel<AO1<6,3>, AOWidget<6,3>>("A0-118");
