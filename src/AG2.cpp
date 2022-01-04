@@ -52,7 +52,7 @@ struct AG_2 : DS_Module {
 			accumulator &= getInput(channels, 0xFFFF, INPUT_B_1 + i);
 			accumulator &= getInput(channels, 0xFFFF, INPUT_C_1 + i);
 			accumulator &= getInput(channels, 0xFFFF, INPUT_D_1 + i);
-			setOutput(channels, OUTPUT_1, accumulator);
+			setOutput(channels, OUTPUT_1 + i, accumulator);
 		}
 	}
 };

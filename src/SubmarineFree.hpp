@@ -11,6 +11,7 @@ extern Model *modelAG104;
 extern Model *modelAG106;
 extern Model *modelAG202;
 
+extern Model *modelAO101;
 extern Model *modelAO106;
 extern Model *modelAO112;
 extern Model *modelAO118;

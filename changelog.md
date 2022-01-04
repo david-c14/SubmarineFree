@@ -1,6 +1,10 @@
 # Changelog
 
 ## v2.0.4
+- 04-Jan-2022 Update CI pipelines to SDK v2.0.5
+- 04-Jan-2022 Fix resizing issue with TD-316
+- 04-Jan-2022 Fix bug #193 incorrect wiring for AG-202, OG-202 and XG-202 devices
+- 22-Dec-2021 Add AO-101 module
 - 20-Dec-2021 Fix bug #186 missing algorithms is AO-1xx manual
 - 18-Dec-2021 Fix bug #185 html tables in manual
 
