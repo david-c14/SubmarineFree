@@ -124,17 +124,17 @@ struct TD316 : SchemeModuleWidget {
 
 	TD316(TD_316 *module) {
 		setModule(module);
-		this->box.size = Vec(240, 380);
+		this->box.size = Vec(module ? (module->moduleSize) : 240, 380);
 		schemePanel = new SchemePanel(this->box.size, 75.0f, 300.0f);
 		schemePanel->resizeHandler = [=]() { onResized(); }; 
 		addChild(schemePanel);
 
 		textField = createWidget<TD3Text>(Vec(4, 18));
-		textField->box.size = Vec(232, 344);
+		textField->box.size = Vec(box.size.x - 8, 344);
 		textField->multiline = true;
 		addChild(textField);
 		addChild(createLightCentered<RightLight>(Vec(3, 14), module, 0));
-		light = createLightCentered<LeftLight>(Vec(237, 14), module, 1);
+		light = createLightCentered<LeftLight>(Vec(box.size.x - 3, 14), module, 1);
 		addChild(light);
 
 	}
@@ -191,6 +191,7 @@ struct TD316 : SchemeModuleWidget {
 	}
 
 	void onResize(const event::Resize &e) override {
+		ModuleWidget::onResize(e);
 		onResized();
 	}
 	void onResized() {

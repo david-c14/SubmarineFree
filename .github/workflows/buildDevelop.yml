@@ -4,7 +4,7 @@ on:
     - develop
 name: Develop
 env:
-  RACK_SDK_VERSION: 2.0.4
+  RACK_SDK_VERSION: 2.0.5
 jobs:
   buildLinux:
     name: Build Linux
