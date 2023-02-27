@@ -1,7 +1,7 @@
 # SubmarineFree 
 Free plugins for VCV Rack
 
-![](https://img.shields.io/github/workflow/status/david-c14/SubmarineFree/Release?label=Release) ![](https://img.shields.io/github/workflow/status/david-c14/SubmarineFree/Develop?label=Develop) ![](https://img.shields.io/github/v/release/david-c14/SubmarineFree?label=Latest) ![](https://img.shields.io/github/release-date/david-c14/SubmarineFree?label=Released) ![](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![](https://img.shields.io/github/actions/workflow/status/david-c14/SubmarineFree/buildRelease.yml?label=Release) ![](https://img.shields.io/actions/github/workflow/status/david-c14/SubmarineFree/buildDevelop.yml?label=Develop) ![](https://img.shields.io/github/v/release/david-c14/SubmarineFree?label=Latest) ![](https://img.shields.io/github/release-date/david-c14/SubmarineFree?label=Released) ![](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 [.plan (what I'm working on)](https://github.com/david-c14/SubmarineFree/issues/23)
 
