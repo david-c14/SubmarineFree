@@ -11,7 +11,7 @@ jobs:
     name: Build Linux
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089
     - name: Build Linux
       uses: ./.github/actions/build_linux
     - name: upload zip
@@ -20,7 +20,7 @@ jobs:
     name: Build Windows
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089
     - name: Build Windows
       uses: ./.github/actions/build_win
     - name: upload zip
@@ -29,7 +29,7 @@ jobs:
     name: Build OSX
     runs-on: macos-10.15
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089
     - name: install tools
       run: brew install automake
     - name: get Rack-SDK
