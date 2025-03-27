@@ -10,6 +10,6 @@ jobs:
     name: Build Linux
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089
     - name: Build Linux
       uses: ./.github/actions/build_linux
